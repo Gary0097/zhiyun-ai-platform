@@ -1,0 +1,20 @@
+{
+  "id": "zhiyun-logo",
+  "name": "AI-OS Logo 配置",
+  "version": "1.0.0",
+  "type": "general",
+  "description": "仅替换 QwenPaw 顶部 Logo；不创建桌面应用，不修改对话和主题。",
+  "author": "Zhiyun AI",
+  "entry": {
+    "backend": "logo_plugin.py",
+    "frontend": "ui/index.js"
+  },
+  "dependencies": [],
+  "qwenpaw_version": {
+    "min": "2.1.0",
+    "max": "2.2.0"
+  },
+  "meta": {
+    "features": ["configurable-header-logo"]
+  }
+}
