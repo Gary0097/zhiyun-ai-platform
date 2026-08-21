@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Any, Iterable
 
 CATALOG_FILE = Path(__file__).with_name("app_catalog.json")
+PROGRESS_FILE = Path(__file__).with_name("feature_progress.json")
+DELIVERY_STATUSES = {"planned", "in_progress", "testing", "completed"}
 
 SYNONYMS = {
     "订单风险": ["交付风险", "延期概率", "高风险订单"],
@@ -28,6 +30,42 @@ def load_catalog(path: Path = CATALOG_FILE) -> dict[str, Any]:
     if catalog.get("schema_version") != 1 or not isinstance(catalog.get("apps"), list):
         raise ValueError("unsupported app catalog")
     return catalog
+
+
+def load_progress(path: Path = PROGRESS_FILE) -> dict[str, Any]:
+    """Load and validate the 31-item PRD delivery ledger."""
+    ledger = json.loads(path.read_text(encoding="utf-8"))
+    features = ledger.get("features")
+    if ledger.get("schema_version") != 1 or not isinstance(features, list):
+        raise ValueError("unsupported feature progress ledger")
+    ids = [item.get("id") for item in features]
+    if sorted(ids) != list(range(1, 32)) or len(ids) != len(set(ids)):
+        raise ValueError("feature progress must contain unique IDs 1..31")
+    for item in features:
+        if item.get("status") not in DELIVERY_STATUSES:
+            raise ValueError(f"unsupported delivery status for feature {item.get('id')}")
+        progress = item.get("progress")
+        if not isinstance(progress, int) or not 0 <= progress <= 100:
+            raise ValueError(f"invalid progress for feature {item.get('id')}")
+    return ledger
+
+
+def progress_summary(ledger: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Build an honest project summary from the feature ledger."""
+    data = ledger or load_progress()
+    features = data["features"]
+    counts = {status: 0 for status in DELIVERY_STATUSES}
+    for item in features:
+        counts[item["status"]] += 1
+    return {
+        "total": len(features),
+        "completed": counts["completed"],
+        "testing": counts["testing"],
+        "in_progress": counts["in_progress"],
+        "planned": counts["planned"],
+        "overall_progress": round(sum(item["progress"] for item in features) / len(features)),
+        "updated_at": data.get("updated_at"),
+    }
 
 
 def _normalize(value: str) -> str:
@@ -123,13 +161,19 @@ def search_apps(
 def agent_response(query: str, limit: int = 3) -> dict[str, Any]:
     """Return an Agent-safe response sourced only from the real catalog."""
     results = search_apps(query, limit=limit)
+    available = any(item["install_status"] == "installed" for item in results)
     return {
         "query": query,
         "found": bool(results),
+        "available": available,
         "results": results,
         "message": (
             "已从真实应用能力索引找到可用应用。"
-            if results
-            else "真实应用目录中暂无匹配能力，不会虚构应用。"
+            if available
+            else (
+                "找到规划能力，但对应应用尚未开发，当前不可用。"
+                if results
+                else "真实应用目录中暂无匹配能力，不会虚构应用。"
+            )
         ),
     }
