@@ -1,11 +1,12 @@
 {
   "id": "zhiyun-brand",
   "name": "智造云 AI-OS 品牌扩展",
-  "version": "0.1.0",
-  "description": "通过 QwenPaw 官方扩展接口配置企业品牌与对话欢迎页。",
+  "version": "0.2.0",
+  "description": "同步企业品牌、配置 QwenPaw 对话欢迎页，并提供企业服务只读状态工具。",
   "author": "Zhiyun AI",
-  "type": "frontend",
+  "type": "general",
   "entry": {
+    "backend": "backend/main.py",
     "frontend": "ui/index.js"
   },
   "qwenpaw_version": {
@@ -13,6 +14,6 @@
     "max": "2.2.0"
   },
   "meta": {
-    "features": ["branding", "chat-welcome"]
+    "features": ["branding", "chat-welcome", "enterprise-health-tool"]
   }
 }

@@ -61,7 +61,8 @@ const server = createServer(async (req, res) => {
     }
     if (!matched) { res.writeHead(404, { 'content-type': 'application/json' }).end(JSON.stringify({ error: '接口不存在' })); return }
 
-    const needsAuth = path !== '/api/auth/login'
+    // 公开端点必须由路由显式声明，避免未来新增 API 被意外暴露。
+    const needsAuth = !matched.public && path !== '/api/auth/login'
     const user = needsAuth ? authenticate(req) : null
     const data = await matched.handler(req, res, { user, params })
     if (!res.writableEnded) res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' }).end(JSON.stringify(data ?? { ok: true }))
@@ -73,6 +74,5 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`智造云企业 AI 智能体平台已启动: http://127.0.0.1:${PORT}`)
-  console.log('默认账号: admin.a / platform / admin.b / admin.c，密码统一 Zhiyun@2026')
 })
 startSchedulerLoop(30000)
