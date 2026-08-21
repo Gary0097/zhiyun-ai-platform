@@ -171,6 +171,7 @@ CREATE TABLE IF NOT EXISTS capability_policy (
 );
 
 CREATE INDEX IF NOT EXISTS idx_os_task_tenant_status ON runtime_task(tenant_id, status, updated_at);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_os_task_source ON runtime_task(tenant_id, source_type, source_id) WHERE source_type IS NOT NULL AND source_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_os_execution_task ON runtime_execution(tenant_id, task_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_os_process_state ON runtime_process(tenant_id, status, heartbeat_at);
 CREATE INDEX IF NOT EXISTS idx_os_event_trace ON runtime_event(tenant_id, trace_id, created_at);

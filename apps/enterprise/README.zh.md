@@ -59,7 +59,23 @@ Phase 0 以兼容方式加入 AI-OS 统一执行基线，现有 V2 API、表和�
 pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase0
 ```
 
-Phase 0 不迁移 WorkTask、Scheduler、Auto-run 或 DSH Session 持久化。后续通过适配器逐步迁移，且新旧调度器不得同时触发同一个业务任务。
+## AI-OS V3.1 Phase 1
+
+Phase 1 在不破坏现有 WorkTask API 的前提下，将一次性 WorkTask 执行迁移到统一运行时：
+
+- `server/os/runtime-store.js` 持久化按租户隔离的 Task、Execution、Process 和生命周期 Event。
+- `server/os/task-service.js` 将每个旧 WorkTask 幂等映射到一个 AI-OS Task，并让每次执行都经过 Kernel。
+- `GET /api/os/tasks` 与 `GET /api/os/tasks/:id` 提供按租户隔离的任务状态和执行历史查询。
+- 旧 `business_work_task` 行继续作为当前 UI 的兼容投影。
+- `scripts/verify-phase1.mjs` 覆盖来源映射幂等性、成功与失败执行持久化，以及跨租户查询隔离。
+
+运行 Phase 1 验证：
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase1
+```
+
+Scheduler、Auto-run 和 DSH Session 持久化仍留待后续迁移。新旧调度器不得同时触发同一个业务任务。
 
 ## Directory map
 

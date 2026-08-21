@@ -11,7 +11,8 @@
     "seed": "node server/db.js --reset",
     "simulate": "node server/cli.js simulate",
     "verify": "node scripts/verify.mjs",
-    "verify:phase0": "node scripts/verify-phase0.mjs"
+    "verify:phase0": "node scripts/verify-phase0.mjs",
+    "verify:phase1": "node scripts/verify-phase1.mjs"
   },
   "engines": {
     "node": ">=24"
