@@ -96,6 +96,22 @@ pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase2
 
 本阶段 Checkpoint 记录安全的尝试边界，尚不支持从被中断的模型 Turn 中间恢复。
 
+## AI-OS V3.1 Phase 3
+
+Phase 3 在不改变 DSH 传输协议的前提下，将基于 DSH 的 Auto-run 工作同步到统一运行时：
+
+- 角色模拟、报告生成、功能演示和多 Agent Turn 将持久化 DSH Session 映射为 AI-OS Task。
+- 每个成功或失败的 DSH Turn 都记录 DSH Execution、Process、生命周期 Event 和 `session.turn.completed` Checkpoint。
+- 旧运行日志、消息、Tool、模型用量和看板记录继续保留，兼容当前 UI。
+- Session 标识继续保存在原有 `business_setting` 中用于冷恢复，同时写入 Checkpoint 状态。
+- `scripts/verify-phase3.mjs` 验证 Session 幂等映射、成功与失败历史、可恢复 Session Checkpoint 和租户隔离。
+
+运行 Phase 3 验证：
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase3
+```
+
 ## Directory map
 
 ```text

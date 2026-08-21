@@ -96,6 +96,22 @@ pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase2
 
 These Checkpoints capture safe attempt boundaries; resuming inside an interrupted model turn is not part of this phase.
 
+## AI-OS V3.1 Phase 3
+
+Phase 3 mirrors DSH-backed Auto-run work into the unified runtime without changing the DSH transport:
+
+- Role simulation, report generation, feature demonstrations, and multi-Agent turns map persistent DSH Sessions to AI-OS Tasks.
+- Every completed or failed DSH turn records a DSH Execution, Process, lifecycle Events, and a `session.turn.completed` Checkpoint.
+- The legacy runtime execution, message, tool, model-usage, and dashboard records remain available for the current UI.
+- Session identifiers stay in existing `business_setting` keys for cold recovery and are also captured in Checkpoint state.
+- `scripts/verify-phase3.mjs` verifies idempotent session mapping, success and failure history, resumable session checkpoints, and tenant isolation.
+
+Run the Phase 3 verification:
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase3
+```
+
 ## Directory map
 
 ```text
