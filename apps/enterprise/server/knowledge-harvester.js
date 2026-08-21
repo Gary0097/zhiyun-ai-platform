@@ -176,19 +176,49 @@ export function exportKnowledgeDoc (tenantId) {
 
 // ---------------------------------------------------------------------------
 // 主流程：Qwen27B 阅读资料 → 生成条目 JSON → 灌库
+// 多研究包轮转：每个研究包 = 一个资料文件 + 一组主题计划；轮询索引持久化，
+// 每轮收割只跑一个包（自动循环时不同包交替，产出持续有新意）。
 // ---------------------------------------------------------------------------
 
-const HARVEST_PLAN = [
-  { topic: '企业工商与资质', prompt: '阅读工作区 web-research.md 的「工商注册信息」与「企业定位与产品体系」章节，输出 6-8 条企业基本信息知识条目（成立时间/注册资本/法定代表人/资质荣誉/经营范围/企业定位/三大产品板块等，每条一个主题）。' },
-  { topic: '产品体系与应用', prompt: '阅读工作区 web-research.md 的「企业定位与产品体系」章节，输出 6-8 条产品知识条目（每条覆盖一条产品线：枕式/立式/理料线/茶叶/给袋式/装盒装箱/液体粉末机型，含典型参数与应用行业）。' },
-  { topic: '客户市场与外贸', prompt: '阅读工作区 web-research.md 的「客户与市场」「技术团队」「企业文化与管理」章节，输出 5-7 条市场与经营知识条目（合作品牌/出口市场/电商渠道布局/推广投入/团队规模/招聘方向/企业文化）。' },
-  { topic: '行业知识衍生', prompt: '基于工作区 web-research.md 中金汉隆的产品应用行业（食品/药品/日化包装），输出 4-6 条行业应用知识条目（如食品包装机选型要点/药品装盒机参数要求/给袋式与预制袋方案对比/理料线规划），条目内容须与资料中的真实参数呼应。' },
+const RESEARCH_PACKS = [
+  {
+    file: 'web-research.md',
+    label: '企业基础资料',
+    plan: [
+      { topic: '企业工商与资质', prompt: '阅读工作区 web-research.md 的「工商注册信息」与「企业定位与产品体系」章节，输出 6-8 条企业基本信息知识条目（成立时间/注册资本/法定代表人/资质荣誉/经营范围/企业定位/三大产品板块等，每条一个主题）。' },
+      { topic: '产品体系与应用', prompt: '阅读工作区 web-research.md 的「企业定位与产品体系」章节，输出 6-8 条产品知识条目（每条覆盖一条产品线：枕式/立式/理料线/茶叶/给袋式/装盒装箱/液体粉末机型，含典型参数与应用行业）。' },
+      { topic: '客户市场与外贸', prompt: '阅读工作区 web-research.md 的「客户与市场」「技术团队」「企业文化与管理」章节，输出 5-7 条市场与经营知识条目（合作品牌/出口市场/电商渠道布局/推广投入/团队规模/招聘方向/企业文化）。' },
+      { topic: '行业知识衍生', prompt: '基于工作区 web-research.md 中金汉隆的产品应用行业（食品/药品/日化包装），输出 4-6 条行业应用知识条目（如食品包装机选型要点/药品装盒机参数要求/给袋式与预制袋方案对比/理料线规划），条目内容须与资料中的真实参数呼应。' },
+    ],
+  },
+  {
+    file: 'web-research-2.md',
+    label: '行业趋势与市场情报',
+    plan: [
+      { topic: '行业规模与增长', prompt: '阅读工作区 web-research-2.md 的「包装机械行业整体规模与趋势」章节，输出 5-7 条行业市场知识条目（全球/中国规模/出口数据/下游占比/商业模式演进，每条一个数据主题）。' },
+      { topic: '技术趋势解读', prompt: '阅读工作区 web-research-2.md 的「技术趋势」章节，输出 5-7 条技术知识条目（伺服系统/机器视觉/实时总线/柔性化换型/国产替代进程等，含具体参数）。' },
+      { topic: '细分市场与选型', prompt: '阅读工作区 web-research-2.md 的「制袋式/给袋式/枕式细分市场」章节，输出 5-7 条细分市场与设备选型知识条目（各机型规模/份额/价格带/选型口诀）。' },
+      { topic: '竞争格局与合规', prompt: '阅读工作区 web-research-2.md 的「竞争格局与高端市场差距」章节，输出 5-6 条竞争与合规知识条目（欧日中梯队/TCO 分析/换型短板/GB4806/CE/GDPR 合规挑战/政策红利）。' },
+      { topic: '企业情报补充', prompt: '阅读工作区 web-research-2.md 的「金汉隆补充情报」章节，输出 5-6 条企业情报知识条目（历史沿革/专利数量/产品线全目/展会动态/非标定位，注意与已有条目不重复的角度）。' },
+    ],
+  },
 ]
 
-const H = { running: false, lastRun: null, items: 0, error: null }
+/** 轮转索引：business_setting key，每次收割推进到下一个包 */
+function nextResearchPack () {
+  const key = 'harvest.pack.cursor'
+  const cur = Number(db.prepare('SELECT value FROM business_setting WHERE key = ?').get(key)?.value ?? 0)
+  const pack = RESEARCH_PACKS[cur % RESEARCH_PACKS.length]
+  const next = (cur + 1) % RESEARCH_PACKS.length
+  db.prepare('INSERT INTO business_setting (key, value, updated_at) VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at')
+    .run(key, String(next), now())
+  return pack
+}
+
+const H = { running: false, lastRun: null, items: 0, error: null, lastPack: null }
 
 export function harvestStatus () {
-  return { ...H, plan: HARVEST_PLAN.map(p => p.topic) }
+  return { ...H, packs: RESEARCH_PACKS.map(p => ({ label: p.label, file: p.file, topics: p.plan.map(x => x.topic) })) }
 }
 
 /**
@@ -200,8 +230,10 @@ export async function runKnowledgeHarvest (user = null) {
   H.running = true; H.error = null
   const jhl = db.prepare("SELECT id, code, name FROM business_tenant WHERE code = 'jhl'").get()
   if (!jhl) { H.running = false; throw new Error('金汉隆租户不存在') }
-  const researchFile = join(DATA_DIR, 'workspaces', jhl.code, 'web-research.md')
-  if (!existsSync(researchFile)) { H.running = false; throw new Error('web-research.md 不存在') }
+  const pack = nextResearchPack()
+  H.lastPack = pack.label
+  const researchFile = join(DATA_DIR, 'workspaces', jhl.code, pack.file)
+  if (!existsSync(researchFile)) { H.running = false; throw new Error(`${pack.file} 不存在`) }
   const kbId = ensureKnowledgeBase(jhl.id)
   let sessionId = null
   let totalItems = 0
@@ -209,8 +241,8 @@ export async function runKnowledgeHarvest (user = null) {
     sessionId = await ensureSession(jhl.id, 'research')
     activeSessions.add(sessionId)
     startHarvestListener()
-    trace(`知识收割启动（${HARVEST_PLAN.length} 个主题，会话 ${sessionId.slice(0, 20)}…）`)
-    for (const plan of HARVEST_PLAN) {
+    trace(`知识收割启动（研究包「${pack.label}」${pack.plan.length} 个主题，会话 ${sessionId.slice(0, 20)}…）`)
+    for (const plan of pack.plan) {
       const question = `${plan.prompt}\n\n严格输出 JSON 数组（不要 markdown 代码块，不要其他文字）：[{"title":"条目标题","content":"条目正文（100-300字，自包含、可供检索）","tags":"分类标签"}]`
       try {
         const turn = await runTurn(sessionId, question)
