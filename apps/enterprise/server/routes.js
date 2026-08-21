@@ -11,7 +11,6 @@ import { FUNCTION_CATALOG, catalogByModule } from './function-catalog.js'
 import { runKnowledgeHarvest, harvestStatus } from './knowledge-harvester.js'
 import { modelInfo } from './llm.js'
 import { runtimeStore, taskService } from './os/runtime.js'
-import { runQwenPawReadTool, verifyQwenPawRequest } from './qwenpaw-gateway.js'
 
 export function route (method, path, handler, opts = {}) {
   return { method, path, handler, ...opts }
@@ -19,12 +18,6 @@ export function route (method, path, handler, opts = {}) {
 
 const J = (d) => JSON.stringify(d)
 const readBody = (req) => new Promise((resolve) => { let b = ''; req.on('data', c => { b += c }); req.on('end', () => { try { resolve(b ? JSON.parse(b) : {}) } catch { resolve({}) } }) })
-const readRawBody = (req, limit = 64 * 1024) => new Promise((resolve, reject) => {
-  const chunks = []; let size = 0
-  req.on('data', c => { size += c.length; if (size > limit) reject(Object.assign(new Error('请求体过大'), { status: 413 })); else chunks.push(c) })
-  req.on('end', () => resolve(Buffer.concat(chunks)))
-  req.on('error', reject)
-})
 
 // 可通过数据管理中心编辑的业务表白名单
 const EDITABLE_TABLES = ['business_customer', 'business_order', 'business_inventory', 'business_finance', 'business_after_sale', 'business_department']
@@ -157,7 +150,7 @@ export function buildRoutes () {
 
   // ---- QwenPaw 企业集成：公开健康/品牌读取，管理写入仍受 system:manage 保护 ----
   H('GET', '/api/health', () => ({
-    status: 'ok', service: 'zhiyun-enterprise', version: '4.0-q2', runtime: 'qwenpaw-control-plane'
+    status: 'legacy', service: 'zhiyun-enterprise', version: 'migration-only', runtime: 'deprecated-control-plane'
   }), { public: true })
   H('GET', '/api/public/brand', () => {
     const get = (k) => db.prepare('SELECT value FROM business_setting WHERE key = ?').get(k)?.value || ''
@@ -167,13 +160,6 @@ export function buildRoutes () {
       primaryColor: get('brand.primary_color') || '#1677ff',
       logo: get('brand.logo') ? '/logo.png' : ''
     }
-  }, { public: true })
-  H('POST', '/api/integrations/qwenpaw/tools/read', async (req) => {
-    const raw = await readRawBody(req)
-    const externalIdentity = verifyQwenPawRequest(req, raw)
-    let body
-    try { body = JSON.parse(raw.toString('utf8') || '{}') } catch { throw Object.assign(new Error('请求 JSON 无效'), { status: 400 }) }
-    return runQwenPawReadTool({ externalIdentity, toolName: String(body.tool || ''), args: body.args || {} })
   }, { public: true })
 
   // ---- 系统设置（品牌 / Logo / QwenPaw 工作台入口）----
