@@ -6,7 +6,8 @@
 
 | 项目 | 当前约定 |
 | --- | --- |
-| UI 与 Logo | 使用 QwenPaw 原生实现 |
+| UI | 使用 QwenPaw 原生实现 |
+| Logo | 独立轻量插件，可替换，不改变桌面和对话功能 |
 | 进程 | `qwenpaw app` 单进程 |
 | Web 地址 | `http://127.0.0.1:8088` |
 | 8390 企业服务 | 停用，不属于当前运行方案 |
@@ -21,7 +22,9 @@
 - Windows：双击仓库根目录 `start-ai-os.cmd`
 - macOS/Linux：执行 `./start-ai-os.sh`
 
-启动器会重复安全地执行以下动作：停用旧 `zhiyun-brand`、`zhiyun-orders` 插件；从 Agent 配置移除旧企业与订单 Tool；安装无界面的 `zhiyun-audit`；启动原生 QwenPaw。
+启动器会重复安全地执行以下动作：停用旧 `zhiyun-brand`、`zhiyun-orders` 插件；从 Agent 配置移除旧企业与订单 Tool；安装无界面的 `zhiyun-audit` 和独立 `zhiyun-logo`；启动原生 QwenPaw。
+
+默认 Logo 为项目提供的红色 Z 字标。Windows 更换时，把新的 PNG、JPG、SVG 或 WebP 文件拖到根目录 `set-ai-os-logo.cmd` 上，然后重启 AI-OS。执行 `python apps/qwenpaw-embedded/scripts/set-logo.py --reset` 可恢复项目默认 Logo。
 
 被停用的旧插件会移动到 QwenPaw 工作目录下的 `disabled_plugins`，不会直接删除。
 
