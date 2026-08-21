@@ -124,6 +124,16 @@ Phase 4 新增独立的高风险 Tool 控制层，不建设 Capability 管理或
 - 放行的高风险写操作及所有被拦截尝试均携带 Trace ID 写入不可变审计记录。
 - `scripts/verify-phase4.mjs` 验证自动任务拦截、轻量确认、熔断、限流和参数校验。
 
+## AI-OS V3.1 Phase 5
+
+Phase 5 新增按租户隔离的 AI-OS 系统监视器：
+
+- `GET /api/os/monitor` 聚合 Task、Process、调度队列、失败、Checkpoint、Runner 和风险控制状态。
+- 新增“AI-OS 监视器”页面，展示 KPI、状态分布、最近执行、Trace 链接和高风险放行/拦截记录。
+- 所有监视器查询均按当前认证租户约束，并要求 `stats:view` 权限。
+- 监视器只读，不增加进程控制或数据修改操作。
+- `scripts/verify-phase5.mjs` 验证监控 KPI、执行与风险信息流及跨租户隔离。
+
 ## Directory map
 
 ```text

@@ -105,4 +105,31 @@ export class RuntimeStore {
       checkpoints: this.db.prepare('SELECT * FROM runtime_checkpoint WHERE task_id=? AND tenant_id=? ORDER BY created_at DESC').all(taskId, tenantId)
     }
   }
+
+  monitorSnapshot ({ tenantId, limit = 50 }) {
+    const size = Math.min(Math.max(Number(limit) || 50, 1), 100)
+    const grouped = (table, column) => this.db.prepare(`SELECT ${column} status, COUNT(*) count FROM ${table} WHERE tenant_id=? GROUP BY ${column}`).all(tenantId)
+    const recentExecutions = this.db.prepare(`SELECT e.execution_id, e.task_id, t.title, e.runner, e.trigger_type, e.status,
+      e.trace_id, e.retry_count, e.started_at, e.finished_at, e.error_message
+      FROM runtime_execution e JOIN runtime_task t ON t.task_id=e.task_id
+      WHERE e.tenant_id=? ORDER BY e.created_at DESC LIMIT ?`).all(tenantId, size)
+    const risks = this.db.prepare(`SELECT audit_id, category, trace_id, payload, created_at FROM audit_audit_log
+      WHERE tenant_id=? AND category IN ('risk.high.allowed','risk.blocked') ORDER BY audit_id DESC LIMIT ?`).all(tenantId, size)
+      .map(row => { try { return { ...row, payload: JSON.parse(row.payload) } } catch { return row } })
+    return {
+      kpi: {
+        tasks: this.db.prepare('SELECT COUNT(*) count FROM runtime_task WHERE tenant_id=?').get(tenantId).count,
+        activeProcesses: this.db.prepare("SELECT COUNT(*) count FROM runtime_process WHERE tenant_id=? AND status IN ('spawned','queued','running','waiting_input','waiting_approval','paused','blocked')").get(tenantId).count,
+        queuedJobs: this.db.prepare("SELECT COUNT(*) count FROM runtime_scheduled_job WHERE tenant_id=? AND status IN ('pending','running','retrying')").get(tenantId).count,
+        failed24h: this.db.prepare("SELECT COUNT(*) count FROM runtime_execution WHERE tenant_id=? AND status='failed' AND julianday(created_at)>=julianday('now','-1 day')").get(tenantId).count,
+        checkpoints24h: this.db.prepare("SELECT COUNT(*) count FROM runtime_checkpoint WHERE tenant_id=? AND julianday(created_at)>=julianday('now','-1 day')").get(tenantId).count,
+        riskBlocked24h: this.db.prepare("SELECT COUNT(*) count FROM audit_audit_log WHERE tenant_id=? AND category='risk.blocked' AND julianday(created_at)>=julianday('now','-1 day')").get(tenantId).count
+      },
+      tasksByStatus: grouped('runtime_task', 'status'),
+      processesByStatus: grouped('runtime_process', 'status'),
+      executionsByRunner: this.db.prepare('SELECT runner, status, COUNT(*) count FROM runtime_execution WHERE tenant_id=? GROUP BY runner,status').all(tenantId),
+      recentExecutions,
+      risks
+    }
+  }
 }

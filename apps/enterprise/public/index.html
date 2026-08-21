@@ -107,7 +107,7 @@ pre{background:#0f172a;color:#c8d3f5;padding:12px;border-radius:8px;font-size:12
     <h1 id="lg-title"><img id="lg-logo" style="display:none">智造云 · 企业 AI 智能体平台</h1>
     <p>多租户业务执行平台</p>
     <label>用户名</label><input id="lg-user" value="admin.a">
-    <label>密码</label><input id="lg-pass" type="password" value="Zhiyun@2026">
+    <label>密码</label><input id="lg-pass" type="password" autocomplete="current-password" placeholder="请输入密码">
     <div style="margin-top:16px"><button onclick="login()" style="width:100%">登 录</button></div>
     <p style="margin-top:12px">admin.a 企业A管理员 · platform 平台管理员 · sales.a 普通员工 · audit.a 审计员</p>
   </div>
@@ -144,6 +144,7 @@ const MENU=[
   {t:'AI 对话',p:'chat',i:'chat',f:'ai_center'},
   {t:'企业数据中心',p:'datacenter2',i:'data',f:'data_center'},
   {t:'AI 运行监控',p:'autorun',i:'monitor',f:'data_center',perm:'stats:view'},
+  {t:'AI-OS 监视器',p:'os-monitor',i:'monitor',f:'data_center',perm:'stats:view'},
   {grp:'任务'},
   {t:'新建任务',p:'worktask',i:'plus',perm:'worktask:run'},
   {t:'项目',p:'projects',i:'folder',perm:'worktask:run'},
@@ -242,6 +243,24 @@ const PAGES={
     <div class="card" id="ar-report-card"><span class="hint">加载中…</span></div>
     <div class="card"><b>最近执行（data_origin=auto-simulated）</b><div id="ar-execs" style="margin-top:10px"><span class="hint">加载中…</span></div></div>
     <div class="card"><b>实时消息流</b><div class="msgflow" id="ar-msgs" style="margin-top:10px"></div></div>`
+  },
+  async 'os-monitor'(){
+    const s=await api('GET','/api/os/monitor?limit=50')
+    const metrics=[['任务总数',s.kpi.tasks],['活跃进程',s.kpi.activeProcesses],['调度队列',s.kpi.queuedJobs],['24h 失败',s.kpi.failed24h],['24h Checkpoint',s.kpi.checkpoints24h],['24h 风险拦截',s.kpi.riskBlocked24h]]
+    const summary=(rows,key='status')=>rows.length?rows.map(r=>`<span class="tag ${r[key]==='failed'||r[key]==='risk.blocked'?'bad':r[key]==='succeeded'||r[key]==='running'?'ok':'info'}" style="margin:0 6px 6px 0">${esc(r[key])} · ${r.count}</span>`).join(''):'<span class="hint">暂无数据</span>'
+    return `<h2>AI-OS 系统监视器</h2>
+      <div class="grid metrics">${metrics.map(x=>`<div class="metric"><div class="v">${x[1]??0}</div><div class="k">${x[0]}</div></div>`).join('')}</div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:16px">
+        <div class="card"><b>任务状态</b><div style="margin-top:12px">${summary(s.tasksByStatus)}</div></div>
+        <div class="card"><b>进程状态</b><div style="margin-top:12px">${summary(s.processesByStatus)}</div></div>
+        <div class="card"><b>执行器状态</b><div style="margin-top:12px">${s.executionsByRunner.length?s.executionsByRunner.map(r=>`<span class="tag info" style="margin:0 6px 6px 0">${esc(r.runner)} / ${esc(r.status)} · ${r.count}</span>`).join(''):'<span class="hint">暂无数据</span>'}</div></div>
+      </div>
+      <div class="card"><b>最近执行</b><div style="margin-top:10px">${s.recentExecutions.length?tbl([
+        ['任务',r=>`<b>${esc(r.title)}</b><div class="detail">${esc(r.task_id)}</div>`],['Runner',r=>esc(r.runner)],['触发',r=>esc(r.trigger_type)],['状态',r=>tag(r.status)],['重试',r=>r.retry_count],['Trace',r=>r.trace_id?`<a style="color:var(--pri);cursor:pointer" onclick="traceView('${r.trace_id}')">${r.trace_id.slice(0,8)}…</a>`:'-'],['开始',r=>esc(r.started_at||'-')],['错误',r=>r.error_message?`<span style="color:var(--bad)">${esc(r.error_message)}</span>`:'-']
+      ],s.recentExecutions):'<span class="hint">暂无统一执行记录</span>'}</div></div>
+      <div class="card"><b>高风险操作记录</b><div style="margin-top:10px">${s.risks.length?tbl([
+        ['时间',r=>esc(r.created_at)],['结果',r=>tag(r.category)],['Tool',r=>esc(r.payload?.toolName||'-')],['用户',r=>esc(r.payload?.userId||'-')],['原因码',r=>esc(r.payload?.code||'-')],['Trace',r=>esc(r.trace_id||'-')]
+      ],s.risks):'<span class="hint">暂无高风险放行或拦截记录</span>'}</div></div>`
   },
   async dashboard(){
     const s=await api('GET','/api/stats/dashboard')

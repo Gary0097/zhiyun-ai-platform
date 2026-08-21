@@ -557,6 +557,11 @@ export function buildRoutes () {
     const url = new URL(req.url, 'http://x')
     return runtimeStore.listTasks({ tenantId: user.tenant_id, status: url.searchParams.get('status'), limit: url.searchParams.get('limit') })
   })
+  H('GET', '/api/os/monitor', (req, res, { user }) => {
+    requirePermission(user, 'stats:view')
+    const url = new URL(req.url, 'http://x')
+    return runtimeStore.monitorSnapshot({ tenantId: user.tenant_id, limit: url.searchParams.get('limit') })
+  })
   H('GET', '/api/os/tasks/:id', (req, res, { user, params }) => {
     requirePermission(user, 'worktask:run')
     const task = runtimeStore.getTask({ tenantId: user.tenant_id, taskId: params.id })
