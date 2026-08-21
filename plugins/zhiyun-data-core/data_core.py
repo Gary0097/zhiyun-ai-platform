@@ -189,6 +189,52 @@ class DataCore:
             for row in rows
         ]
 
+    def create_schema(
+        self,
+        entity: str,
+        label: str,
+        fields: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """Create a user-defined dataset and its initial field model atomically."""
+        if not FIELD_NAME.fullmatch(entity):
+            raise DataCoreError("entity name must use lowercase letters, numbers and underscores")
+        if not label.strip():
+            raise DataCoreError("entity label is required")
+        if not fields:
+            raise DataCoreError("at least one field is required")
+        names = [str(field.get("name", "")) for field in fields]
+        if len(names) != len(set(names)):
+            raise DataCoreError("field names must be unique")
+        for field in fields:
+            name = str(field.get("name", ""))
+            kind = str(field.get("field_type", "text"))
+            if not FIELD_NAME.fullmatch(name):
+                raise DataCoreError(f"invalid field name: {name}")
+            if kind not in FIELD_TYPES:
+                raise DataCoreError(f"unsupported field type: {kind}")
+            if not str(field.get("label", "")).strip():
+                raise DataCoreError(f"field label is required: {name}")
+        with self.connect() as connection:
+            try:
+                connection.execute(
+                    "INSERT INTO data_schemas(entity, label) VALUES(?, ?)",
+                    (entity, label.strip()),
+                )
+                connection.executemany(
+                    """
+                    INSERT INTO schema_fields
+                    (entity, field_name, label, field_type, required, active, position, built_in)
+                    VALUES(?, ?, ?, ?, ?, 1, ?, 0)
+                    """,
+                    [
+                        (entity, field["name"], str(field["label"]).strip(), field.get("field_type", "text"), int(bool(field.get("required"))), position)
+                        for position, field in enumerate(fields)
+                    ],
+                )
+            except sqlite3.IntegrityError as exc:
+                raise DataCoreError(f"entity already exists: {entity}") from exc
+        return self.list_schema(entity)
+
     def add_field(
         self,
         entity: str,
