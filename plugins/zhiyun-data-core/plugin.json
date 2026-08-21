@@ -1,12 +1,13 @@
 {
   "id": "zhiyun-data-core",
   "name": "AI-OS Data Core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "general",
   "description": "面向全部 PawApp 的 Workspace 统一数据库、Schema Registry、导入批次和模拟数据服务。",
   "author": "Zhiyun AI",
   "entry": {
-    "backend": "data_core_plugin.py"
+    "backend": "data_core_plugin.py",
+    "frontend": "ui/index.js"
   },
   "dependencies": [],
   "qwenpaw_version": {
@@ -14,6 +15,6 @@
     "max": "2.2.0"
   },
   "meta": {
-    "features": ["workspace-sqlite", "schema-registry", "import-preview", "simulation-batches", "batch-rollback"]
+    "features": ["workspace-sqlite", "schema-registry", "import-preview", "simulation-batches", "batch-rollback", "data-browser", "schema-preview"]
   }
 }
