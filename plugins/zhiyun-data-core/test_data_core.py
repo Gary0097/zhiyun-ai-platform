@@ -37,6 +37,24 @@ class DataCoreTests(unittest.TestCase):
         self.assertEqual(field["label"], "所属区域")
         self.assertFalse(field["active"])
 
+    def test_user_can_create_department_dataset_and_import_rows(self) -> None:
+        schema = self.core.create_schema("production", "生产日报", [
+            {"name": "work_date", "label": "日期", "field_type": "date", "required": True},
+            {"name": "department", "label": "部门", "field_type": "text", "required": True},
+            {"name": "output", "label": "产量", "field_type": "number"},
+            {"name": "labor_hours", "label": "工时", "field_type": "number"},
+        ])
+        self.assertEqual(schema["entity"], "production")
+        self.core.import_rows("production", [{"work_date": "2026-08-22", "department": "一车间", "output": 120, "labor_hours": 24}])
+        self.assertEqual(self.core.list_records("production")[0]["data"]["output"], 120)
+
+    def test_duplicate_or_unsafe_dataset_is_rejected(self) -> None:
+        with self.assertRaises(DataCoreError):
+            self.core.create_schema("DROP TABLE", "危险", [{"name": "value", "label": "值"}])
+        self.core.create_schema("finance", "财务", [{"name": "amount", "label": "金额", "field_type": "number"}])
+        with self.assertRaisesRegex(DataCoreError, "already exists"):
+            self.core.create_schema("finance", "财务", [{"name": "amount", "label": "金额"}])
+
     def test_invalid_field_identifier_is_rejected(self) -> None:
         with self.assertRaises(DataCoreError):
             self.core.add_field("orders", "DROP TABLE", "危险字段")
