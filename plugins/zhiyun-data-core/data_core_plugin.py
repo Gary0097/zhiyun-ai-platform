@@ -55,6 +55,11 @@ async def health() -> dict[str, Any]:
     return {"status": "available", "database": str(core.database), "schema_version": 1}
 
 
+@router.get("/entities")
+async def entities() -> dict[str, Any]:
+    return {"entities": core.list_entities()}
+
+
 @router.get("/schemas/{entity}")
 async def schema(entity: str) -> dict[str, Any]:
     return _handle(lambda: core.list_schema(entity))
