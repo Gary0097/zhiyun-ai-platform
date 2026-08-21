@@ -1,11 +1,15 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { randomBytes } from 'node:crypto'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const enterprise = join(root, '..', 'enterprise')
 const plugin = join(root, 'plugins', 'zhiyun-brand')
 const checkOnly = process.argv.includes('--check')
+const gatewaySecret = process.env.ZHIYUN_GATEWAY_SECRET || randomBytes(32).toString('hex')
+const qwenpawIdentity = process.env.ZHIYUN_QWENPAW_IDENTITY || 'local-admin'
+const qwenpawUsername = process.env.ZHIYUN_QWENPAW_USERNAME || 'admin.a'
 
 function requireCommand (command, args, hint) {
   const result = spawnSync(command, args, { encoding: 'utf8' })
@@ -35,7 +39,7 @@ const children = [
   spawn(process.execPath, ['start.mjs'], {
     cwd: enterprise,
     stdio: 'inherit',
-    env: { ...process.env, PORT: process.env.ENTERPRISE_PORT || '8390' },
+    env: { ...process.env, PORT: process.env.ENTERPRISE_PORT || '8390', ZHIYUN_GATEWAY_SECRET: gatewaySecret, ZHIYUN_QWENPAW_IDENTITY: qwenpawIdentity, ZHIYUN_QWENPAW_USERNAME: qwenpawUsername },
   }),
   spawn('qwenpaw', ['app'], {
     cwd: root,
@@ -43,6 +47,8 @@ const children = [
     env: {
       ...process.env,
       ZHIYUN_ENTERPRISE_URL: process.env.ZHIYUN_ENTERPRISE_URL || 'http://127.0.0.1:8390',
+      ZHIYUN_GATEWAY_SECRET: gatewaySecret,
+      ZHIYUN_QWENPAW_IDENTITY: qwenpawIdentity,
     },
   }),
 ]

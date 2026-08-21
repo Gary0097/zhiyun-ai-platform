@@ -83,6 +83,13 @@ CREATE TABLE IF NOT EXISTS business_agent (
 CREATE TABLE IF NOT EXISTS business_setting (
   key TEXT PRIMARY KEY, value TEXT, updated_at TEXT
 );
+CREATE TABLE IF NOT EXISTS integration_identity_map (
+  id INTEGER PRIMARY KEY, provider TEXT NOT NULL, external_user_id TEXT NOT NULL,
+  tenant_id INTEGER NOT NULL REFERENCES business_tenant(id), user_id INTEGER NOT NULL REFERENCES business_user(id),
+  status TEXT NOT NULL DEFAULT 'active', created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+  UNIQUE(provider, external_user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_identity_map_user ON integration_identity_map(tenant_id, user_id);
 CREATE TABLE IF NOT EXISTS business_invoice (
   invoice_id INTEGER PRIMARY KEY, tenant_id INTEGER NOT NULL, invoice_no TEXT NOT NULL,
   invoice_date TEXT NOT NULL, supplier TEXT NOT NULL, category TEXT NOT NULL,
@@ -268,6 +275,7 @@ const TOOLS = [
 
 function seed () {
   const t = now()
+  db.exec('DELETE FROM integration_identity_map;')
   db.exec('DELETE FROM audit_change; DELETE FROM audit_audit_log; DELETE FROM log_amendment; DELETE FROM log_operation_log;')
   db.exec('DELETE FROM log_feature_usage; DELETE FROM log_login_log;')
   db.exec('DELETE FROM runtime_scheduled_job; DELETE FROM runtime_model_usage; DELETE FROM runtime_tool_execution; DELETE FROM runtime_agent_execution; DELETE FROM runtime_message; DELETE FROM runtime_conversation;')
@@ -401,6 +409,15 @@ function ensureMigrations () {
   ]
   const upsert = db.prepare('INSERT INTO business_setting (key, value, updated_at) VALUES (?,?,?) ON CONFLICT(key) DO NOTHING')
   for (const [k, v] of defaults) upsert.run(k, v, now())
+
+  // 本地单用户开发映射。生产环境通过系统管理维护映射，且身份只从签名服务请求读取。
+  const devIdentity = process.env.ZHIYUN_QWENPAW_IDENTITY || 'local-admin'
+  const mappedUsername = process.env.ZHIYUN_QWENPAW_USERNAME || 'admin.a'
+  const devUser = db.prepare("SELECT id, tenant_id FROM business_user WHERE username = ? AND status = 'active'").get(mappedUsername)
+  if (devUser) db.prepare(`INSERT INTO integration_identity_map
+    (provider, external_user_id, tenant_id, user_id, status, created_at, updated_at)
+    VALUES ('qwenpaw',?,?,?,?,?,?) ON CONFLICT(provider, external_user_id) DO NOTHING`)
+    .run(devIdentity, devUser.tenant_id, devUser.id, 'active', now(), now())
 
   // 对话型智能助手：自然语言交流 + 可查业务数据（逐租户补齐，含未来新租户）
   const assistantPrompt = `你是智造云平台的企业智能助手，用简洁专业的中文与用户对话。
