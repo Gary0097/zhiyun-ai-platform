@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "apps": [
+    {
+      "id": "zhiyun-data-studio",
+      "repository": "https://github.com/Gary0097/zhiyun-data-studio.git",
+      "ref": "main",
+      "commit": "363cf46a6c0f648af13ed92221d3899dc107f44f",
+      "install_dir": "zhiyun-data-studio"
+    }
+  ]
+}
