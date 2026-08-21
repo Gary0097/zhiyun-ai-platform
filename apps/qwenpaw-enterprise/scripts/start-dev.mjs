@@ -35,6 +35,16 @@ const installed = spawnSync('qwenpaw', ['plugin', 'install', plugin, '--force'],
 })
 if (installed.status !== 0) process.exit(installed.status || 1)
 
+// QwenPaw 对第三方工具默认要求 Agent 显式启用；开发启动器自动完成只读工具绑定。
+const enabled = spawnSync(process.env.PYTHON || 'python', [join(root, 'scripts', 'enable-enterprise-tools.py')], {
+  stdio: 'inherit',
+  env: process.env,
+})
+if (enabled.status !== 0) {
+  console.error('无法为 QwenPaw Agent 启用智造云企业工具；请确认已执行 qwenpaw init，且 python 与 qwenpaw 位于同一环境')
+  process.exit(enabled.status || 1)
+}
+
 const children = [
   spawn(process.execPath, ['start.mjs'], {
     cwd: enterprise,

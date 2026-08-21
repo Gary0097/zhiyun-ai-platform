@@ -1,8 +1,8 @@
 {
   "id": "zhiyun-brand",
   "name": "智造云 AI-OS 品牌扩展",
-  "version": "0.2.0",
-  "description": "同步企业品牌、配置 QwenPaw 对话欢迎页，并提供企业服务只读状态工具。",
+  "version": "0.3.0",
+  "description": "同步企业品牌，并提供可信企业数据只读工具。",
   "author": "Zhiyun AI",
   "type": "general",
   "entry": {
@@ -14,6 +14,13 @@
     "max": "2.2.0"
   },
   "meta": {
-    "features": ["branding", "chat-welcome", "enterprise-health-tool"]
+    "features": ["branding", "chat-welcome", "enterprise-read-tools"],
+    "tools": [
+      { "name": "enterprise_platform_status", "description": "读取企业服务连接状态和版本", "icon": "🏢" },
+      { "name": "enterprise_query_orders", "description": "查询当前企业订单、进度与交付风险", "icon": "📦" },
+      { "name": "enterprise_query_inventory", "description": "查询当前企业库存与低库存物料", "icon": "🏭" },
+      { "name": "enterprise_query_customers", "description": "查询当前企业客户档案", "icon": "👥" },
+      { "name": "enterprise_search_knowledge", "description": "检索当前企业知识库", "icon": "📚" }
+    ]
   }
 }

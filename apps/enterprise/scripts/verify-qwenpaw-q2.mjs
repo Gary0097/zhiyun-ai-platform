@@ -14,6 +14,8 @@ const checks = [
   ['QwenPaw 库存工具', read('qwenpaw-enterprise/plugins/zhiyun-brand/backend/main.py').includes('enterprise_query_inventory')],
   ['QwenPaw 客户工具', read('qwenpaw-enterprise/plugins/zhiyun-brand/backend/main.py').includes('enterprise_query_customers')],
   ['QwenPaw 知识工具', read('qwenpaw-enterprise/plugins/zhiyun-brand/backend/main.py').includes('enterprise_search_knowledge')],
+  ['插件声明企业工具', read('qwenpaw-enterprise/plugins/zhiyun-brand/plugin.json').includes('enterprise_query_orders')],
+  ['默认 Agent 显式启用', read('qwenpaw-enterprise/scripts/start-dev.mjs').includes('enable-enterprise-tools.py')],
 ]
 for (const [name, ok] of checks) console.log(`${ok ? '✓' : '✗'} ${name}`)
 if (checks.some(([, ok]) => !ok)) process.exit(1)
