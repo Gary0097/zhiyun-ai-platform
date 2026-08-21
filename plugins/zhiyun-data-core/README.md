@@ -11,6 +11,15 @@ Data Core 是全部业务 PawApp 共用的数据服务。应用只能通过 `/zh
 - 真实数据和模拟数据都记录来源、批次和创建时间。
 - 模拟数据按批次撤销，不影响真实数据。
 - SQLite WAL 模式兼容 Windows 10/11 与 Ubuntu 22.04/24.04。
+- AI 对话可调用 `query_enterprise_orders` 查询真实/模拟订单，不再扫描工作区猜测数据来源。
+- AI 可在用户明确要求时调用 `generate_simulated_orders` 写入可撤销的模拟订单批次。
+
+## Agent 工具
+
+| 工具 | 用途 | 边界 |
+| --- | --- | --- |
+| `query_enterprise_orders` | 按关键词、订单号、客户、状态、数据来源查询 | 不接受 SQL，最多返回 200 条 |
+| `generate_simulated_orders` | 生成测试或演示订单 | 仅模拟数据，返回可撤销批次 ID |
 
 ## HTTP API
 
