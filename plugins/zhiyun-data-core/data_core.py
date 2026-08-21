@@ -162,6 +162,33 @@ class DataCore:
             ],
         }
 
+    def list_entities(self) -> list[dict[str, Any]]:
+        """Return user-facing datasets with live record/source counts."""
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT s.entity, s.label, s.updated_at,
+                       COUNT(r.record_id) AS record_count,
+                       SUM(CASE WHEN r.source_type = 'real' THEN 1 ELSE 0 END) AS real_count,
+                       SUM(CASE WHEN r.source_type = 'simulated' THEN 1 ELSE 0 END) AS simulated_count
+                FROM data_schemas AS s
+                LEFT JOIN data_records AS r ON r.entity = s.entity
+                GROUP BY s.entity, s.label, s.updated_at
+                ORDER BY s.entity
+                """
+            ).fetchall()
+        return [
+            {
+                "entity": row["entity"],
+                "label": row["label"],
+                "updated_at": row["updated_at"],
+                "record_count": int(row["record_count"] or 0),
+                "real_count": int(row["real_count"] or 0),
+                "simulated_count": int(row["simulated_count"] or 0),
+            }
+            for row in rows
+        ]
+
     def add_field(
         self,
         entity: str,
