@@ -1,5 +1,6 @@
 // Tool 工具中心：Agent 不直接操作数据库；调用链 Agent → Harness → Tool Registry → Permission Guard → Tool → DB
 import { db, now } from './db.js'
+import { enforceToolRisk } from './os/risk-control.js'
 import { dataScope, logOperation } from './auth.js'
 
 class ToolDenied extends Error { constructor (msg) { super(msg); this.status = 403; this.denied = true } }
@@ -144,11 +145,6 @@ export function guardToolCall ({ tenantId, agentToolIds, toolName, confirmed = f
   if (!toolRow) throw new ToolDenied(`工具不存在或未对本企业开放：${toolName}`)
   if (!toolRow.enabled) throw new ToolDenied(`工具已停用：${toolName}`)
   if (agentToolIds && !agentToolIds.includes(toolName)) throw new ToolDenied(`Agent 未被授权调用工具：${toolName}`)
-  if (toolRow.sensitive && !confirmed) {
-    const e = new Error(`敏感操作需人工确认：${toolName}（AI建议已生成，等待人工确认后执行）`)
-    e.status = 202; e.pendingConfirm = { tool: toolName }
-    throw e
-  }
   return toolRow
 }
 
@@ -159,7 +155,8 @@ export function executeTool ({ tenantId, userId, traceId, executionId, toolName,
   let status = 'success'; let output; let error = null
   try {
     if (!impl) throw new ToolDenied(`未知工具：${toolName}`)
-    guardToolCall({ tenantId, agentToolIds, toolName, confirmed })
+    const toolRow = guardToolCall({ tenantId, agentToolIds, toolName, confirmed })
+    enforceToolRisk({ database: db, now, tenantId, userId, traceId, toolName, sensitive: Boolean(toolRow.sensitive), args: args || {}, confirmed })
     const ctx = {
       tenantId, userId, traceId, scope,
       // 订单表支持 owner 数据域；其余表默认租户全域（演示数据域对订单生效）

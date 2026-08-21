@@ -24,6 +24,8 @@ The existing Scheduler is the second migrated caller. Cron, interval, condition 
 
 Auto-run is the third migrated caller. Its existing DSH HTTP envelope, multiplexed WebSocket approval handling, persistent Session keys, and legacy observability records remain unchanged. Each role, report, feature demonstration, or multi-Agent Session maps to one source-backed AI-OS Task, while each DSH turn becomes a separate Execution and Process with the same trace identifier as the legacy execution record. A `session.turn.completed` Checkpoint retains the Session identifier for cold recovery.
 
+High-risk Tool control is enforced independently of the optional Capability and Approval models. Unattended executions cannot perform sensitive writes. Interactive writes retain the existing inline confirmation contract and then pass a tenant kill switch, per-minute write limit, structural argument limits, and operation-specific business validation. High-risk allow and deny decisions are audit records linked to the execution trace.
+
 ## Alternatives considered
 
 **Replace the enterprise agent loop with DSH immediately.** The local loop supports current API and scheduled-task behavior. Immediate replacement would combine contract migration with runtime migration and make regressions harder to isolate.
@@ -36,4 +38,4 @@ Auto-run is the third migrated caller. Its existing DSH HTTP envelope, multiplex
 
 New AI-OS work has one place for tenant validation, runner selection, result normalization, and durable task lifecycle state while existing behavior remains available. The Task query API is tenant-scoped and exposes executions, processes, events, and artifacts without exposing another tenant's records.
 
-Auto-run and DSH Session history now project into the unified runtime. Scheduler policy remains in the existing scheduler instead of introducing a competing scheduler, so `job_lock` continues to be the single concurrency guard. Checkpoints capture attempt and Session-turn boundaries but do not yet resume an interrupted model turn; approval orchestration, event delivery, and business-result verification remain later consumers. Deleting a legacy WorkTask does not erase its AI-OS runtime history.
+Auto-run and DSH Session history now project into the unified runtime. Scheduler policy remains in the existing scheduler instead of introducing a competing scheduler, so `job_lock` continues to be the single concurrency guard. Checkpoints capture attempt and Session-turn boundaries but do not yet resume an interrupted model turn. Capability administration and Approval orchestration are intentionally outside the current product scope; event delivery and business-result verification remain later consumers. Deleting a legacy WorkTask does not erase its AI-OS runtime history.
