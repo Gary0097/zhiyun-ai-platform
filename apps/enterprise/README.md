@@ -41,6 +41,24 @@ node server/cli.js simulate
 - **可视化**：33 表数据库浏览（分页/全列搜索/凭据列隐藏）+ AI 运行监控看板（KPI/趋势/耗时/模块分布）+ 完整 markdown 渲染
 - **日志审计**：四层日志表 + trace replay + 数据修改留痕（audit_change）
 
+## AI-OS V3.1 Phase 0
+
+Phase 0 以兼容方式加入 AI-OS 统一运行契约，现有 V2 API、表和执行路径继续保留：
+
+- `server/os/schema.js`：幂等创建 Task、Execution、Process、Checkpoint、Event、Approval、Artifact 与 Capability 基线表；
+- `server/os/execution-kernel.js`：为平台轻量 Agent Loop 与 DSH Session 提供统一路由边界；
+- `server/os/adapters/`：通过依赖注入封装两类 Runner，避免业务层直接绑定某一执行引擎；
+- `server/os/contracts.js`：统一任务、进程、执行状态和租户必填约束；
+- `scripts/verify-phase0.mjs`：在内存 SQLite 中验证幂等迁移、Runner 路由和租户保护。
+
+运行 Phase 0 基线验证：
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase0
+```
+
+Phase 0 只建立兼容底座，尚未把旧 WorkTask、Scheduler 和 Auto-run 切换到新内核；后续阶段应通过适配器逐条迁移，禁止新旧调度同时触发同一业务任务。
+
 ## 目录导览
 
 ```text
@@ -56,6 +74,7 @@ server/
 ├── llm.js                 模型适配层（OpenAI 兼容/mock/连通测试）
 ├── tools.js               Tool 实现（query_*/knowledge_search 等）
 ├── scheduler.js           定时任务调度
+├── os/                    AI-OS 统一契约、Schema、Kernel 与 Runner Adapter
 └── auth.js                认证/权限/操作日志
 public/index.html          单文件 SPA 前端（分组侧边栏/看板/表单/轮询）
 scripts/                   验证/导入/夜间排程脚本

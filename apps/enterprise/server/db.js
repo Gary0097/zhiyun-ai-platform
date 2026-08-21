@@ -1,6 +1,7 @@
 // 智造云平台数据库层：SQLite（node:sqlite），四层数据模型 business_ / runtime_ / log_ / audit_
 // 所有核心表绑定 tenant_id；所有可生成数据携带 data_origin（real/simulated/imported/manual）
 import { DatabaseSync } from 'node:sqlite'
+import { ensureOsSchema } from './os/schema.js'
 import { scryptSync, randomBytes } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -473,6 +474,7 @@ function ensureMigrations () {
 
 export function init () {
   db.exec(SCHEMA)
+  ensureOsSchema(db)
   const count = db.prepare('SELECT COUNT(*) AS c FROM business_tenant').get().c
   if (count === 0 || process.argv.includes('--reset')) seed()
   ensureMigrations()
