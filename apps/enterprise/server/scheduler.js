@@ -1,8 +1,8 @@
 // 自动任务执行中心：Scheduler → Job → Worker(runAgent) → 结果/日志；job_lock 防重复执行
 import { db, now } from './db.js'
-import { runAgent } from './harness.js'
 import { evaluateCondition } from './tools.js'
 import { logOperation } from './auth.js'
+import { runtimeStore, taskService } from './os/runtime.js'
 
 /** 5 字段 cron 解析（分 时 日 月 周），支持 * / ,- 与数字 */
 export function cronMatches (expr, date) {
@@ -83,17 +83,32 @@ export async function runTaskNow (taskId, triggerSource = 'manual', conditionDet
   const execute = async (attempt) => {
     db.prepare("UPDATE runtime_scheduled_job SET started_at = ?, status = 'running' WHERE job_id = ?").run(now(), jobId)
     try {
-      const res = await runAgent({
-        agentId: task.agent_id, user: null,
+      const res = await taskService.executeScheduledTask({
+        scheduledTask: task,
         instruction: input.instruction + (conditionDetail ? `（触发条件：${conditionDetail}）` : ''),
-        triggerType: `scheduled:${triggerSource}`
+        triggerSource,
+        attempt
       })
+      if (res.status !== 'succeeded') {
+        throw Object.assign(new Error(res.error || `AI-OS execution ${res.status}`), {
+          osTaskId: res.osTaskId,
+          osExecutionId: res.osExecutionId
+        })
+      }
       db.prepare("UPDATE runtime_scheduled_job SET status = 'success', finished_at = ?, execution_id = ? WHERE job_id = ?")
         .run(now(), res.executionId, jobId)
-      return { jobId: Number(jobId), status: 'success', ...res }
+      return { ...res, jobId: Number(jobId), status: 'success' }
     } catch (e) {
       if (attempt < task.max_retry) {
         db.prepare("UPDATE runtime_scheduled_job SET status = 'retrying', retry_count = ? WHERE job_id = ?").run(attempt, jobId)
+        const osTask = taskService.ensureScheduledTask(task)
+        if (e.osExecutionId) runtimeStore.saveCheckpoint({
+          task: osTask,
+          executionId: e.osExecutionId,
+          stepKey: 'retry.scheduled',
+          state: { nextAttempt: attempt + 1, reason: e.message },
+          safeToResume: true
+        })
         return execute(attempt + 1)
       }
       db.prepare("UPDATE runtime_scheduled_job SET status = 'failed', finished_at = ?, failure_reason = ? WHERE job_id = ?")

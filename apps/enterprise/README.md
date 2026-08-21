@@ -77,6 +77,25 @@ pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase1
 
 Scheduler, Auto-run, and DSH session persistence remain later migrations. Old and new schedulers must never trigger the same business task concurrently.
 
+## AI-OS V3.1 Phase 2
+
+Phase 2 migrates the existing Scheduler worker path while preserving its trigger and compatibility behavior:
+
+- Cron, interval, condition evaluation, `job_lock`, legacy Job rows, retries, and dead-letter audit stay in `server/scheduler.js`.
+- Every scheduler attempt maps to one AI-OS Execution and Process through `TaskService`.
+- Retry counts are persisted per Execution, so separate attempts remain traceable.
+- Completion and retry decisions persist resumable Checkpoints and emit checkpoint Events.
+- `server/os/runtime.js` provides one shared runtime composition for REST and Scheduler callers.
+- `scripts/verify-phase2.mjs` covers scheduler source mapping, retry attempts, checkpoints, and tenant isolation.
+
+Run the Phase 2 verification:
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase2
+```
+
+These Checkpoints capture safe attempt boundaries; resuming inside an interrupted model turn is not part of this phase.
+
 ## Directory map
 
 ```text

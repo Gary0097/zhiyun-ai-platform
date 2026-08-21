@@ -10,10 +10,7 @@ import { startAutoRun, stopAutoRun, autoRunStatus, autoRunAnalytics, runJhlRepor
 import { FUNCTION_CATALOG, catalogByModule } from './function-catalog.js'
 import { runKnowledgeHarvest, harvestStatus } from './knowledge-harvester.js'
 import { modelInfo } from './llm.js'
-import { ExecutionKernel } from './os/execution-kernel.js'
-import { createLightweightRunner } from './os/adapters/lightweight-runner.js'
-import { RuntimeStore } from './os/runtime-store.js'
-import { TaskService } from './os/task-service.js'
+import { runtimeStore, taskService } from './os/runtime.js'
 
 export function route (method, path, handler, opts = {}) {
   return { method, path, handler, ...opts }
@@ -21,9 +18,6 @@ export function route (method, path, handler, opts = {}) {
 
 const J = (d) => JSON.stringify(d)
 const readBody = (req) => new Promise((resolve) => { let b = ''; req.on('data', c => { b += c }); req.on('end', () => { try { resolve(b ? JSON.parse(b) : {}) } catch { resolve({}) } }) })
-const runtimeStore = new RuntimeStore({ database: db })
-const executionKernel = new ExecutionKernel().registerRunner('lightweight', createLightweightRunner({ runAgent }))
-const taskService = new TaskService({ database: db, kernel: executionKernel, store: runtimeStore })
 
 // 可通过数据管理中心编辑的业务表白名单
 const EDITABLE_TABLES = ['business_customer', 'business_order', 'business_inventory', 'business_finance', 'business_after_sale', 'business_department']

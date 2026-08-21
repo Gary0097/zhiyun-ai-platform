@@ -39,7 +39,7 @@ assert.equal(detail.status, 'succeeded')
 assert.equal(detail.executions.length, 1)
 assert.equal(detail.executions[0].trace_id, 'trace-ok')
 assert.equal(detail.processes[0].status, 'succeeded')
-assert.deepEqual(detail.events.map(event => event.event_type), ['task.created', 'execution.started', 'execution.succeeded'])
+assert.deepEqual(detail.events.map(event => event.event_type), ['task.created', 'execution.started', 'execution.succeeded', 'checkpoint.saved'])
 assert.equal(store.getTask({ tenantId: 2, taskId: first.task_id }), null, 'cross-tenant task lookup must not leak')
 
 const failingKernel = new ExecutionKernel().registerRunner('lightweight', { run: async () => { throw new Error('runner unavailable') } })
