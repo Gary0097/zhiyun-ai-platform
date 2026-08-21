@@ -10,8 +10,6 @@ const logoPlugin = join(repoRoot, 'plugins', 'zhiyun-logo')
 const appDiscoveryPlugin = join(repoRoot, 'plugins', 'zhiyun-app-discovery')
 const dataCorePlugin = join(repoRoot, 'plugins', 'zhiyun-data-core')
 const dataStudioPlugin = join(appRoot, 'runtime', 'pawapps', 'zhiyun-data-studio')
-const checkOnly = process.argv.includes('--check')
-const python = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3')
 
 function run (command, args, hint, capture = false) {
   const result = spawnSync(command, args, {
@@ -28,15 +26,8 @@ function run (command, args, hint, capture = false) {
   return capture ? `${result.stdout || ''}${result.stderr || ''}`.trim() : ''
 }
 
-const version = run('qwenpaw', ['--version'], '未检测到 QwenPaw 2.1.0，请先按 README 安装。', true)
-if (!version.includes('2.1.0')) {
-  console.error(`QwenPaw 版本不匹配：${version}`)
-  process.exit(1)
-}
-run(python, ['-c', 'import qwenpaw'], `当前 ${python} 与 qwenpaw 不在同一 Python 环境；请设置 PYTHON 后重试。`, true)
-
-console.log(`环境检查通过：${version}`)
-if (checkOnly) process.exit(0)
+run(process.execPath, [join(scriptsRoot, 'doctor.mjs')], '启动诊断未通过；请按上方提示处理后重试。')
+if (process.argv.includes('--check')) process.exit(0)
 
 run(python, [join(scriptsRoot, 'cleanup-legacy.py')], '清理旧品牌、应用和企业 Tool 配置失败。')
 run('qwenpaw', ['plugin', 'install', auditPlugin, '--force'], '日志审计插件安装失败。')
