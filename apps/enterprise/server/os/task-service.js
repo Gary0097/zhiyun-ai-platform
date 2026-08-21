@@ -90,4 +90,31 @@ export class TaskService {
     })
     return { ...result, osTaskId: task.task_id, osExecutionId: run.executionId }
   }
+
+  recordExternalExecution ({ tenantId, title, objective, sourceType, sourceId, agentId = null, triggerType, sessionId = null, result }) {
+    const task = this.store.ensureSourceTask({ tenantId, sourceType, sourceId, title, objective })
+    const run = this.store.startExecution({
+      task,
+      runner: RUNNER_KIND.DSH,
+      triggerType,
+      agentId,
+      input: { instruction: objective, sessionId, sourceType, sourceId: String(sourceId) }
+    })
+    const normalized = {
+      status: result.status === 'success' ? 'succeeded' : result.status,
+      traceId: result.traceId ?? null,
+      output: result.output ?? null,
+      error: result.error ?? null
+    }
+    this.store.finishExecution({ task, ...run, result: normalized })
+    this.store.saveCheckpoint({
+      task,
+      executionId: run.executionId,
+      processId: run.processId,
+      stepKey: 'session.turn.completed',
+      state: { sessionId, status: normalized.status, traceId: normalized.traceId },
+      safeToResume: Boolean(sessionId)
+    })
+    return { osTaskId: task.task_id, osExecutionId: run.executionId }
+  }
 }
