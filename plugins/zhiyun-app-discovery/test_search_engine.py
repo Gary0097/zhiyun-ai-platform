@@ -3,7 +3,7 @@
 
 import unittest
 
-from search_engine import agent_response, load_catalog, search_apps
+from search_engine import agent_response, load_catalog, load_progress, progress_summary, search_apps
 
 
 class SearchEngineTests(unittest.TestCase):
@@ -21,6 +21,9 @@ class SearchEngineTests(unittest.TestCase):
         result = search_apps("处理订单合同不一致")
         self.assertEqual(result[0]["app_id"], "zhiyun-order-studio")
         self.assertEqual(result[0]["matched_capability"]["capability_id"], 10)
+        self.assertEqual(result[0]["install_status"], "planned")
+        self.assertIsNone(result[0]["route"])
+        self.assertIsNone(result[0]["repository_url"])
 
     def test_expense_review_prefers_finance_studio(self) -> None:
         result = search_apps("识别发票并审核报销")
@@ -39,6 +42,27 @@ class SearchEngineTests(unittest.TestCase):
         response = agent_response("量子火箭发动机自动装配")
         self.assertFalse(response["found"])
         self.assertEqual(response["results"], [])
+
+    def test_planned_capability_is_not_reported_available(self) -> None:
+        response = agent_response("识别发票并审核报销")
+        self.assertTrue(response["found"])
+        self.assertFalse(response["available"])
+        self.assertIn("尚未开发", response["message"])
+
+    def test_installed_catalog_is_truthful(self) -> None:
+        apps = {app["app_id"]: app for app in load_catalog()["apps"]}
+        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.2.1")
+        self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
+        self.assertEqual(apps["zhiyun-order-studio"]["health"], "not_developed")
+
+    def test_progress_covers_all_31_prd_features(self) -> None:
+        ledger = load_progress()
+        self.assertEqual([item["id"] for item in ledger["features"]], list(range(1, 32)))
+        summary = progress_summary(ledger)
+        self.assertEqual(summary["total"], 31)
+        self.assertEqual(summary["in_progress"], 6)
+        self.assertEqual(summary["completed"], 0)
+        self.assertEqual(summary["overall_progress"], 9)
 
 
 if __name__ == "__main__":
