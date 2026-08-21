@@ -9,9 +9,9 @@ from fastapi import APIRouter, Query
 from qwenpaw.plugins.api import PluginApi
 
 try:
-    from .search_engine import agent_response, load_catalog, search_apps
+    from .search_engine import agent_response, load_catalog, load_progress, progress_summary, search_apps
 except ImportError:
-    from search_engine import agent_response, load_catalog, search_apps
+    from search_engine import agent_response, load_catalog, load_progress, progress_summary, search_apps
 
 router = APIRouter()
 
@@ -29,6 +29,13 @@ async def search(
 ) -> dict[str, Any]:
     """Search application names, aliases, capabilities and scenarios."""
     return {"query": q, "results": search_apps(q, limit=limit)}
+
+
+@router.get("/progress")
+async def progress() -> dict[str, Any]:
+    """Return the auditable 31-item PRD delivery ledger and summary."""
+    ledger = load_progress()
+    return {**ledger, "summary": progress_summary(ledger)}
 
 
 def find_paw_apps(query: str, limit: int = 3) -> dict[str, Any]:
