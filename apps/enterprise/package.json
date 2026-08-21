@@ -1,0 +1,18 @@
+{
+  "name": "@deepseek-ai/dsh-enterprise",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "智造云企业 AI 智能体平台（基于 DeepSeek Harness 的多租户业务执行平台）",
+  "bin": {},
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "seed": "node server/db.js --reset",
+    "simulate": "node server/cli.js simulate",
+    "verify": "node scripts/verify.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

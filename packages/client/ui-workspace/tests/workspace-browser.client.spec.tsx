@@ -234,19 +234,51 @@ describe('WorkspaceBrowser', () => {
     ])
   })
 
-  it('expands a group on click and opens a session row', () => {
+  it('enters the Workspace conversation on row click; the chevron alone toggles', () => {
     const open = vi.fn()
     mount({
       useSessions: hook(sessionState([summary('alpha-s', 1)])),
       useWorkspaces: hook(workspaceState([workspace('alpha', ['alpha-s'])])),
       open,
     })
+    // Row click resumes the newest session and expands the group to show it.
     fireEvent.click(screen.getByText('alpha'))
-    fireEvent.click(screen.getByText('alpha-s'))
     expect(open).toHaveBeenCalledWith(sid('alpha-s'))
-    // Collapse hides the row again.
-    fireEvent.click(screen.getByText('alpha'))
+    expect(screen.getByText('alpha-s')).toBeTruthy()
+    fireEvent.click(screen.getByText('alpha-s'))
+    expect(open).toHaveBeenCalledTimes(2)
+    // Collapse lives on the chevron button; a row click never collapses.
+    fireEvent.click(screen.getByRole('button', { name: '展开或收起“alpha”' }))
     expect(screen.queryByText('alpha-s')).toBeNull()
+  })
+
+  it('starts a fresh session when an empty Workspace row is clicked', () => {
+    const open = vi.fn()
+    const startSession = vi.fn()
+    mount({
+      useSessions: hook(sessionState([])),
+      useWorkspaces: hook(workspaceState([workspace('alpha', [])])),
+      open,
+      startSession,
+    })
+    fireEvent.click(screen.getByText('alpha'))
+    expect(open).not.toHaveBeenCalled()
+    expect(startSession).toHaveBeenCalledWith(wid('alpha'))
+  })
+
+  it('expands the ungrouped bucket on row click without opening anything', () => {
+    const open = vi.fn()
+    const startSession = vi.fn()
+    mount({
+      useSessions: hook(sessionState([summary('loose', 1)])),
+      useWorkspaces: hook(workspaceState([workspace('alpha', [])])),
+      open,
+      startSession,
+    })
+    fireEvent.click(screen.getByText('未分组'))
+    expect(open).not.toHaveBeenCalled()
+    expect(startSession).not.toHaveBeenCalled()
+    expect(screen.getByText('loose')).toBeTruthy()
   })
 
   it('shows five sessions by default and clears transient show-all when the Workspace collapses', () => {
@@ -265,9 +297,9 @@ describe('WorkspaceBrowser', () => {
     expect(screen.getByText('session-7')).toBeTruthy()
     expect(screen.getByRole('button', { name: '收起' })).toBeTruthy()
 
-    fireEvent.click(screen.getByText('alpha'))
+    fireEvent.click(screen.getByRole('button', { name: '展开或收起“alpha”' }))
     expect(b.store.getSnapshot().groupExpansion).toEqual({ alpha: false })
-    fireEvent.click(screen.getByText('alpha'))
+    fireEvent.click(screen.getByRole('button', { name: '展开或收起“alpha”' }))
     expect(b.store.getSnapshot().groupExpansion).toEqual({ alpha: true })
     expect(screen.queryByText('session-6')).toBeNull()
     expect(screen.getByRole('button', { name: '展开其余 2 个会话' })).toBeTruthy()
@@ -388,8 +420,11 @@ describe('WorkspaceBrowser', () => {
     })
     fireEvent.click(screen.getByText('alpha'))
     expect(screen.getByText('child-s')).toBeTruthy()
-    expect(screen.queryByRole('button', { name: /展开|收起/ })).toBeNull()
-    expect(screen.getByText('child-s').closest('[role="treeitem"]')?.getAttribute('draggable')).toBe('true')
+    // Only the workspace row owns a group toggle; the fork-child row has none.
+    expect(screen.getByRole('button', { name: '展开或收起“alpha”' })).toBeTruthy()
+    const childRow = screen.getByText('child-s').closest('[role="treeitem"]')
+    expect(childRow?.querySelector('button[aria-label*="展开或收起"]')).toBeNull()
+    expect(childRow?.getAttribute('draggable')).toBe('true')
   })
 
   it('expands the target group before starting a session from its ＋', () => {
@@ -434,7 +469,8 @@ describe('WorkspaceBrowser', () => {
     // expansion list unchanged (no duplicate key, group still open).
     rerender(b, { useSessions: hook({ ...first, current: sid('b') }) })
     expect(screen.getByText('b')).toBeTruthy()
-    fireEvent.click(screen.getByText('alpha'))
+    // The group folds only through its chevron, never a selection move.
+    fireEvent.click(screen.getByRole('button', { name: '展开或收起“alpha”' }))
     expect(screen.queryByText('b')).toBeNull()
   })
 

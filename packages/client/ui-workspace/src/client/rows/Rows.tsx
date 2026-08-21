@@ -102,16 +102,18 @@ function rowHalf(e: { clientY: number; currentTarget: HTMLElement }): 'before' |
  * Workspace shows its hover card (the ungrouped bucket has none).
  * `containsCurrent` arrives on the node (derivation fact, no renderer scan).
  * @param props.group - derived group node.
- * @param props.onToggle - expand/collapse the group.
+ * @param props.onToggle - expand/collapse the group (the chevron button).
+ * @param props.onOpen - enter the Workspace's conversation (row click).
  * @param props.onCreate - start a frontend Session inside this Workspace.
  * @param props.drag - optional workspace-row drag wiring.
  * @param props.home - host account home for POSIX hover-path abbreviation.
  * @param props.t - the browser root's locale seat.
  * @returns the row element.
  */
-export function ProjectRowItem({ group, onToggle, onCreate, actions, drag, home, t }: {
+export function ProjectRowItem({ group, onToggle, onOpen, onCreate, actions, drag, home, t }: {
   group: GroupNode
   onToggle: () => void
+  onOpen: () => void
   onCreate: () => void
   /** Real-Workspace actions; absent for the ungrouped bucket (no menu shown). */
   actions?: { rename: () => void; delete: () => void } | undefined
@@ -135,7 +137,7 @@ export function ProjectRowItem({ group, onToggle, onCreate, actions, drag, home,
       className={clsx(css.projectRow, menuOpen && css.menuOpen)}
       role="treeitem"
       aria-expanded={row.expanded}
-      onClick={onToggle}
+      onClick={onOpen}
       draggable={drag !== undefined}
       onDragStart={drag === undefined
         ? undefined
@@ -150,7 +152,15 @@ export function ProjectRowItem({ group, onToggle, onCreate, actions, drag, home,
         {row.expanded ? <IconFolderOpen16 /> : <IconFolderClose16 />}
       </span>
       <span className={clsx(css.slot, css.chevron)}>
-        <IconTriangleRightFill14 className={clsx(css.arrow, row.expanded && css.arrowOpen)} />
+        <button
+          type="button"
+          className={clsx(css.arrow, css.arrowButton, row.expanded && css.arrowOpen)}
+          aria-label={t('group.toggle.aria', { name: label })}
+          aria-expanded={row.expanded}
+          onClick={(e) => { e.stopPropagation(); onToggle() }}
+        >
+          <IconTriangleRightFill14 />
+        </button>
       </span>
       <span className={css.projectText}>
         <span className={css.title}>{label}</span>

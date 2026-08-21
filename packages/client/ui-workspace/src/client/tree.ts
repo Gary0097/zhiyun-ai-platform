@@ -228,6 +228,35 @@ function sessionNode(
 }
 
 /**
+ * The most recently updated visible session of one Workspace — the row a
+ * workspace-row click resumes. Collapsed groups carry no derived rows
+ * (`GroupNode.sessions` is empty while folded), so this reads the list
+ * snapshot directly.
+ * @param list - sessions list snapshot.
+ * @param workspaces - real workspaces in stable Host order.
+ * @param archivedSessionIds - registry-global archive set.
+ * @param workspaceId - the Workspace whose conversation to resume.
+ * @returns the newest visible session id, or undefined when none exists.
+ */
+export function mostRecentSessionId(
+  list: SessionListState,
+  workspaces: readonly WorkspaceView[],
+  archivedSessionIds: readonly SessionId[],
+  workspaceId: WorkspaceId,
+): SessionId | undefined {
+  const archived = new Set(archivedSessionIds)
+  const workspace = workspaces.find(w => w.workspaceId === workspaceId)
+  if (workspace === undefined) return undefined
+  let best: SessionSummary | undefined
+  for (const id of workspace.sessionIds) {
+    const summary = list.byId[id]
+    if (summary === undefined || !sessionVisible(summary, list.current, archived)) continue
+    if (best === undefined || summary.updatedAt > best.updatedAt) best = summary
+  }
+  return best?.id
+}
+
+/**
  * Derive the workspace browser groups with every session as a top-level row.
  *
  * Every group shows; sessions populate under expanded groups in the selected

@@ -19,8 +19,8 @@ import type {
   SessionId, SessionListState, SessionSearchResultItem, WorkspaceId, WorkspaceView,
 } from '@deepseek-ai/dsh-client-runtime/client'
 import type { WorkspaceBrowserProps } from './contract/slots.ts'
-import type { SessionNode, SessionOrderBy } from './tree.ts'
-import { deriveFlat, deriveGroups, deriveSearchResults, UNGROUPED_KEY } from './tree.ts'
+import type { GroupNode, SessionNode, SessionOrderBy } from './tree.ts'
+import { deriveFlat, deriveGroups, deriveSearchResults, mostRecentSessionId, UNGROUPED_KEY } from './tree.ts'
 import { ProjectRowItem, SearchResultItem, SessionNodeItem } from './rows/Rows.tsx'
 import { FLAT_SESSION_ORDER_KEY } from './stores.ts'
 import { WorkspacePickFlow } from './WorkspacePicker.tsx'
@@ -378,6 +378,17 @@ function SessionTree({
       console.warn('workspace reorder rejected:', reason)
     })
   }
+  // A workspace row click is the workspace's conversation seat: expand the
+  // group (so the resumed row highlights beneath it), then resume the newest
+  // visible session — or, when none exists yet, start a fresh one. The
+  // ungrouped bucket has no conversation of its own: its row only toggles.
+  const enterGroupConversation = (group: GroupNode): void => {
+    if (!group.expanded) setGroupExpanded(group.key, true)
+    if (group.workspaceId === undefined) return
+    const resume = mostRecentSessionId(list, orderedWorkspaces, archivedSessionIds, group.workspaceId)
+    if (resume !== undefined) open(resume)
+    else startSession(group.workspaceId)
+  }
   const workspaceDropAtListStart = groups[0]?.workspaceId !== undefined
     && workspaceDrag?.over?.id === groups[0].workspaceId
     && workspaceDrag.over.half === 'before'
@@ -454,6 +465,7 @@ function SessionTree({
                 group={group}
                 home={home}
                 t={t}
+                onOpen={() => { enterGroupConversation(group) }}
                 onToggle={() => {
                   if (group.expanded) {
                     setExpandedSessionGroups(keys => keys.filter(key => key !== group.key))

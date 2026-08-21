@@ -272,7 +272,9 @@ describe('Hero chrome', () => {
     }
     expect(brandMarkOwner.size).toBe(34)
     expect(brandMarkOwner.className).toBeTypeOf('string')
-    expect(renderSlot.mock.calls[0]?.[2]?.fallback).toBeTruthy()
+    // The fallback is the neutral sparkle mark (svg), never the old whale.
+    const fallback = renderSlot.mock.calls[0]?.[2]?.fallback
+    expect(fallback).toBeTruthy()
   })
 })
 

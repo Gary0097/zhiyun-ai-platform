@@ -159,6 +159,20 @@
   transition: transform 150ms var(--ds-ease-in-out);
 }
 
+/* The arrow is a real button (keyboard-reachable group toggle) wearing the
+   bare-glyph look: no chrome, inherits the slot's color. */
+.arrowButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 .arrowOpen {
   transform: rotate(90deg);
 }

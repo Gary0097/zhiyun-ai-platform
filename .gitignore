@@ -39,3 +39,13 @@ apps/web/dist/
 worktrees/
 .agents/worktrees/
 .typert-*/
+
+# ---- 智造云企业平台（apps/enterprise）----
+# 运行数据（SQLite 库/租户工作区/日志）——不入库，重生成即可
+apps/enterprise/data/
+# 本地密钥（含真实 API key，绝不入库）
+apps/enterprise/config/secrets.local.env
+# 临时日志
+apps/enterprise/*.log
+apps/enterprise/err*.log
+apps/enterprise/out*.log
