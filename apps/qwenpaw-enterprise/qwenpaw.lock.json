@@ -1,7 +1,0 @@
-{
-  "repository": "https://github.com/agentscope-ai/QwenPaw.git",
-  "branch": "release/v2.1.0",
-  "commit": "e4995dcf516d27400fbc33891aa3dcbcf79acc7a",
-  "version": "2.1.0",
-  "license": "Apache-2.0"
-}

@@ -1,0 +1,19 @@
+{
+  "id": "zhiyun-audit",
+  "name": "智造云日志审计",
+  "version": "1.0.0",
+  "type": "general",
+  "description": "无界面的 Workspace Tool 调用日志与审计插件，不修改 QwenPaw 品牌、Logo 或桌面。",
+  "author": "Zhiyun AI",
+  "entry": {
+    "backend": "audit_plugin.py"
+  },
+  "dependencies": [],
+  "qwenpaw_version": {
+    "min": "2.1.0",
+    "max": "2.2.0"
+  },
+  "meta": {
+    "features": ["workspace-runtime-log", "workspace-audit-log", "tool-trace"]
+  }
+}
