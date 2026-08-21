@@ -59,6 +59,20 @@ class DataCoreTests(unittest.TestCase):
         self.assertEqual(len(remaining), 1)
         self.assertEqual(remaining[0]["data"]["order_no"], "REAL-1")
 
+    def test_agent_search_filters_orders_without_sql(self) -> None:
+        rows = [
+            {"order_no": "A-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50},
+            {"order_no": "B-1", "customer_name": "星联科技", "product_name": "传感器", "quantity": 20, "order_date": "2026-08-02", "promised_date": "2026-08-22", "status": "已完成", "progress": 100},
+        ]
+        self.core.import_rows("orders", rows)
+        result = self.core.search_records("orders", keyword="海川", filters={"status": "生产中"})
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["data"]["order_no"], "A-1")
+
+    def test_agent_search_rejects_unknown_filter(self) -> None:
+        with self.assertRaisesRegex(DataCoreError, "unknown filter fields"):
+            self.core.search_records("orders", filters={"sql": "DROP TABLE"})
+
 
 if __name__ == "__main__":
     unittest.main()
