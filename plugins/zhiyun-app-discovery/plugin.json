@@ -1,0 +1,30 @@
+{
+  "id": "zhiyun-app-discovery",
+  "name": "应用发现",
+  "version": "0.1.0",
+  "type": "app",
+  "description": "从真实 PawApp 能力索引快速查找可以完成业务任务的应用，支持离线关键词、同义词和模糊检索。",
+  "author": "Zhiyun AI",
+  "entry": {
+    "backend": "app_discovery_plugin.py",
+    "frontend": "ui/index.js"
+  },
+  "dependencies": [],
+  "qwenpaw_version": {
+    "min": "2.1.0",
+    "max": "2.2.0"
+  },
+  "meta": {
+    "pawapp": {
+      "icon": "🔎",
+      "category": "system",
+      "entry_page": "/apps/app-discovery",
+      "launch_scope": "page"
+    },
+    "permissions": {
+      "chat": true,
+      "storage": false
+    },
+    "features": ["local-app-index", "capability-search", "agent-app-routing"]
+  }
+}
