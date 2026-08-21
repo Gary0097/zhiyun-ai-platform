@@ -40,6 +40,10 @@ function currentCommit (target) {
   return result.status === 0 ? result.stdout.trim() : ''
 }
 
+function isMaterialized (target, app) {
+  return currentCommit(target) === app.commit && existsSync(join(target, 'plugin.json'))
+}
+
 const lock = JSON.parse(readFileSync(lockPath, 'utf8'))
 validate(lock)
 if (checkOnly) {
@@ -51,7 +55,7 @@ mkdirSync(appsRoot, { recursive: true })
 
 for (const app of lock.apps) {
   const target = join(appsRoot, app.install_dir)
-  if (currentCommit(target) === app.commit) {
+  if (isMaterialized(target, app)) {
     console.log(`PawApp 已就绪：${app.id} @ ${app.commit.slice(0, 8)}`)
   } else if (!existsSync(target)) {
     const clone = git(['clone', '--filter=blob:none', '--no-checkout', app.repository, target], appRoot)
@@ -63,11 +67,13 @@ for (const app of lock.apps) {
   if (currentCommit(target) !== app.commit) {
     const fetch = git(['fetch', '--depth=1', 'origin', app.commit], target)
     if (fetch.status !== 0) fail(`无法获取 ${app.id} 的锁定版本，且本地没有该版本。`)
+  }
+  if (!isMaterialized(target, app)) {
     const checkout = git(['checkout', '--detach', '--force', app.commit], target)
     if (checkout.status !== 0) fail(`无法切换 ${app.id} 到锁定版本。`)
   }
 
-  if (currentCommit(target) !== app.commit) fail(`${app.id} 提交校验失败。`)
+  if (!isMaterialized(target, app)) fail(`${app.id} 提交或工作区文件校验失败。`)
   const manifestPath = join(target, 'plugin.json')
   if (!existsSync(manifestPath)) fail(`${app.id} 缺少 plugin.json。`)
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
