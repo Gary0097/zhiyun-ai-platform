@@ -409,6 +409,37 @@ class DataCore:
             for row in rows
         ]
 
+    def search_records(
+        self,
+        entity: str,
+        *,
+        keyword: str = "",
+        filters: dict[str, Any] | None = None,
+        source_type: str | None = None,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        """Search active records without exposing raw SQL to callers."""
+        schema = self.list_schema(entity)
+        active_fields = {field["name"] for field in schema["fields"] if field["active"]}
+        safe_filters = {key: value for key, value in (filters or {}).items() if value not in (None, "")}
+        unknown = sorted(set(safe_filters) - active_fields)
+        if unknown:
+            raise DataCoreError(f"unknown filter fields: {', '.join(unknown)}")
+
+        records = self.list_records(entity, limit=1000, source_type=source_type)
+        needle = keyword.strip().casefold()
+        matched: list[dict[str, Any]] = []
+        for record in records:
+            payload = record["data"]
+            if safe_filters and any(str(payload.get(key, "")).casefold() != str(value).casefold() for key, value in safe_filters.items()):
+                continue
+            if needle and not any(needle in str(value).casefold() for value in payload.values()):
+                continue
+            matched.append(record)
+            if len(matched) >= max(1, min(limit, 200)):
+                break
+        return matched
+
     def list_batches(self, entity: str | None = None) -> list[dict[str, Any]]:
         query = "SELECT * FROM data_batches"
         params: tuple[Any, ...] = ()
