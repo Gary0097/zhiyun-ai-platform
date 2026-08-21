@@ -112,6 +112,18 @@ Run the Phase 3 verification:
 pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase3
 ```
 
+## AI-OS V3.1 Phase 4
+
+Phase 4 adds a focused high-risk Tool control layer without introducing Capability management or an Approval workflow:
+
+- Automated and unattended runs cannot execute sensitive write Tools.
+- Interactive sensitive writes retain the existing inline confirmation behavior.
+- A tenant setting, `risk.write.enabled.<tenantId>=0`, acts as an immediate write kill switch.
+- High-risk writes are limited to 20 per tenant per minute.
+- Arguments are limited by encoded size, nesting depth, unsafe keys, and operation-specific business ranges.
+- Allowed high-risk writes and all blocked attempts are written to immutable audit records with their Trace ID.
+- `scripts/verify-phase4.mjs` verifies automation blocking, inline confirmation, kill switch, rate limit, and argument validation.
+
 ## Directory map
 
 ```text

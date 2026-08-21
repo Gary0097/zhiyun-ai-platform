@@ -112,6 +112,18 @@ Phase 3 在不改变 DSH 传输协议的前提下，将基于 DSH 的 Auto-run �
 pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase3
 ```
 
+## AI-OS V3.1 Phase 4
+
+Phase 4 新增独立的高风险 Tool 控制层，不建设 Capability 管理或 Approval 审批工作流：
+
+- 自动任务和无人值守运行禁止执行敏感写 Tool。
+- 交互式敏感写操作保留现有轻量确认行为。
+- 租户设置 `risk.write.enabled.<tenantId>=0` 可立即熔断写操作。
+- 高风险写操作限制为每个租户每分钟 20 次。
+- 参数受到编码大小、嵌套深度、危险键和具体业务范围限制。
+- 放行的高风险写操作及所有被拦截尝试均携带 Trace ID 写入不可变审计记录。
+- `scripts/verify-phase4.mjs` 验证自动任务拦截、轻量确认、熔断、限流和参数校验。
+
 ## Directory map
 
 ```text
