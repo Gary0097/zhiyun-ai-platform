@@ -46,9 +46,9 @@
       "id": 6,
       "name": "关键指标趋势分析",
       "app_id": "zhiyun-data-studio",
-      "status": "planned",
-      "progress": 0,
-      "note": "未开发。"
+      "status": "in_progress",
+      "progress": 60,
+      "note": "已支持订单量、平均进度和生产延误率月度趋势、方向判断与异常月份识别，待真实数据验收。"
     },
     {
       "id": 7,
