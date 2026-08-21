@@ -59,7 +59,23 @@ Run the Phase 0 verification:
 pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase0
 ```
 
-Phase 0 does not migrate WorkTask, Scheduler, Auto-run, or DSH session persistence. Later migrations use the adapters incrementally, and old and new schedulers must never trigger the same business task concurrently.
+## AI-OS V3.1 Phase 1
+
+Phase 1 migrates one-shot WorkTask execution onto the unified runtime without breaking the existing WorkTask API:
+
+- `server/os/runtime-store.js` persists tenant-scoped Task, Execution, Process, and lifecycle Event records.
+- `server/os/task-service.js` idempotently maps each legacy WorkTask to one AI-OS Task and sends every execution through the kernel.
+- `GET /api/os/tasks` and `GET /api/os/tasks/:id` expose tenant-scoped task status and execution history.
+- The legacy `business_work_task` row remains a compatibility projection for the current UI.
+- `scripts/verify-phase1.mjs` covers source idempotency, successful and failed execution persistence, and cross-tenant lookup isolation.
+
+Run the Phase 1 verification:
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase1
+```
+
+Scheduler, Auto-run, and DSH session persistence remain later migrations. Old and new schedulers must never trigger the same business task concurrently.
 
 ## Directory map
 

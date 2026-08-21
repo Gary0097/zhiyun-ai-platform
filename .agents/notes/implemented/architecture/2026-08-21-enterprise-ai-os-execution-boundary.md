@@ -16,7 +16,9 @@ The AI-OS task model needs one stable execution boundary before existing callers
 
 The lightweight runner adapts the existing enterprise `runAgent` operation. The DSH runner adapts a supplied session operation. Both adapters use dependency injection, so the kernel does not import either runtime and does not create a second model or session protocol.
 
-The enterprise database initializes additive Task, Plan, Context Snapshot, Execution, Process, Checkpoint, Event, Approval, Artifact, Capability, and Capability Policy tables. Existing V2 tables and APIs remain authoritative until their callers migrate explicitly. The new tables require tenant ownership for tenant-scoped records and use idempotent `CREATE TABLE IF NOT EXISTS` migrations.
+The enterprise database initializes additive Task, Plan, Context Snapshot, Execution, Process, Checkpoint, Event, Approval, Artifact, Capability, and Capability Policy tables. Source-backed tasks have one tenant-scoped source mapping. Existing V2 tables and APIs remain available as compatibility projections while callers migrate explicitly.
+
+WorkTask is the first migrated caller. `TaskService` maps each legacy WorkTask idempotently to one AI-OS Task, runs it through the kernel, and persists a new Execution, Process, and lifecycle Events for every attempt. The legacy WorkTask row continues to receive its former status, trace, output, and latency fields so the existing UI and API contract do not change during this phase.
 
 ## Alternatives considered
 
@@ -28,6 +30,6 @@ The enterprise database initializes additive Task, Plan, Context Snapshot, Execu
 
 ## Consequences
 
-New AI-OS work has one place for tenant validation, runner selection, and result normalization while existing behavior remains available. Schema creation and adapter routing are verified without requiring a model provider or running HTTP service.
+New AI-OS work has one place for tenant validation, runner selection, result normalization, and durable task lifecycle state while existing behavior remains available. The Task query API is tenant-scoped and exposes executions, processes, events, and artifacts without exposing another tenant's records.
 
-The boundary does not migrate WorkTask, Scheduler, Auto-run, or DSH session persistence by itself. Those callers must adopt the kernel incrementally, and old and new schedulers must not trigger the same business task concurrently. Checkpoint persistence, approval orchestration, event delivery, and business-result verification remain later consumers of the baseline tables.
+Scheduler, Auto-run, and DSH session persistence still require incremental migration, and old and new schedulers must not trigger the same business task concurrently. Checkpoint persistence, approval orchestration, event delivery, and business-result verification remain later consumers of the baseline tables. Deleting a legacy WorkTask does not erase its AI-OS runtime history.

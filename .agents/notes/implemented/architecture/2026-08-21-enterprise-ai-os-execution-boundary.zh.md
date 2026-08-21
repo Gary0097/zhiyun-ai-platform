@@ -16,7 +16,9 @@ AI-OS 任务模型需要先建立稳定的统一执行边界，再迁移现有�
 
 轻量 Runner 适配现有企业平台 `runAgent` 操作，DSH Runner 适配外部注入的 Session 操作。两个适配器均使用依赖注入，因此 Kernel 不导入任一运行时，也不建立第二套模型或 Session 协议。
 
-企业数据库以增量方式初始化 Task、Plan、Context Snapshot、Execution、Process、Checkpoint、Event、Approval、Artifact、Capability 和 Capability Policy 表。在调用方明确迁移前，现有 V2 表和 API 继续作为权威来源。新表要求租户范围内的记录必须绑定租户，并通过幂等的 `CREATE TABLE IF NOT EXISTS` 完成迁移。
+企业数据库以增量方式初始化 Task、Plan、Context Snapshot、Execution、Process、Checkpoint、Event、Approval、Artifact、Capability 和 Capability Policy 表。来自业务来源的任务在租户范围内只保留一个来源映射。现有 V2 表和 API 在调用方逐步迁移期间继续作为兼容投影。
+
+WorkTask 是首个完成迁移的调用方。`TaskService` 将每个旧 WorkTask 幂等映射到一个 AI-OS Task，通过 Kernel 执行，并为每次尝试持久化新的 Execution、Process 和生命周期 Event。旧 WorkTask 行继续回写原有状态、Trace、输出和耗时字段，因此本阶段不会改变既有 UI 与 API 约定。
 
 ## Alternatives considered
 
@@ -28,6 +30,6 @@ AI-OS 任务模型需要先建立稳定的统一执行边界，再迁移现有�
 
 ## Consequences
 
-新的 AI-OS 工作拥有统一的租户校验、Runner 选择和结果标准化入口，同时现有行为继续可用。Schema 创建和适配器路由无需模型 Provider 或运行中的 HTTP 服务即可验证。
+新的 AI-OS 工作拥有统一的租户校验、Runner 选择、结果标准化和持久化任务生命周期入口，同时现有行为继续可用。Task 查询 API 按租户隔离，可读取 Execution、Process、Event 和 Artifact，且不会暴露其他租户的数据。
 
-该边界本身不会迁移 WorkTask、Scheduler、Auto-run 或 DSH Session 持久化。调用方需要逐步接入 Kernel，且新旧调度器不得同时触发同一个业务任务。Checkpoint 持久化、审批编排、事件投递和业务结果验证将在后续阶段使用这些基线表。
+Scheduler、Auto-run 和 DSH Session 持久化仍需逐步迁移，且新旧调度器不得同时触发同一个业务任务。Checkpoint 持久化、审批编排、事件投递和业务结果验证将在后续阶段使用这些基线表。删除旧 WorkTask 不会擦除其 AI-OS 运行历史。
