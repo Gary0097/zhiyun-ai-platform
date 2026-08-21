@@ -20,6 +20,8 @@ AI-OS 任务模型需要先建立稳定的统一执行边界，再迁移现有�
 
 WorkTask 是首个完成迁移的调用方。`TaskService` 将每个旧 WorkTask 幂等映射到一个 AI-OS Task，通过 Kernel 执行，并为每次尝试持久化新的 Execution、Process 和生命周期 Event。旧 WorkTask 行继续回写原有状态、Trace、输出和耗时字段，因此本阶段不会改变既有 UI 与 API 约定。
 
+现有 Scheduler 是第二个完成迁移的调用方。Cron、Interval、Condition 判断、Job Lock、旧 Job 记录、重试和死信行为继续保留在 `scheduler.js`，仅替换 Worker 执行边界。每次调度尝试都会成为独立的 AI-OS Execution 与 Process，记录重试次数，并保存可恢复的完成 Checkpoint；准备重试时，在下一次尝试前额外保存 `retry.scheduled` Checkpoint。
+
 ## Alternatives considered
 
 **立即用 DSH 替换企业平台 Agent 循环。** 本地循环承载现有 API 和定时任务行为；立即替换会把执行约定迁移和运行时迁移合并，增加回归定位难度。
@@ -32,4 +34,4 @@ WorkTask 是首个完成迁移的调用方。`TaskService` 将每个旧 WorkTask
 
 新的 AI-OS 工作拥有统一的租户校验、Runner 选择、结果标准化和持久化任务生命周期入口，同时现有行为继续可用。Task 查询 API 按租户隔离，可读取 Execution、Process、Event 和 Artifact，且不会暴露其他租户的数据。
 
-Scheduler、Auto-run 和 DSH Session 持久化仍需逐步迁移，且新旧调度器不得同时触发同一个业务任务。Checkpoint 持久化、审批编排、事件投递和业务结果验证将在后续阶段使用这些基线表。删除旧 WorkTask 不会擦除其 AI-OS 运行历史。
+Auto-run 和 DSH Session 持久化仍需逐步迁移。本阶段不新增与现有 Scheduler 竞争的调度器，调度策略继续由旧 Scheduler 管理，`job_lock` 仍是唯一并发保护。Checkpoint 已能记录尝试边界，但尚不能从模型 Turn 中间恢复；审批编排、事件投递和业务结果验证仍留待后续。删除旧 WorkTask 不会擦除其 AI-OS 运行历史。

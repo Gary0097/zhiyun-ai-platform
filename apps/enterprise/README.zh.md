@@ -77,6 +77,25 @@ pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase1
 
 Scheduler、Auto-run 和 DSH Session 持久化仍留待后续迁移。新旧调度器不得同时触发同一个业务任务。
 
+## AI-OS V3.1 Phase 2
+
+Phase 2 在保留现有触发和兼容行为的前提下，迁移 Scheduler 的 Worker 执行路径：
+
+- Cron、Interval、Condition 判断、`job_lock`、旧 Job 行、重试和死信审计继续保留在 `server/scheduler.js`。
+- 每次调度尝试都通过 `TaskService` 映射为一个 AI-OS Execution 与 Process。
+- 每个 Execution 持久化重试次数，使不同尝试可以独立追踪。
+- 完成和重试决策会保存可恢复 Checkpoint，并产生 Checkpoint Event。
+- `server/os/runtime.js` 为 REST 与 Scheduler 调用方提供唯一共享的运行时装配。
+- `scripts/verify-phase2.mjs` 覆盖调度来源映射、重试尝试、Checkpoint 和租户隔离。
+
+运行 Phase 2 验证：
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase2
+```
+
+本阶段 Checkpoint 记录安全的尝试边界，尚不支持从被中断的模型 Turn 中间恢复。
+
 ## Directory map
 
 ```text

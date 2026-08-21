@@ -20,6 +20,8 @@ The enterprise database initializes additive Task, Plan, Context Snapshot, Execu
 
 WorkTask is the first migrated caller. `TaskService` maps each legacy WorkTask idempotently to one AI-OS Task, runs it through the kernel, and persists a new Execution, Process, and lifecycle Events for every attempt. The legacy WorkTask row continues to receive its former status, trace, output, and latency fields so the existing UI and API contract do not change during this phase.
 
+The existing Scheduler is the second migrated caller. Cron, interval, condition evaluation, job locking, legacy Job records, retries, and dead-letter behavior remain in `scheduler.js`; only the worker execution boundary changes. Each scheduler attempt becomes a separate AI-OS Execution and Process, records its retry count, and saves a resumable completion Checkpoint. A retry decision saves an additional `retry.scheduled` Checkpoint before the next attempt.
+
 ## Alternatives considered
 
 **Replace the enterprise agent loop with DSH immediately.** The local loop supports current API and scheduled-task behavior. Immediate replacement would combine contract migration with runtime migration and make regressions harder to isolate.
@@ -32,4 +34,4 @@ WorkTask is the first migrated caller. `TaskService` maps each legacy WorkTask i
 
 New AI-OS work has one place for tenant validation, runner selection, result normalization, and durable task lifecycle state while existing behavior remains available. The Task query API is tenant-scoped and exposes executions, processes, events, and artifacts without exposing another tenant's records.
 
-Scheduler, Auto-run, and DSH session persistence still require incremental migration, and old and new schedulers must not trigger the same business task concurrently. Checkpoint persistence, approval orchestration, event delivery, and business-result verification remain later consumers of the baseline tables. Deleting a legacy WorkTask does not erase its AI-OS runtime history.
+Auto-run and DSH session persistence still require incremental migration. Scheduler policy remains in the existing scheduler instead of introducing a competing scheduler, so `job_lock` continues to be the single concurrency guard. Checkpoints now capture attempt boundaries but do not yet resume an interrupted model turn; approval orchestration, event delivery, and business-result verification remain later consumers. Deleting a legacy WorkTask does not erase its AI-OS runtime history.

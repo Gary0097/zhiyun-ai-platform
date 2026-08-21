@@ -23,14 +23,14 @@ export class RuntimeStore {
     return this.db.prepare('SELECT * FROM runtime_task WHERE task_id = ?').get(taskId)
   }
 
-  startExecution ({ task, runner, triggerType, agentId = null, input = null }) {
+  startExecution ({ task, runner, triggerType, agentId = null, input = null, retryCount = 0 }) {
     const executionId = this.id()
     const processId = this.id()
     const at = this.clock()
     this.db.prepare(`INSERT INTO runtime_execution
-      (execution_id, task_id, tenant_id, runner, trigger_type, status, input_json, started_at, created_at)
-      VALUES (?,?,?,?,?,'running',?,?,?)`)
-      .run(executionId, task.task_id, task.tenant_id, runner, triggerType, J(input), at, at)
+      (execution_id, task_id, tenant_id, runner, trigger_type, status, input_json, retry_count, started_at, created_at)
+      VALUES (?,?,?,?,?,'running',?,?,?,?)`)
+      .run(executionId, task.task_id, task.tenant_id, runner, triggerType, J(input), retryCount, at, at)
     this.db.prepare(`INSERT INTO runtime_process
       (process_id, tenant_id, task_id, execution_id, agent_id, status, heartbeat_at, started_at)
       VALUES (?,?,?,?,?,'running',?,?)`)
@@ -39,6 +39,23 @@ export class RuntimeStore {
       .run(at, task.task_id, task.tenant_id)
     this.appendEvent({ tenantId: task.tenant_id, taskId: task.task_id, executionId, processId, eventType: 'execution.started', payload: { runner, triggerType } })
     return { executionId, processId }
+  }
+
+  saveCheckpoint ({ task, executionId, processId = null, stepKey, state, safeToResume = true }) {
+    const checkpointId = this.id()
+    this.db.prepare(`INSERT INTO runtime_checkpoint
+      (checkpoint_id, tenant_id, task_id, execution_id, process_id, step_key, state_json, safe_to_resume, created_at)
+      VALUES (?,?,?,?,?,?,?,?,?)`)
+      .run(checkpointId, task.tenant_id, task.task_id, executionId, processId, stepKey, J(state), safeToResume ? 1 : 0, this.clock())
+    this.appendEvent({
+      tenantId: task.tenant_id,
+      taskId: task.task_id,
+      executionId,
+      processId,
+      eventType: 'checkpoint.saved',
+      payload: { checkpointId, stepKey, safeToResume }
+    })
+    return checkpointId
   }
 
   finishExecution ({ task, executionId, processId, result }) {
@@ -84,7 +101,8 @@ export class RuntimeStore {
       executions: this.db.prepare('SELECT * FROM runtime_execution WHERE task_id=? AND tenant_id=? ORDER BY created_at DESC').all(taskId, tenantId),
       processes: this.db.prepare('SELECT * FROM runtime_process WHERE task_id=? AND tenant_id=? ORDER BY started_at DESC').all(taskId, tenantId),
       events: this.db.prepare('SELECT * FROM runtime_event WHERE task_id=? AND tenant_id=? ORDER BY created_at').all(taskId, tenantId),
-      artifacts: this.db.prepare('SELECT * FROM runtime_artifact WHERE task_id=? AND tenant_id=? ORDER BY created_at DESC').all(taskId, tenantId)
+      artifacts: this.db.prepare('SELECT * FROM runtime_artifact WHERE task_id=? AND tenant_id=? ORDER BY created_at DESC').all(taskId, tenantId),
+      checkpoints: this.db.prepare('SELECT * FROM runtime_checkpoint WHERE task_id=? AND tenant_id=? ORDER BY created_at DESC').all(taskId, tenantId)
     }
   }
 }
