@@ -7,6 +7,7 @@ import { randomUUID } from 'node:crypto'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { FUNCTION_CATALOG, featureRoles } from './function-catalog.js'
+import { taskService } from './os/runtime.js'
 
 const ORIGIN = 'auto-simulated'
 const MODEL_LABEL = 'Qwen3.8-27B · dsh Harness'
@@ -356,7 +357,7 @@ function ensureConversation (tenantId, roleKey, title, agentId) {
 }
 
 /** 一轮执行落库：execution + 消息 + 工具调用 + 模型用量（data_origin=auto-simulated） */
-function logRound ({ tenant, agentName, roleKey, roleTitle, question, turn, triggerType, error = null, feature = null, module = null }) {
+function logRound ({ tenant, agentName, roleKey, roleTitle, question, turn, triggerType, sessionId = null, error = null, feature = null, module = null }) {
   const agentId = agentName ? resolveAgentId(tenant.id, agentName) : null
   const traceId = randomUUID()
   const convId = ensureConversation(tenant.id, roleKey, feature ? `${feature} · 功能演示` : `${roleTitle} · 自动运行`, agentId)
@@ -380,6 +381,17 @@ function logRound ({ tenant, agentName, roleKey, roleTitle, question, turn, trig
   }
   if (ok) db.prepare('INSERT INTO runtime_model_usage (tenant_id, execution_id, model, token_input, token_output, created_at, data_origin) VALUES (?,?,?,?,?,?,?)')
     .run(tenant.id, execId, MODEL_LABEL, tokenIn, tokenOut, t, ORIGIN)
+  taskService.recordExternalExecution({
+    tenantId: tenant.id,
+    title: feature ? `${feature} · 功能演示` : roleTitle,
+    objective: question,
+    sourceType: 'auto_session',
+    sourceId: `${roleKey}:${sessionId || 'unavailable'}`,
+    agentId,
+    triggerType,
+    sessionId,
+    result: { status: ok ? 'success' : 'failed', traceId, output: ok ? (turn.text || '') : null, error: ok ? null : String(error ?? turn?.reason ?? 'empty reply') }
+  })
   return { executionId: execId, traceId }
 }
 
@@ -495,13 +507,13 @@ async function askRole (role, roundIdx) {
   try {
     const question = roleQuestion(role, roundIdx)
     const turn = await runTurn(sessionId, question)
-    logRound({ tenant, agentName: role.agentName, roleKey: role.key, roleTitle: role.name, question, turn, triggerType: 'auto:sim', ...extra })
+    logRound({ tenant, agentName: role.agentName, roleKey: role.key, roleTitle: role.name, question, turn, triggerType: 'auto:sim', sessionId, ...extra })
     role.done += 1
     S.done += 1
     trace(`角色轮次完成: ${role.name} 第${roundIdx + 1}轮 (${turn.latencyMs}ms, ${turn.text.length} 字)`)
   } catch (e) {
     trace(`角色轮次失败: ${role.name} 第${roundIdx + 1}轮: ${e.message}`)
-    logRound({ tenant, agentName: role.agentName, roleKey: role.key, roleTitle: role.name, question: roleQuestion(role, roundIdx), turn: null, triggerType: 'auto:sim', error: e.message, ...extra })
+    logRound({ tenant, agentName: role.agentName, roleKey: role.key, roleTitle: role.name, question: roleQuestion(role, roundIdx), turn: null, triggerType: 'auto:sim', sessionId, error: e.message, ...extra })
     role.failed += 1
     S.failed += 1
     noteError(`${role.name}: ${e.message}`)
@@ -584,7 +596,7 @@ export async function runJhlReport () {
     if (!turn.text) throw new Error('模型返回空报告')
     // 3) 存库
     settingUpsert().run('auto.report.jhl', turn.text, now())
-    logRound({ tenant, agentName: '采购分析 Agent', roleKey: 'report', roleTitle: '金汉隆数据报告', question, turn, triggerType: 'auto:report' })
+    logRound({ tenant, agentName: '采购分析 Agent', roleKey: 'report', roleTitle: '金汉隆数据报告', question, turn, triggerType: 'auto:report', sessionId })
     S.report = { running: false, generatedAt: now(), error: null }
     trace(`报告完成 (${turn.text.length} 字, ${turn.latencyMs}ms)`)
     return { ok: true }
@@ -592,7 +604,7 @@ export async function runJhlReport () {
     S.report = { running: false, generatedAt: null, error: e.message }
     trace(`报告失败: ${e.message}`)
     noteError(`报告生成失败: ${e.message}`)
-    logRound({ tenant, agentName: '采购分析 Agent', roleKey: 'report', roleTitle: '金汉隆数据报告', question: '（生成失败）', turn: null, triggerType: 'auto:report', error: e.message })
+    logRound({ tenant, agentName: '采购分析 Agent', roleKey: 'report', roleTitle: '金汉隆数据报告', question: '（生成失败）', turn: null, triggerType: 'auto:report', sessionId, error: e.message })
     throw e
   } finally {
     if (sessionId) activeSessions.delete(sessionId)
@@ -623,21 +635,21 @@ export async function runMultiAgentTest () {
     const t1 = await runTurn(a, q1)
     insMessage(convId, 'user', `[采购分析师] ${q1}`)
     if (t1.text) insMessage(convId, 'assistant', `[采购分析师] ${t1.text}`)
-    logRound({ tenant, agentName: '采购分析 Agent', roleKey: 'multiagent-a', roleTitle: '多 Agent · 采购分析师', question: q1, turn: t1, triggerType: 'auto:multiagent' })
+    logRound({ tenant, agentName: '采购分析 Agent', roleKey: 'multiagent-a', roleTitle: '多 Agent · 采购分析师', question: q1, turn: t1, triggerType: 'auto:multiagent', sessionId: a })
 
     // ② 助手回答分析师的问题
     const q2 = `企业智能助手你好，我是采购分析师。我向你提出以下问题：\n\n${t1.text || '（无内容）'}\n\n${read}请回答其中的问题并给出建议。`
     const t2 = await runTurn(b, q2)
     insMessage(convId, 'user', `[智能助手→收] ${q2.slice(0, 500)}`)
     if (t2.text) insMessage(convId, 'assistant', `[智能助手] ${t2.text}`)
-    logRound({ tenant, agentName: '企业智能助手', roleKey: 'multiagent-b', roleTitle: '多 Agent · 智能助手', question: q2, turn: t2, triggerType: 'auto:multiagent' })
+    logRound({ tenant, agentName: '企业智能助手', roleKey: 'multiagent-b', roleTitle: '多 Agent · 智能助手', question: q2, turn: t2, triggerType: 'auto:multiagent', sessionId: b })
 
     // ③ 分析师评估收尾
     const q3 = `采购分析师继续。企业智能助手的回复如下：\n\n${t2.text || '（无内容）'}\n\n${read}请评估该回复，给出最终意见与行动清单。`
     const t3 = await runTurn(a, q3)
     insMessage(convId, 'user', `[采购分析师→收] ${q3.slice(0, 500)}`)
     if (t3.text) insMessage(convId, 'assistant', `[采购分析师] ${t3.text}`)
-    logRound({ tenant, agentName: '采购分析 Agent', roleKey: 'multiagent-a', roleTitle: '多 Agent · 采购分析师', question: q3, turn: t3, triggerType: 'auto:multiagent' })
+    logRound({ tenant, agentName: '采购分析 Agent', roleKey: 'multiagent-a', roleTitle: '多 Agent · 采购分析师', question: q3, turn: t3, triggerType: 'auto:multiagent', sessionId: a })
 
     S.multiagent = { running: false, finishedAt: now(), error: null }
     return { ok: true, turns: 3 }
@@ -671,11 +683,11 @@ export async function runFeatureDemo (featureIdx, user) {
     void startApprovalListener()
     trace(`功能演示开始: ${f.name}（${f.module}）@${tenant.code}`)
     const turn = await runTurn(sessionId, f.question)
-    logRound({ tenant, agentName: null, roleKey: 'feature-demo', roleTitle: f.agent, question: f.question, turn, triggerType: 'auto:feature', feature: f.name, module: f.module })
+    logRound({ tenant, agentName: null, roleKey: 'feature-demo', roleTitle: f.agent, question: f.question, turn, triggerType: 'auto:feature', sessionId, feature: f.name, module: f.module })
     trace(`功能演示完成: ${f.name} (${turn.latencyMs}ms)`)
     return { ok: true, feature: f.name, module: f.module, reply: turn.text, latencyMs: turn.latencyMs }
   } catch (e) {
-    logRound({ tenant, agentName: null, roleKey: 'feature-demo', roleTitle: f.agent, question: f.question, turn: null, triggerType: 'auto:feature', error: e.message, feature: f.name, module: f.module })
+    logRound({ tenant, agentName: null, roleKey: 'feature-demo', roleTitle: f.agent, question: f.question, turn: null, triggerType: 'auto:feature', sessionId, error: e.message, feature: f.name, module: f.module })
     noteError(`功能演示失败 ${f.name}: ${e.message}`)
     throw e
   } finally {

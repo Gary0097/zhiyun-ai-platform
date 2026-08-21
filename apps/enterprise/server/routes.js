@@ -10,6 +10,7 @@ import { startAutoRun, stopAutoRun, autoRunStatus, autoRunAnalytics, runJhlRepor
 import { FUNCTION_CATALOG, catalogByModule } from './function-catalog.js'
 import { runKnowledgeHarvest, harvestStatus } from './knowledge-harvester.js'
 import { modelInfo } from './llm.js'
+import { runtimeStore, taskService } from './os/runtime.js'
 
 export function route (method, path, handler, opts = {}) {
   return { method, path, handler, ...opts }
@@ -236,9 +237,10 @@ export function buildRoutes () {
   H('POST', '/api/users', async (req, res, { user }) => {
     requirePermission(user, 'system:manage')
     const b = await readBody(req)
+    if (!b.password || String(b.password).length < 8) throw Object.assign(new Error('创建用户时必须提供至少 8 位密码'), { status: 400 })
     if (user.role !== 'platform_admin' && Number(b.tenant_id) !== user.tenant_id) throw new PermissionError('不得为其他企业创建用户')
     const id = db.prepare('INSERT INTO business_user (tenant_id, username, password_hash, display_name, dept_id, title, role, data_scope, data_origin, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)')
-      .run(b.tenant_id || user.tenant_id, b.username, hashPassword(b.password || 'Zhiyun@2026'), b.display_name, b.dept_id || null, b.title || null, b.role || 'employee', b.data_scope || 'self', 'manual', now()).lastInsertRowid
+      .run(b.tenant_id || user.tenant_id, b.username, hashPassword(String(b.password)), b.display_name, b.dept_id || null, b.title || null, b.role || 'employee', b.data_scope || 'self', 'manual', now()).lastInsertRowid
     logOperation({ tenantId: user.tenant_id, userId: user.id, module: 'system', action: '创建用户', resourceType: 'user', resourceId: id, after: { username: b.username, role: b.role } })
     return { id: Number(id) }
   })
@@ -486,15 +488,16 @@ export function buildRoutes () {
     return { fired: fired.length }
   })
 
-  // ---- 一次性 AI 任务（新建任务：runAgent 真实执行，异步回写状态）----
+  // ---- 一次性 AI 任务（兼容业务表 + AI-OS Task/Execution 统一运行时）----
   async function executeWorkTask (taskId, user) {
-    const t = db.prepare('SELECT * FROM business_work_task WHERE id = ?').get(taskId)
+    const t = taskService.loadLegacyWorkTask({ taskId, tenantId: user.tenant_id })
     if (!t || t.status === 'running') return
     db.prepare("UPDATE business_work_task SET status='running', error=NULL, output=NULL WHERE id = ?").run(taskId)
     try {
-      const res = await runAgent({ agentId: t.agent_id, user, instruction: t.instruction, triggerType: 'task' })
+      const res = await taskService.executeLegacyWorkTask({ workTask: t, user })
+      const legacyStatus = res.status === 'succeeded' ? 'success' : res.status
       db.prepare('UPDATE business_work_task SET status=?, execution_id=?, trace_id=?, output=?, latency_ms=?, finished_at=? WHERE id=?')
-        .run(res.status, res.executionId, res.traceId, String(res.output ?? '').slice(0, 4000), res.latencyMs, now(), taskId)
+        .run(legacyStatus, res.executionId, res.traceId, String(res.output ?? '').slice(0, 4000), res.latencyMs, now(), taskId)
     } catch (e) {
       // runAgent 对不存在/未发布/跨租户 Agent 在落库前抛错，业务表兜底置 failed
       db.prepare("UPDATE business_work_task SET status='failed', error=?, finished_at=? WHERE id=?")
@@ -546,6 +549,24 @@ export function buildRoutes () {
     db.prepare('DELETE FROM business_work_task WHERE id = ?').run(t.id)
     logOperation({ tenantId: user.tenant_id, userId: user.id, module: 'task', action: '删除任务', resourceType: 'work_task', resourceId: t.id, before: { title: t.title } })
     return { ok: true }
+  })
+
+  // AI-OS 查询面：所有读取均按当前租户约束，legacy WorkTask 只作为兼容投影。
+  H('GET', '/api/os/tasks', (req, res, { user }) => {
+    requirePermission(user, 'worktask:run')
+    const url = new URL(req.url, 'http://x')
+    return runtimeStore.listTasks({ tenantId: user.tenant_id, status: url.searchParams.get('status'), limit: url.searchParams.get('limit') })
+  })
+  H('GET', '/api/os/monitor', (req, res, { user }) => {
+    requirePermission(user, 'stats:view')
+    const url = new URL(req.url, 'http://x')
+    return runtimeStore.monitorSnapshot({ tenantId: user.tenant_id, limit: url.searchParams.get('limit') })
+  })
+  H('GET', '/api/os/tasks/:id', (req, res, { user, params }) => {
+    requirePermission(user, 'worktask:run')
+    const task = runtimeStore.getTask({ tenantId: user.tenant_id, taskId: params.id })
+    if (!task) throw Object.assign(new Error('AI-OS 任务不存在'), { status: 404 })
+    return task
   })
 
   // ---- 项目 ----

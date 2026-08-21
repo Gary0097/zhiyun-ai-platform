@@ -1,68 +1,162 @@
-# 智造云企业 AI 智能体平台（apps/enterprise）
+# Zhiyun Enterprise AI Agent Platform (`apps/enterprise`)
 
-基于 DeepSeek Harness 的多租户企业 AI 智能体运行与业务执行平台。完整需求规格见仓库根目录 PRD 文档与 `AI-OS-PRD-V3.0.md`。
+English | [中文](README.zh.md)
 
-## 架构
+A multi-tenant enterprise AI agent runtime and business execution platform built on DeepSeek Harness. The repository product requirements and `AI-OS-PRD-V3.0.md` define the complete product specification.
+
+## Architecture
 
 ```text
-企业平台 (8390)  ←HTTP 信封 API + WebSocket→  DSH Harness (8308)  ←OpenAI 兼容→  模型层
+Enterprise platform (8390)  ←HTTP envelope API + WebSocket→  DSH Harness (8308)  ←OpenAI compatible→  Model layer
 ```
 
-- **企业平台**（本目录）：零依赖 Node ≥24（node:http + node:sqlite），管租户/RBAC/业务数据/看板/AI 自动运行/知识库/调度/日志审计
-- **DSH Harness**：Cordis 插件化 Agent Runtime（仓库 dsh 部分，已做去品牌化与工作区即续接等定制）
-- **模型层**：多 Provider 可路由（本地 LM Studio / 远端 OpenAI 兼容网关）
+- **Enterprise platform**: This directory uses Node.js 24 or later without runtime npm dependencies (`node:http` and `node:sqlite`) and owns tenants, RBAC, business data, dashboards, automatic AI runs, knowledge, scheduling, logs, and audit.
+- **DSH Harness**: The repository's Cordis plugin-based Agent Runtime includes the product's neutral branding and workspace-resume customizations.
+- **Model layer**: Configurable providers route to local LM Studio or remote OpenAI-compatible gateways.
 
-## 快速开始
+## Quick start
 
 ```sh
-# 1. 配置模型密钥（本地文件，不入库）
-cp config/secrets.example.env config/secrets.local.env   # 编辑填入密钥
+# 1. Configure model credentials in an ignored local file.
+cp config/secrets.example.env config/secrets.local.env
 
-# 2. 启动 DSH Web（8308，模型凭据见 ~/.dsh/settings.yaml 与 ~/.dsh/.credentials.yaml）
+# 2. Start DSH Web on 8308. Provider credentials live in the DSH credentials layer.
 node ../cli/lib/bin.js web --no-open --port 8308
 
-# 3. 启动企业平台（8390，自动加载 secrets.local.env）
+# 3. Start the enterprise platform on 8390. The launcher loads secrets.local.env.
 node start.mjs
 
-# 4.（可选）生成 88.6 万条历史运行数据
+# 4. Optionally generate the historical runtime dataset.
 node server/cli.js simulate
 ```
 
-默认账号（密码统一 `Zhiyun@2026`，种子数据仅演示用）：`platform` 平台超管 · `admin.a/b/c` 企业管理员 · `admin.j` 金汉隆管理员 · `sales.a` 普通员工 · `audit.a` 审计员。
+Seed accounts are demonstration data. Their shared password and identifiers are created by `server/db.js`; do not enable them in a production deployment.
 
-## 核心能力
+## Capabilities
 
-- **多租户**：所有核心表绑定 `tenant_id`，查询一律由服务端 Context 注入；跨租户访问一律 403
-- **AI 自动运行**：34 角色轮跑（6 业务 + 28 功能模块演示），dsh 信封 API 直驱真实模型，全链路日志（trigger_type: auto:sim/report/multiagent/feature/research/task）
-- **知识库**：两级（库→条目）+ knowledge_search 真检索 + 联网资料收割（资料→模型加工→入库→工作区 KNOWLEDGE.md 导出，dsh 会话可直接阅读）
-- **WorkBuddy 式协作**：一次性 AI 任务（异步执行/状态轮询/trace 回放）+ 项目容器
-- **定时任务**：cron/interval/condition 三类触发 + job_lock 防重 + 重试 + 死信审计
-- **数据生成**：历史运行数据（88.6 万条，月度曲线/时段规律）+ 成体系企业业务数据（行业画像/订单状态机/财务派生）
-- **可视化**：33 表数据库浏览（分页/全列搜索/凭据列隐藏）+ AI 运行监控看板（KPI/趋势/耗时/模块分布）+ 完整 markdown 渲染
-- **日志审计**：四层日志表 + trace replay + 数据修改留痕（audit_change）
+- **Multi-tenancy**: Core records carry `tenant_id`, server context supplies the active tenant, and cross-tenant requests fail with HTTP 403.
+- **Automatic AI runs**: Role rotation and feature demonstrations drive real model sessions through the DSH envelope API and record one trace across each run.
+- **Knowledge**: Knowledge bases contain entries, `knowledge_search` performs real retrieval, and the harvester writes reviewed results to tenant workspaces for DSH access.
+- **Work collaboration**: One-shot AI tasks run asynchronously, expose status and trace replay, and may belong to project containers.
+- **Scheduled tasks**: Cron, interval, and condition triggers use `job_lock`, retries, and dead-letter audit records.
+- **Data generation**: Runtime and connected business generators create marked demonstration data with coherent order, finance, and inventory relationships.
+- **Visualization**: Database browsing, AI runtime dashboards, and Markdown rendering expose platform state without direct database access.
+- **Audit**: Runtime, tool, operation, and immutable audit records share trace identifiers; authorized display corrections retain before-and-after values.
 
-## 目录导览
+## AI-OS V3.1 Phase 0
+
+Phase 0 adds a compatible AI-OS execution baseline while existing V2 APIs, tables, and execution paths remain available:
+
+- `server/os/schema.js` creates the Task, Execution, Process, Checkpoint, Event, Approval, Artifact, and Capability baseline idempotently.
+- `server/os/execution-kernel.js` provides one runner-selection and result-normalization boundary for the lightweight enterprise loop and DSH sessions.
+- `server/os/adapters/` injects both runners so business code does not bind directly to one execution engine.
+- `server/os/contracts.js` owns shared task, process, and execution states and rejects execution requests without a tenant.
+- `scripts/verify-phase0.mjs` verifies idempotent SQLite migration, runner routing, and the tenant requirement.
+
+Run the Phase 0 verification:
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase0
+```
+
+## AI-OS V3.1 Phase 1
+
+Phase 1 migrates one-shot WorkTask execution onto the unified runtime without breaking the existing WorkTask API:
+
+- `server/os/runtime-store.js` persists tenant-scoped Task, Execution, Process, and lifecycle Event records.
+- `server/os/task-service.js` idempotently maps each legacy WorkTask to one AI-OS Task and sends every execution through the kernel.
+- `GET /api/os/tasks` and `GET /api/os/tasks/:id` expose tenant-scoped task status and execution history.
+- The legacy `business_work_task` row remains a compatibility projection for the current UI.
+- `scripts/verify-phase1.mjs` covers source idempotency, successful and failed execution persistence, and cross-tenant lookup isolation.
+
+Run the Phase 1 verification:
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase1
+```
+
+Scheduler, Auto-run, and DSH session persistence remain later migrations. Old and new schedulers must never trigger the same business task concurrently.
+
+## AI-OS V3.1 Phase 2
+
+Phase 2 migrates the existing Scheduler worker path while preserving its trigger and compatibility behavior:
+
+- Cron, interval, condition evaluation, `job_lock`, legacy Job rows, retries, and dead-letter audit stay in `server/scheduler.js`.
+- Every scheduler attempt maps to one AI-OS Execution and Process through `TaskService`.
+- Retry counts are persisted per Execution, so separate attempts remain traceable.
+- Completion and retry decisions persist resumable Checkpoints and emit checkpoint Events.
+- `server/os/runtime.js` provides one shared runtime composition for REST and Scheduler callers.
+- `scripts/verify-phase2.mjs` covers scheduler source mapping, retry attempts, checkpoints, and tenant isolation.
+
+Run the Phase 2 verification:
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase2
+```
+
+These Checkpoints capture safe attempt boundaries; resuming inside an interrupted model turn is not part of this phase.
+
+## AI-OS V3.1 Phase 3
+
+Phase 3 mirrors DSH-backed Auto-run work into the unified runtime without changing the DSH transport:
+
+- Role simulation, report generation, feature demonstrations, and multi-Agent turns map persistent DSH Sessions to AI-OS Tasks.
+- Every completed or failed DSH turn records a DSH Execution, Process, lifecycle Events, and a `session.turn.completed` Checkpoint.
+- The legacy runtime execution, message, tool, model-usage, and dashboard records remain available for the current UI.
+- Session identifiers stay in existing `business_setting` keys for cold recovery and are also captured in Checkpoint state.
+- `scripts/verify-phase3.mjs` verifies idempotent session mapping, success and failure history, resumable session checkpoints, and tenant isolation.
+
+Run the Phase 3 verification:
+
+```sh
+pnpm --filter @deepseek-ai/dsh-enterprise run verify:phase3
+```
+
+## AI-OS V3.1 Phase 4
+
+Phase 4 adds a focused high-risk Tool control layer without introducing Capability management or an Approval workflow:
+
+- Automated and unattended runs cannot execute sensitive write Tools.
+- Interactive sensitive writes retain the existing inline confirmation behavior.
+- A tenant setting, `risk.write.enabled.<tenantId>=0`, acts as an immediate write kill switch.
+- High-risk writes are limited to 20 per tenant per minute.
+- Arguments are limited by encoded size, nesting depth, unsafe keys, and operation-specific business ranges.
+- Allowed high-risk writes and all blocked attempts are written to immutable audit records with their Trace ID.
+- `scripts/verify-phase4.mjs` verifies automation blocking, inline confirmation, kill switch, rate limit, and argument validation.
+
+## AI-OS V3.1 Phase 5
+
+Phase 5 adds a tenant-scoped AI-OS system monitor:
+
+- `GET /api/os/monitor` aggregates Task, Process, scheduled queue, failure, Checkpoint, runner, and risk-control state.
+- The new **AI-OS Monitor** page shows KPIs, state distributions, recent executions, Trace links, and high-risk allow/block records.
+- Every monitor query is constrained by the authenticated tenant and requires `stats:view`.
+- The monitor is read-only; it does not add process-control or mutation actions.
+- `scripts/verify-phase5.mjs` verifies monitor KPIs, execution and risk feeds, and cross-tenant isolation.
+
+## Directory map
 
 ```text
 server/
-├── index.js               服务入口
-├── db.js                  33 表 schema + 种子 + 幂等迁移
-├── routes.js              REST API（权限守卫）
-├── auto-run.js            AI 自动运行模拟器
-├── function-catalog.js    28 项产品功能清单（单一数据源）
-├── knowledge-harvester.js 知识收割器
-├── business-generator.js  企业业务数据生成器
-├── harness.js             平台内 Agent 执行引擎（6 步循环 + trace 落库）
-├── llm.js                 模型适配层（OpenAI 兼容/mock/连通测试）
-├── tools.js               Tool 实现（query_*/knowledge_search 等）
-├── scheduler.js           定时任务调度
-└── auth.js                认证/权限/操作日志
-public/index.html          单文件 SPA 前端（分组侧边栏/看板/表单/轮询）
-scripts/                   验证/导入/夜间排程脚本
-start.mjs                  启动器（加载本地密钥）
-config/model.json          模型配置（密钥走环境变量，已脱敏）
+├── index.js               HTTP service entry
+├── db.js                  V2 schema, seeds, and idempotent migrations
+├── routes.js              REST API and permission guards
+├── auto-run.js            Automatic role and feature runs
+├── function-catalog.js    Product feature catalog
+├── knowledge-harvester.js Knowledge harvesting pipeline
+├── business-generator.js  Coherent enterprise demonstration data
+├── harness.js             Existing bounded enterprise Agent loop
+├── llm.js                 OpenAI-compatible model adapter
+├── tools.js               Enterprise Tool implementations
+├── scheduler.js           Existing scheduled-task runner
+├── os/                    AI-OS contracts, schema, kernel, and runner adapters
+└── auth.js                Authentication, authorization, and operation logs
+public/index.html          Current single-file enterprise SPA
+scripts/                   Verification, import, and orchestration scripts
+start.mjs                  Launcher and local credentials loader
+config/model.json          Model configuration without credentials
 ```
 
-## 数据说明
+## Data
 
-运行数据（`data/` 下 SQLite 库与租户工作区文档）不入库，服务启动时幂等生成种子；所有数据带 `data_origin` 标记（real/simulated/imported/manual/generated/auto-simulated/web-research），可在数据库浏览页按来源筛选。
+SQLite databases and tenant workspace documents under `data/` are ignored. Startup creates seed records idempotently, and scripts regenerate demonstration datasets. Generated and imported records retain `data_origin` values such as `real`, `simulated`, `imported`, `manual`, `generated`, `auto-simulated`, and `web-research`.
