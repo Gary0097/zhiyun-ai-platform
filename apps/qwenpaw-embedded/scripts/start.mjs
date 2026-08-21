@@ -31,12 +31,11 @@ if (!version.includes('2.1.0')) {
   console.error(`QwenPaw 版本不匹配：${version}`)
   process.exit(1)
 }
-run(python, ['-c', 'import qwenpaw'], `当前 ${python} 与 qwenpaw 不在同一 Python 环境；请设置 PYTHON 后重试。`, true)
-
 console.log(`环境检查通过：${version}`)
 if (checkOnly) process.exit(0)
 
-run(python, [join(scriptsRoot, 'cleanup-legacy.py')], '清理旧品牌、应用和企业 Tool 配置失败。')
+// 本机 qwenpaw 为 Desktop 打包 exe（无可 import 的 Python 包），故用 Node 等价实现清理。
+run(process.execPath, [join(scriptsRoot, 'cleanup-legacy.mjs')], '清理旧品牌、应用和企业 Tool 配置失败。')
 run('qwenpaw', ['plugin', 'install', auditPlugin, '--force'], '日志审计插件安装失败。')
 run('qwenpaw', ['plugin', 'install', logoPlugin, '--force'], 'Logo 配置插件安装失败。')
 run('qwenpaw', ['plugin', 'install', appDiscoveryPlugin, '--force'], '应用发现插件安装失败。')
