@@ -20,6 +20,16 @@ class DataCoreTests(unittest.TestCase):
         schema = self.core.list_schema("orders")
         self.assertIn("order_no", [field["name"] for field in schema["fields"]])
 
+    def test_entity_overview_reflects_real_and_simulated_records(self) -> None:
+        row = {"order_no": "REAL-1", "customer_name": "客户", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
+        self.core.import_rows("orders", [row])
+        self.core.generate_orders(3, seed=9)
+        overview = self.core.list_entities()[0]
+        self.assertEqual(overview["entity"], "orders")
+        self.assertEqual(overview["record_count"], 4)
+        self.assertEqual(overview["real_count"], 1)
+        self.assertEqual(overview["simulated_count"], 3)
+
     def test_user_can_add_rename_and_disable_field(self) -> None:
         self.core.add_field("orders", "sales_region", "销售区域")
         schema = self.core.update_field("orders", "sales_region", label="所属区域", active=False)
