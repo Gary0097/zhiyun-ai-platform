@@ -148,16 +148,36 @@ export function buildRoutes () {
     return { insight, generated_at: now(), cached: false }
   })
 
-  // ---- 系统设置（品牌 / Logo / dsh 工作台入口）----
+  // ---- QwenPaw 企业集成：公开健康/品牌读取，管理写入仍受 system:manage 保护 ----
+  H('GET', '/api/health', () => ({
+    status: 'ok', service: 'zhiyun-enterprise', version: '4.0-q1', runtime: 'qwenpaw-control-plane'
+  }), { public: true })
+  H('GET', '/api/public/brand', () => {
+    const get = (k) => db.prepare('SELECT value FROM business_setting WHERE key = ?').get(k)?.value || ''
+    return {
+      name: get('brand.name'),
+      subtitle: get('brand.subtitle'),
+      primaryColor: get('brand.primary_color') || '#1677ff',
+      logo: get('brand.logo') ? '/logo.png' : ''
+    }
+  }, { public: true })
+
+  // ---- 系统设置（品牌 / Logo / QwenPaw 工作台入口）----
   H('GET', '/api/settings/brand', () => {
     const get = (k) => db.prepare('SELECT value FROM business_setting WHERE key = ?').get(k)?.value || ''
-    return { name: get('brand.name'), logo: get('brand.logo') ? '/logo.png' : '' }
+    return { name: get('brand.name'), subtitle: get('brand.subtitle'), primaryColor: get('brand.primary_color') || '#1677ff', logo: get('brand.logo') ? '/logo.png' : '' }
   })
   H('PUT', '/api/settings/brand', async (req, res, { user }) => {
     requirePermission(user, 'system:manage')
     const b = await readBody(req)
     if (b.name) db.prepare("UPDATE business_setting SET value = ?, updated_at = ? WHERE key = 'brand.name'").run(String(b.name).slice(0, 60), now())
-    logOperation({ tenantId: user.tenant_id, userId: user.id, module: 'system', action: '修改系统名称', after: { name: b.name } })
+    if (typeof b.subtitle === 'string') db.prepare("UPDATE business_setting SET value = ?, updated_at = ? WHERE key = 'brand.subtitle'").run(b.subtitle.slice(0, 100), now())
+    if (b.primaryColor) {
+      const color = String(b.primaryColor)
+      if (!/^#[0-9a-f]{6}$/i.test(color)) throw Object.assign(new Error('品牌主色必须为 #RRGGBB'), { status: 400 })
+      db.prepare("UPDATE business_setting SET value = ?, updated_at = ? WHERE key = 'brand.primary_color'").run(color, now())
+    }
+    logOperation({ tenantId: user.tenant_id, userId: user.id, module: 'system', action: '修改系统品牌', after: { name: b.name, subtitle: b.subtitle, primaryColor: b.primaryColor } })
     return { ok: true }
   })
   H('POST', '/api/settings/logo', async (req, res, { user }) => {
@@ -168,7 +188,13 @@ export function buildRoutes () {
     if (m[2].length > 2 * 1024 * 1024) throw Object.assign(new Error('图片过大（>1.5MB）'), { status: 400 })
     const { writeFileSync } = await import('node:fs')
     const ext = m[1].replace('svg+xml', 'svg').replace('jpeg', 'jpg')
-    writeFileSync(join(DATA_DIR, 'logo.' + ext), Buffer.from(m[2], 'base64'))
+    const content = Buffer.from(m[2], 'base64')
+    if (ext === 'svg') {
+      const svg = content.toString('utf8')
+      const unsafe = /<script\b|<foreignObject\b|\son[a-z]+\s*=|(?:href|xlink:href)\s*=\s*['"]\s*(?:javascript:|data:|https?:)/i
+      if (!/^\s*<svg\b/i.test(svg) || unsafe.test(svg)) throw Object.assign(new Error('SVG Logo 包含脚本、事件或外部资源'), { status: 400 })
+    }
+    writeFileSync(join(DATA_DIR, 'logo.' + ext), content)
     db.prepare("UPDATE business_setting SET value = ?, updated_at = ? WHERE key = 'brand.logo'").run('logo.' + ext, now())
     logOperation({ tenantId: user.tenant_id, userId: user.id, module: 'system', action: '修改系统 Logo', after: { file: 'logo.' + ext } })
     return { ok: true, logo: '/logo.png' }
@@ -176,6 +202,18 @@ export function buildRoutes () {
   H('DELETE', '/api/settings/logo', (req, res, { user }) => {
     requirePermission(user, 'system:manage')
     db.prepare("UPDATE business_setting SET value = '', updated_at = ? WHERE key = 'brand.logo'").run(now())
+    return { ok: true }
+  })
+  H('GET', '/api/settings/qwenpaw', () => ({
+    url: db.prepare('SELECT value FROM business_setting WHERE key = ?').get('qwenpaw.url')?.value || 'http://127.0.0.1:8088'
+  }))
+  H('PUT', '/api/settings/qwenpaw', async (req, res, { user }) => {
+    requirePermission(user, 'system:manage')
+    const b = await readBody(req)
+    const url = String(b.url || '').slice(0, 200)
+    if (!/^https?:\/\//i.test(url)) throw Object.assign(new Error('QwenPaw 地址必须以 http:// 或 https:// 开头'), { status: 400 })
+    db.prepare("UPDATE business_setting SET value = ?, updated_at = ? WHERE key = 'qwenpaw.url'").run(url, now())
+    logOperation({ tenantId: user.tenant_id, userId: user.id, module: 'system', action: '修改 QwenPaw 工作台地址', after: { url } })
     return { ok: true }
   })
   // 所有登录用户可读（AI 对话页需要拿管理员配置的工作台地址）；写入仍限管理员

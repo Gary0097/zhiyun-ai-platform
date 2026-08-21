@@ -394,6 +394,9 @@ function ensureMigrations () {
   const defaults = [
     ['brand.name', '智造云企业 AI 智能体平台'],
     ['brand.logo', ''],
+    ['brand.primary_color', '#1677ff'],
+    ['brand.subtitle', '企业 AI 操作系统'],
+    ['qwenpaw.url', 'http://127.0.0.1:8088'],
     ['dsh.url', 'http://127.0.0.1:8308']
   ]
   const upsert = db.prepare('INSERT INTO business_setting (key, value, updated_at) VALUES (?,?,?) ON CONFLICT(key) DO NOTHING')

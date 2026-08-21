@@ -222,14 +222,13 @@ const tag=s=>`<span class="tag ${s==='success'||s==='published'||s==='active'||s
 const tbl=(cols,rows)=>`<table><tr>${cols.map(c=>`<th>${c[0]}</th>`).join('')}</tr>${rows.map(r=>`<tr>${cols.map(c=>`<td>${c[1](r)}</td>`).join('')}</tr>`).join('')}</table>`
 
 const PAGES={
-  // AI 对话：功能模块入口条 + 直接内嵌 dsh Web（Harness 会话体系），每个工作区即对话中心
+  // AI 对话：QwenPaw 原生 Chat 是主交互面；企业后台仅保留兼容入口。
   async chat(){
-    let url='http://127.0.0.1:8308'
-    try{ url=(await api('GET','/api/settings/dsh')).url||url }catch{}
+    let url='http://127.0.0.1:8088'
+    try{ url=(await api('GET','/api/settings/qwenpaw')).url||url }catch{}
     return `<h2>AI 对话</h2>
-    <div class="card" style="padding:10px 14px;margin-bottom:12px" id="feat-entry"><span class="hint">功能模块加载中…</span></div>
-    <div class="framewrap" style="height:calc(100vh - 215px)"><div class="head">
-      <span class="hint">由 Agent 工作台提供完整对话能力（会话/文件/终端/技能），工作区即对话中心。地址可在系统设置中修改。</span>
+    <div class="framewrap" style="height:calc(100vh - 115px)"><div class="head">
+      <span class="hint">QwenPaw 2.1 提供原生流式对话、连续会话、记忆、文件、Skills、PawApp 与 Tool 状态。地址可在品牌与入口中修改。</span>
       <span><button class="ghost" onclick="window.open('${esc(url)}','_blank')">新窗口打开</button></span>
     </div>
     <iframe src="${esc(url)}"></iframe></div>`
@@ -570,7 +569,7 @@ const PAGES={
     }
     // 内容面板（复用现有 PAGES 函数）
     let body=''
-    if(tab==='brand') body=settingsBrand(await api('GET','/api/settings/brand'),await api('GET','/api/settings/dsh'))
+    if(tab==='brand') body=settingsBrand(await api('GET','/api/settings/brand'),await api('GET','/api/settings/qwenpaw'))
     else if(tab==='model') body=await settingsModel()
     else if(tab==='autorun') body=settingsAutorun()
     else if(tab==='sim') body=await PAGES.simulator()
@@ -655,7 +654,7 @@ async function modelSave(){
     location.hash='settings?tab=model'; go('settings')
   }catch(e){alert('保存失败：'+e.message)}
 }
-function settingsBrand(brand,dshc){  return `<div class="card"><b>品牌设置</b>
+function settingsBrand(brand,qpc){  return `<div class="card"><b>品牌设置</b>
     <div class="logobox">
       ${brand.logo?`<img src="${brand.logo}">`:'<div class="hint" style="width:60px;text-align:center">无Logo</div>'}
       <div><input type="file" id="logo-file" accept="image/*" style="width:260px"><br>
@@ -663,12 +662,14 @@ function settingsBrand(brand,dshc){  return `<div class="card"><b>品牌设置</
       ${brand.logo?'<button class="danger" style="margin-top:8px;margin-left:6px" onclick="delLogo()">移除</button>':''}</div>
     </div>
     <label>系统名称</label><input id="brand-name" value="${esc(brand.name)}" style="max-width:360px">
+    <label>系统副标题</label><input id="brand-subtitle" value="${esc(brand.subtitle||'')}" style="max-width:360px">
+    <label>品牌主色</label><input id="brand-color" type="color" value="${esc(brand.primaryColor||'#1677ff')}" style="max-width:100px">
     <button style="margin-top:10px" onclick="saveBrand()">保存</button>
-    <p class="hint">Logo 与名称即时生效于侧边栏与登录页。</p></div>
-  <div class="card"><b>AI 对话入口（dsh 工作台）</b>
-    <label>工作台地址（iframe 内嵌）</label><input id="dsh-url" value="${esc(dshc.url)}" style="max-width:420px">
-    <button style="margin-top:10px" onclick="saveDsh()">保存</button>
-    <p class="hint">Agent 工作台 Web 地址，保存后「AI 对话」菜单即嵌入该地址。</p></div>`
+    <p class="hint">Logo、名称、副标题和主色由企业后台持久化，并同步到 QwenPaw 对话端。</p></div>
+  <div class="card"><b>AI 对话入口（QwenPaw 2.1）</b>
+    <label>QwenPaw 工作台地址</label><input id="qwenpaw-url" value="${esc(qpc.url)}" style="max-width:420px">
+    <button style="margin-top:10px" onclick="saveQwenPaw()">保存</button>
+    <p class="hint">保存后「AI 对话」使用 QwenPaw 原生会话、记忆、文件、技能和应用能力。</p></div>`
 }
 async function jobsView(status){
   const r=await api('GET','/api/jobs'+(status?'?status='+status:''))
@@ -1011,7 +1012,7 @@ async function invoiceItems(id,no){
   ${tbl([['物料',x=>esc(x.item_name)],['规格',x=>`<span class="detail">${esc(x.spec||'-')}</span>`],['数量',x=>x.qty],['单价',x=>'¥'+x.unit_price.toFixed(2)],['金额',x=>'<b>¥'+x.amount.toFixed(2)+'</b>']],items)}</div>`)
   document.getElementById('inv-items').scrollIntoView({behavior:'smooth'})
 }
-/* ---- 聊天前端已移除：AI 对话由 dsh iframe 提供，历史会话数据仍可通过 /api/conversations 查询 ---- */
+/* ---- 主对话由 QwenPaw 原生 Chat 提供，旧会话仅保留迁移读取 ---- */
 /* ---- 设置 ---- */
 async function uploadLogo(){
   const f=$('#logo-file').files[0]; if(!f){alert('请先选择图片');return}
@@ -1022,9 +1023,10 @@ async function uploadLogo(){
 }
 async function delLogo(){ await api('DELETE','/api/settings/logo'); BRAND=await api('GET','/api/settings/brand'); applyBrand(); renderMenu(); location.hash='settings?tab=brand'; go('settings') }
 async function saveBrand(){
-  await api('PUT','/api/settings/brand',{name:$('#brand-name').value})
+  await api('PUT','/api/settings/brand',{name:$('#brand-name').value,subtitle:$('#brand-subtitle').value,primaryColor:$('#brand-color').value})
   BRAND=await api('GET','/api/settings/brand'); applyBrand(); renderMenu(); alert('已保存')
 }
+async function saveQwenPaw(){ await api('PUT','/api/settings/qwenpaw',{url:$('#qwenpaw-url').value}); alert('已保存，AI 对话将使用新的 QwenPaw 地址') }
 async function saveDsh(){ await api('PUT','/api/settings/dsh',{url:$('#dsh-url').value}); alert('已保存，AI 对话将使用新地址') }
 /* ---- 复用原有交互 ---- */
 async function traceView(traceId){
