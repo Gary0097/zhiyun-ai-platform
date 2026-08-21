@@ -11,8 +11,10 @@ from qwenpaw.plugins.api import PluginApi
 
 try:
     from .data_core import DataCore, DataCoreError, default_database
+    from .agent_tools import build_agent_tools
 except ImportError:
     from data_core import DataCore, DataCoreError, default_database
+    from agent_tools import build_agent_tools
 
 core = DataCore(default_database())
 router = APIRouter()
@@ -123,6 +125,21 @@ class DataCorePlugin:
 
     def register(self, api: PluginApi) -> None:
         api.register_http_router(router, prefix="/zhiyun-data-core", tags=["zhiyun-data-core"])
+        query_orders, simulate_orders_tool = build_agent_tools(core)
+        api.register_tool(
+            tool_name="query_enterprise_orders",
+            tool_func=query_orders,
+            description="查询统一数据库中的企业订单、客户、状态和交付进度；回答订单问题时优先调用。",
+            icon="🔎",
+            tool_type="filesystem",
+        )
+        api.register_tool(
+            tool_name="generate_simulated_orders",
+            tool_func=simulate_orders_tool,
+            description="按用户明确要求生成可撤销的模拟订单数据，并返回批次 ID。",
+            icon="🧪",
+            tool_type="filesystem",
+        )
 
 
 plugin = DataCorePlugin()
