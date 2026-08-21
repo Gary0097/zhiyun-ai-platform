@@ -26,6 +26,8 @@ Auto-run is the third migrated caller. Its existing DSH HTTP envelope, multiplex
 
 High-risk Tool control is enforced independently of the optional Capability and Approval models. Unattended executions cannot perform sensitive writes. Interactive writes retain the existing inline confirmation contract and then pass a tenant kill switch, per-minute write limit, structural argument limits, and operation-specific business validation. High-risk allow and deny decisions are audit records linked to the execution trace.
 
+The AI-OS monitor is a read-only projection over the unified runtime. It aggregates tenant-scoped Task, Process, Execution, scheduled queue, Checkpoint, and risk audit state into one endpoint and page. It reuses `stats:view`, exposes existing Trace replay links, and intentionally does not introduce process mutation or cross-tenant platform views.
+
 ## Alternatives considered
 
 **Replace the enterprise agent loop with DSH immediately.** The local loop supports current API and scheduled-task behavior. Immediate replacement would combine contract migration with runtime migration and make regressions harder to isolate.

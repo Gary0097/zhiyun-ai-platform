@@ -124,6 +124,16 @@ Phase 4 adds a focused high-risk Tool control layer without introducing Capabili
 - Allowed high-risk writes and all blocked attempts are written to immutable audit records with their Trace ID.
 - `scripts/verify-phase4.mjs` verifies automation blocking, inline confirmation, kill switch, rate limit, and argument validation.
 
+## AI-OS V3.1 Phase 5
+
+Phase 5 adds a tenant-scoped AI-OS system monitor:
+
+- `GET /api/os/monitor` aggregates Task, Process, scheduled queue, failure, Checkpoint, runner, and risk-control state.
+- The new **AI-OS Monitor** page shows KPIs, state distributions, recent executions, Trace links, and high-risk allow/block records.
+- Every monitor query is constrained by the authenticated tenant and requires `stats:view`.
+- The monitor is read-only; it does not add process-control or mutation actions.
+- `scripts/verify-phase5.mjs` verifies monitor KPIs, execution and risk feeds, and cross-tenant isolation.
+
 ## Directory map
 
 ```text
