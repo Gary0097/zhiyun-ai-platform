@@ -13,7 +13,12 @@ for (const file of ['start-ai-os.cmd', 'start-ai-os.sh', 'diagnose-ai-os.cmd', '
 
 const start = readFileSync(join(scripts, 'start.mjs'), 'utf8')
 assert.ok(start.includes("join(scriptsRoot, 'doctor.mjs')"), 'start must run doctor before installation')
-assert.ok(start.indexOf('doctor.mjs') < start.indexOf('cleanup-legacy.py'), 'doctor must run before mutations')
+assert.ok(start.indexOf('doctor.mjs') < start.indexOf('cleanup-legacy.mjs'), 'doctor must run before mutations')
+assert.ok(start.includes('for (const app of externalApps)'), 'start must install every locked external PawApp')
+
+const sync = readFileSync(join(scripts, 'sync-pawapps.mjs'), 'utf8')
+assert.ok(sync.includes("'.pawapp-commit'"), 'sync must persist a commit marker')
+assert.ok(sync.includes("rmSync(join(staging, '.git')"), 'sync must remove Git metadata before plugin installation')
 
 const result = spawnSync(process.execPath, [join(scripts, 'doctor.mjs'), '--json'], { cwd: root, encoding: 'utf8' })
 const report = JSON.parse(result.stdout)
