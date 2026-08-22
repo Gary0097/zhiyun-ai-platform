@@ -6,6 +6,8 @@ v0.4.0 为任意数据表增加 Excel/CSV 导入：文件解析后自动匹配�
 
 v0.5.0 内置“生产日报”指标模板，包含日期、部门、产量/产值、工时、人数、成本和损耗字段；统一数据中心可以一键生成可撤销的模拟生产数据，用于直接验收 Data Studio 跨部门指标。
 
+v0.6.0 提供受限的订单查询接口，Data Studio 可以按关键词、订单号、客户、状态和真实/模拟来源读取进度看板数据。接口不接受 SQL，单次最多返回 200 条记录。
+
 统一数据库服务，同时提供可视化数据浏览入口 `/apps/data-core`。
 
 可验收功能：
@@ -48,6 +50,7 @@ Data Core 是全部业务 PawApp 共用的数据服务。应用只能通过 `/zh
 | POST | `/zhiyun-data-core/imports/orders/preview` | 导入映射与校验预览 |
 | POST | `/zhiyun-data-core/imports/orders/commit` | 写入已通过校验的数据 |
 | POST | `/zhiyun-data-core/simulate/orders` | 生成关联模拟订单 |
+| GET | `/zhiyun-data-core/orders` | 按关键词、订单号、客户、状态和来源查询订单，最多 200 条 |
 | GET | `/zhiyun-data-core/records/orders` | 查询订单记录 |
 | POST | `/zhiyun-data-core/batches/{id}/rollback` | 撤销导入或模拟批次 |
 

@@ -63,3 +63,46 @@ def persist(workspace: Path, event: dict[str, Any]) -> None:
             database.commit()
         finally:
             database.close()
+
+
+def list_events(
+    workspace: Path,
+    *,
+    status: str | None = None,
+    tool_name: str | None = None,
+    limit: int = 100,
+) -> list[dict[str, Any]]:
+    """Read a bounded metadata-only audit feed for the system audit page."""
+    if status not in {None, "success", "failed", "blocked"}:
+        raise ValueError(f"unsupported audit status: {status}")
+    bounded_limit = max(1, min(int(limit), 500))
+    clauses: list[str] = []
+    parameters: list[Any] = []
+    if status:
+        clauses.append("status = ?")
+        parameters.append(status)
+    if tool_name:
+        clauses.append("tool_name = ?")
+        parameters.append(tool_name)
+    where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+    database_path = workspace.expanduser().resolve() / "data" / "ai-os.sqlite"
+    if not database_path.exists():
+        return []
+    database = sqlite3.connect(database_path, timeout=10)
+    database.row_factory = sqlite3.Row
+    try:
+        exists = database.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='audit_tool_call'"
+        ).fetchone()
+        if not exists:
+            return []
+        rows = database.execute(
+            f"""SELECT trace_id, session_id, agent_id, tool_name, status,
+                       duration_ms, error_type, created_at
+                FROM audit_tool_call {where}
+                ORDER BY created_at DESC, id DESC LIMIT ?""",
+            [*parameters, bounded_limit],
+        ).fetchall()
+        return [dict(row) for row in rows]
+    finally:
+        database.close()

@@ -77,6 +77,7 @@ for (const entry of ['start-ai-os.cmd', 'start-ai-os.sh', 'diagnose-ai-os.cmd', 
 }
 
 const commands = [
+  [process.execPath, [join(root, 'scripts', 'verify-project-plan.mjs')]],
   [process.execPath, ['--check', join(scripts, 'start.mjs')]],
   [process.execPath, ['--check', join(scripts, 'sync-pawapps.mjs')]],
   [process.execPath, ['--check', join(scripts, 'doctor.mjs')]],

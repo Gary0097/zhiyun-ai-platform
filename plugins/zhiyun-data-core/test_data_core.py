@@ -114,6 +114,32 @@ class DataCoreTests(unittest.TestCase):
         with self.assertRaisesRegex(DataCoreError, "unknown filter fields"):
             self.core.search_records("orders", filters={"sql": "DROP TABLE"})
 
+    def test_order_dashboard_query_can_filter_real_records(self) -> None:
+        rows = [
+            {"order_no": "REAL-OPEN", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50},
+            {"order_no": "REAL-DONE", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "已完成", "progress": 100},
+        ]
+        self.core.import_rows("orders", rows)
+        self.core.generate_orders(2, seed=12)
+
+        result = self.core.search_records(
+            "orders",
+            keyword="海川",
+            filters={"status": "生产中"},
+            source_type="real",
+            limit=200,
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["source_type"], "real")
+        self.assertEqual(result[0]["data"]["order_no"], "REAL-OPEN")
+        self.assertEqual(result[0]["data"]["progress"], 50)
+
+    def test_order_dashboard_query_has_a_hard_result_limit(self) -> None:
+        self.core.generate_orders(220, seed=31)
+        result = self.core.search_records("orders", limit=1000)
+        self.assertEqual(len(result), 200)
+
 
 if __name__ == "__main__":
     unittest.main()

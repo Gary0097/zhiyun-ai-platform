@@ -175,7 +175,7 @@
       "app_id": "zhiyun-data-core",
       "name": "Data Core",
       "aliases": ["统一数据库", "数据核心"],
-      "version": "0.5.0",
+      "version": "0.6.0",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",
@@ -189,15 +189,27 @@
       "app_id": "zhiyun-audit",
       "name": "日志审计服务",
       "aliases": ["审计", "操作日志", "高风险操作"],
-      "version": "1.1.1",
+      "version": "1.2.0",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",
-      "route": null,
+      "route": "/apps/audit",
       "repository_url": null,
       "platforms": ["windows", "linux"],
       "health": "available",
-      "capabilities": []
+      "capabilities": [
+        {
+          "id": 31,
+          "name": "Tool 调用审计",
+          "description": "查看成功、失败和已阻断 Tool 调用的脱敏执行元数据。",
+          "questions": ["查看操作审计", "哪些高风险操作被阻断", "Agent Tool 是否执行失败"],
+          "objects": ["Tool 调用", "Trace", "审计事件"],
+          "inputs": ["状态筛选"],
+          "outputs": ["脱敏审计列表"],
+          "roles": ["管理员", "安全审计员"],
+          "scenarios": ["安全审计", "故障追踪", "高风险操作检查"]
+        }
+      ]
     },
     {
       "app_id": "zhiyun-logo",

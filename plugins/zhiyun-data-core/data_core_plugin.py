@@ -158,6 +158,44 @@ async def records(
     )
 
 
+@router.get("/orders")
+async def orders(
+    keyword: str = Query(default="", max_length=200),
+    order_no: str = Query(default="", max_length=200),
+    customer_name: str = Query(default="", max_length=200),
+    status: str = Query(default="", max_length=200),
+    source_type: str | None = Query(default=None),
+    limit: int = Query(default=100, ge=1, le=200),
+) -> dict[str, Any]:
+    """Expose the bounded order query contract used by business PawApps."""
+    filters = {
+        key: value
+        for key, value in {
+            "order_no": order_no,
+            "customer_name": customer_name,
+            "status": status,
+        }.items()
+        if value
+    }
+    def query() -> dict[str, Any]:
+        records = core.search_records(
+            "orders",
+            keyword=keyword,
+            filters=filters,
+            source_type=source_type,
+            limit=limit,
+        )
+        return {
+            "entity": "orders",
+            "count": len(records),
+            "keyword": keyword,
+            "filters": filters,
+            "source_type": source_type,
+            "records": records,
+        }
+    return _handle(query)
+
+
 @router.get("/batches")
 async def batches(entity: str | None = None) -> dict[str, Any]:
     return {"batches": core.list_batches(entity)}
