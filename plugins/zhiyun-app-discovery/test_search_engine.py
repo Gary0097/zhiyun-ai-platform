@@ -65,7 +65,7 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.5.2")
         self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
         self.assertEqual(apps["zhiyun-data-core"]["version"], "0.5.0")
-        self.assertEqual(apps["zhiyun-audit"]["version"], "1.1.0")
+        self.assertEqual(apps["zhiyun-audit"]["version"], "1.1.1")
 
     def test_progress_covers_all_31_prd_features(self) -> None:
         ledger = load_progress()
