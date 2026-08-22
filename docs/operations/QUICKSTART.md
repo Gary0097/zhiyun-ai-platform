@@ -2,6 +2,8 @@
 
 AI-OS 采用 QwenPaw 2.1.0 单进程运行，默认地址为 `http://127.0.0.1:8088`，不需要启动 8390 企业服务。主仓库负责启动和系统插件，独立 PawApp 会按 `apps/qwenpaw-embedded/pawapps.lock.json` 的固定提交自动同步。
 
+当前发布树只包含QwenPaw方案。不要使用旧目录名或历史文档推断启动入口；即使本地文件夹仍叫 `deepseek-harness`，只要其Git远端是本仓库，也应从仓库根目录运行下列脚本。
+
 ## 首次准备
 
 两种系统都需要 Node.js 18+、Git、Python，以及已安装并初始化的 QwenPaw 2.1.0。请确认以下命令可运行：
@@ -70,5 +72,7 @@ git pull --ff-only origin master
 - `qwenpaw` 找不到：QwenPaw 未安装或其可执行目录不在 PATH。
 - Python 无法导入 `qwenpaw`：CLI 与 `PYTHON` 指向了不同环境；把 `PYTHON` 设置为安装 QwenPaw 的解释器。
 - PawApp 同步失败：检查 Git、GitHub 网络和目标目录；不要手工修改 `runtime/pawapps` 中的锁定代码。
+- Windows出现 `.git/objects/pack` 拒绝访问：说明仍在运行旧版同步器；拉取最新master后重新启动，新版安装源不会携带`.git`。
+- Agent看不到Studio工具：确认Data Studio至少为v0.7.1、Order Studio至少为v0.5.1，并检查启动日志无治理类型冲突。
 - 8088 已监听：可能 AI-OS 已经启动；先访问页面确认，再决定是否停止旧进程。
 - 不要启动 8390：该服务已退出当前目标架构。
