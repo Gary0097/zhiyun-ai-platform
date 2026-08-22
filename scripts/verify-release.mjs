@@ -55,7 +55,10 @@ const sync = readFileSync(join(scripts, 'sync-pawapps.mjs'), 'utf8')
 assert.ok(sync.includes("'.pawapp-commit'"), 'sync must use a materialization marker')
 assert.ok(sync.includes("rmSync(join(staging, '.git')"), 'sync must remove Git metadata before install')
 const cleanup = readFileSync(join(scripts, 'cleanup-legacy.mjs'), 'utf8')
-assert.ok(cleanup.includes('QWENPAW_WORKING_DIR') && cleanup.includes('COPAW_WORKING_DIR'), 'cleanup must follow the QwenPaw working directory contract')\nfor (const pluginId of ['cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']) {\n  assert.ok(cleanup.includes(pluginId), `cleanup must quarantine incompatible plugin: ${pluginId}`)\n}
+assert.ok(cleanup.includes('QWENPAW_WORKING_DIR') && cleanup.includes('COPAW_WORKING_DIR'), 'cleanup must follow the QwenPaw working directory contract')
+for (const pluginId of ['cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']) {
+  assert.ok(cleanup.includes(pluginId), `cleanup must quarantine incompatible plugin: ${pluginId}`)
+}
 assert.ok(existsSync(join(root, 'plugins', 'zhiyun-logo', 'assets', 'default-logo.png')), 'packaged default logo is missing')
 
 const allowedToolTypes = new Set(['file', 'internal', 'network', 'shell'])
@@ -81,6 +84,7 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'set-logo.mjs')]],
   [process.execPath, ['--check', join(scripts, 'health-report.mjs')]],
   [process.execPath, [join(scripts, 'health-report.mjs'), '--check']],
+  [process.execPath, [join(scripts, 'verify-health-report.mjs')]],
   [process.execPath, [join(scripts, 'set-logo.mjs'), '--check']],
   [process.execPath, [join(scripts, 'sync-pawapps.mjs'), '--check']],
   [process.execPath, [join(scripts, 'verify-deployment.mjs')]],
