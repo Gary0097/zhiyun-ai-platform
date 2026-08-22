@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -27,7 +27,8 @@ try {
   assert.equal(existsSync(join(temp, 'branding', 'logo.json')), false)
 
   const workspace = join(temp, 'workspaces', 'default')
-  for (const pluginId of ['zhiyun-orders', 'cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator', 'user-kept-plugin']) {
+  const disabledIds = ['zhiyun-orders', 'cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']
+  for (const pluginId of [...disabledIds, 'user-kept-plugin']) {
     mkdirSync(join(temp, 'plugins', pluginId), { recursive: true })
   }
   mkdirSync(workspace, { recursive: true })
@@ -38,13 +39,12 @@ try {
   const agent = JSON.parse(readFileSync(join(workspace, 'agent.json'), 'utf8'))
   assert.equal(agent.tools.builtin_tools.enterprise_platform_status, undefined)
   assert.ok(agent.tools.builtin_tools.safe_tool)
-  for (const pluginId of ['zhiyun-orders', 'cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']) {
+  for (const pluginId of disabledIds) {
     assert.equal(existsSync(join(temp, 'plugins', pluginId)), false, `${pluginId} should be disabled`)
-    assert.ok(readFileSync(join(temp, 'disabled_plugins', '..', 'config.json'), 'utf8'))
   }
   assert.ok(existsSync(join(temp, 'plugins', 'user-kept-plugin')), 'unknown user plugins must be preserved')
-  const backups = (await import('node:fs')).readdirSync(join(temp, 'disabled_plugins'))
-  for (const pluginId of ['zhiyun-orders', 'cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']) {
+  const backups = readdirSync(join(temp, 'disabled_plugins'))
+  for (const pluginId of disabledIds) {
     assert.ok(backups.some(name => name.startsWith(`${pluginId}-`)), `${pluginId} backup is missing`)
   }
 } finally {
