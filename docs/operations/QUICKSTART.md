@@ -6,15 +6,46 @@ AI-OS 采用 QwenPaw 2.1.0 单进程运行，默认地址为 `http://127.0.0.1:8
 
 ## 首次准备
 
-两种系统都需要 Node.js 18+、Git，以及已安装并初始化的 QwenPaw 2.1.0。请确认以下命令可运行：
+两种系统只需预装 Node.js 18+ 和 Git。QwenPaw 2.1.0 与 Python 依赖由项目安装到已忽略的 `apps/qwenpaw-embedded/runtime/qwenpaw`，不会污染系统 Python，也不会提交到 Git。
+
+Windows 首次运行：
+
+```powershell
+.\setup-ai-os.ps1
+```
+
+Ubuntu / Linux 首次运行：
+
+```bash
+chmod +x setup-ai-os.sh
+./setup-ai-os.sh
+```
+
+安装器读取 `apps/qwenpaw-embedded/qwenpaw.lock.json` 的精确版本和上游 Commit。环境已就绪时会立即退出，不重复下载或安装。启动器优先使用项目运行环境；若管理员已配置版本完全一致的全局 QwenPaw 2.1.0，仍可回退使用。
+
+安装后可确认：
 
 ```text
 node --version
 git --version
-qwenpaw --version
+node apps/qwenpaw-embedded/scripts/runtime-env.mjs --json
 ```
 
-Windows Desktop/打包版不要求系统 Python 能 `import qwenpaw`。只有使用 QwenPaw 源码/CLI Python 环境时，才需要设置 `PYTHON`；诊断会将 Desktop 模式显示为提醒而不是失败。
+不需要编辑系统 `PATH` 或设置 `PYTHON`。项目启动器会自动选择对应平台的 QwenPaw 与 Python。Windows Desktop/全局 CLI 仍作为兼容回退。
+
+### 离线与依赖缓存
+
+首次联网安装会把锁定的上游安装器和 uv 包缓存保存在 `apps/qwenpaw-embedded/runtime/cache`。同一运行环境后续启动完全离线。需要从已有缓存重建时：
+
+```powershell
+.\setup-ai-os.ps1 -Offline
+```
+
+```bash
+AI_OS_OFFLINE=1 ./setup-ai-os.sh
+```
+
+向其他机器交付离线缓存时，应通过受控发布包携带 `runtime/cache`，不要提交 Git；缓存必须与 `qwenpaw.lock.json` 同版本。
 
 ## 一键启动
 
@@ -31,7 +62,7 @@ chmod +x start-ai-os.sh diagnose-ai-os.sh
 ./start-ai-os.sh
 ```
 
-首次启动会同步外部 PawApp 并安装插件，因此取决于 GitHub 网络速度；后续锁定版本已经落盘时不会重复下载。\n\n启动器采用“保留配置、净化插件”的兼容策略：继续使用现有 QwenPaw 模型配置、密钥和 Agent 工作区；只将已确认与当前 AI-OS 无关且不兼容的 `cospaw`、`ai_decision`、`team_chat`、`qwenpaw-creator` 移入 `disabled_plugins`。这是可恢复停用，不会删除插件或用户数据；其他未知用户插件不会被改动。Creator 在本项目中仅作为开发参考，不作为运行应用加载。
+首次启动会同步外部 PawApp 并安装插件，因此取决于 GitHub 网络速度；后续锁定版本已经落盘时不会重复下载。项目 QwenPaw 依赖由首次准备步骤安装一次，普通启动不会重建环境。\n\n启动器采用“保留配置、净化插件”的兼容策略：继续使用现有 QwenPaw 模型配置、密钥和 Agent 工作区；只将已确认与当前 AI-OS 无关且不兼容的 `cospaw`、`ai_decision`、`team_chat`、`qwenpaw-creator` 移入 `disabled_plugins`。这是可恢复停用，不会删除插件或用户数据；其他未知用户插件不会被改动。Creator 在本项目中仅作为开发参考，不作为运行应用加载。
 
 ## 运行健康检查
 
@@ -103,7 +134,7 @@ chmod +x set-ai-os-logo.sh
 ## 常见问题
 
 - `qwenpaw` 找不到：QwenPaw 未安装或其可执行目录不在 PATH。
-- Python 无法导入 `qwenpaw`：Desktop版可忽略该提醒；源码安装模式再把 `PYTHON` 指向安装了QwenPaw的解释器。
+- QwenPaw 运行环境缺失或版本不符：Windows运行 `.\setup-ai-os.ps1`，Linux运行 `./setup-ai-os.sh`；无需手工编辑 PATH。
 - PawApp 同步失败：检查 Git、GitHub 网络和目标目录；不要手工修改 `runtime/pawapps` 中的锁定代码。
 - Windows出现 `.git/objects/pack` 拒绝访问：说明仍在运行旧版同步器；拉取最新master后重新启动，新版安装源不会携带`.git`。
 - Agent看不到Studio工具：确认Data Studio至少为v0.8.0、Order Studio至少为v0.5.2，并检查启动日志无治理类型冲突。

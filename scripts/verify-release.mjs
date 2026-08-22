@@ -22,6 +22,9 @@ for (const removed of [
 }
 
 const qwenpawLock = JSON.parse(readFileSync(join(embedded, 'qwenpaw.lock.json'), 'utf8'))
+assert.equal(qwenpawLock.schema_version, 1)
+assert.equal(qwenpawLock.package, 'qwenpaw')
+assert.equal(qwenpawLock.version, '2.1.0')
 assert.equal(qwenpawLock.ref, 'release/v2.1.0', 'QwenPaw must stay pinned to release/v2.1.0')
 assert.match(qwenpawLock.commit, /^[0-9a-f]{40}$/, 'QwenPaw must use a full commit SHA')
 const pawapps = JSON.parse(readFileSync(join(embedded, 'pawapps.lock.json'), 'utf8'))
@@ -72,13 +75,14 @@ for (const pluginFile of [
   }
 }
 
-for (const entry of ['start-ai-os.cmd', 'start-ai-os.sh', 'diagnose-ai-os.cmd', 'diagnose-ai-os.sh', 'set-ai-os-logo.cmd', 'set-ai-os-logo.sh', 'check-ai-os.cmd', 'check-ai-os.sh']) {
+for (const entry of ['setup-ai-os.ps1', 'setup-ai-os.sh', 'start-ai-os.cmd', 'start-ai-os.sh', 'diagnose-ai-os.cmd', 'diagnose-ai-os.sh', 'set-ai-os-logo.cmd', 'set-ai-os-logo.sh', 'check-ai-os.cmd', 'check-ai-os.sh']) {
   assert.ok(existsSync(join(root, entry)), `missing cross-platform entry: ${entry}`)
 }
 
 const commands = [
   [process.execPath, [join(root, 'scripts', 'verify-project-plan.mjs')]],
   [process.execPath, ['--check', join(scripts, 'start.mjs')]],
+  [process.execPath, ['--check', join(scripts, 'runtime-env.mjs')]],
   [process.execPath, ['--check', join(scripts, 'sync-pawapps.mjs')]],
   [process.execPath, ['--check', join(scripts, 'doctor.mjs')]],
   [process.execPath, ['--check', join(scripts, 'cleanup-legacy.mjs')]],
@@ -89,6 +93,7 @@ const commands = [
   [process.execPath, [join(scripts, 'set-logo.mjs'), '--check']],
   [process.execPath, [join(scripts, 'sync-pawapps.mjs'), '--check']],
   [process.execPath, [join(scripts, 'verify-deployment.mjs')]],
+  [process.execPath, [join(scripts, 'verify-runtime.mjs')]],
   [process.execPath, [join(scripts, 'verify-maintenance.mjs')]],
 ]
 for (const [command, args] of commands) {
