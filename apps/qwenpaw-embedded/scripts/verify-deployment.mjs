@@ -11,6 +11,11 @@ for (const file of ['setup-ai-os.ps1', 'setup-ai-os.sh', 'start-ai-os.cmd', 'sta
   assert.ok(existsSync(join(root, file)), `missing deployment file: ${file}`)
 }
 
+const windowsStart = readFileSync(join(root, 'start-ai-os.cmd'), 'utf8')
+const linuxStart = readFileSync(join(root, 'start-ai-os.sh'), 'utf8')
+assert.ok(windowsStart.includes('runtime\\qwenpaw\\venv\\Scripts\\qwenpaw.exe'), 'Windows wrapper must recognize the managed venv layout')
+assert.ok(linuxStart.includes('runtime/qwenpaw/venv/bin/qwenpaw'), 'Linux wrapper must recognize the managed venv layout')
+
 const start = readFileSync(join(scripts, 'start.mjs'), 'utf8')
 assert.ok(start.includes("from './runtime-env.mjs'"), 'start must resolve the project-managed QwenPaw runtime')
 assert.ok(start.includes('qwenpawCommand'), 'start must not require a global qwenpaw command')
