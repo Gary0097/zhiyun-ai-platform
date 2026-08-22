@@ -70,11 +70,11 @@
 
     React.useEffect(function () { loadDataset(selected, source); }, [selected, source]);
 
-    function simulate() {
+    function simulate(entity) {
       setLoading(true); setError("");
-      request("/zhiyun-data-core/simulate/orders", {
+      request("/zhiyun-data-core/simulate/" + encodeURIComponent(entity), {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ count: 20 })
-      }).then(function () { loadDataset("orders", source); })
+      }).then(function () { message.success("已生成 20 条可撤销的模拟数据"); loadDataset(entity, source); })
         .catch(function (reason) { setError(reason.message || "模拟数据生成失败"); setLoading(false); });
     }
 
@@ -133,7 +133,7 @@
             h(antd.Button, { onClick: function () { loadDataset(selected, source); } }, "刷新"),
             h(antd.Button, { onClick: function () { setCreateOpen(true); } }, "新建数据表"),
             h(antd.Upload, { accept: ".xlsx,.csv", showUploadList: false, beforeUpload: upload }, h(antd.Button, { type: selected === "orders" ? "default" : "primary" }, "导入 Excel/CSV")),
-            selected === "orders" ? h(antd.Button, { type: "primary", onClick: simulate, loading: loading }, "生成 20 条模拟订单") : null)
+            selected === "orders" || selected === "production" ? h(antd.Button, { type: "primary", onClick: function () { simulate(selected); }, loading: loading }, selected === "orders" ? "生成 20 条模拟订单" : "生成 20 条模拟生产数据") : null)
         ),
         error ? h(antd.Alert, { type: "error", showIcon: true, message: error, style: { marginBottom: 16 } }) : null,
         h(antd.Row, { gutter: [12, 12], style: { marginBottom: 16 } },
