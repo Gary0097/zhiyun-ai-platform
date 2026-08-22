@@ -137,7 +137,7 @@ chmod +x set-ai-os-logo.sh
 - QwenPaw 运行环境缺失或版本不符：Windows运行 `.\setup-ai-os.ps1`，Linux运行 `./setup-ai-os.sh`；无需手工编辑 PATH。
 - PawApp 同步失败：检查 Git、GitHub 网络和目标目录；不要手工修改 `runtime/pawapps` 中的锁定代码。
 - Windows出现 `.git/objects/pack` 拒绝访问：说明仍在运行旧版同步器；拉取最新master后重新启动，新版安装源不会携带`.git`。
-- Agent看不到Studio工具：确认Data Studio至少为v0.8.0、Order Studio至少为v0.5.2，并检查启动日志无治理类型冲突。
+- Agent看不到Studio工具：确认Data Studio至少为v0.8.0、Order Studio至少为v0.6.0，并检查启动日志无治理类型冲突。
 - 8088 已监听：启动器会在安装插件前停止，避免重复实例和文件占用；先访问页面确认，再停止旧进程后重试。
 - 页面能打开但模块不可用：运行 `check-ai-os.cmd` 或 `./check-ai-os.sh`，按失败模块定位，不要只依据整段启动日志猜测。
 - 启动日志出现上述已停用插件：先确认是否拉取了最新 `master`，再重启；清理动作发生在 QwenPaw 启动前。\n- 需要恢复被停用插件：停止 AI-OS 后，从实际 QwenPaw 工作目录的 `disabled_plugins` 将对应备份移回 `plugins`；恢复后产生的兼容问题不属于 AI-OS 发布门禁。\n- 不要启动 8390：该服务已退出当前目标架构。

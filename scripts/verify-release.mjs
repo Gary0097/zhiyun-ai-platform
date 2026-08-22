@@ -103,6 +103,8 @@ for (const [command, args] of commands) {
 
 const materialize = spawnSync(process.execPath, [join(scripts, 'sync-pawapps.mjs')], { cwd: root, stdio: 'inherit' })
 assert.equal(materialize.status, 0, 'locked PawApps must materialize from GitHub')
+const phase0 = spawnSync(process.execPath, [join(root, 'scripts', 'verify-phase0-controls.mjs')], { cwd: root, stdio: 'inherit' })
+assert.equal(phase0.status, 0, 'Phase 0 repository controls must stay complete')
 
 function pythonFiles (directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap(entry => {

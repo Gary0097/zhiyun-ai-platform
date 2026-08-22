@@ -25,7 +25,7 @@
       "app_id": "zhiyun-order-studio",
       "name": "Order Studio",
       "aliases": ["订单中心", "合同订单", "ddzx", "订单处理"],
-      "version": "0.5.2",
+      "version": "0.6.0",
       "category": "order",
       "install_status": "installed",
       "route": "/apps/zhiyun-order-studio",

@@ -68,7 +68,7 @@ class SearchEngineTests(unittest.TestCase):
         apps = {app["app_id"]: app for app in load_catalog()["apps"]}
         self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.8.0")
         self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
-        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.5.2")
+        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.6.0")
         self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
         self.assertEqual(apps["zhiyun-data-core"]["version"], "0.6.0")
         self.assertEqual(apps["zhiyun-audit"]["version"], "1.2.0")
