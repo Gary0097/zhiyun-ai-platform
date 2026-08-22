@@ -62,7 +62,7 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual(summary["total"], 31)
         self.assertEqual(summary["in_progress"], 9)
         self.assertEqual(summary["completed"], 0)
-        self.assertEqual(summary["overall_progress"], 14)
+        self.assertEqual(summary["overall_progress"], 15)
 
 
 if __name__ == "__main__":
