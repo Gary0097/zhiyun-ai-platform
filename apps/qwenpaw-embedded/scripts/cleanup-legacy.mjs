@@ -1,5 +1,5 @@
-// 停用旧品牌/应用插件，并清理 Agent 的遗留企业 Tool。
-// 等价于 cleanup-legacy.py，但不依赖 qwenpaw Python 包（本机 qwenpaw 为 Desktop 打包 exe）。
+// 停用旧架构和已确认不兼容的非 AI-OS 插件，并清理 Agent 遗留企业 Tool。
+// 仅移动到 disabled_plugins，保留可恢复备份；不删除用户数据。
 import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync } from 'node:fs'
 import { join, normalize, resolve } from 'node:path'
 import { homedir } from 'node:os'
@@ -16,24 +16,27 @@ const QWENPAW_HOME = workingDir()
 const PLUGINS_DIR = join(QWENPAW_HOME, 'plugins')
 const DISABLED_DIR = join(QWENPAW_HOME, 'disabled_plugins')
 const LEGACY_PLUGINS = ['zhiyun-brand', 'zhiyun-orders']
+const INCOMPATIBLE_PLUGINS = ['cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']
 const LEGACY_TOOLS = [
   'enterprise_platform_status', 'enterprise_query_orders', 'enterprise_query_inventory',
   'enterprise_query_customers', 'enterprise_search_knowledge', 'orders_query', 'orders_delivery_risk',
 ]
 
-// 1. 停用旧插件（移动到 disabled_plugins）
 mkdirSync(DISABLED_DIR, { recursive: true })
 const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-for (const pluginId of LEGACY_PLUGINS) {
+
+function disablePlugin (pluginId, reason) {
   const source = join(PLUGINS_DIR, pluginId)
-  if (existsSync(source)) {
-    const target = join(DISABLED_DIR, `${pluginId}-${stamp}`)
-    renameSync(source, target)
-    console.log(`已停用旧插件 ${pluginId}（可恢复备份：${target}）`)
-  }
+  if (!existsSync(source)) return
+  const target = join(DISABLED_DIR, `${pluginId}-${stamp}`)
+  renameSync(source, target)
+  console.log(`已停用${reason}插件 ${pluginId}（可恢复备份：${target}）`)
 }
 
-// 2. 清理 Agent 遗留 Tool
+for (const pluginId of LEGACY_PLUGINS) disablePlugin(pluginId, '旧架构')
+for (const pluginId of INCOMPATIBLE_PLUGINS) disablePlugin(pluginId, '非 AI-OS 不兼容')
+
+// 清理 Agent 遗留 Tool。
 const configPath = join(QWENPAW_HOME, 'config.json')
 if (!existsSync(configPath)) {
   console.log('未发现QwenPaw配置，跳过Agent遗留Tool清理（首次初始化后无需旧配置迁移）。')
