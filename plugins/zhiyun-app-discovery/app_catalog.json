@@ -111,16 +111,16 @@
         "ddzx",
         "订单处理"
       ],
-      "version": null,
+      "version": "0.1.0",
       "category": "order",
-      "install_status": "planned",
-      "route": null,
-      "repository_url": null,
+      "install_status": "installed",
+      "route": "/apps/zhiyun-order-studio",
+      "repository_url": "https://github.com/Gary0097/zhiyun-order-studio",
       "platforms": [
         "windows",
         "linux"
       ],
-      "health": "not_developed",
+      "health": "available",
       "capabilities": [
         {
           "id": 7,
