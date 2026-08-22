@@ -38,9 +38,9 @@
       "id": 5,
       "name": "企业关键数据日看板",
       "app_id": "zhiyun-data-studio",
-      "status": "planned",
-      "progress": 0,
-      "note": "未开发。"
+      "status": "in_progress",
+      "progress": 40,
+      "note": "已交付订单域每日简报、异常摘要、优先清单和Agent工具；生产、财务、售后及定时推送尚未接入。"
     },
     {
       "id": 6,
