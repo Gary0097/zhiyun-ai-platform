@@ -45,6 +45,20 @@ for (const app of externalApps) {
 console.log('\nAI-OS 启动中：http://127.0.0.1:8088')
 console.log(`运行形态：原生 QwenPaw 单进程；启用系统插件与 ${externalApps.length} 个外部 PawApp；不启动企业服务。\n`)
 const child = spawn('qwenpaw', ['app'], { cwd: repoRoot, stdio: 'inherit', env: process.env })
-process.on('SIGINT', () => child.kill('SIGINT'))
-process.on('SIGTERM', () => child.kill('SIGTERM'))
-child.on('exit', code => { process.exitCode = code || 0 })
+const health = spawn(process.execPath, [join(scriptsRoot, 'health-report.mjs')], {
+  cwd: repoRoot,
+  stdio: 'inherit',
+  env: process.env,
+})
+process.on('SIGINT', () => {
+  health.kill('SIGINT')
+  child.kill('SIGINT')
+})
+process.on('SIGTERM', () => {
+  health.kill('SIGTERM')
+  child.kill('SIGTERM')
+})
+child.on('exit', code => {
+  if (!health.killed) health.kill('SIGTERM')
+  process.exitCode = code || 0
+})
