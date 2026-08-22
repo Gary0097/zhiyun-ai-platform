@@ -5,14 +5,14 @@
     {"id": 1, "name": "实时客户订单进度看板", "app_id": "zhiyun-data-studio", "status": "in_progress", "progress": 80, "note": "已有订单表格与进度展示，待接入真实业务系统。"},
     {"id": 2, "name": "客户交付风险智能预警", "app_id": "zhiyun-data-studio", "status": "in_progress", "progress": 75, "note": "已有规则评分、红黄绿预警和Agent工具，待真实数据验收。"},
     {"id": 3, "name": "多源数据自动采集", "app_id": "zhiyun-data-studio", "status": "in_progress", "progress": 35, "note": "目前支持Excel/CSV，微信、表单和ERP尚未接入。"},
-    {"id": 4, "name": "跨部门数据融合加工", "app_id": "zhiyun-data-studio", "status": "planned", "progress": 0, "note": "未开发。"},
-    {"id": 5, "name": "企业关键数据日看板", "app_id": "zhiyun-data-studio", "status": "planned", "progress": 0, "note": "未开发。"},
-    {"id": 6, "name": "关键指标趋势分析", "app_id": "zhiyun-data-studio", "status": "planned", "progress": 0, "note": "未开发。"},
-    {"id": 7, "name": "客户订单自动格式化", "app_id": "zhiyun-order-studio", "status": "planned", "progress": 0, "note": "Order Studio未创建。"},
-    {"id": 8, "name": "多模板支持与适配", "app_id": "zhiyun-order-studio", "status": "planned", "progress": 0, "note": "Order Studio未创建。"},
-    {"id": 9, "name": "合同要素提取与比对", "app_id": "zhiyun-order-studio", "status": "planned", "progress": 0, "note": "Order Studio未创建。"},
-    {"id": 10, "name": "订单—合同一致性验证", "app_id": "zhiyun-order-studio", "status": "planned", "progress": 0, "note": "Order Studio未创建。"},
-    {"id": 11, "name": "异常处理流程自动化", "app_id": "zhiyun-order-studio", "status": "planned", "progress": 0, "note": "Order Studio未创建。"},
+    {"id": 4, "name": "跨部门数据融合加工", "app_id": "zhiyun-data-studio", "status": "testing", "progress": 70, "note": "已实现任意数据表字段映射、人效/单位成本/损耗分析与界面，待真实部门数据验收。"},
+    {"id": 5, "name": "企业关键数据日看板", "app_id": "zhiyun-data-studio", "status": "testing", "progress": 65, "note": "已实现订单域一页式简报和导出；生产、报销、售后聚合及微信推送尚未接入。"},
+    {"id": 6, "name": "关键指标趋势分析", "app_id": "zhiyun-data-studio", "status": "testing", "progress": 70, "note": "已实现订单量、平均进度、延误率月度趋势和异常月份；通用指标预测仍需扩展。"},
+    {"id": 7, "name": "客户订单自动格式化", "app_id": "zhiyun-order-studio", "status": "in_progress", "progress": 60, "note": "已支持微信/邮件/OCR结果文本结构化；图片OCR需由QwenPaw文件能力或后续OCR连接器提供。"},
+    {"id": 8, "name": "多模板支持与适配", "app_id": "zhiyun-order-studio", "status": "testing", "progress": 70, "note": "已实现标准、FOB、OEM和促销模板匹配、依据与处理步骤，待业务模板验收。"},
+    {"id": 9, "name": "合同要素提取与比对", "app_id": "zhiyun-order-studio", "status": "testing", "progress": 65, "note": "已支持文本/PDF/Word提取、要素证据和风险规则；库存、产能语义比对尚未接入。"},
+    {"id": 10, "name": "订单—合同一致性验证", "app_id": "zhiyun-order-studio", "status": "testing", "progress": 65, "note": "已实现客户、产品、数量、交期、单价和付款比例差异清单，待真实合同样本验收。"},
+    {"id": 11, "name": "异常处理流程自动化", "app_id": "zhiyun-order-studio", "status": "planned", "progress": 0, "note": "尚未开发历史相似流程、话术和处理路径推荐。"},
     {"id": 12, "name": "客户咨询智能应答", "app_id": "zhiyun-service-studio", "status": "planned", "progress": 0, "note": "Service Studio未创建。"},
     {"id": 13, "name": "智能语义理解与意图识别", "app_id": "zhiyun-service-studio", "status": "planned", "progress": 0, "note": "Service Studio未创建。"},
     {"id": 14, "name": "售后工单智能管理", "app_id": "zhiyun-service-studio", "status": "planned", "progress": 0, "note": "Service Studio未创建。"},
@@ -32,6 +32,6 @@
     {"id": 28, "name": "人力资源数据分析", "app_id": "zhiyun-people-studio", "status": "planned", "progress": 0, "note": "People Studio未创建。"},
     {"id": 29, "name": "现有系统数据接口开发", "app_id": "zhiyun-integration-hub", "status": "in_progress", "progress": 10, "note": "已有内部Data Core API，ERP/WMS接口尚未开发。"},
     {"id": 30, "name": "供应链风险实时监控系统", "app_id": "zhiyun-supply-studio", "status": "planned", "progress": 0, "note": "Supply Studio未创建。"},
-    {"id": 31, "name": "系统安全加固", "app_id": "zhiyun-audit", "status": "in_progress", "progress": 35, "note": "已有QwenPaw基础安全与Tool审计，缺审计界面和高风险控制闭环。"}
+    {"id": 31, "name": "系统安全加固", "app_id": "zhiyun-audit", "status": "in_progress", "progress": 50, "note": "已有QwenPaw基础安全、Tool审计、敏感字段脱敏和灾难性高风险操作硬阻断；加密、审计界面和更完整防泄漏仍待开发。"}
   ]
 }

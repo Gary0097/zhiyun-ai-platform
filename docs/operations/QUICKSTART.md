@@ -6,16 +6,15 @@ AI-OS 采用 QwenPaw 2.1.0 单进程运行，默认地址为 `http://127.0.0.1:8
 
 ## 首次准备
 
-两种系统都需要 Node.js 18+、Git、Python，以及已安装并初始化的 QwenPaw 2.1.0。请确认以下命令可运行：
+两种系统都需要 Node.js 18+、Git，以及已安装并初始化的 QwenPaw 2.1.0。请确认以下命令可运行：
 
 ```text
 node --version
 git --version
 qwenpaw --version
-python -c "import qwenpaw"
 ```
 
-Linux 若命令名为 `python3`，启动器会自动使用它。若 QwenPaw 安装在其他 Python 环境，可显式设置 `PYTHON`。
+Windows Desktop/打包版不要求系统 Python 能 `import qwenpaw`。只有使用 QwenPaw 源码/CLI Python 环境时，才需要设置 `PYTHON`；诊断会将 Desktop 模式显示为提醒而不是失败。
 
 ## 一键启动
 
@@ -48,7 +47,7 @@ diagnose-ai-os.cmd
 ./diagnose-ai-os.sh
 ```
 
-诊断覆盖 Node.js、Git、QwenPaw CLI、Python 环境、目录权限、PawApp 落盘情况和 8088 端口。`PawApp 尚未同步` 是首次启动提醒，不会阻止启动；红色失败项必须先处理。
+诊断覆盖 Node.js、Git、QwenPaw CLI/可选 Python 环境、目录权限、PawApp 落盘情况和 8088 端口。`PawApp 尚未同步` 是首次启动提醒，不会阻止启动；红色失败项必须先处理。
 
 如需机器可读结果，可运行：
 
@@ -67,12 +66,23 @@ git pull --ff-only origin master
 
 外部应用版本由锁文件控制，不会因其仓库后续提交而自动漂移。若新版启动失败，可将主仓库回退到上一个已验收提交后重新启动；工作区数据库和日志不应提交到 Git。
 
+## 修改 Logo
+
+项目默认 Logo 已内置。Windows 可把 PNG/JPG/SVG/WebP 文件拖到 `set-ai-os-logo.cmd`，Linux 运行：
+
+```bash
+chmod +x set-ai-os-logo.sh
+./set-ai-os-logo.sh /path/to/logo.png
+```
+
+恢复默认 Logo：Windows 运行 `node apps\qwenpaw-embedded\scripts\set-logo.mjs --reset`；Linux 运行 `./set-ai-os-logo.sh --reset`。脚本只依赖 Node.js，兼容无法 `import qwenpaw` 的 Desktop 版。
+
 ## 常见问题
 
 - `qwenpaw` 找不到：QwenPaw 未安装或其可执行目录不在 PATH。
-- Python 无法导入 `qwenpaw`：CLI 与 `PYTHON` 指向了不同环境；把 `PYTHON` 设置为安装 QwenPaw 的解释器。
+- Python 无法导入 `qwenpaw`：Desktop版可忽略该提醒；源码安装模式再把 `PYTHON` 指向安装了QwenPaw的解释器。
 - PawApp 同步失败：检查 Git、GitHub 网络和目标目录；不要手工修改 `runtime/pawapps` 中的锁定代码。
 - Windows出现 `.git/objects/pack` 拒绝访问：说明仍在运行旧版同步器；拉取最新master后重新启动，新版安装源不会携带`.git`。
-- Agent看不到Studio工具：确认Data Studio至少为v0.7.1、Order Studio至少为v0.5.1，并检查启动日志无治理类型冲突。
-- 8088 已监听：可能 AI-OS 已经启动；先访问页面确认，再决定是否停止旧进程。
+- Agent看不到Studio工具：确认Data Studio至少为v0.7.2、Order Studio至少为v0.5.2，并检查启动日志无治理类型冲突。
+- 8088 已监听：启动器会在安装插件前停止，避免重复实例和文件占用；先访问页面确认，再停止旧进程后重试。
 - 不要启动 8390：该服务已退出当前目标架构。

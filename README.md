@@ -16,6 +16,7 @@
 - 系统插件：Logo、日志审计、应用发现、Data Core
 - Data Studio：数据导入、订单看板、风险、趋势、日报和跨部门分析
 - Order Studio：订单格式化、模板适配、合同审查与一致性验证
+- 高风险控制：审计全部 Tool 调用，并硬阻断系统盘递归删除、磁盘格式化、破坏性 Git 重写和整库/整表删除
 - Workspace：数据库、日志、知识库和用户数据的唯一持久化位置
 
 外部 PawApp 由 `apps/qwenpaw-embedded/pawapps.lock.json` 锁定到确定提交。不要直接修改 `runtime/pawapps` 或 `~/.qwenpaw/plugins` 中的安装副本。
@@ -26,4 +27,4 @@
 node scripts/verify-release.mjs
 ```
 
-发布门禁会验证纯 QwenPaw 架构、版本锁、启动器、PawApp 治理类型、Python 测试和 Windows/Linux 入口。遗留架构的移除记录见 [迁移说明](docs/migration/LEGACY_REMOVAL.md)。
+发布门禁会验证纯 QwenPaw 架构、版本锁、启动器、内外部 PawApp 版本/治理类型、78项 Python 测试和 Windows/Linux 入口。遗留架构的移除记录见 [迁移说明](docs/migration/LEGACY_REMOVAL.md)。

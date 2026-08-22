@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
@@ -8,7 +8,16 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const embedded = join(root, 'apps', 'qwenpaw-embedded')
 const scripts = join(embedded, 'scripts')
 
-for (const removed of ['apps/enterprise/package.json', 'apps/enterprise/server/index.js', 'pawapps/zhiyun-orders/plugin.json', 'pawapps/_shared/zhiyun_workspace.py', 'apps/qwenpaw-embedded/scripts/cleanup-legacy.py']) {
+for (const removed of [
+  'apps/enterprise/package.json',
+  'apps/enterprise/server/index.js',
+  'pawapps/zhiyun-orders/plugin.json',
+  'pawapps/_shared/zhiyun_workspace.py',
+  'apps/qwenpaw-embedded/scripts/cleanup-legacy.py',
+  'apps/qwenpaw-embedded/scripts/set-logo.py',
+  'apps/qwenpaw-embedded/scripts/verify-r0.mjs',
+  'apps/qwenpaw-embedded/scripts/verify-s0.mjs',
+]) {
   assert.equal(existsSync(join(root, removed)), false, `legacy source must be removed: ${removed}`)
 }
 
@@ -31,6 +40,11 @@ for (const app of pawapps.apps) {
   assert.ok(entry.route, `${app.id} must expose a route`)
 }
 
+for (const pluginId of ['zhiyun-app-discovery', 'zhiyun-audit', 'zhiyun-data-core', 'zhiyun-logo']) {
+  const manifest = JSON.parse(readFileSync(join(root, 'plugins', pluginId, 'plugin.json'), 'utf8'))
+  assert.equal(catalogById.get(pluginId)?.version, manifest.version, `${pluginId} catalog version must match plugin.json`)
+}
+
 const start = readFileSync(join(scripts, 'start.mjs'), 'utf8')
 assert.ok(start.includes('for (const app of externalApps)'), 'launcher must install every locked PawApp')
 assert.ok(start.includes('cleanup-legacy.mjs'), 'launcher must use the Desktop-compatible cleanup')
@@ -40,6 +54,9 @@ assert.ok(!start.includes('8390'), 'launcher must not start the retired service'
 const sync = readFileSync(join(scripts, 'sync-pawapps.mjs'), 'utf8')
 assert.ok(sync.includes("'.pawapp-commit'"), 'sync must use a materialization marker')
 assert.ok(sync.includes("rmSync(join(staging, '.git')"), 'sync must remove Git metadata before install')
+const cleanup = readFileSync(join(scripts, 'cleanup-legacy.mjs'), 'utf8')
+assert.ok(cleanup.includes('QWENPAW_WORKING_DIR') && cleanup.includes('COPAW_WORKING_DIR'), 'cleanup must follow the QwenPaw working directory contract')
+assert.ok(existsSync(join(root, 'plugins', 'zhiyun-logo', 'assets', 'default-logo.png')), 'packaged default logo is missing')
 
 const allowedToolTypes = new Set(['file', 'internal', 'network', 'shell'])
 for (const pluginFile of [
@@ -52,7 +69,7 @@ for (const pluginFile of [
   }
 }
 
-for (const entry of ['start-ai-os.cmd', 'start-ai-os.sh', 'diagnose-ai-os.cmd', 'diagnose-ai-os.sh']) {
+for (const entry of ['start-ai-os.cmd', 'start-ai-os.sh', 'diagnose-ai-os.cmd', 'diagnose-ai-os.sh', 'set-ai-os-logo.cmd', 'set-ai-os-logo.sh']) {
   assert.ok(existsSync(join(root, entry)), `missing cross-platform entry: ${entry}`)
 }
 
@@ -61,11 +78,42 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'sync-pawapps.mjs')]],
   [process.execPath, ['--check', join(scripts, 'doctor.mjs')]],
   [process.execPath, ['--check', join(scripts, 'cleanup-legacy.mjs')]],
+  [process.execPath, ['--check', join(scripts, 'set-logo.mjs')]],
+  [process.execPath, [join(scripts, 'set-logo.mjs'), '--check']],
   [process.execPath, [join(scripts, 'sync-pawapps.mjs'), '--check']],
+  [process.execPath, [join(scripts, 'verify-deployment.mjs')]],
+  [process.execPath, [join(scripts, 'verify-maintenance.mjs')]],
 ]
 for (const [command, args] of commands) {
   const result = spawnSync(command, args, { cwd: root, stdio: 'inherit' })
   assert.equal(result.status, 0, `release check failed: ${command} ${args.join(' ')}`)
+}
+
+const materialize = spawnSync(process.execPath, [join(scripts, 'sync-pawapps.mjs')], { cwd: root, stdio: 'inherit' })
+assert.equal(materialize.status, 0, 'locked PawApps must materialize from GitHub')
+
+function pythonFiles (directory) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
+    const path = join(directory, entry.name)
+    return entry.isDirectory() ? pythonFiles(path) : (entry.name.endsWith('.py') ? [path] : [])
+  })
+}
+
+for (const app of pawapps.apps) {
+  const appRoot = join(embedded, 'runtime', 'pawapps', app.install_dir)
+  const manifest = JSON.parse(readFileSync(join(appRoot, 'plugin.json'), 'utf8'))
+  const entry = catalogById.get(app.id)
+  assert.equal(manifest.id, app.id, `${app.id} manifest ID mismatch`)
+  assert.equal(manifest.version, entry.version, `${app.id} catalog version must match materialized manifest`)
+  assert.equal(manifest.meta?.pawapp?.entry_page, entry.route, `${app.id} route must match materialized manifest`)
+  assert.equal(readFileSync(join(appRoot, '.pawapp-commit'), 'utf8').trim(), app.commit, `${app.id} marker must match lock`)
+  assert.equal(existsSync(join(appRoot, '.git')), false, `${app.id} install source must not contain Git metadata`)
+  for (const pluginFile of pythonFiles(join(appRoot, 'backend'))) {
+    const source = readFileSync(pluginFile, 'utf8')
+    for (const match of source.matchAll(/tool_type="([^"]+)"/g)) {
+      assert.ok(allowedToolTypes.has(match[1]), `invalid QwenPaw governance type ${match[1]} in ${pluginFile}`)
+    }
+  }
 }
 
 const python = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3')
@@ -74,4 +122,10 @@ for (const plugin of ['zhiyun-app-discovery', 'zhiyun-audit', 'zhiyun-data-core'
   assert.equal(result.status, 0, `Python tests failed: ${plugin}`)
 }
 
-console.log('AI-OS 发布门禁通过：纯QwenPaw架构、跨平台启动、版本锁和系统插件测试均正常。')
+for (const app of pawapps.apps) {
+  const appRoot = join(embedded, 'runtime', 'pawapps', app.install_dir)
+  const result = spawnSync(python, ['-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test*.py', '-v'], { cwd: appRoot, stdio: 'inherit' })
+  assert.equal(result.status, 0, `Python tests failed: ${app.id}`)
+}
+
+console.log('AI-OS 发布门禁通过：纯QwenPaw架构、跨平台启动、版本锁、系统插件和全部锁定PawApp测试均正常。')

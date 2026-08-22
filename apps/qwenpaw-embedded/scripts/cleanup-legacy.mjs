@@ -1,10 +1,18 @@
 // 停用旧品牌/应用插件，并清理 Agent 的遗留企业 Tool。
 // 等价于 cleanup-legacy.py，但不依赖 qwenpaw Python 包（本机 qwenpaw 为 Desktop 打包 exe）。
 import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync } from 'node:fs'
-import { join, normalize } from 'node:path'
+import { join, normalize, resolve } from 'node:path'
 import { homedir } from 'node:os'
 
-const QWENPAW_HOME = join(homedir(), '.qwenpaw')
+function workingDir () {
+  const explicit = process.env.QWENPAW_WORKING_DIR || process.env.COPAW_WORKING_DIR
+  if (explicit) return resolve(explicit)
+  const current = join(homedir(), '.qwenpaw')
+  const legacy = join(homedir(), '.copaw')
+  return !existsSync(current) && existsSync(legacy) ? legacy : current
+}
+
+const QWENPAW_HOME = workingDir()
 const PLUGINS_DIR = join(QWENPAW_HOME, 'plugins')
 const DISABLED_DIR = join(QWENPAW_HOME, 'disabled_plugins')
 const LEGACY_PLUGINS = ['zhiyun-brand', 'zhiyun-orders']

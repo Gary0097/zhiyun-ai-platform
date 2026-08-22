@@ -116,12 +116,14 @@ def search_apps(
     *,
     limit: int = 5,
     catalog: dict[str, Any] | None = None,
+    ledger: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     """Search real catalog entries without requiring a model or network."""
     clean_query = query.strip()
     if not clean_query:
         return []
     query_terms = _terms(clean_query)
+    progress_by_id = {item["id"]: item for item in (ledger or load_progress())["features"]}
     results: list[dict[str, Any]] = []
     for app in (catalog or load_catalog())["apps"]:
         app_matches: list[dict[str, Any]] = []
@@ -129,9 +131,13 @@ def search_apps(
             matches = [_match_score(query_terms, label, value) for label, value in _text_values(app, capability)]
             score, reason = max(matches, key=lambda item: item[0], default=(0.0, ""))
             if score:
+                delivery = progress_by_id.get(capability.get("id"), {})
                 app_matches.append({
                     "capability_id": capability.get("id"),
                     "capability_name": capability.get("name"),
+                    "delivery_status": delivery.get("status", "planned"),
+                    "delivery_progress": delivery.get("progress", 0),
+                    "delivery_note": delivery.get("note", "交付状态未登记。"),
                     "score": round(score, 2),
                     "reason": reason,
                 })
@@ -139,7 +145,8 @@ def search_apps(
             continue
         app_matches.sort(key=lambda item: (-item["score"], item["capability_id"] or 0))
         top = app_matches[0]
-        installed_bonus = 5.0 if app.get("install_status") == "installed" else 0.0
+        capability_available = app.get("install_status") == "installed" and top["delivery_status"] != "planned"
+        installed_bonus = 5.0 if capability_available else 0.0
         results.append({
             "app_id": app["app_id"],
             "name": app["name"],
@@ -150,6 +157,7 @@ def search_apps(
             "route": app.get("route"),
             "repository_url": app.get("repository_url"),
             "platforms": app.get("platforms", []),
+            "available": capability_available,
             "score": round(top["score"] + installed_bonus, 2),
             "matched_capability": top,
             "related_capabilities": app_matches[1:3],
@@ -161,7 +169,7 @@ def search_apps(
 def agent_response(query: str, limit: int = 3) -> dict[str, Any]:
     """Return an Agent-safe response sourced only from the real catalog."""
     results = search_apps(query, limit=limit)
-    available = any(item["install_status"] == "installed" for item in results)
+    available = any(item["available"] for item in results)
     return {
         "query": query,
         "found": bool(results),
@@ -171,7 +179,7 @@ def agent_response(query: str, limit: int = 3) -> dict[str, Any]:
             "已从真实应用能力索引找到可用应用。"
             if available
             else (
-                "找到规划能力，但对应应用尚未开发，当前不可用。"
+                "找到对应应用或规划能力，但匹配功能尚未交付，当前不可用。"
                 if results
                 else "真实应用目录中暂无匹配能力，不会虚构应用。"
             )
