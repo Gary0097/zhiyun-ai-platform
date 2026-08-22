@@ -55,20 +55,20 @@ class SearchEngineTests(unittest.TestCase):
         self.assertFalse(response["available"])
         self.assertIn("尚未交付", response["message"])
 
-    def test_installed_app_does_not_make_planned_capability_available(self) -> None:
+    def test_installed_app_does_not_make_testing_capability_available(self) -> None:
         response = agent_response("处理延期和投诉复合异常")
         self.assertTrue(response["found"])
         self.assertFalse(response["available"])
         result = response["results"][0]
         self.assertEqual(result["app_id"], "zhiyun-order-studio")
-        self.assertEqual(result["matched_capability"]["delivery_status"], "planned")
+        self.assertEqual(result["matched_capability"]["delivery_status"], "testing")
         self.assertFalse(result["available"])
 
     def test_installed_catalog_is_truthful(self) -> None:
         apps = {app["app_id"]: app for app in load_catalog()["apps"]}
-        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.8.0")
+        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.9.0")
         self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
-        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.6.0")
+        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.7.0")
         self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
         self.assertEqual(apps["zhiyun-data-core"]["version"], "0.6.0")
         self.assertEqual(apps["zhiyun-audit"]["version"], "1.2.0")
@@ -79,10 +79,11 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual([item["id"] for item in ledger["features"]], list(range(1, 32)))
         summary = progress_summary(ledger)
         self.assertEqual(summary["total"], 31)
-        self.assertEqual(summary["testing"], 6)
-        self.assertEqual(summary["in_progress"], 7)
+        self.assertEqual(summary["testing"], 11)
+        self.assertEqual(summary["in_progress"], 3)
+        self.assertEqual(summary["planned"], 17)
         self.assertEqual(summary["completed"], 0)
-        self.assertEqual(summary["overall_progress"], 25)
+        self.assertEqual(summary["overall_progress"], 37)
 
 
 if __name__ == "__main__":

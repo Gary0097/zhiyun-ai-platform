@@ -132,10 +132,11 @@ def search_apps(
             score, reason = max(matches, key=lambda item: item[0], default=(0.0, ""))
             if score:
                 delivery = progress_by_id.get(capability.get("id"), {})
+                delivery_status = capability.get("delivery_status", delivery.get("status", "planned"))
                 app_matches.append({
                     "capability_id": capability.get("id"),
                     "capability_name": capability.get("name"),
-                    "delivery_status": delivery.get("status", "planned"),
+                    "delivery_status": delivery_status,
                     "delivery_progress": delivery.get("progress", 0),
                     "delivery_note": delivery.get("note", "交付状态未登记。"),
                     "score": round(score, 2),
@@ -145,7 +146,7 @@ def search_apps(
             continue
         app_matches.sort(key=lambda item: (-item["score"], item["capability_id"] or 0))
         top = app_matches[0]
-        capability_available = app.get("install_status") == "installed" and top["delivery_status"] != "planned"
+        capability_available = app.get("install_status") == "installed" and top["delivery_status"] == "completed"
         installed_bonus = 5.0 if capability_available else 0.0
         results.append({
             "app_id": app["app_id"],
