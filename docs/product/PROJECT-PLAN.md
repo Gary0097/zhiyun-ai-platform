@@ -18,13 +18,13 @@ into this repository only through pinned commits.
 
 As of the ledger date, the plan contains 31 capabilities:
 
-- 0 delivered;
-- 7 in development;
-- 6 in testing; and
-- 18 planned.
+- 11 completed;
+- 3 in development;
+- 0 in testing; and
+- 17 planned.
 
 Therefore the product is not complete. Percentages are planning indicators, not
-acceptance evidence. A capability becomes `delivered` only at 100% after its
+acceptance evidence. A capability becomes `completed` only at 100% after its
 real-data path, UI, backend, Agent tools, persistence, error/empty states,
 platform checks, and issue acceptance criteria have passed.
 
@@ -54,12 +54,11 @@ administrator and cannot be represented by a source commit.
 
 ### Phase 1 — Accept the two existing PawApps
 
-1. Finish and accept Data Studio features 1–6 against real Data Core records.
-2. Finish and accept Order Studio features 7–11 against real order and contract
-   samples, including the currently unimplemented exception workflow.
-3. Merge each PawApp change in its owning repository, update the full commit SHA
-   in `pawapps.lock.json`, then run the main repository release gate on Windows
-   and Linux.
+1. Data Studio features 1–6 were accepted against real Data Core records.
+2. Order Studio features 7–11 were accepted against real order and contract
+   samples, including the exception workflow.
+3. Both PawApps were merged first, pinned by formal merge SHA, and passed the
+   main repository release gate on Windows and Linux.
 
 ### Phase 2 — Complete shared platform foundations
 
@@ -84,7 +83,7 @@ health contract, versioned data contract, rollback method, and locked full SHA.
 
 ## Per-Capability Definition of Done
 
-A feature may be changed to `delivered` only when all of the following are true:
+A feature may be changed to `completed` only when all of the following are true:
 
 - its linked issue acceptance criteria pass with reproducible evidence;
 - real persisted data is used, with simulation explicitly labeled and optional;
@@ -95,7 +94,7 @@ A feature may be changed to `delivered` only when all of the following are true:
 - Windows and Linux behavior and version consistency are verified;
 - migrations preserve existing Workspace data and have a tested rollback; and
 - the progress entry contains an evidence-based note and is set to 100% only
-  with status `delivered`.
+  with status `completed`.
 
 ## Plan Integrity Check
 

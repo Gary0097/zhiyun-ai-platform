@@ -1,4 +1,4 @@
-# Phase 1 PawApp Acceptance Candidate
+# Phase 1 PawApp Acceptance Record
 
 Issue: `Gary0097/zhiyun-ai-platform#68`
 
@@ -13,7 +13,7 @@ Issue: `Gary0097/zhiyun-ai-platform#68`
 Both external PRs passed `verify (ubuntu-24.04)` and
 `verify (windows-2022)` before manual merge.
 
-## Candidate scope
+## Accepted scope
 
 Data Studio features 1–6 use persisted Data Core records and now produce
 traceable, reviewable risk, fusion, daily-brief and trend artifacts. Order
@@ -28,10 +28,18 @@ available Phase 1 behavior.
 
 ## Acceptance state
 
-Features 1–11 remain `testing` below 100%. Automated checks prove the versioned
-contracts, persistence rules, interfaces, empty/error behavior and platform
-gates; they do not replace the user's real-data acceptance. Only after that
-acceptance may a follow-up change mark individual features `delivered`.
+The user completed live acceptance on 2026-08-23 with Data Studio v0.9.0,
+Order Studio v0.7.0 and all six runtime health checks passing. Features 1–11
+are therefore recorded as `completed` at 100%. Automated checks continue to
+verify their versioned contracts, persistence rules, interfaces, empty/error
+behavior and platform gates.
+
+The accepted scope does not claim ERP/WMS online connectors or additional
+business-domain daily summaries. Those remain later capabilities and do not
+block acceptance of the Phase 1 scope described above.
 
 Rollback restores the previous full SHA for each PawApp. The PawApp databases
 and Workspace content are retained and must not be deleted during rollback.
+
+Future changes follow [PawApp Upgrade Policy](./PAWAPP-UPGRADE-POLICY.md). They
+create a new version and acceptance record; they do not rewrite this baseline.

@@ -55,13 +55,22 @@ class SearchEngineTests(unittest.TestCase):
         self.assertFalse(response["available"])
         self.assertIn("尚未交付", response["message"])
 
-    def test_installed_app_does_not_make_testing_capability_available(self) -> None:
+    def test_accepted_phase1_capability_is_available(self) -> None:
         response = agent_response("处理延期和投诉复合异常")
+        self.assertTrue(response["found"])
+        self.assertTrue(response["available"])
+        result = response["results"][0]
+        self.assertEqual(result["app_id"], "zhiyun-order-studio")
+        self.assertEqual(result["matched_capability"]["delivery_status"], "completed")
+        self.assertTrue(result["available"])
+
+    def test_installed_app_does_not_make_in_progress_capability_available(self) -> None:
+        response = agent_response("整理资料并形成企业知识库")
         self.assertTrue(response["found"])
         self.assertFalse(response["available"])
         result = response["results"][0]
-        self.assertEqual(result["app_id"], "zhiyun-order-studio")
-        self.assertEqual(result["matched_capability"]["delivery_status"], "testing")
+        self.assertEqual(result["app_id"], "qwenpaw-knowledge-base")
+        self.assertEqual(result["matched_capability"]["delivery_status"], "in_progress")
         self.assertFalse(result["available"])
 
     def test_installed_catalog_is_truthful(self) -> None:
@@ -79,11 +88,11 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual([item["id"] for item in ledger["features"]], list(range(1, 32)))
         summary = progress_summary(ledger)
         self.assertEqual(summary["total"], 31)
-        self.assertEqual(summary["testing"], 11)
+        self.assertEqual(summary["testing"], 0)
         self.assertEqual(summary["in_progress"], 3)
         self.assertEqual(summary["planned"], 17)
-        self.assertEqual(summary["completed"], 0)
-        self.assertEqual(summary["overall_progress"], 37)
+        self.assertEqual(summary["completed"], 11)
+        self.assertEqual(summary["overall_progress"], 39)
 
 
 if __name__ == "__main__":
