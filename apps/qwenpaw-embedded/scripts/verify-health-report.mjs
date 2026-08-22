@@ -11,7 +11,7 @@ function catalog () {
   return {
     apps: [
       { app_id: 'zhiyun-data-studio', version: '0.8.0', install_status: 'installed', health: 'available', capabilities: Array.from({ length: 31 }, (_, index) => ({ id: index + 1 })) },
-      { app_id: 'zhiyun-order-studio', version: '0.5.2', install_status: 'installed', health: 'available', capabilities: [] },
+      { app_id: 'zhiyun-order-studio', version: '0.6.0', install_status: 'installed', health: 'available', capabilities: [] },
       { app_id: 'zhiyun-data-core', version: '0.5.0', capabilities: [] },
       { app_id: 'zhiyun-audit', version: '1.1.1', capabilities: [] },
       { app_id: 'zhiyun-logo', version: '1.0.0', capabilities: [] },
@@ -33,7 +33,7 @@ async function scenario (overrides = {}) {
       '/api/zhiyun-app-discovery/catalog': catalog(),
       '/api/zhiyun-data-core/health': { status: 'available', schema_version: 1 },
       '/api/zhiyun-data-studio/health': { status: 'available', version: '0.8.0' },
-      '/api/zhiyun-order-studio/health': { status: 'available', version: '0.5.2' },
+      '/api/zhiyun-order-studio/health': { status: 'available', version: '0.6.0' },
       ...overrides,
     }
     response.end(JSON.stringify(bodies[request.url] || {}))
