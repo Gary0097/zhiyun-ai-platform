@@ -51,18 +51,18 @@ class SearchEngineTests(unittest.TestCase):
 
     def test_installed_catalog_is_truthful(self) -> None:
         apps = {app["app_id"]: app for app in load_catalog()["apps"]}
-        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.2.1")
+        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.7.0")
         self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
-        self.assertEqual(apps["zhiyun-order-studio"]["health"], "not_developed")
+        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.3.0")\n        self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
 
     def test_progress_covers_all_31_prd_features(self) -> None:
         ledger = load_progress()
         self.assertEqual([item["id"] for item in ledger["features"]], list(range(1, 32)))
         summary = progress_summary(ledger)
         self.assertEqual(summary["total"], 31)
-        self.assertEqual(summary["in_progress"], 10)
+        self.assertEqual(summary["in_progress"], 11)
         self.assertEqual(summary["completed"], 0)
-        self.assertEqual(summary["overall_progress"], 17)
+        self.assertEqual(summary["overall_progress"], 19)
 
 
 if __name__ == "__main__":
