@@ -60,9 +60,9 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual([item["id"] for item in ledger["features"]], list(range(1, 32)))
         summary = progress_summary(ledger)
         self.assertEqual(summary["total"], 31)
-        self.assertEqual(summary["in_progress"], 11)
+        self.assertEqual(summary["in_progress"], 12)
         self.assertEqual(summary["completed"], 0)
-        self.assertEqual(summary["overall_progress"], 19)
+        self.assertEqual(summary["overall_progress"], 21)
 
 
 if __name__ == "__main__":
