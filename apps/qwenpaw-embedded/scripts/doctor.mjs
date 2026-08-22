@@ -3,6 +3,7 @@ import { accessSync, constants, existsSync, mkdirSync, readFileSync } from 'node
 import net from 'node:net'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { resolveRuntime, runtimeEnvironment } from './runtime-env.mjs'
 
 const appRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
 const repoRoot = join(appRoot, '..', '..')
@@ -11,9 +12,11 @@ const lockPath = join(appRoot, 'pawapps.lock.json')
 const python = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3')
 const jsonOutput = process.argv.includes('--json')
 const checks = []
+const runtime = resolveRuntime()
+const runtimeEnv = runtimeEnvironment(runtime)
 
 function command (name, args = []) {
-  const result = spawnSync(name, args, { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' })
+  const result = spawnSync(name, args, { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe', env: runtimeEnv })
   return {
     ok: !result.error && result.status === 0,
     output: `${result.stdout || ''}${result.stderr || ''}`.trim(),
@@ -41,11 +44,17 @@ record('node', nodeMajor >= 18 ? 'pass' : 'fail', `Node.js ${process.versions.no
 const git = command('git', ['--version'])
 record('git', git.ok ? 'pass' : 'fail', git.output || git.error || '未找到 Git', '请安装 Git 并确保 git 在 PATH 中。')
 
-const qwenpaw = command('qwenpaw', ['--version'])
-record('qwenpaw-cli', qwenpaw.ok && qwenpaw.output.includes('2.1.0') ? 'pass' : 'fail', qwenpaw.output || qwenpaw.error || '未找到 qwenpaw', '请安装 QwenPaw 2.1.0。')
+const qwenpaw = runtime.command ? command(runtime.command, ['--version']) : { ok: false, output: runtime.output, error: '' }
+record(
+  'qwenpaw-cli',
+  qwenpaw.ok && qwenpaw.output.includes(runtime.version) ? 'pass' : 'fail',
+  runtime.command ? `${qwenpaw.output}（${runtime.source === 'project' ? `项目运行环境 ${runtime.root}` : '全局安装'}）` : runtime.output,
+  `运行 ${runtime.remedy || (process.platform === 'win32' ? '.\\setup-ai-os.ps1' : './setup-ai-os.sh')} 安装项目运行环境。`,
+)
 
-const pythonImport = command(python, ['-c', 'import qwenpaw; print(qwenpaw.__file__)'])
-record('python-runtime', pythonImport.ok ? 'pass' : (qwenpaw.ok ? 'warn' : 'fail'), pythonImport.ok ? `${python} 可导入 qwenpaw` : (qwenpaw.ok ? 'QwenPaw Desktop/CLI 可用，独立 Python 包不可用（不阻断启动）' : (pythonImport.output || pythonImport.error)), 'CLI 可用时无需处理；源码安装模式请设置 PYTHON 为安装了 QwenPaw 的解释器。')
+const selectedPython = runtime.python || python
+const pythonImport = command(selectedPython, ['-c', 'import qwenpaw; print(qwenpaw.__file__)'])
+record('python-runtime', pythonImport.ok ? 'pass' : (qwenpaw.ok ? 'warn' : 'fail'), pythonImport.ok ? `${selectedPython} 可导入 qwenpaw` : (qwenpaw.ok ? 'QwenPaw Desktop/CLI 可用，独立 Python 包不可用（不阻断启动）' : (pythonImport.output || pythonImport.error)), 'CLI 可用时无需处理；源码安装模式请设置 PYTHON 为安装了 QwenPaw 的解释器。')
 
 try {
   for (const dir of [runtimeRoot, join(appRoot, 'workspace')]) {
