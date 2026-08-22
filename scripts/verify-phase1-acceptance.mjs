@@ -38,9 +38,9 @@ for (const [id, contract] of Object.entries(expected)) {
 const phase1 = progress.features.filter(feature => feature.id >= 1 && feature.id <= 11)
 assert.equal(phase1.length, 11)
 for (const feature of phase1) {
-  assert.equal(feature.status, 'testing', `feature ${feature.id} must remain testing before user acceptance`)
-  assert.ok(feature.progress < 100, `feature ${feature.id} cannot be 100 before user acceptance`)
-  assert.match(feature.note, /待用户|后续|随对应/, `feature ${feature.id} needs an evidence/limitation note`)
+  assert.equal(feature.status, 'completed', `feature ${feature.id} must record completed user acceptance`)
+  assert.equal(feature.progress, 100, `feature ${feature.id} must be 100 after user acceptance`)
+  assert.match(feature.note, /2026-08-23.*用户实机验收/, `feature ${feature.id} needs dated user-acceptance evidence`)
 }
 
-console.log('Phase 1 集成检查通过：正式合并 SHA、版本、功能 1–11 实现证据及待用户验收状态一致。')
+console.log('Phase 1 验收检查通过：正式合并 SHA、版本、功能 1–11 实现证据及用户实机验收记录一致。')

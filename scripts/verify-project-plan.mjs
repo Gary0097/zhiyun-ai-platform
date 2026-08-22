@@ -16,7 +16,7 @@ assert.equal(progress.schema_version, 1, 'unsupported feature progress schema')
 assert.match(progress.updated_at, /^\d{4}-\d{2}-\d{2}$/, 'feature progress requires an ISO date')
 assert.ok(Array.isArray(progress.features) && progress.features.length > 0, 'feature progress must not be empty')
 
-const allowedStatuses = new Set(['planned', 'in_progress', 'testing', 'delivered'])
+const allowedStatuses = new Set(['planned', 'in_progress', 'testing', 'completed'])
 const featureIds = new Set()
 for (const feature of progress.features) {
   assert.ok(Number.isInteger(feature.id) && feature.id > 0, 'feature IDs must be positive integers')
@@ -31,8 +31,8 @@ for (const feature of progress.features) {
   assert.ok(feature.note.trim(), `feature ${feature.id} requires a non-empty evidence note`)
 
   if (feature.status === 'planned') assert.equal(feature.progress, 0, `planned feature ${feature.id} must remain at 0%`)
-  if (feature.status === 'delivered') assert.equal(feature.progress, 100, `delivered feature ${feature.id} must be at 100%`)
-  if (feature.progress === 100) assert.equal(feature.status, 'delivered', `feature ${feature.id} at 100% must be delivered`)
+  if (feature.status === 'completed') assert.equal(feature.progress, 100, `completed feature ${feature.id} must be at 100%`)
+  if (feature.progress === 100) assert.equal(feature.status, 'completed', `feature ${feature.id} at 100% must be completed`)
 }
 
 const lockedAppIds = new Set(lock.apps.map(app => app.id))
@@ -49,7 +49,7 @@ const counts = Object.fromEntries([...allowedStatuses].map(status => [
   status,
   progress.features.filter(feature => feature.status === status).length,
 ]))
-const complete = counts.delivered === progress.features.length
+const complete = counts.completed === progress.features.length
 
-console.log(`项目计划检查通过：${progress.features.length} 项能力；已交付 ${counts.delivered}，测试中 ${counts.testing}，开发中 ${counts.in_progress}，计划中 ${counts.planned}。`)
+console.log(`项目计划检查通过：${progress.features.length} 项能力；已完成 ${counts.completed}，测试中 ${counts.testing}，开发中 ${counts.in_progress}，计划中 ${counts.planned}。`)
 if (!complete) console.log('项目仍在开发中；不得将当前进度描述为“全部完成”。')
