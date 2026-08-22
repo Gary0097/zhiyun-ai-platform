@@ -60,7 +60,7 @@ class AppDiscoveryPlugin:
                 "which application can complete a task. Never guess an app name."
             ),
             icon="🔎",
-            tool_type="local",
+            tool_type="internal",
         )
 
 

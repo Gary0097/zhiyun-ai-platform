@@ -1,59 +1,30 @@
-# DeepSeek Harness
+# Zhiyun AI-OS
 
-English | [中文](README.zh.md)
+智造云 AI-OS 以 **QwenPaw 2.1.0** 为唯一运行内核、桌面交互和 Agent 容器。主仓库只负责系统插件、统一工作区、版本锁与跨平台启动；业务能力由独立 PawApp 仓库交付。
 
-DeepSeek Harness (`dsh`) is an open-source agent harness developed by [DeepSeek AI](https://deepseek.com).
+## 唯一启动入口
 
-It uses an architecture where **everything is a plugin**, and is powered by [Cordis](https://github.com/cordiverse/cordis), whose design is described in [_A Programming Paradigm for Spatiotemporal Composability_](https://github.com/cordiverse/paper).
+- Windows：`start-ai-os.cmd`
+- Ubuntu / Linux：`./start-ai-os.sh`
+- 地址：`http://127.0.0.1:8088`
 
-## Developer preview
+无需也禁止启动 8390、DeepSeek Harness 或旧 enterprise 服务。详细步骤见 [快速部署](docs/operations/QUICKSTART.md)。
 
-DeepSeek Harness is currently in _developer preview_ and is iterating rapidly. **THERE WILL BE COMPATIBILITY-BREAKING CHANGES.**
+## 当前组成
 
-## Run
+- QwenPaw 2.1.0：对话、Agent、文件与知识库、插件宿主
+- 系统插件：Logo、日志审计、应用发现、Data Core
+- Data Studio：数据导入、订单看板、风险、趋势、日报和跨部门分析
+- Order Studio：订单格式化、模板适配、合同审查与一致性验证
+- 高风险控制：审计全部 Tool 调用，并硬阻断系统盘递归删除、磁盘格式化、破坏性 Git 重写和整库/整表删除
+- Workspace：数据库、日志、知识库和用户数据的唯一持久化位置
 
-### Run from `npm`
+外部 PawApp 由 `apps/qwenpaw-embedded/pawapps.lock.json` 锁定到确定提交。不要直接修改 `runtime/pawapps` 或 `~/.qwenpaw/plugins` 中的安装副本。
 
-Install `Node.js`, then run:
+## 发布验收
 
-```sh
-npx @deepseek-ai/dsh web
+```bash
+node scripts/verify-release.mjs
 ```
 
-The command starts the Web UI at `http://127.0.0.1:3080` by default and opens it in the default browser for a local launch. An SSH launch only prints the host URL because the SSH client or editor owns the local forwarded address. Pass `--no-open` to run the server without opening a browser. See [Web UI guide](docs/user/guide/index.md).
-
-### Run from source
-
-To run from a repository checkout:
-
-```sh
-git clone https://github.com/deepseek-ai/deepseek-harness.git
-cd deepseek-harness
-pnpm install
-pnpm run build
-pnpm dsh web
-```
-
-`pnpm run build` prepares the repository artifacts. `pnpm dsh web` uses those built artifacts without rebuilding.
-
-## Community and support
-
-- Feel free to submit feedback or bug reports through [GitHub Discussions](https://github.com/deepseek-ai/deepseek-harness/discussions).
-- Add the [`dsh-plugin`](https://github.com/topics/dsh-plugin) topic to your plugin repository for discoverability.
-- Join <a href="https://discord.gg/Ycq5dCaS4">DeepSeek Harness Discord community</a>.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Development
-
-Start with the [development guide](docs/development.md) and [architecture documentation](docs/architecture.md).
-
-For agents, follow [AGENTS.md](AGENTS.md).
-
-## License
-
-[MIT](LICENSE)
-
-Third-party dependencies and their licenses are disclosed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+发布门禁会验证纯 QwenPaw 架构、版本锁、启动器、内外部 PawApp 版本/治理类型、78项 Python 测试和 Windows/Linux 入口。遗留架构的移除记录见 [迁移说明](docs/migration/LEGACY_REMOVAL.md)。

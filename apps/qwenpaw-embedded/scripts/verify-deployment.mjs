@@ -19,6 +19,8 @@ assert.ok(start.includes('for (const app of externalApps)'), 'start must install
 const sync = readFileSync(join(scripts, 'sync-pawapps.mjs'), 'utf8')
 assert.ok(sync.includes("'.pawapp-commit'"), 'sync must persist a commit marker')
 assert.ok(sync.includes("rmSync(join(staging, '.git')"), 'sync must remove Git metadata before plugin installation')
+const doctor = readFileSync(join(scripts, 'doctor.mjs'), 'utf8')
+assert.ok(doctor.includes("portInUse ? 'fail' : 'pass'"), 'occupied 8088 must stop duplicate startup before mutation')
 
 const result = spawnSync(process.execPath, [join(scripts, 'doctor.mjs'), '--json'], { cwd: root, encoding: 'utf8' })
 const report = JSON.parse(result.stdout)

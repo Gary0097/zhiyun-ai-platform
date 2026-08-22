@@ -1,10 +1,18 @@
 // 停用旧品牌/应用插件，并清理 Agent 的遗留企业 Tool。
 // 等价于 cleanup-legacy.py，但不依赖 qwenpaw Python 包（本机 qwenpaw 为 Desktop 打包 exe）。
 import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync } from 'node:fs'
-import { join, normalize } from 'node:path'
+import { join, normalize, resolve } from 'node:path'
 import { homedir } from 'node:os'
 
-const QWENPAW_HOME = join(homedir(), '.qwenpaw')
+function workingDir () {
+  const explicit = process.env.QWENPAW_WORKING_DIR || process.env.COPAW_WORKING_DIR
+  if (explicit) return resolve(explicit)
+  const current = join(homedir(), '.qwenpaw')
+  const legacy = join(homedir(), '.copaw')
+  return !existsSync(current) && existsSync(legacy) ? legacy : current
+}
+
+const QWENPAW_HOME = workingDir()
 const PLUGINS_DIR = join(QWENPAW_HOME, 'plugins')
 const DISABLED_DIR = join(QWENPAW_HOME, 'disabled_plugins')
 const LEGACY_PLUGINS = ['zhiyun-brand', 'zhiyun-orders']
@@ -26,9 +34,15 @@ for (const pluginId of LEGACY_PLUGINS) {
 }
 
 // 2. 清理 Agent 遗留 Tool
-const rootConfig = JSON.parse(readFileSync(join(QWENPAW_HOME, 'config.json'), 'utf8'))
+const configPath = join(QWENPAW_HOME, 'config.json')
+if (!existsSync(configPath)) {
+  console.log('未发现QwenPaw配置，跳过Agent遗留Tool清理（首次初始化后无需旧配置迁移）。')
+  process.exit(0)
+}
+const rootConfig = JSON.parse(readFileSync(configPath, 'utf8'))
 const profiles = (rootConfig.agents && rootConfig.agents.profiles) || {}
 for (const [agentId, ref] of Object.entries(profiles)) {
+  if (!ref || typeof ref.workspace_dir !== 'string') continue
   const workspaceDir = normalize(ref.workspace_dir.replace(/\\/g, '/'))
   const agentPath = join(workspaceDir, 'agent.json')
   if (!existsSync(agentPath)) continue

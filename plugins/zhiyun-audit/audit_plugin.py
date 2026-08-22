@@ -13,8 +13,14 @@ from qwenpaw.plugins.api import PluginApi
 
 try:
     from .audit_store import persist, redact
+    from .risk_policy import assess
 except ImportError:
     from audit_store import persist, redact
+    from risk_policy import assess
+
+
+class HighRiskOperationBlocked(RuntimeError):
+    """Raised when an Agent attempts a catastrophic irreversible operation."""
 
 
 class AuditMiddleware(MiddlewareBase):
@@ -32,8 +38,25 @@ class AuditMiddleware(MiddlewareBase):
         del agent
         call = input_kwargs.get("tool_call")
         tool_name = str(getattr(call, "name", "unknown"))
-        tool_input = redact(getattr(call, "input", {}), "input")
+        raw_input = getattr(call, "input", {})
+        tool_input = redact(raw_input, "input")
         trace_id = f"tool-{uuid.uuid4()}"
+        decision = assess(tool_name, raw_input)
+        if decision.blocked:
+            persist(self.workspace, {
+                "trace_id": trace_id,
+                "event": "tool.blocked",
+                "session_id": self.session_id,
+                "agent_id": self.agent_id,
+                "tool_name": tool_name,
+                "tool_input": tool_input,
+                "status": "blocked",
+                "duration_ms": 0,
+                "error_type": "HighRiskOperationBlocked",
+                "risk_rule": decision.rule_id,
+                "risk_reason": decision.reason,
+            })
+            raise HighRiskOperationBlocked(f"高风险操作已阻断：{decision.reason}（{decision.rule_id}）")
         started = time.perf_counter()
         status = "success"
         error_type = None
