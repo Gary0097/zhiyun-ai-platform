@@ -5,19 +5,22 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 from pydantic import BaseModel, Field
 from qwenpaw.plugins.api import PluginApi
 
 try:
     from .data_core import DataCore, DataCoreError, default_database
     from .agent_tools import build_agent_tools
+    from .table_parser import parse_table
 except ImportError:
     from data_core import DataCore, DataCoreError, default_database
     from agent_tools import build_agent_tools
+    from table_parser import parse_table
 
 core = DataCore(default_database())
 router = APIRouter()
+MAX_UPLOAD = 20 * 1024 * 1024
 
 
 class FieldCreate(BaseModel):
@@ -71,6 +74,17 @@ async def health() -> dict[str, Any]:
 @router.get("/entities")
 async def entities() -> dict[str, Any]:
     return {"entities": core.list_entities()}
+
+
+@router.post("/parse")
+async def parse_upload(file: UploadFile = File(...)) -> dict[str, Any]:
+    content = await file.read(MAX_UPLOAD + 1)
+    if len(content) > MAX_UPLOAD:
+        raise HTTPException(status_code=413, detail="文件不能超过20MB")
+    try:
+        return parse_table(file.filename or "upload", content)
+    except (UnicodeDecodeError, ValueError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @router.post("/schemas")
