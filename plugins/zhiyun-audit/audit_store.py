@@ -46,7 +46,8 @@ def persist(workspace: Path, event: dict[str, Any]) -> None:
                 os.fsync(descriptor)
             finally:
                 os.close(descriptor)
-        with sqlite3.connect(data / "ai-os.sqlite", timeout=10) as database:
+        database = sqlite3.connect(data / "ai-os.sqlite", timeout=10)
+        try:
             database.execute("PRAGMA journal_mode=WAL")
             database.execute(
                 """CREATE TABLE IF NOT EXISTS audit_tool_call (
@@ -59,3 +60,6 @@ def persist(workspace: Path, event: dict[str, Any]) -> None:
                 "INSERT INTO audit_tool_call(trace_id,session_id,agent_id,tool_name,status,duration_ms,error_type,created_at) VALUES (?,?,?,?,?,?,?,?)",
                 (payload["trace_id"], payload.get("session_id"), payload.get("agent_id"), payload["tool_name"], payload["status"], payload["duration_ms"], payload.get("error_type"), payload["timestamp"]),
             )
+            database.commit()
+        finally:
+            database.close()

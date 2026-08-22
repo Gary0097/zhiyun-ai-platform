@@ -1,7 +1,7 @@
 {
   "id": "zhiyun-audit",
   "name": "智造云日志审计",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "type": "general",
   "description": "无界面的 Workspace Tool 调用审计与灾难性高风险操作阻断插件，不修改 QwenPaw 品牌、Logo 或桌面。",
   "author": "Zhiyun AI",
