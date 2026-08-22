@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -27,18 +27,28 @@ try {
   assert.equal(existsSync(join(temp, 'branding', 'logo.json')), false)
 
   const workspace = join(temp, 'workspaces', 'default')
-  mkdirSync(join(temp, 'plugins', 'zhiyun-orders'), { recursive: true })
+  const disabledIds = ['zhiyun-orders', 'cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']
+  for (const pluginId of [...disabledIds, 'user-kept-plugin']) {
+    mkdirSync(join(temp, 'plugins', pluginId), { recursive: true })
+  }
   mkdirSync(workspace, { recursive: true })
   writeFileSync(join(temp, 'config.json'), JSON.stringify({ agents: { profiles: { default: { workspace_dir: workspace } } } }), 'utf8')
   writeFileSync(join(workspace, 'agent.json'), JSON.stringify({ tools: { builtin_tools: { enterprise_platform_status: { enabled: true }, safe_tool: { enabled: true } } } }), 'utf8')
   run('cleanup-legacy.mjs')
+
   const agent = JSON.parse(readFileSync(join(workspace, 'agent.json'), 'utf8'))
   assert.equal(agent.tools.builtin_tools.enterprise_platform_status, undefined)
   assert.ok(agent.tools.builtin_tools.safe_tool)
-  assert.equal(existsSync(join(temp, 'plugins', 'zhiyun-orders')), false)
-  assert.ok(existsSync(join(temp, 'disabled_plugins')))
+  for (const pluginId of disabledIds) {
+    assert.equal(existsSync(join(temp, 'plugins', pluginId)), false, `${pluginId} should be disabled`)
+  }
+  assert.ok(existsSync(join(temp, 'plugins', 'user-kept-plugin')), 'unknown user plugins must be preserved')
+  const backups = readdirSync(join(temp, 'disabled_plugins'))
+  for (const pluginId of disabledIds) {
+    assert.ok(backups.some(name => name.startsWith(`${pluginId}-`)), `${pluginId} backup is missing`)
+  }
 } finally {
   rmSync(temp, { recursive: true, force: true })
 }
 
-console.log('维护脚本回归通过：Desktop兼容Logo配置、工作目录契约和遗留Tool清理正常。')
+console.log('维护脚本回归通过：Logo、工作目录、遗留Tool和不兼容插件的可恢复清理正常。')
