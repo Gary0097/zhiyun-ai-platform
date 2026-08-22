@@ -139,6 +139,11 @@ async def simulate_orders(request: SimulationCreate) -> dict[str, Any]:
     return _handle(lambda: core.generate_orders(request.count, request.seed))
 
 
+@router.post("/simulate/production")
+async def simulate_production(request: SimulationCreate) -> dict[str, Any]:
+    return _handle(lambda: core.generate_production(request.count, request.seed))
+
+
 @router.get("/records/{entity}")
 async def records(
     entity: str,
@@ -174,6 +179,13 @@ class DataCorePlugin:
             tool_func=query_orders,
             description="查询统一数据库中的企业订单、客户、状态和交付进度；回答订单问题时优先调用。",
             icon="🔎",
+            tool_type="filesystem",
+        )
+        api.register_tool(
+            tool_name="generate_simulated_production",
+            tool_func=lambda count=60, seed=None: core.generate_production(count, seed),
+            description="按用户明确要求生成可撤销的模拟生产日报，用于测试部门人效、成本和损耗指标。",
+            icon="🏭",
             tool_type="filesystem",
         )
         api.register_tool(
