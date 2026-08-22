@@ -5,7 +5,7 @@
       "app_id": "zhiyun-data-studio",
       "name": "Data Studio",
       "aliases": ["数据分析", "数据中枢", "销售BI", "经营看板", "sjfx", "data paw"],
-      "version": "0.7.2",
+      "version": "0.8.0",
       "category": "data",
       "install_status": "installed",
       "route": "/apps/zhiyun-data-studio",
