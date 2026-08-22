@@ -81,6 +81,7 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'set-logo.mjs')]],
   [process.execPath, ['--check', join(scripts, 'health-report.mjs')]],
   [process.execPath, [join(scripts, 'health-report.mjs'), '--check']],
+  [process.execPath, [join(scripts, 'verify-health-report.mjs')]],
   [process.execPath, [join(scripts, 'set-logo.mjs'), '--check']],
   [process.execPath, [join(scripts, 'sync-pawapps.mjs'), '--check']],
   [process.execPath, [join(scripts, 'verify-deployment.mjs')]],
