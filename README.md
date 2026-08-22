@@ -28,3 +28,10 @@ node scripts/verify-release.mjs
 ```
 
 发布门禁会验证纯 QwenPaw 架构、版本锁、启动器、内外部 PawApp 版本/治理类型、78项 Python 测试和 Windows/Linux 入口。遗留架构的移除记录见 [迁移说明](docs/migration/LEGACY_REMOVAL.md)。
+
+完整产品跨多个独立仓库，当前状态、仓库边界、交付顺序和完成定义见
+[项目计划](docs/product/PROJECT-PLAN.md)。修改功能进度时可先运行离线检查：
+
+```bash
+node scripts/verify-project-plan.mjs
+```
