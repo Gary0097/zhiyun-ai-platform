@@ -32,6 +32,19 @@ class FieldPatch(BaseModel):
     active: bool | None = None
 
 
+class SchemaFieldCreate(BaseModel):
+    name: str
+    label: str
+    field_type: str = "text"
+    required: bool = False
+
+
+class SchemaCreate(BaseModel):
+    entity: str
+    label: str
+    fields: list[SchemaFieldCreate] = Field(min_length=1, max_length=100)
+
+
 class ImportPreview(BaseModel):
     rows: list[dict[str, Any]] = Field(min_length=1, max_length=10000)
     mapping: dict[str, str] | None = None
@@ -58,6 +71,17 @@ async def health() -> dict[str, Any]:
 @router.get("/entities")
 async def entities() -> dict[str, Any]:
     return {"entities": core.list_entities()}
+
+
+@router.post("/schemas")
+async def create_schema(request: SchemaCreate) -> dict[str, Any]:
+    return _handle(
+        lambda: core.create_schema(
+            request.entity,
+            request.label,
+            [field.model_dump() for field in request.fields],
+        )
+    )
 
 
 @router.get("/schemas/{entity}")

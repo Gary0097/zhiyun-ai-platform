@@ -36,6 +36,11 @@
     var errorState = React.useState("");
     var error = errorState[0];
     var setError = errorState[1];
+    var createState = React.useState(false);
+    var createOpen = createState[0];
+    var setCreateOpen = createState[1];
+    var schemaForm = antd.Form.useForm()[0];
+    var message = antd.App.useApp().message;
 
     function loadEntities() {
       return request("/zhiyun-data-core/entities").then(function (data) { setEntities(data.entities || []); });
@@ -64,6 +69,16 @@
         .catch(function (reason) { setError(reason.message || "模拟数据生成失败"); setLoading(false); });
     }
 
+    function createDataset() {
+      schemaForm.validateFields().then(function (values) {
+        return request("/zhiyun-data-core/schemas", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(values)
+        });
+      }).then(function (created) {
+        message.success("数据表已创建"); setCreateOpen(false); schemaForm.resetFields(); setSelected(created.entity); return loadEntities();
+      }).catch(function (reason) { if (reason instanceof Error) message.error(reason.message); });
+    }
+
     var activeFields = schema ? schema.fields.filter(function (field) { return field.active; }) : [];
     var columns = activeFields.map(function (field) {
       return { title: field.label, dataIndex: ["data", field.name], key: field.name, width: 150, ellipsis: true };
@@ -80,6 +95,7 @@
             h("p", { style: { color: "#667085", marginTop: 0 } }, "查看各 PawApp 共享数据库中的表结构、真实数据与模拟数据。")),
           h("div", { style: { display: "flex", gap: 8 } },
             h(antd.Button, { onClick: function () { loadDataset(selected, source); } }, "刷新"),
+            h(antd.Button, { onClick: function () { setCreateOpen(true); } }, "新建数据表"),
             selected === "orders" ? h(antd.Button, { type: "primary", onClick: simulate, loading: loading }, "生成 20 条模拟订单") : null)
         ),
         error ? h(antd.Alert, { type: "error", showIcon: true, message: error, style: { marginBottom: 16 } }) : null,
@@ -106,7 +122,27 @@
             { title: "状态", dataIndex: "active", render: function (value) { return h(antd.Tag, { color: value ? "green" : "default" }, value ? "启用" : "停用"); } },
             { title: "内置字段", dataIndex: "built_in", render: function (value) { return value ? "是" : "否"; } }
           ] }) }
-        ] })
+        ] }),
+        h(antd.Modal, { title: "新建部门数据表", width: 760, open: createOpen, onOk: createDataset, onCancel: function () { setCreateOpen(false); } },
+          h(antd.Form, { form: schemaForm, layout: "vertical", initialValues: { fields: [{ name: "record_date", label: "日期", field_type: "date", required: true }] } },
+            h(antd.Row, { gutter: 12 },
+              h(antd.Col, { span: 12 }, h(antd.Form.Item, { name: "label", label: "数据表名称", rules: [{ required: true }] }, h(antd.Input, { placeholder: "例如：生产日报" }))),
+              h(antd.Col, { span: 12 }, h(antd.Form.Item, { name: "entity", label: "数据表标识", rules: [{ required: true, pattern: /^[a-z][a-z0-9_]{0,62}$/, message: "使用小写英文、数字和下划线" }] }, h(antd.Input, { placeholder: "例如：production" })))
+            ),
+            h(antd.Form.List, { name: "fields" }, function (fields, actions) {
+              return h(React.Fragment, null,
+                fields.map(function (field) { return h(antd.Space, { key: field.key, align: "baseline", style: { display: "flex", marginBottom: 8 } },
+                  h(antd.Form.Item, { name: [field.name, "label"], rules: [{ required: true }] }, h(antd.Input, { placeholder: "显示名称" })),
+                  h(antd.Form.Item, { name: [field.name, "name"], rules: [{ required: true, pattern: /^[a-z][a-z0-9_]{0,62}$/ }] }, h(antd.Input, { placeholder: "field_name" })),
+                  h(antd.Form.Item, { name: [field.name, "field_type"], initialValue: "text" }, h(antd.Select, { style: { width: 120 }, options: ["text", "integer", "number", "boolean", "date", "datetime"].map(function (value) { return { value: value, label: value }; }) })),
+                  h(antd.Form.Item, { name: [field.name, "required"], valuePropName: "checked" }, h(antd.Checkbox, null, "必填")),
+                  fields.length > 1 ? h(antd.Button, { danger: true, size: "small", onClick: function () { actions.remove(field.name); } }, "删除") : null
+                ); }),
+                h(antd.Button, { type: "dashed", onClick: function () { actions.add({ field_type: "text", required: false }); } }, "添加字段")
+              );
+            })
+          )
+        )
       )
     );
   }
