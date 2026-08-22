@@ -175,7 +175,7 @@
       "app_id": "zhiyun-data-core",
       "name": "Data Core",
       "aliases": ["统一数据库", "数据核心"],
-      "version": "0.5.0",
+      "version": "0.6.0",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",
