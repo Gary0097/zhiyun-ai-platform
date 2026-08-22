@@ -31,7 +31,7 @@ chmod +x start-ai-os.sh diagnose-ai-os.sh
 ./start-ai-os.sh
 ```
 
-首次启动会同步外部 PawApp 并安装插件，因此取决于 GitHub 网络速度；后续锁定版本已经落盘时不会重复下载。
+首次启动会同步外部 PawApp 并安装插件，因此取决于 GitHub 网络速度；后续锁定版本已经落盘时不会重复下载。\n\n启动器采用“保留配置、净化插件”的兼容策略：继续使用现有 QwenPaw 模型配置、密钥和 Agent 工作区；只将已确认与当前 AI-OS 无关且不兼容的 `cospaw`、`ai_decision`、`team_chat`、`qwenpaw-creator` 移入 `disabled_plugins`。这是可恢复停用，不会删除插件或用户数据；其他未知用户插件不会被改动。Creator 在本项目中仅作为开发参考，不作为运行应用加载。
 
 ## 一键诊断
 
@@ -85,4 +85,4 @@ chmod +x set-ai-os-logo.sh
 - Windows出现 `.git/objects/pack` 拒绝访问：说明仍在运行旧版同步器；拉取最新master后重新启动，新版安装源不会携带`.git`。
 - Agent看不到Studio工具：确认Data Studio至少为v0.7.2、Order Studio至少为v0.5.2，并检查启动日志无治理类型冲突。
 - 8088 已监听：启动器会在安装插件前停止，避免重复实例和文件占用；先访问页面确认，再停止旧进程后重试。
-- 不要启动 8390：该服务已退出当前目标架构。
+- 启动日志出现上述已停用插件：先确认是否拉取了最新 `master`，再重启；清理动作发生在 QwenPaw 启动前。\n- 需要恢复被停用插件：停止 AI-OS 后，从实际 QwenPaw 工作目录的 `disabled_plugins` 将对应备份移回 `plugins`；恢复后产生的兼容问题不属于 AI-OS 发布门禁。\n- 不要启动 8390：该服务已退出当前目标架构。
