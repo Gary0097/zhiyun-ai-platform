@@ -29,6 +29,7 @@ for (const endpoint of ['zhiyun-logo', 'zhiyun-app-discovery', 'zhiyun-data-core
 }
 const healthCheck = spawnSync(process.execPath, [join(scripts, 'health-report.mjs'), '--check'], { cwd: root, encoding: 'utf8' })
 assert.equal(healthCheck.status, 0, 'health report configuration must be valid')
+assert.ok(health.includes('validatePayload') && health.includes('validateContracts'), 'health report must validate payload semantics and version contracts')
 
 const result = spawnSync(process.execPath, [join(scripts, 'doctor.mjs'), '--json'], { cwd: root, encoding: 'utf8' })
 const report = JSON.parse(result.stdout)
