@@ -189,7 +189,7 @@
       "app_id": "zhiyun-audit",
       "name": "日志审计服务",
       "aliases": ["审计", "操作日志", "高风险操作"],
-      "version": "1.1.0",
+      "version": "1.1.1",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",
