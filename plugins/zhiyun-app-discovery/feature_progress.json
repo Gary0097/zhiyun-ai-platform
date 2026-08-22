@@ -70,9 +70,9 @@
       "id": 9,
       "name": "合同要素提取与比对",
       "app_id": "zhiyun-order-studio",
-      "status": "planned",
-      "progress": 0,
-      "note": "Order Studio未创建。"
+      "status": "in_progress",
+      "progress": 50,
+      "note": "已支持合同双方、金额、付款、交付、违约和争议条款提取，保留原文证据并识别缺失项、高风险表述和立场相关风险；PDF/Word直接导入、库存/产能比对及真实合同验收尚未完成。"
     },
     {
       "id": 10,
