@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -34,14 +34,9 @@ function validate (lock) {
   }
 }
 
-function currentCommit (target) {
-  if (!existsSync(join(target, '.git'))) return ''
-  const result = git(['rev-parse', 'HEAD'], target, true)
-  return result.status === 0 ? result.stdout.trim() : ''
-}
-
 function isMaterialized (target, app) {
-  return currentCommit(target) === app.commit && existsSync(join(target, 'plugin.json'))
+  const marker = join(target, '.pawapp-commit')
+  return existsSync(marker) && readFileSync(marker, 'utf8').trim() === app.commit && existsSync(join(target, 'plugin.json')) && !existsSync(join(target, '.git'))
 }
 
 const lock = JSON.parse(readFileSync(lockPath, 'utf8'))
@@ -57,26 +52,24 @@ for (const app of lock.apps) {
   const target = join(appsRoot, app.install_dir)
   if (isMaterialized(target, app)) {
     console.log(`PawApp 已就绪：${app.id} @ ${app.commit.slice(0, 8)}`)
-  } else if (!existsSync(target)) {
-    const clone = git(['clone', '--filter=blob:none', '--no-checkout', app.repository, target], appRoot)
-    if (clone.status !== 0) fail(`无法克隆 ${app.id}；请检查网络或 GitHub 访问权限。`)
-  } else if (!existsSync(join(target, '.git'))) {
-    fail(`${target} 已存在但不是 Git 仓库，请移走后重试。`)
+    continue
   }
-
-  if (currentCommit(target) !== app.commit) {
-    const fetch = git(['fetch', '--depth=1', 'origin', app.commit], target)
-    if (fetch.status !== 0) fail(`无法获取 ${app.id} 的锁定版本，且本地没有该版本。`)
-  }
-  if (!isMaterialized(target, app)) {
-    const checkout = git(['checkout', '--detach', '--force', app.commit], target)
-    if (checkout.status !== 0) fail(`无法切换 ${app.id} 到锁定版本。`)
-  }
-
-  if (!isMaterialized(target, app)) fail(`${app.id} 提交或工作区文件校验失败。`)
-  const manifestPath = join(target, 'plugin.json')
+  const staging = `${target}.sync-${process.pid}`
+  rmSync(staging, { recursive: true, force: true })
+  const clone = git(['clone', '--filter=blob:none', '--no-checkout', app.repository, staging], appRoot)
+  if (clone.status !== 0) fail(`无法克隆 ${app.id}；请检查网络或 GitHub 访问权限。`)
+  const fetch = git(['fetch', '--depth=1', 'origin', app.commit], staging)
+  if (fetch.status !== 0) fail(`无法获取 ${app.id} 的锁定版本。`)
+  const checkout = git(['checkout', '--detach', '--force', app.commit], staging)
+  if (checkout.status !== 0) fail(`无法切换 ${app.id} 到锁定版本。`)
+  const manifestPath = join(staging, 'plugin.json')
   if (!existsSync(manifestPath)) fail(`${app.id} 缺少 plugin.json。`)
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
   if (manifest.id !== app.id) fail(`${app.id} 的 plugin.json ID 不匹配。`)
+  rmSync(join(staging, '.git'), { recursive: true, force: true })
+  writeFileSync(join(staging, '.pawapp-commit'), `${app.commit}\n`, 'utf8')
+  rmSync(target, { recursive: true, force: true })
+  renameSync(staging, target)
+  if (!isMaterialized(target, app)) fail(`${app.id} 提交或工作区文件校验失败。`)
   console.log(`PawApp 同步完成：${app.id} @ ${app.commit.slice(0, 8)}`)
 }

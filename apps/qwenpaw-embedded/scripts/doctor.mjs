@@ -45,7 +45,7 @@ const qwenpaw = command('qwenpaw', ['--version'])
 record('qwenpaw-cli', qwenpaw.ok && qwenpaw.output.includes('2.1.0') ? 'pass' : 'fail', qwenpaw.output || qwenpaw.error || '未找到 qwenpaw', '请安装 QwenPaw 2.1.0。')
 
 const pythonImport = command(python, ['-c', 'import qwenpaw; print(qwenpaw.__file__)'])
-record('python-runtime', pythonImport.ok ? 'pass' : 'fail', pythonImport.ok ? `${python} 可导入 qwenpaw` : (pythonImport.output || pythonImport.error), `设置 PYTHON 为安装了 QwenPaw 的 Python，例如 PYTHON=/path/to/python。`)
+record('python-runtime', pythonImport.ok ? 'pass' : (qwenpaw.ok ? 'warn' : 'fail'), pythonImport.ok ? `${python} 可导入 qwenpaw` : (qwenpaw.ok ? 'QwenPaw Desktop/CLI 可用，独立 Python 包不可用（不阻断启动）' : (pythonImport.output || pythonImport.error)), 'CLI 可用时无需处理；源码安装模式请设置 PYTHON 为安装了 QwenPaw 的解释器。')
 
 try {
   for (const dir of [runtimeRoot, join(appRoot, 'workspace')]) {
