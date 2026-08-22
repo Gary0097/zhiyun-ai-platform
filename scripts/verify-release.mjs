@@ -60,6 +60,7 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'start.mjs')]],
   [process.execPath, ['--check', join(scripts, 'sync-pawapps.mjs')]],
   [process.execPath, ['--check', join(scripts, 'doctor.mjs')]],
+  [process.execPath, ['--check', join(scripts, 'cleanup-legacy.mjs')]],
   [process.execPath, [join(scripts, 'sync-pawapps.mjs'), '--check']],
 ]
 for (const [command, args] of commands) {

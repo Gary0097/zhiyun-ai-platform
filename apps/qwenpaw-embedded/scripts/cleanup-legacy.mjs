@@ -26,9 +26,15 @@ for (const pluginId of LEGACY_PLUGINS) {
 }
 
 // 2. 清理 Agent 遗留 Tool
-const rootConfig = JSON.parse(readFileSync(join(QWENPAW_HOME, 'config.json'), 'utf8'))
+const configPath = join(QWENPAW_HOME, 'config.json')
+if (!existsSync(configPath)) {
+  console.log('未发现QwenPaw配置，跳过Agent遗留Tool清理（首次初始化后无需旧配置迁移）。')
+  process.exit(0)
+}
+const rootConfig = JSON.parse(readFileSync(configPath, 'utf8'))
 const profiles = (rootConfig.agents && rootConfig.agents.profiles) || {}
 for (const [agentId, ref] of Object.entries(profiles)) {
+  if (!ref || typeof ref.workspace_dir !== 'string') continue
   const workspaceDir = normalize(ref.workspace_dir.replace(/\\/g, '/'))
   const agentPath = join(workspaceDir, 'agent.json')
   if (!existsSync(agentPath)) continue

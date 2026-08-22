@@ -21,9 +21,9 @@ class SearchEngineTests(unittest.TestCase):
         result = search_apps("处理订单合同不一致")
         self.assertEqual(result[0]["app_id"], "zhiyun-order-studio")
         self.assertEqual(result[0]["matched_capability"]["capability_id"], 10)
-        self.assertEqual(result[0]["install_status"], "planned")
-        self.assertIsNone(result[0]["route"])
-        self.assertIsNone(result[0]["repository_url"])
+        self.assertEqual(result[0]["install_status"], "installed")
+        self.assertEqual(result[0]["route"], "/apps/zhiyun-order-studio")
+        self.assertEqual(result[0]["repository_url"], "https://github.com/Gary0097/zhiyun-order-studio")
 
     def test_expense_review_prefers_finance_studio(self) -> None:
         result = search_apps("识别发票并审核报销")
@@ -53,16 +53,17 @@ class SearchEngineTests(unittest.TestCase):
         apps = {app["app_id"]: app for app in load_catalog()["apps"]}
         self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.7.1")
         self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
-        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.3.0")\n        self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
+        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.5.1")
+        self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
 
     def test_progress_covers_all_31_prd_features(self) -> None:
         ledger = load_progress()
         self.assertEqual([item["id"] for item in ledger["features"]], list(range(1, 32)))
         summary = progress_summary(ledger)
         self.assertEqual(summary["total"], 31)
-        self.assertEqual(summary["in_progress"], 13)
+        self.assertEqual(summary["in_progress"], 6)
         self.assertEqual(summary["completed"], 0)
-        self.assertEqual(summary["overall_progress"], 24)
+        self.assertEqual(summary["overall_progress"], 9)
 
 
 if __name__ == "__main__":
