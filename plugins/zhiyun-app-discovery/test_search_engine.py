@@ -51,7 +51,7 @@ class SearchEngineTests(unittest.TestCase):
 
     def test_installed_catalog_is_truthful(self) -> None:
         apps = {app["app_id"]: app for app in load_catalog()["apps"]}
-        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.7.0")
+        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.7.1")
         self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
         self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.3.0")\n        self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
 
