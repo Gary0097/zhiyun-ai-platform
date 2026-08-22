@@ -179,21 +179,21 @@ class DataCorePlugin:
             tool_func=query_orders,
             description="查询统一数据库中的企业订单、客户、状态和交付进度；回答订单问题时优先调用。",
             icon="🔎",
-            tool_type="filesystem",
+            tool_type="internal",
         )
         api.register_tool(
             tool_name="generate_simulated_production",
             tool_func=lambda count=60, seed=None: core.generate_production(count, seed),
             description="按用户明确要求生成可撤销的模拟生产日报，用于测试部门人效、成本和损耗指标。",
             icon="🏭",
-            tool_type="filesystem",
+            tool_type="internal",
         )
         api.register_tool(
             tool_name="generate_simulated_orders",
             tool_func=simulate_orders_tool,
             description="按用户明确要求生成可撤销的模拟订单数据，并返回批次 ID。",
             icon="🧪",
-            tool_type="filesystem",
+            tool_type="internal",
         )
 
 
