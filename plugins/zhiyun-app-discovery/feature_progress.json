@@ -54,9 +54,9 @@
       "id": 7,
       "name": "客户订单自动格式化",
       "app_id": "zhiyun-order-studio",
-      "status": "planned",
-      "progress": 0,
-      "note": "Order Studio未创建。"
+      "status": "in_progress",
+      "progress": 35,
+      "note": "已支持微信、邮件或OCR结果文本的客户/产品/数量/交期提取、原文证据和缺失字段提示；图片OCR与确认入库尚未完成。"
     },
     {
       "id": 8,
