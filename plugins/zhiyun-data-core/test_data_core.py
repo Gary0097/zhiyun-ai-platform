@@ -20,6 +20,11 @@ class DataCoreTests(unittest.TestCase):
         schema = self.core.list_schema("orders")
         self.assertIn("order_no", [field["name"] for field in schema["fields"]])
 
+    def test_default_production_template_exists(self) -> None:
+        schema = self.core.list_schema("production")
+        self.assertEqual(schema["label"], "生产日报")
+        self.assertEqual([field["name"] for field in schema["fields"]], ["record_date", "department", "output", "labor_hours", "employee_count", "cost", "loss"])
+
     def test_entity_overview_reflects_real_and_simulated_records(self) -> None:
         row = {"order_no": "REAL-1", "customer_name": "客户", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
         self.core.import_rows("orders", [row])
@@ -38,15 +43,15 @@ class DataCoreTests(unittest.TestCase):
         self.assertFalse(field["active"])
 
     def test_user_can_create_department_dataset_and_import_rows(self) -> None:
-        schema = self.core.create_schema("production", "生产日报", [
+        schema = self.core.create_schema("work_logs", "车间工时", [
             {"name": "work_date", "label": "日期", "field_type": "date", "required": True},
             {"name": "department", "label": "部门", "field_type": "text", "required": True},
             {"name": "output", "label": "产量", "field_type": "number"},
             {"name": "labor_hours", "label": "工时", "field_type": "number"},
         ])
-        self.assertEqual(schema["entity"], "production")
-        self.core.import_rows("production", [{"work_date": "2026-08-22", "department": "一车间", "output": 120, "labor_hours": 24}])
-        self.assertEqual(self.core.list_records("production")[0]["data"]["output"], 120)
+        self.assertEqual(schema["entity"], "work_logs")
+        self.core.import_rows("work_logs", [{"work_date": "2026-08-22", "department": "一车间", "output": 120, "labor_hours": 24}])
+        self.assertEqual(self.core.list_records("work_logs")[0]["data"]["output"], 120)
 
     def test_duplicate_or_unsafe_dataset_is_rejected(self) -> None:
         with self.assertRaises(DataCoreError):
@@ -86,6 +91,14 @@ class DataCoreTests(unittest.TestCase):
         remaining = self.core.list_records("orders")
         self.assertEqual(len(remaining), 1)
         self.assertEqual(remaining[0]["data"]["order_no"], "REAL-1")
+
+    def test_production_simulation_is_reversible(self) -> None:
+        batch = self.core.generate_production(12, seed=17)
+        records = self.core.list_records("production", source_type="simulated")
+        self.assertEqual(len(records), 12)
+        self.assertIn(records[0]["data"]["department"], ["机加工一部", "装配一部", "表面处理", "质量检验"])
+        self.core.rollback_batch(batch["batch_id"])
+        self.assertEqual(self.core.list_records("production"), [])
 
     def test_agent_search_filters_orders_without_sql(self) -> None:
         rows = [
