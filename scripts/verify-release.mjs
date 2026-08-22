@@ -69,7 +69,7 @@ for (const pluginFile of [
   }
 }
 
-for (const entry of ['start-ai-os.cmd', 'start-ai-os.sh', 'diagnose-ai-os.cmd', 'diagnose-ai-os.sh', 'set-ai-os-logo.cmd', 'set-ai-os-logo.sh']) {
+for (const entry of ['start-ai-os.cmd', 'start-ai-os.sh', 'diagnose-ai-os.cmd', 'diagnose-ai-os.sh', 'set-ai-os-logo.cmd', 'set-ai-os-logo.sh', 'check-ai-os.cmd', 'check-ai-os.sh']) {
   assert.ok(existsSync(join(root, entry)), `missing cross-platform entry: ${entry}`)
 }
 
@@ -79,6 +79,8 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'doctor.mjs')]],
   [process.execPath, ['--check', join(scripts, 'cleanup-legacy.mjs')]],
   [process.execPath, ['--check', join(scripts, 'set-logo.mjs')]],
+  [process.execPath, ['--check', join(scripts, 'health-report.mjs')]],
+  [process.execPath, [join(scripts, 'health-report.mjs'), '--check']],
   [process.execPath, [join(scripts, 'set-logo.mjs'), '--check']],
   [process.execPath, [join(scripts, 'sync-pawapps.mjs'), '--check']],
   [process.execPath, [join(scripts, 'verify-deployment.mjs')]],
