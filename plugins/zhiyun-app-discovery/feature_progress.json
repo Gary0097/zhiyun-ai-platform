@@ -23,16 +23,16 @@
       "name": "多源数据自动采集",
       "app_id": "zhiyun-data-studio",
       "status": "in_progress",
-      "progress": 35,
-      "note": "目前支持Excel/CSV，微信、表单和ERP尚未接入。"
+      "progress": 55,
+      "note": "支持任意部门数据表的Excel/CSV解析、字段映射、预览校验和统一入库；微信、表单、ERP尚未接入。"
     },
     {
       "id": 4,
       "name": "跨部门数据融合加工",
       "app_id": "zhiyun-data-studio",
-      "status": "planned",
-      "progress": 0,
-      "note": "未开发。"
+      "status": "in_progress",
+      "progress": 15,
+      "note": "已具备自定义部门数据表和统一导入基础，跨域指标模型与部门仪表盘尚未开发。"
     },
     {
       "id": 5,
