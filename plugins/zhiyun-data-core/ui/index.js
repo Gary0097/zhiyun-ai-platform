@@ -41,6 +41,15 @@
     var setCreateOpen = createState[1];
     var schemaForm = antd.Form.useForm()[0];
     var message = antd.App.useApp().message;
+    var importState = React.useState(null);
+    var importData = importState[0];
+    var setImportData = importState[1];
+    var mappingState = React.useState({});
+    var mapping = mappingState[0];
+    var setMapping = mappingState[1];
+    var previewState = React.useState(null);
+    var preview = previewState[0];
+    var setPreview = previewState[1];
 
     function loadEntities() {
       return request("/zhiyun-data-core/entities").then(function (data) { setEntities(data.entities || []); });
@@ -79,6 +88,33 @@
       }).catch(function (reason) { if (reason instanceof Error) message.error(reason.message); });
     }
 
+    function upload(file) {
+      var form = new FormData(); form.append("file", file);
+      request("/zhiyun-data-core/parse", { method: "POST", body: form }).then(function (data) {
+        var next = {};
+        (data.headers || []).forEach(function (header) {
+          var match = (schema.fields || []).find(function (field) { return field.active && (field.name === header || field.label === header); });
+          if (match) next[header] = match.name;
+        });
+        setImportData(data); setMapping(next); setPreview(null);
+      }).catch(function (reason) { message.error(reason.message || "文件解析失败"); });
+      return false;
+    }
+
+    function previewImport() {
+      request("/zhiyun-data-core/imports/" + encodeURIComponent(selected) + "/preview", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rows: importData.rows, mapping: mapping, source_name: importData.filename })
+      }).then(setPreview).catch(function (reason) { message.error(reason.message); });
+    }
+
+    function commitImport() {
+      request("/zhiyun-data-core/imports/" + encodeURIComponent(selected) + "/commit", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rows: importData.rows, mapping: mapping, source_name: importData.filename })
+      }).then(function (result) {
+        message.success("已导入 " + result.row_count + " 条真实数据"); setImportData(null); setPreview(null); return loadDataset(selected, source);
+      }).catch(function (reason) { message.error(reason.message); });
+    }
+
     var activeFields = schema ? schema.fields.filter(function (field) { return field.active; }) : [];
     var columns = activeFields.map(function (field) {
       return { title: field.label, dataIndex: ["data", field.name], key: field.name, width: 150, ellipsis: true };
@@ -96,6 +132,7 @@
           h("div", { style: { display: "flex", gap: 8 } },
             h(antd.Button, { onClick: function () { loadDataset(selected, source); } }, "刷新"),
             h(antd.Button, { onClick: function () { setCreateOpen(true); } }, "新建数据表"),
+            h(antd.Upload, { accept: ".xlsx,.csv", showUploadList: false, beforeUpload: upload }, h(antd.Button, { type: selected === "orders" ? "default" : "primary" }, "导入 Excel/CSV")),
             selected === "orders" ? h(antd.Button, { type: "primary", onClick: simulate, loading: loading }, "生成 20 条模拟订单") : null)
         ),
         error ? h(antd.Alert, { type: "error", showIcon: true, message: error, style: { marginBottom: 16 } }) : null,
@@ -142,6 +179,18 @@
               );
             })
           )
+        ),
+        h(antd.Modal, { title: importData ? ("导入 " + importData.filename + " → " + (schema ? schema.label : selected)) : "导入数据", width: 820, open: !!importData, okText: "确认写入", okButtonProps: { disabled: !preview || preview.error_count > 0 }, onOk: commitImport, onCancel: function () { setImportData(null); setPreview(null); }, footer: function (_, buttons) { return h(React.Fragment, null, h(antd.Button, { onClick: previewImport }, "预览校验"), buttons.OkBtn ? h(buttons.OkBtn) : null, buttons.CancelBtn ? h(buttons.CancelBtn) : null); } },
+          importData ? h(React.Fragment, null,
+            h(antd.Alert, { type: "info", showIcon: true, message: "共 " + importData.row_count + " 行，请确认源字段和数据库字段的对应关系。", style: { marginBottom: 14 } }),
+            h("div", { style: { display: "grid", gridTemplateColumns: "repeat(2,minmax(280px,1fr))", gap: 10 } }, (importData.headers || []).map(function (header) {
+              return h("div", { key: header, style: { display: "flex", gap: 8, alignItems: "center" } },
+                h("span", { style: { width: 120, overflow: "hidden", textOverflow: "ellipsis" } }, header),
+                h(antd.Select, { allowClear: true, value: mapping[header], placeholder: "选择目标字段", style: { flex: 1 }, options: (schema ? schema.fields : []).filter(function (field) { return field.active; }).map(function (field) { return { value: field.name, label: field.label + " (" + field.name + ")" }; }), onChange: function (value) { var next = Object.assign({}, mapping); if (value) next[header] = value; else delete next[header]; setMapping(next); setPreview(null); } })
+              );
+            })),
+            preview ? h(antd.Alert, { style: { marginTop: 14 }, type: preview.error_count ? "error" : "success", showIcon: true, message: preview.error_count ? ("发现 " + preview.error_count + " 行错误") : (preview.valid_count + " 行校验通过"), description: (preview.errors || []).slice(0, 5).map(function (item) { return "第" + item.row + "行：" + item.errors.join("，"); }).join("；") }) : null
+          ) : null
         )
       )
     );
