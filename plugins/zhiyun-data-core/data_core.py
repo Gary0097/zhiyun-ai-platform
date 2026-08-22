@@ -32,6 +32,16 @@ ORDER_FIELDS = [
     ("production_delay_days", "生产延误天数", "integer", False),
 ]
 
+PRODUCTION_FIELDS = [
+    ("record_date", "日期", "date", True),
+    ("department", "部门", "text", True),
+    ("output", "产量/产值", "number", True),
+    ("labor_hours", "工时", "number", True),
+    ("employee_count", "人数", "number", False),
+    ("cost", "成本", "number", False),
+    ("loss", "损耗", "number", False),
+]
+
 
 class DataCoreError(ValueError):
     """Raised when a request violates a Data Core rule."""
@@ -126,6 +136,18 @@ class DataCore:
                     INSERT OR IGNORE INTO schema_fields
                     (entity, field_name, label, field_type, required, active, position, built_in)
                     VALUES('orders', ?, ?, ?, ?, 1, ?, 1)
+                    """,
+                    (name, label, kind, int(required), position),
+                )
+            connection.execute(
+                "INSERT OR IGNORE INTO data_schemas(entity, label) VALUES('production', '生产日报')"
+            )
+            for position, (name, label, kind, required) in enumerate(PRODUCTION_FIELDS):
+                connection.execute(
+                    """
+                    INSERT OR IGNORE INTO schema_fields
+                    (entity, field_name, label, field_type, required, active, position, built_in)
+                    VALUES('production', ?, ?, ?, ?, 1, ?, 1)
                     """,
                     (name, label, kind, int(required), position),
                 )
@@ -391,6 +413,31 @@ class DataCore:
             "orders", rows, source_type="simulated", source_name=f"AI simulated orders (seed={seed})"
         )
         return {"batch_id": batch_id, "entity": "orders", "row_count": count, "source_type": "simulated", "seed": seed}
+
+    def generate_production(self, count: int = 60, seed: int | None = None) -> dict[str, Any]:
+        """Generate reversible production records for an end-to-end demo."""
+        if count < 1 or count > 5000:
+            raise DataCoreError("simulation count must be between 1 and 5000")
+        generator = random.Random(seed)
+        departments = ["机加工一部", "装配一部", "表面处理", "质量检验"]
+        today = date.today()
+        rows = []
+        for _ in range(count):
+            department = generator.choice(departments)
+            employees = generator.randint(4, 18)
+            hours = employees * generator.choice([8, 8, 10])
+            output = generator.randint(80, 600)
+            rows.append({
+                "record_date": (today - timedelta(days=generator.randint(0, 29))).isoformat(),
+                "department": department,
+                "output": output,
+                "labor_hours": hours,
+                "employee_count": employees,
+                "cost": round(output * generator.uniform(8, 28), 2),
+                "loss": round(output * generator.uniform(0.005, 0.08), 2),
+            })
+        batch_id = self._insert_batch("production", rows, source_type="simulated", source_name=f"AI simulated production (seed={seed})")
+        return {"batch_id": batch_id, "entity": "production", "row_count": count, "source_type": "simulated", "seed": seed}
 
     def _insert_batch(
         self,
