@@ -55,8 +55,8 @@
       "name": "客户订单自动格式化",
       "app_id": "zhiyun-order-studio",
       "status": "in_progress",
-      "progress": 35,
-      "note": "已支持微信、邮件或OCR结果文本的客户/产品/数量/交期提取、原文证据和缺失字段提示；图片OCR与确认入库尚未完成。"
+      "progress": 60,
+      "note": "已支持订单号、下单日期、客户、产品、数量、交期提取，可编辑确认、Data Core预览校验和真实入库；图片OCR尚未完成。"
     },
     {
       "id": 8,
