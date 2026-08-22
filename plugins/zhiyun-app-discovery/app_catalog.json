@@ -111,7 +111,7 @@
         "ddzx",
         "订单处理"
       ],
-      "version": "0.3.0",
+      "version": "0.4.0",
       "category": "order",
       "install_status": "installed",
       "route": "/apps/zhiyun-order-studio",
