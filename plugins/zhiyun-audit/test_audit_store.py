@@ -16,8 +16,13 @@ class AuditStoreTest(unittest.TestCase):
             audit = json.loads((root / "logs/audit.jsonl").read_text(encoding="utf-8"))
             self.assertEqual(runtime["tool_input"]["token"], "[REDACTED]")
             self.assertEqual(audit["trace_id"], "t-1")
-            with sqlite3.connect(root / "data/ai-os.sqlite") as database:
+            database = sqlite3.connect(root / "data/ai-os.sqlite")
+            try:
                 row = database.execute("SELECT tool_name,status FROM audit_tool_call WHERE trace_id='t-1'").fetchone()
+            finally:
+                # sqlite3.Connection's context manager does not close the handle.
+                # Explicit close is required before TemporaryDirectory cleanup on Windows.
+                database.close()
             self.assertEqual(row, ("web_search", "success"))
 
 
