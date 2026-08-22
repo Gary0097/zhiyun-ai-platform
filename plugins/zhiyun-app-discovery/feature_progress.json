@@ -32,6 +32,6 @@
     {"id": 28, "name": "人力资源数据分析", "app_id": "zhiyun-people-studio", "status": "planned", "progress": 0, "note": "People Studio未创建。"},
     {"id": 29, "name": "现有系统数据接口开发", "app_id": "zhiyun-integration-hub", "status": "in_progress", "progress": 10, "note": "已有内部Data Core API，ERP/WMS接口尚未开发。"},
     {"id": 30, "name": "供应链风险实时监控系统", "app_id": "zhiyun-supply-studio", "status": "planned", "progress": 0, "note": "Supply Studio未创建。"},
-    {"id": 31, "name": "系统安全加固", "app_id": "zhiyun-audit", "status": "in_progress", "progress": 50, "note": "已有QwenPaw基础安全、Tool审计、敏感字段脱敏和灾难性高风险操作硬阻断；加密、审计界面和更完整防泄漏仍待开发。"}
+    {"id": 31, "name": "系统安全加固", "app_id": "zhiyun-audit", "status": "in_progress", "progress": 65, "note": "已有QwenPaw基础安全、Tool审计、脱敏审计界面和灾难性高风险操作硬阻断；加密和更完整防泄漏仍待开发。"}
   ]
 }

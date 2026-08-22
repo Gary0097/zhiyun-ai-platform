@@ -38,6 +38,12 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual(result[0]["app_id"], "qwenpaw-knowledge-base")
         self.assertEqual(result[0]["install_status"], "installed")
 
+    def test_audit_request_opens_installed_audit_viewer(self) -> None:
+        result = search_apps("查看操作审计")
+        self.assertEqual(result[0]["app_id"], "zhiyun-audit")
+        self.assertEqual(result[0]["route"], "/apps/audit")
+        self.assertTrue(result[0]["available"])
+
     def test_unknown_query_never_invents_app(self) -> None:
         response = agent_response("量子火箭发动机自动装配")
         self.assertFalse(response["found"])
@@ -64,8 +70,9 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
         self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.5.2")
         self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
-        self.assertEqual(apps["zhiyun-data-core"]["version"], "0.5.0")
-        self.assertEqual(apps["zhiyun-audit"]["version"], "1.1.1")
+        self.assertEqual(apps["zhiyun-data-core"]["version"], "0.6.0")
+        self.assertEqual(apps["zhiyun-audit"]["version"], "1.2.0")
+        self.assertEqual(apps["zhiyun-audit"]["route"], "/apps/audit")
 
     def test_progress_covers_all_31_prd_features(self) -> None:
         ledger = load_progress()
@@ -75,7 +82,7 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual(summary["testing"], 6)
         self.assertEqual(summary["in_progress"], 7)
         self.assertEqual(summary["completed"], 0)
-        self.assertEqual(summary["overall_progress"], 24)
+        self.assertEqual(summary["overall_progress"], 25)
 
 
 if __name__ == "__main__":

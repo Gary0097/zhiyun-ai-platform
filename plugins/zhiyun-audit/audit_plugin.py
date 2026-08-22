@@ -9,18 +9,45 @@ from pathlib import Path
 from typing import Any, AsyncGenerator, Callable
 
 from agentscope.middleware import MiddlewareBase
+from fastapi import APIRouter, HTTPException, Query
 from qwenpaw.plugins.api import PluginApi
 
 try:
-    from .audit_store import persist, redact
+    from .audit_store import list_events, persist, redact
     from .risk_policy import assess
 except ImportError:
-    from audit_store import persist, redact
+    from audit_store import list_events, persist, redact
     from risk_policy import assess
 
 
 class HighRiskOperationBlocked(RuntimeError):
     """Raised when an Agent attempts a catastrophic irreversible operation."""
+
+
+router = APIRouter()
+
+
+@router.get("/events")
+async def events(
+    status: str | None = Query(default=None),
+    tool_name: str | None = Query(default=None, max_length=200),
+    limit: int = Query(default=100, ge=1, le=500),
+) -> dict[str, Any]:
+    """Return redacted audit metadata without Tool inputs or model reasoning."""
+    try:
+        records = list_events(_workspace(), status=status, tool_name=tool_name, limit=limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return {"count": len(records), "events": records}
+
+
+def _workspace() -> Path:
+    try:
+        from qwenpaw.constant import WORKING_DIR
+
+        return Path(WORKING_DIR) / "workspace"
+    except ImportError:
+        return Path.home() / ".qwenpaw" / "workspace"
 
 
 class AuditMiddleware(MiddlewareBase):
@@ -94,6 +121,7 @@ def _factory(ctx: Any, agent_config: Any) -> AuditMiddleware | None:
 
 class AuditPlugin:
     def register(self, api: PluginApi) -> None:
+        api.register_http_router(router, prefix="/zhiyun-audit", tags=["zhiyun-audit"])
         api.register_middleware(_factory, priority=40)
 
 
