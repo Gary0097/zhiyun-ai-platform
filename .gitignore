@@ -8,6 +8,7 @@ apps/qwenpaw-embedded/runtime/*
 !apps/qwenpaw-embedded/runtime/.gitignore
 apps/qwenpaw-embedded/workspace/*
 !apps/qwenpaw-embedded/workspace/.gitignore
+apps/qwenpaw-embedded/workspace.secret/
 
 # Runtime databases, logs and secrets
 *.sqlite

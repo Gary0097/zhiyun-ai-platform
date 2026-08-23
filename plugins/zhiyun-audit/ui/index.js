@@ -50,12 +50,13 @@
       h("div", { style: { maxWidth: 1400, margin: "0 auto" } },
         h("div", { style: { display: "flex", justifyContent: "space-between", gap: 16, alignItems: "center" } },
           h("div", null,
-            h("h2", { style: { marginBottom: 4 } }, "Tool 调用审计"),
+            h("h2", { style: { marginBottom: 4 } }, "安全审计中心"),
             h("p", { style: { color: "#667085", marginTop: 0 } }, "仅展示脱敏后的执行元数据，不展示 Tool 输入、密钥或模型推理。")),
           h(antd.Button, { onClick: load, loading: loading }, "刷新")),
         h(antd.Alert, { type: integrity && integrity.status === "degraded" ? "error" : "info", showIcon: true,
           message: integrity ? (integrity.status === "available" ? "审计链完整性已验证" : "审计链完整性异常") : "正在验证审计链完整性",
           description: "灾难性操作与未确认外部写入会被阻断；键名及内容中的凭据、邮箱和手机号会脱敏。审计查看不会修改 Workspace 数据。", style: { marginBottom: 16 } }),
+        h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：查看 Agent 和工具的脱敏执行记录，验证日志链是否被篡改，并定位失败或被安全策略阻断的操作。"), h("ol", null, h("li", null, "先确认顶部显示“审计链完整性已验证”。"), h("li", null, "使用状态筛选查看失败或已阻断记录。"), h("li", null, "依据 Trace ID 关联具体运行；原始输入和模型推理不会在此展示。"))) }] }),
         error ? h(antd.Alert, { type: "error", showIcon: true, message: error, style: { marginBottom: 16 } }) : null,
         h(antd.Card, { size: "small", style: { marginBottom: 16 } },
           h(antd.Space, null,
@@ -67,5 +68,5 @@
       ));
   }
 
-  Q.registerRoutes("zhiyun-audit", [{ path: "/apps/audit", component: AuditViewer, label: "Tool 调用审计", icon: "🛡️", priority: 74 }]);
+  Q.registerRoutes("zhiyun-audit", [{ path: "/apps/audit", component: AuditViewer, label: "安全审计中心", icon: "🛡️", priority: 74 }]);
 })();

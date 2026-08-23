@@ -55,15 +55,23 @@ const health = spawn(process.execPath, [join(scriptsRoot, 'health-report.mjs')],
   stdio: 'inherit',
   env: launchEnv,
 })
+const modelHealth = spawn(process.execPath, [join(scriptsRoot, 'model-health-report.mjs')], {
+  cwd: repoRoot,
+  stdio: 'inherit',
+  env: launchEnv,
+})
 process.on('SIGINT', () => {
   health.kill('SIGINT')
+  modelHealth.kill('SIGINT')
   child.kill('SIGINT')
 })
 process.on('SIGTERM', () => {
   health.kill('SIGTERM')
+  modelHealth.kill('SIGTERM')
   child.kill('SIGTERM')
 })
 child.on('exit', code => {
   if (!health.killed) health.kill('SIGTERM')
+  if (!modelHealth.killed) modelHealth.kill('SIGTERM')
   process.exitCode = code || 0
 })

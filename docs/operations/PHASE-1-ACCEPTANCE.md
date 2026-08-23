@@ -10,6 +10,12 @@ Issue: `Gary0097/zhiyun-ai-platform#68`
    `e35312d35e5e306fa288d60ef7464294a1fef0a7` (v0.7.0).
 3. The main platform lock and catalog are updated only to those formal SHAs.
 
+The accepted capabilities were later upgraded without changing their delivery
+status: Data Studio PR #15 merged as
+`de291fed581e5c8d684379682351011a4be4c73a` (v0.9.1), and Order Studio PR #12
+merged as `612b2a2b48ee8321da208b4aa7ebdbce22e6f939` (v0.7.1). These releases add
+Chinese titles and in-app guidance while preserving the accepted data paths.
+
 Both external PRs passed `verify (ubuntu-24.04)` and
 `verify (windows-2022)` before manual merge.
 

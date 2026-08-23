@@ -139,6 +139,7 @@
       h("div", { style: { maxWidth: 1280, margin: "0 auto" } },
         h("h2", { style: { marginBottom: 4 } }, "应用与项目中心"),
         h("p", { style: { color: "#667085", marginTop: 0 } }, "真实应用入口、能力检索和 31 项 PRD 交付进度。"),
+        h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：按中文名称、业务功能或自然语言需求查找真实已登记应用，并区分已安装与功能已交付。"), h("ol", null, h("li", null, "在“我的应用”输入要解决的业务问题。"), h("li", null, "查看匹配功能、原因、健康和安装状态。"), h("li", null, "只有已验收能力才会显示可用；计划中功能不会被虚构为可用。"))) }] }),
         error ? h(antd.Alert, { type: "error", message: error, showIcon: true, style: { marginBottom: 16 } }) : null,
         h(antd.Tabs, { defaultActiveKey: "mine", items: items })
       )

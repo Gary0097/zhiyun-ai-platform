@@ -4,15 +4,15 @@ Issue: `Gary0097/zhiyun-ai-platform#74`
 
 ## Formal external merge
 
-Integration Hub PR #4 fixed the route-isolation defect found during live
-browser testing and was manually merged as
-`a3d90c2dba77e1d85f5c089957152bc7688e5707` (v0.1.1). The platform lock uses
-only this latest formal SHA; the superseded v0.1.0 SHA is not shipped.
+System Integration Center PR #5 added the guided Chinese workflow and was
+manually merged as `abad579ab8a47acd2a6c77df6aeac7b100e65591` (v0.2.0).
+It replaces handwritten connector and mapping JSON with source-specific forms
+and automatic field matching. The platform lock uses only this formal SHA.
 
 ## Candidate scope
 
-- Integration Hub reads real CSV/JSON, HTTPS JSON APIs and SQLite in read-only
-  mode, previews mappings, validates through Data Core, requires confirmation
+- The system integration center reads real CSV/JSON, HTTPS JSON APIs and SQLite
+  in read-only mode, automatically proposes mappings, validates through Data Core, requires confirmation
   before commit, and retains Run/Trace/batch/failure/retry evidence.
 - Data Core v0.7.0 records idempotent migrations, reports semantic integrity
   and disk health, creates checksum-verified backups, optionally encrypts them
