@@ -17,7 +17,13 @@ QwenPaw 2.1.0 :8088
     │   └── Data Core (SQLite in Workspace)
     └── Locked PawApps
         ├── Data Studio
-        └── Order Studio
+        ├── Order Studio
+        ├── Integration Hub
+        ├── Service Studio
+        ├── Supply Studio
+        ├── Sales Studio
+        ├── Finance Studio
+        └── People Studio
 ```
 
 ## 运行约束
