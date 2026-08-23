@@ -79,20 +79,29 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
         self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.7.0")
         self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
-        self.assertEqual(apps["zhiyun-data-core"]["version"], "0.6.0")
-        self.assertEqual(apps["zhiyun-audit"]["version"], "1.2.0")
+        self.assertEqual(apps["zhiyun-data-core"]["version"], "0.7.0")
+        self.assertEqual(apps["zhiyun-audit"]["version"], "1.3.0")
         self.assertEqual(apps["zhiyun-audit"]["route"], "/apps/audit")
+        self.assertEqual(apps["zhiyun-integration-hub"]["version"], "0.1.1")
+        self.assertEqual(apps["zhiyun-integration-hub"]["install_status"], "installed")
+
+    def test_unaccepted_integration_capability_is_not_available(self) -> None:
+        response = agent_response("把智能体结果对接ERP")
+        self.assertTrue(response["found"])
+        self.assertFalse(response["available"])
+        self.assertEqual(response["results"][0]["app_id"], "zhiyun-integration-hub")
+        self.assertEqual(response["results"][0]["matched_capability"]["delivery_status"], "testing")
 
     def test_progress_covers_all_31_prd_features(self) -> None:
         ledger = load_progress()
         self.assertEqual([item["id"] for item in ledger["features"]], list(range(1, 32)))
         summary = progress_summary(ledger)
         self.assertEqual(summary["total"], 31)
-        self.assertEqual(summary["testing"], 0)
-        self.assertEqual(summary["in_progress"], 3)
+        self.assertEqual(summary["testing"], 2)
+        self.assertEqual(summary["in_progress"], 1)
         self.assertEqual(summary["planned"], 17)
         self.assertEqual(summary["completed"], 11)
-        self.assertEqual(summary["overall_progress"], 39)
+        self.assertEqual(summary["overall_progress"], 43)
 
 
 if __name__ == "__main__":

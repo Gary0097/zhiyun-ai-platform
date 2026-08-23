@@ -12,6 +12,7 @@ function catalog () {
     apps: [
       { app_id: 'zhiyun-data-studio', version: '0.8.0', install_status: 'installed', health: 'available', capabilities: Array.from({ length: 31 }, (_, index) => ({ id: index + 1 })) },
       { app_id: 'zhiyun-order-studio', version: '0.6.0', install_status: 'installed', health: 'available', capabilities: [] },
+      { app_id: 'zhiyun-integration-hub', version: '0.1.0', install_status: 'installed', health: 'available', capabilities: [] },
       { app_id: 'zhiyun-data-core', version: '0.5.0', capabilities: [] },
       { app_id: 'zhiyun-audit', version: '1.1.1', capabilities: [] },
       { app_id: 'zhiyun-logo', version: '1.0.0', capabilities: [] },
@@ -31,9 +32,11 @@ async function scenario (overrides = {}) {
     const bodies = {
       '/api/zhiyun-logo/config': { logo: 'data:image/png;base64,AA==', source: 'default-logo.png' },
       '/api/zhiyun-app-discovery/catalog': catalog(),
-      '/api/zhiyun-data-core/health': { status: 'available', schema_version: 1 },
+      '/api/zhiyun-data-core/health': { status: 'available', schema_version: 2, integrity: 'ok' },
+      '/api/zhiyun-audit/integrity': { status: 'available', integrity: 'verified', events: 2 },
       '/api/zhiyun-data-studio/health': { status: 'available', version: '0.8.0' },
       '/api/zhiyun-order-studio/health': { status: 'available', version: '0.6.0' },
+      '/api/zhiyun-integration-hub/health': { status: 'available', version: '0.1.0' },
       ...overrides,
     }
     response.end(JSON.stringify(bodies[request.url] || {}))
@@ -59,7 +62,7 @@ const healthy = await scenario()
 assert.equal(healthy.code, 0, healthy.stderr || healthy.stdout)
 const healthyReport = JSON.parse(healthy.stdout)
 assert.equal(healthyReport.ok, true)
-assert.equal(healthyReport.passed, 6)
+assert.equal(healthyReport.passed, 8)
 
 const mismatched = await scenario({
   '/api/zhiyun-data-studio/health': { status: 'available', version: '0.6.0' },
@@ -75,5 +78,12 @@ const hollow = await scenario({
 assert.equal(hollow.code, 1)
 const hollowReport = JSON.parse(hollow.stdout)
 assert.ok(hollowReport.checks.some(item => item.id === 'zhiyun-data-core' && item.message.includes('schema_version')))
+
+const tampered = await scenario({
+  '/api/zhiyun-audit/integrity': { status: 'degraded', integrity: 'broken', line: 2 },
+})
+assert.equal(tampered.code, 1)
+const tamperedReport = JSON.parse(tampered.stdout)
+assert.ok(tamperedReport.checks.some(item => item.id === 'zhiyun-audit' && item.message.includes('完整性')))
 
 console.log('运行健康语义回归通过：真实响应、版本漂移和空壳JSON均被正确判定。')

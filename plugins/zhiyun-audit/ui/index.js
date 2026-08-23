@@ -18,14 +18,17 @@
     var errorState = React.useState("");
     var error = errorState[0];
     var setError = errorState[1];
+    var integrityState = React.useState(null);
+    var integrity = integrityState[0];
+    var setIntegrity = integrityState[1];
 
     function load() {
       setLoading(true); setError("");
       var query = status ? "?status=" + encodeURIComponent(status) : "";
-      Q.host.fetch("/zhiyun-audit/events" + query).then(function (response) {
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        return response.json();
-      }).then(function (body) { setRecords(body.events || []); })
+      Promise.all([Q.host.fetch("/zhiyun-audit/events" + query), Q.host.fetch("/zhiyun-audit/integrity")]).then(function (responses) {
+        if (!responses[0].ok || !responses[1].ok) throw new Error("审计接口不可用");
+        return Promise.all([responses[0].json(), responses[1].json()]);
+      }).then(function (bodies) { setRecords(bodies[0].events || []); setIntegrity(bodies[1]); })
         .catch(function (reason) { setError(reason.message || "审计记录加载失败"); })
         .finally(function () { setLoading(false); });
     }
@@ -50,7 +53,9 @@
             h("h2", { style: { marginBottom: 4 } }, "Tool 调用审计"),
             h("p", { style: { color: "#667085", marginTop: 0 } }, "仅展示脱敏后的执行元数据，不展示 Tool 输入、密钥或模型推理。")),
           h(antd.Button, { onClick: load, loading: loading }, "刷新")),
-        h(antd.Alert, { type: "info", showIcon: true, message: "灾难性操作会被硬阻断并记录为 blocked。审计查看不会修改 Workspace 数据。", style: { marginBottom: 16 } }),
+        h(antd.Alert, { type: integrity && integrity.status === "degraded" ? "error" : "info", showIcon: true,
+          message: integrity ? (integrity.status === "available" ? "审计链完整性已验证" : "审计链完整性异常") : "正在验证审计链完整性",
+          description: "灾难性操作与未确认外部写入会被阻断；键名及内容中的凭据、邮箱和手机号会脱敏。审计查看不会修改 Workspace 数据。", style: { marginBottom: 16 } }),
         error ? h(antd.Alert, { type: "error", showIcon: true, message: error, style: { marginBottom: 16 } }) : null,
         h(antd.Card, { size: "small", style: { marginBottom: 16 } },
           h(antd.Space, null,

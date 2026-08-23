@@ -33,7 +33,7 @@ assert.ok(doctor.includes('setup-ai-os'), 'doctor must provide the project runti
 assert.ok(doctor.includes("portInUse ? 'fail' : 'pass'"), 'occupied 8088 must stop duplicate startup before mutation')
 
 const health = readFileSync(join(scripts, 'health-report.mjs'), 'utf8')
-for (const endpoint of ['zhiyun-logo', 'zhiyun-app-discovery', 'zhiyun-data-core', 'zhiyun-data-studio', 'zhiyun-order-studio']) {
+for (const endpoint of ['zhiyun-logo', 'zhiyun-app-discovery', 'zhiyun-data-core', 'zhiyun-audit', 'zhiyun-data-studio', 'zhiyun-order-studio', 'zhiyun-integration-hub']) {
   assert.ok(health.includes(endpoint), `health report missing endpoint: ${endpoint}`)
 }
 const healthCheck = spawnSync(process.execPath, [join(scripts, 'health-report.mjs'), '--check'], { cwd: root, encoding: 'utf8' })

@@ -14,7 +14,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Iterator
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 FIELD_NAME = re.compile(r"^[a-z][a-z0-9_]{0,62}$")
 FIELD_TYPES = {"text", "integer", "number", "boolean", "date", "datetime"}
 SOURCE_TYPES = {"real", "simulated"}
@@ -76,6 +76,11 @@ class DataCore:
                     key TEXT PRIMARY KEY,
                     value TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS data_core_migrations (
+                    version INTEGER PRIMARY KEY,
+                    applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    description TEXT NOT NULL
+                );
                 CREATE TABLE IF NOT EXISTS data_schemas (
                     entity TEXT PRIMARY KEY,
                     label TEXT NOT NULL,
@@ -123,6 +128,11 @@ class DataCore:
             ).fetchone()
             if current and int(current["value"]) > SCHEMA_VERSION:
                 raise RuntimeError("Data Core database is newer than this plugin")
+            current_version = int(current["value"]) if current else 0
+            if current_version < 1:
+                connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(1, 'initial schema registry and reversible batches')")
+            if current_version < 2:
+                connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(2, 'backup recovery and migration journal')")
             connection.execute(
                 "INSERT OR REPLACE INTO data_core_meta(key, value) VALUES('schema_version', ?)",
                 (str(SCHEMA_VERSION),),
@@ -139,6 +149,7 @@ class DataCore:
                     """,
                     (name, label, kind, int(required), position),
                 )
+
             connection.execute(
                 "INSERT OR IGNORE INTO data_schemas(entity, label) VALUES('production', '生产日报')"
             )
@@ -151,6 +162,13 @@ class DataCore:
                     """,
                     (name, label, kind, int(required), position),
                 )
+
+    def migration_history(self) -> list[dict[str, Any]]:
+        with self.connect() as connection:
+            rows = connection.execute(
+                "SELECT version, applied_at, description FROM data_core_migrations ORDER BY version"
+            ).fetchall()
+        return [dict(row) for row in rows]
 
     def list_schema(self, entity: str) -> dict[str, Any]:
         with self.connect() as connection:

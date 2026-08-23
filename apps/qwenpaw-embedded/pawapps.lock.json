@@ -14,6 +14,13 @@
       "ref": "main",
       "commit": "e35312d35e5e306fa288d60ef7464294a1fef0a7",
       "install_dir": "zhiyun-order-studio"
+    },
+    {
+      "id": "zhiyun-integration-hub",
+      "repository": "https://github.com/Gary0097/zhiyun-integration-hub.git",
+      "ref": "main",
+      "commit": "a3d90c2dba77e1d85f5c089957152bc7688e5707",
+      "install_dir": "zhiyun-integration-hub"
     }
   ]
 }

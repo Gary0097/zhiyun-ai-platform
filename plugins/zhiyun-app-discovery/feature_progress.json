@@ -30,8 +30,8 @@
     {"id": 26, "name": "审批流引擎", "app_id": "zhiyun-people-studio", "status": "planned", "progress": 0, "note": "People Studio未创建。"},
     {"id": 27, "name": "员工信息与生日管理", "app_id": "zhiyun-people-studio", "status": "planned", "progress": 0, "note": "People Studio未创建。"},
     {"id": 28, "name": "人力资源数据分析", "app_id": "zhiyun-people-studio", "status": "planned", "progress": 0, "note": "People Studio未创建。"},
-    {"id": 29, "name": "现有系统数据接口开发", "app_id": "zhiyun-integration-hub", "status": "in_progress", "progress": 10, "note": "已有内部Data Core API，ERP/WMS接口尚未开发。"},
+    {"id": 29, "name": "现有系统数据接口开发", "app_id": "zhiyun-integration-hub", "status": "testing", "progress": 95, "note": "Integration Hub v0.1.1 已提供真实 CSV/JSON、HTTPS API 与只读 SQLite 接入、映射预览、确认后 Data Core 批次写入、Trace 和失败重试，并通过 QwenPaw 路由隔离回归；待用户实机验收，厂商专用适配器按具体系统另行扩展。"},
     {"id": 30, "name": "供应链风险实时监控系统", "app_id": "zhiyun-supply-studio", "status": "planned", "progress": 0, "note": "Supply Studio未创建。"},
-    {"id": 31, "name": "系统安全加固", "app_id": "zhiyun-audit", "status": "in_progress", "progress": 65, "note": "已有QwenPaw基础安全、Tool审计、脱敏审计界面和灾难性高风险操作硬阻断；加密和更完整防泄漏仍待开发。"}
+    {"id": 31, "name": "系统安全加固", "app_id": "zhiyun-audit", "status": "testing", "progress": 95, "note": "QwenPaw 基础安全、键名和内容级敏感信息防泄漏、Tool 审计、防篡改哈希链、外部写入确认、灾难性操作阻断及 Data Core AES-GCM 加密备份已完成；待用户实机验收。"}
   ]
 }
