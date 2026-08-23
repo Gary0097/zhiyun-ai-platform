@@ -49,11 +49,14 @@ class SearchEngineTests(unittest.TestCase):
         self.assertFalse(response["found"])
         self.assertEqual(response["results"], [])
 
-    def test_planned_capability_is_not_reported_available(self) -> None:
+    def test_testing_capability_is_launchable_for_acceptance(self) -> None:
         response = agent_response("识别发票并审核报销")
         self.assertTrue(response["found"])
-        self.assertFalse(response["available"])
-        self.assertIn("尚未交付", response["message"])
+        self.assertTrue(response["available"])
+        result = response["results"][0]
+        self.assertEqual(result["app_id"], "zhiyun-finance-studio")
+        self.assertEqual(result["matched_capability"]["delivery_status"], "testing")
+        self.assertIn("实机验收", response["message"])
 
     def test_accepted_phase1_capability_is_available(self) -> None:
         response = agent_response("处理延期和投诉复合异常")
