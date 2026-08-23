@@ -1,4 +1,4 @@
-# Phase 2 Shared Foundations Acceptance Candidate
+# Phase 2 Shared Foundations Acceptance
 
 Issue: `Gary0097/zhiyun-ai-platform#74`
 
@@ -10,7 +10,7 @@ on top of the guided Chinese workflow and was manually merged as
 It replaces handwritten connector and mapping JSON with source-specific forms
 and automatic field matching. The platform lock uses only this formal SHA.
 
-## Candidate scope
+## Accepted scope
 
 - The system integration center reads real CSV/JSON, HTTPS JSON APIs and SQLite
   in read-only mode, automatically proposes mappings, validates through Data Core, requires confirmation
@@ -25,12 +25,16 @@ and automatic field matching. The platform lock uses only this formal SHA.
   the desktop, catalog, Data Core integrity, audit integrity and all three
   installed PawApps with runtime/catalog version comparison.
 
-## Acceptance boundary
+## Live acceptance
 
-Capabilities 29 and 31 remain `testing` at 95%. Automated tests and the full
-release gate do not replace live acceptance. Vendor-specific ERP/WMS adapters,
+Capabilities 29 and 31 reached `completed` at 100% after user live acceptance
+on 2026-08-23. The user verified the Chinese guided application flow, audit and
+security behavior, successful agent conversation, and imported the real
+`应收收款事实_线上_数据导出.csv` file after the v0.2.1 encoding fix.
+
+Vendor-specific ERP/WMS adapters,
 scheduled sync and external-system writes are extensions selected for a real
-target system; v0.1 does not claim them generically.
+target system; v0.2.1 does not claim them generically.
 
 Rollback restores the previous platform commit and PawApp lock. Data Core
 recovery always verifies the backup and creates a safety backup first; Workspace

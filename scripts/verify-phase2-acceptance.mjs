@@ -24,9 +24,9 @@ for (const file of [
 
 for (const id of [29, 31]) {
   const feature = progress.features.find(item => item.id === id)
-  assert.equal(feature?.status, 'testing', `feature ${id} must remain testing before live acceptance`)
-  assert.ok(feature.progress < 100, `feature ${id} cannot be 100 before live acceptance`)
-  assert.match(feature.note, /待用户实机验收/, `feature ${id} needs explicit acceptance boundary`)
+  assert.equal(feature?.status, 'completed', `feature ${id} must record live acceptance`)
+  assert.equal(feature.progress, 100, `feature ${id} must be 100 after live acceptance`)
+  assert.match(feature.note, /2026-08-23.*用户实机验收/, `feature ${id} needs dated live acceptance evidence`)
 }
 
 const hubRoot = join(embedded, 'runtime', 'pawapps', 'zhiyun-integration-hub')
@@ -36,4 +36,4 @@ assert.equal(readFileSync(join(hubRoot, 'ui', 'index.js'), 'utf8').includes('配
 assert.equal(readFileSync(join(hubRoot, 'ui', 'index.js'), 'utf8').includes('字段映射 JSON'), false)
 assert.ok(readFileSync(join(hubRoot, 'ui', 'index.js'), 'utf8').includes('Q.registerRoutes("zhiyun-integration-hub"'))
 assert.equal(readFileSync(join(hubRoot, 'ui', 'index.js'), 'utf8').includes('document.getElementById("app")'), false)
-console.log('Phase 2 候选检查通过：正式 Integration Hub SHA、Data Core、安全、离线恢复证据及待用户验收边界一致。')
+console.log('Phase 2 验收检查通过：正式 Integration Hub SHA、Data Core、安全、离线恢复证据及用户实机验收记录一致。')

@@ -18,9 +18,9 @@ into this repository only through pinned commits.
 
 As of the ledger date, the plan contains 31 capabilities:
 
-- 11 completed;
+- 13 completed;
 - 1 in development;
-- 2 in testing; and
+- 0 in testing; and
 - 17 planned.
 
 Therefore the product is not complete. Percentages are planning indicators, not
@@ -67,9 +67,10 @@ administrator and cannot be represented by a source commit.
 3. Validate application discovery, offline fallback, dependency health, data
    backup/recovery, migrations, and semantic runtime health end to end.
 
-The Phase 2 implementation candidate uses the system integration center v0.2.1, Data Core
-v0.7.0 and Audit v1.3.0. Capabilities 29 and 31 remain `testing` until live user
-acceptance; installed state alone does not make them available.
+The accepted Phase 2 implementation uses the system integration center v0.2.1,
+Data Core v0.7.0 and Audit v1.3.0. Capabilities 29 and 31 passed live user
+acceptance on 2026-08-23 and are available; installed state alone still does not
+make any other capability available.
 
 ### Phase 3 — Add future PawApps by business value
 
