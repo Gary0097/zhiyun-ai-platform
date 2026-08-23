@@ -8,8 +8,10 @@ export const endpoints = [
   { id: 'zhiyun-logo', name: '智造云 Logo', path: '/api/zhiyun-logo/config', contentType: 'application/json' },
   { id: 'zhiyun-app-discovery', name: '应用发现', path: '/api/zhiyun-app-discovery/catalog', contentType: 'application/json' },
   { id: 'zhiyun-data-core', name: 'Data Core', path: '/api/zhiyun-data-core/health', contentType: 'application/json' },
+  { id: 'zhiyun-audit', name: '安全审计', path: '/api/zhiyun-audit/integrity', contentType: 'application/json' },
   { id: 'zhiyun-data-studio', name: 'Data Studio', path: '/api/zhiyun-data-studio/health', contentType: 'application/json' },
   { id: 'zhiyun-order-studio', name: 'Order Studio', path: '/api/zhiyun-order-studio/health', contentType: 'application/json' },
+  { id: 'zhiyun-integration-hub', name: 'Integration Hub', path: '/api/zhiyun-integration-hub/health', contentType: 'application/json' },
 ]
 
 if (checkOnly) {
@@ -28,11 +30,11 @@ function validatePayload (id, payload) {
   }
   if (id === 'zhiyun-app-discovery') {
     if (!Array.isArray(payload?.apps)) return '应用目录缺少apps数组'
-    const required = ['zhiyun-data-studio', 'zhiyun-order-studio', 'zhiyun-data-core', 'zhiyun-audit', 'zhiyun-logo']
+    const required = ['zhiyun-data-studio', 'zhiyun-order-studio', 'zhiyun-integration-hub', 'zhiyun-data-core', 'zhiyun-audit', 'zhiyun-logo']
     const byId = new Map(payload.apps.map(app => [app.app_id, app]))
     const missing = required.filter(id => !byId.has(id))
     if (missing.length) return `应用目录缺少：${missing.join('、')}`
-    for (const id of ['zhiyun-data-studio', 'zhiyun-order-studio']) {
+    for (const id of ['zhiyun-data-studio', 'zhiyun-order-studio', 'zhiyun-integration-hub']) {
       const app = byId.get(id)
       if (app.install_status !== 'installed' || app.health !== 'available' || !app.version) return `${id}目录状态不真实`
     }
@@ -41,10 +43,14 @@ function validatePayload (id, payload) {
     return ''
   }
   if (id === 'zhiyun-data-core') {
-    return payload?.status === 'available' && payload?.schema_version === 1
+    return payload?.status === 'available' && payload?.schema_version === 2 && payload?.integrity === 'ok'
       ? '' : 'Data Core状态或schema_version异常'
   }
-  if (id === 'zhiyun-data-studio' || id === 'zhiyun-order-studio') {
+  if (id === 'zhiyun-audit') {
+    return payload?.status === 'available' && ['verified', 'empty'].includes(payload?.integrity)
+      ? '' : '审计日志完整性异常'
+  }
+  if (id === 'zhiyun-data-studio' || id === 'zhiyun-order-studio' || id === 'zhiyun-integration-hub') {
     return payload?.status === 'available' && typeof payload?.version === 'string' && payload.version.length > 0
       ? '' : '应用状态或版本缺失'
   }
@@ -82,7 +88,7 @@ function validateContracts (results) {
   const catalog = results.find(item => item.id === 'zhiyun-app-discovery')?.payload
   if (!catalog?.apps) return
   const versions = new Map(catalog.apps.map(app => [app.app_id, app.version]))
-  for (const id of ['zhiyun-data-studio', 'zhiyun-order-studio']) {
+  for (const id of ['zhiyun-data-studio', 'zhiyun-order-studio', 'zhiyun-integration-hub']) {
     const result = results.find(item => item.id === id)
     if (result?.status === 'pass' && result.payload?.version !== versions.get(id)) {
       result.status = 'fail'

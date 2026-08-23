@@ -45,7 +45,7 @@ node apps/qwenpaw-embedded/scripts/runtime-env.mjs --json
 AI_OS_OFFLINE=1 ./setup-ai-os.sh
 ```
 
-向其他机器交付离线缓存时，应通过受控发布包携带 `runtime/cache`，不要提交 Git；缓存必须与 `qwenpaw.lock.json` 同版本。
+向其他机器交付离线缓存时，应通过受控发布包携带 `runtime/cache`，不要提交 Git；缓存必须与 `qwenpaw.lock.json` 和 `pawapps.lock.json` 同版本。联网执行 PawApp 同步时会为每个正式锁定 SHA 生成 `runtime/cache/pawapps/*.bundle`。离线环境设置 `AI_OS_OFFLINE=1` 后，同步器只使用这些 bundle，不访问 GitHub；已有且 SHA 匹配的 PawApp 可直接复用。
 
 ## 一键启动
 

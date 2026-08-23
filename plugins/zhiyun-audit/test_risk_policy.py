@@ -29,6 +29,12 @@ class RiskPolicyTest(unittest.TestCase):
         self.assertFalse(assess("delete_file", {"path": "/tmp/report.csv"}).blocked)
         self.assertFalse(assess("execute_sql", {"sql": "DELETE FROM orders WHERE batch_id = ?"}).blocked)
 
+    def test_external_write_requires_explicit_confirmation(self):
+        blocked = assess("send_customer_email", {"to": "customer@example.com"})
+        self.assertTrue(blocked.blocked)
+        self.assertEqual(blocked.rule_id, "external-write.confirmation-required")
+        self.assertFalse(assess("send_customer_email", {"to": "customer@example.com", "confirmed": True}).blocked)
+
 
 if __name__ == "__main__":
     unittest.main()

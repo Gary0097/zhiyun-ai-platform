@@ -5,15 +5,22 @@
       "id": "zhiyun-data-studio",
       "repository": "https://github.com/Gary0097/zhiyun-data-studio.git",
       "ref": "main",
-      "commit": "4a586269e30d591295c1348a042479adeb570540",
+      "commit": "de291fed581e5c8d684379682351011a4be4c73a",
       "install_dir": "zhiyun-data-studio"
     },
     {
       "id": "zhiyun-order-studio",
       "repository": "https://github.com/Gary0097/zhiyun-order-studio.git",
       "ref": "main",
-      "commit": "e35312d35e5e306fa288d60ef7464294a1fef0a7",
+      "commit": "612b2a2b48ee8321da208b4aa7ebdbce22e6f939",
       "install_dir": "zhiyun-order-studio"
+    },
+    {
+      "id": "zhiyun-integration-hub",
+      "repository": "https://github.com/Gary0097/zhiyun-integration-hub.git",
+      "ref": "main",
+      "commit": "b0297c23dd9865cb6d3f565cc0253f47be223f60",
+      "install_dir": "zhiyun-integration-hub"
     }
   ]
 }

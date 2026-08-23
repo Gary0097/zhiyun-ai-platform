@@ -13,10 +13,10 @@ from fastapi import APIRouter, HTTPException, Query
 from qwenpaw.plugins.api import PluginApi
 
 try:
-    from .audit_store import list_events, persist, redact
+    from .audit_store import list_events, persist, redact, verify_integrity
     from .risk_policy import assess
 except ImportError:
-    from audit_store import list_events, persist, redact
+    from audit_store import list_events, persist, redact, verify_integrity
     from risk_policy import assess
 
 
@@ -25,6 +25,11 @@ class HighRiskOperationBlocked(RuntimeError):
 
 
 router = APIRouter()
+
+
+@router.get("/integrity")
+async def integrity() -> dict[str, Any]:
+    return verify_integrity(_workspace())
 
 
 @router.get("/events")

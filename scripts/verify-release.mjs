@@ -57,6 +57,7 @@ assert.ok(!start.includes('8390'), 'launcher must not start the retired service'
 const sync = readFileSync(join(scripts, 'sync-pawapps.mjs'), 'utf8')
 assert.ok(sync.includes("'.pawapp-commit'"), 'sync must use a materialization marker')
 assert.ok(sync.includes("rmSync(join(staging, '.git')"), 'sync must remove Git metadata before install')
+assert.ok(sync.includes('AI_OS_OFFLINE') && sync.includes("'bundle', 'create'"), 'sync must support verified PawApp offline bundles')
 const cleanup = readFileSync(join(scripts, 'cleanup-legacy.mjs'), 'utf8')
 assert.ok(cleanup.includes('QWENPAW_WORKING_DIR') && cleanup.includes('COPAW_WORKING_DIR'), 'cleanup must follow the QwenPaw working directory contract')
 for (const pluginId of ['cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']) {
@@ -94,6 +95,7 @@ const commands = [
   [process.execPath, [join(scripts, 'sync-pawapps.mjs'), '--check']],
   [process.execPath, [join(scripts, 'verify-deployment.mjs')]],
   [process.execPath, [join(scripts, 'verify-runtime.mjs')]],
+  [process.execPath, [join(scripts, 'verify-pawapp-offline.mjs')]],
   [process.execPath, [join(scripts, 'verify-maintenance.mjs')]],
 ]
 for (const [command, args] of commands) {
@@ -107,6 +109,8 @@ const phase0 = spawnSync(process.execPath, [join(root, 'scripts', 'verify-phase0
 assert.equal(phase0.status, 0, 'Phase 0 repository controls must stay complete')
 const phase1 = spawnSync(process.execPath, [join(root, 'scripts', 'verify-phase1-acceptance.mjs')], { cwd: root, stdio: 'inherit' })
 assert.equal(phase1.status, 0, 'Phase 1 PawApp acceptance candidate must stay consistent')
+const phase2 = spawnSync(process.execPath, [join(root, 'scripts', 'verify-phase2-acceptance.mjs')], { cwd: root, stdio: 'inherit' })
+assert.equal(phase2.status, 0, 'Phase 2 shared-foundations acceptance candidate must stay consistent')
 
 function pythonFiles (directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap(entry => {

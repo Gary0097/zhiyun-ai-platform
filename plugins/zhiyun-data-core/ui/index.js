@@ -50,9 +50,21 @@
     var previewState = React.useState(null);
     var preview = previewState[0];
     var setPreview = previewState[1];
+    var healthState = React.useState(null);
+    var health = healthState[0];
+    var setHealth = healthState[1];
+    var backupsState = React.useState([]);
+    var backups = backupsState[0];
+    var setBackups = backupsState[1];
 
     function loadEntities() {
       return request("/zhiyun-data-core/entities").then(function (data) { setEntities(data.entities || []); });
+    }
+
+    function loadOperations() {
+      return Promise.all([request("/zhiyun-data-core/health"), request("/zhiyun-data-core/backups")]).then(function (values) {
+        setHealth(values[0]); setBackups(values[1].backups || []);
+      });
     }
 
     function loadDataset(entity, sourceType) {
@@ -68,7 +80,21 @@
         .finally(function () { setLoading(false); });
     }
 
-    React.useEffect(function () { loadDataset(selected, source); }, [selected, source]);
+    React.useEffect(function () { loadDataset(selected, source); loadOperations(); }, [selected, source]);
+
+    function createBackup() {
+      request("/zhiyun-data-core/backups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) })
+        .then(function (result) { message.success("备份已创建并校验：" + result.name); return loadOperations(); })
+        .catch(function (reason) { message.error(reason.message || "备份失败"); });
+    }
+
+    function restoreBackup(name) {
+      antd.Modal.confirm({ title: "确认恢复 Data Core？", content: "恢复前会自动创建安全备份；现有 Workspace 文件不会删除。", okText: "确认恢复", okButtonProps: { danger: true }, onOk: function () {
+        return request("/zhiyun-data-core/backups/" + encodeURIComponent(name) + "/restore", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirmed: true }) })
+          .then(function (result) { message.success("恢复完成；安全备份：" + result.safety_backup); loadDataset(selected, source); return loadOperations(); })
+          .catch(function (reason) { message.error(reason.message || "恢复失败"); });
+      } });
+    }
 
     function simulate(entity) {
       setLoading(true); setError("");
@@ -131,10 +157,12 @@
             h("p", { style: { color: "#667085", marginTop: 0 } }, "查看各 PawApp 共享数据库中的表结构、真实数据与模拟数据。")),
           h("div", { style: { display: "flex", gap: 8 } },
             h(antd.Button, { onClick: function () { loadDataset(selected, source); } }, "刷新"),
+            h(antd.Button, { onClick: createBackup }, "创建校验备份"),
             h(antd.Button, { onClick: function () { setCreateOpen(true); } }, "新建数据表"),
             h(antd.Upload, { accept: ".xlsx,.csv", showUploadList: false, beforeUpload: upload }, h(antd.Button, { type: selected === "orders" ? "default" : "primary" }, "导入 Excel/CSV")),
             selected === "orders" || selected === "production" ? h(antd.Button, { type: "primary", onClick: function () { simulate(selected); }, loading: loading }, selected === "orders" ? "生成 20 条模拟订单" : "生成 20 条模拟生产数据") : null)
         ),
+        h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：集中管理所有智造云应用共享的数据、字段、导入批次、模拟数据、健康检查和安全备份。"), h("ol", null, h("li", null, "用“导入 Excel/CSV”导入真实业务数据并核对字段。"), h("li", null, "测试时可明确生成带来源标记的模拟数据，并可按批次撤销。"), h("li", null, "新增或调整字段请在字段管理中完成，核心字段受保护。"), h("li", null, "恢复备份前必须确认，系统会先创建安全备份。"))) }] }),
         error ? h(antd.Alert, { type: "error", showIcon: true, message: error, style: { marginBottom: 16 } }) : null,
         h(antd.Row, { gutter: [12, 12], style: { marginBottom: 16 } },
           [["数据表", entities.length], ["当前记录", current.record_count || 0], ["真实数据", current.real_count || 0], ["模拟数据", current.simulated_count || 0]].map(function (item) {
@@ -158,7 +186,18 @@
             { title: "必填", dataIndex: "required", render: function (value) { return value ? "是" : "否"; } },
             { title: "状态", dataIndex: "active", render: function (value) { return h(antd.Tag, { color: value ? "green" : "default" }, value ? "启用" : "停用"); } },
             { title: "内置字段", dataIndex: "built_in", render: function (value) { return value ? "是" : "否"; } }
-          ] }) }
+          ] }) },
+          { key: "operations", label: "健康与备份", children: h(React.Fragment, null,
+            h(antd.Alert, { type: health && health.status === "available" ? "success" : "error", showIcon: true,
+              message: health ? ("数据库完整性：" + health.integrity + "；Schema v" + health.schema_version + "；备份 " + health.backup_count + " 个") : "正在读取健康状态",
+              description: health && health.reason ? (health.reason + "；影响：" + health.impact) : "恢复操作会校验 SHA-256 并先创建安全备份。AES-GCM 加密备份可通过 API 指定密钥环境变量。", style: { marginBottom: 12 } }),
+            h(antd.Table, { rowKey: "name", size: "small", pagination: false, dataSource: backups, columns: [
+              { title: "备份", dataIndex: "name" }, { title: "时间", dataIndex: "created_at" },
+              { title: "加密", dataIndex: "encrypted", render: function (value) { return value ? "AES-GCM" : "否"; } },
+              { title: "校验", dataIndex: "verified", render: function (value) { return h(antd.Tag, { color: value ? "green" : "red" }, value ? "通过" : "失败"); } },
+              { title: "操作", key: "action", render: function (_, item) { return h(antd.Button, { danger: true, disabled: !item.verified || item.encrypted, onClick: function () { restoreBackup(item.name); } }, item.encrypted ? "通过 API 提供密钥恢复" : "恢复"); } }
+            ] })
+          ) }
         ] }),
         h(antd.Modal, { title: "新建部门数据表", width: 760, open: createOpen, onOk: createDataset, onCancel: function () { setCreateOpen(false); } },
           h(antd.Form, { form: schemaForm, layout: "vertical", initialValues: { fields: [{ name: "record_date", label: "日期", field_type: "date", required: true }] } },

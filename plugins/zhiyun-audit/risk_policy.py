@@ -85,6 +85,10 @@ def _dangerous_path(value: Any) -> bool:
 def assess(tool_name: str, tool_input: Any) -> RiskDecision:
     """Return a deterministic block decision without mutating input."""
     name = str(tool_name or "")
+    if re.search(r"(send|publish|upload|external.*write|write.*external|发送|发布|外部写入)", name, re.I):
+        confirmed = isinstance(tool_input, dict) and tool_input.get("confirmed") is True
+        if not confirmed:
+            return RiskDecision(True, "external-write.confirmation-required", "外部写入、发送或发布前必须由用户明确确认。")
     command = _command_text(tool_input)
     if command and (_SHELL_TOOL.search(name) or _SQL_TOOL.search(name) or isinstance(tool_input, dict)):
         for rule_id, reason, pattern in _RULES:

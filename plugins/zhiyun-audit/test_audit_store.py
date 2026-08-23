@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from audit_store import list_events, persist
+from audit_store import list_events, persist, redact, verify_integrity
 
 
 class AuditStoreTest(unittest.TestCase):
@@ -16,6 +16,8 @@ class AuditStoreTest(unittest.TestCase):
             audit = json.loads((root / "logs/audit.jsonl").read_text(encoding="utf-8"))
             self.assertEqual(runtime["tool_input"]["token"], "[REDACTED]")
             self.assertEqual(audit["trace_id"], "t-1")
+            self.assertEqual(audit["previous_hash"], "0" * 64)
+            self.assertEqual(len(audit["event_hash"]), 64)
             database = sqlite3.connect(root / "data/ai-os.sqlite")
             try:
                 row = database.execute("SELECT tool_name,status FROM audit_tool_call WHERE trace_id='t-1'").fetchone()
@@ -24,6 +26,24 @@ class AuditStoreTest(unittest.TestCase):
                 # Explicit close is required before TemporaryDirectory cleanup on Windows.
                 database.close()
             self.assertEqual(row, ("web_search", "success"))
+            self.assertEqual(verify_integrity(root)["integrity"], "verified")
+
+    def test_redacts_inline_credentials_and_personal_identifiers(self):
+        value = redact("Bearer abcdefghijklmnop user@example.com 13812345678 sk-abcdefghijklmnop")
+        self.assertNotIn("abcdefghijklmnop", value)
+        self.assertNotIn("user@example.com", value)
+        self.assertNotIn("13812345678", value)
+
+    def test_integrity_detects_tampering_and_accepts_legacy_prefix(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "logs").mkdir()
+            (root / "logs/audit.jsonl").write_text('{"legacy":true}\n', encoding="utf-8")
+            persist(root, {"trace_id": "t-1", "tool_name": "safe", "status": "success", "duration_ms": 1})
+            self.assertEqual(verify_integrity(root)["legacy_events"], 1)
+            text = (root / "logs/audit.jsonl").read_text(encoding="utf-8").replace('"safe"', '"changed"')
+            (root / "logs/audit.jsonl").write_text(text, encoding="utf-8")
+            self.assertEqual(verify_integrity(root)["status"], "degraded")
 
     def test_lists_bounded_filtered_metadata_without_tool_input(self):
         with tempfile.TemporaryDirectory() as directory:

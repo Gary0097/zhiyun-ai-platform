@@ -3,9 +3,9 @@
   "apps": [
     {
       "app_id": "zhiyun-data-studio",
-      "name": "Data Studio",
+      "name": "企业数据分析中心",
       "aliases": ["数据分析", "数据中枢", "销售BI", "经营看板", "sjfx", "data paw"],
-      "version": "0.9.0",
+      "version": "0.9.1",
       "category": "data",
       "install_status": "installed",
       "route": "/apps/zhiyun-data-studio",
@@ -23,9 +23,9 @@
     },
     {
       "app_id": "zhiyun-order-studio",
-      "name": "Order Studio",
+      "name": "智能订单中心",
       "aliases": ["订单中心", "合同订单", "ddzx", "订单处理"],
-      "version": "0.7.0",
+      "version": "0.7.1",
       "category": "order",
       "install_status": "installed",
       "route": "/apps/zhiyun-order-studio",
@@ -42,7 +42,7 @@
     },
     {
       "app_id": "zhiyun-service-studio",
-      "name": "Service Studio",
+      "name": "智能售后服务中心",
       "aliases": ["智能客服", "售后中心", "客服运营", "shkf"],
       "version": null,
       "category": "service",
@@ -60,7 +60,7 @@
     },
     {
       "app_id": "zhiyun-supply-studio",
-      "name": "Supply Studio",
+      "name": "采购与供应链中心",
       "aliases": ["采购管理", "供应链", "智能补货", "gyl"],
       "version": null,
       "category": "supply",
@@ -76,7 +76,7 @@
     },
     {
       "app_id": "zhiyun-sales-studio",
-      "name": "Sales Studio",
+      "name": "销售客户中心",
       "aliases": ["销售平台", "CRM", "客户关系", "xsfx"],
       "version": null,
       "category": "sales",
@@ -93,7 +93,7 @@
     },
     {
       "app_id": "zhiyun-finance-studio",
-      "name": "Finance Studio",
+      "name": "财务智能中心",
       "aliases": ["财务中枢", "报销审核", "财务票据", "cw"],
       "version": null,
       "category": "finance",
@@ -110,7 +110,7 @@
     },
     {
       "app_id": "zhiyun-people-studio",
-      "name": "People Studio",
+      "name": "组织协同中心",
       "aliases": ["管理协同", "组织人事", "通讯录", "审批", "hr"],
       "version": null,
       "category": "people",
@@ -129,22 +129,22 @@
     },
     {
       "app_id": "zhiyun-integration-hub",
-      "name": "Integration Hub",
+      "name": "系统集成中心",
       "aliases": ["系统集成", "接口中心", "ERP对接", "WMS对接", "jkzx"],
-      "version": null,
+      "version": "0.2.1",
       "category": "integration",
-      "install_status": "planned",
-      "route": null,
-      "repository_url": null,
+      "install_status": "installed",
+      "route": "/apps/zhiyun-integration-hub",
+      "repository_url": "https://github.com/Gary0097/zhiyun-integration-hub",
       "platforms": ["windows", "linux"],
-      "health": "not_developed",
+      "health": "available",
       "capabilities": [
         {"id": 29, "name": "现有系统数据接口开发", "keywords": ["ERP接口", "WMS接口", "系统对接", "开放API"], "questions": ["把智能体结果对接ERP"]}
       ]
     },
     {
       "app_id": "qwenpaw-knowledge-base",
-      "name": "Workspace Knowledge Base",
+      "name": "工作区知识库",
       "aliases": ["知识库", "知识工厂", "文件知识库", "workspace files", "knowledge base", "zsk"],
       "version": "2.1.0",
       "category": "knowledge",
@@ -173,13 +173,13 @@
     },
     {
       "app_id": "zhiyun-data-core",
-      "name": "Data Core",
+      "name": "统一数据中心",
       "aliases": ["统一数据库", "数据核心"],
-      "version": "0.6.0",
+      "version": "0.7.0",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",
-      "route": null,
+      "route": "/apps/data-core",
       "repository_url": null,
       "platforms": ["windows", "linux"],
       "health": "available",
@@ -187,9 +187,9 @@
     },
     {
       "app_id": "zhiyun-audit",
-      "name": "日志审计服务",
+      "name": "安全审计中心",
       "aliases": ["审计", "操作日志", "高风险操作"],
-      "version": "1.2.0",
+      "version": "1.3.0",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",

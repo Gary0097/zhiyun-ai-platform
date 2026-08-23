@@ -13,12 +13,15 @@ try:
     from .data_core import DataCore, DataCoreError, default_database
     from .agent_tools import build_agent_tools
     from .table_parser import parse_table
+    from .operations import DataCoreOperations, DataOperationError
 except ImportError:
     from data_core import DataCore, DataCoreError, default_database
     from agent_tools import build_agent_tools
     from table_parser import parse_table
+    from operations import DataCoreOperations, DataOperationError
 
 core = DataCore(default_database())
+operations = DataCoreOperations(core.database)
 router = APIRouter()
 MAX_UPLOAD = 20 * 1024 * 1024
 
@@ -59,6 +62,15 @@ class SimulationCreate(BaseModel):
     seed: int | None = None
 
 
+class BackupCreate(BaseModel):
+    key_env: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]{2,100}$")
+
+
+class BackupRestore(BaseModel):
+    confirmed: bool = False
+    key_env: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]{2,100}$")
+
+
 def _handle(action):
     try:
         return action()
@@ -68,7 +80,29 @@ def _handle(action):
 
 @router.get("/health")
 async def health() -> dict[str, Any]:
-    return {"status": "available", "database": str(core.database), "schema_version": 1}
+    return {**operations.health(), "version": "0.7.0", "database": str(core.database),
+            "migrations": core.migration_history()}
+
+
+@router.get("/backups")
+async def backups() -> dict[str, Any]:
+    return {"backups": operations.list_backups()}
+
+
+@router.post("/backups")
+async def create_backup(request: BackupCreate) -> dict[str, Any]:
+    try:
+        return operations.create_backup(key_env=request.key_env)
+    except DataOperationError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/backups/{name}/restore")
+async def restore_backup(name: str, request: BackupRestore) -> dict[str, Any]:
+    try:
+        return operations.restore_backup(name, confirmed=request.confirmed, key_env=request.key_env)
+    except DataOperationError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
 
 @router.get("/entities")
