@@ -49,11 +49,14 @@ class SearchEngineTests(unittest.TestCase):
         self.assertFalse(response["found"])
         self.assertEqual(response["results"], [])
 
-    def test_planned_capability_is_not_reported_available(self) -> None:
+    def test_testing_capability_is_launchable_for_acceptance(self) -> None:
         response = agent_response("识别发票并审核报销")
         self.assertTrue(response["found"])
-        self.assertFalse(response["available"])
-        self.assertIn("尚未交付", response["message"])
+        self.assertTrue(response["available"])
+        result = response["results"][0]
+        self.assertEqual(result["app_id"], "zhiyun-finance-studio")
+        self.assertEqual(result["matched_capability"]["delivery_status"], "testing")
+        self.assertIn("实机验收", response["message"])
 
     def test_accepted_phase1_capability_is_available(self) -> None:
         response = agent_response("处理延期和投诉复合异常")
@@ -97,11 +100,11 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual([item["id"] for item in ledger["features"]], list(range(1, 32)))
         summary = progress_summary(ledger)
         self.assertEqual(summary["total"], 31)
-        self.assertEqual(summary["testing"], 0)
+        self.assertEqual(summary["testing"], 17)
         self.assertEqual(summary["in_progress"], 1)
-        self.assertEqual(summary["planned"], 17)
+        self.assertEqual(summary["planned"], 0)
         self.assertEqual(summary["completed"], 13)
-        self.assertEqual(summary["overall_progress"], 43)
+        self.assertEqual(summary["overall_progress"], 93)
 
 
 if __name__ == "__main__":

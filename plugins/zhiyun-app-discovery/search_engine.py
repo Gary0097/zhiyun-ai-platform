@@ -12,6 +12,7 @@ from typing import Any, Iterable
 CATALOG_FILE = Path(__file__).with_name("app_catalog.json")
 PROGRESS_FILE = Path(__file__).with_name("feature_progress.json")
 DELIVERY_STATUSES = {"planned", "in_progress", "testing", "completed"}
+LAUNCHABLE_STATUSES = {"completed", "testing"}
 
 SYNONYMS = {
     "订单风险": ["交付风险", "延期概率", "高风险订单"],
@@ -146,7 +147,10 @@ def search_apps(
             continue
         app_matches.sort(key=lambda item: (-item["score"], item["capability_id"] or 0))
         top = app_matches[0]
-        capability_available = app.get("install_status") == "installed" and top["delivery_status"] == "completed"
+        capability_available = (
+            app.get("install_status") == "installed"
+            and top["delivery_status"] in LAUNCHABLE_STATUSES
+        )
         installed_bonus = 5.0 if capability_available else 0.0
         results.append({
             "app_id": app["app_id"],
@@ -170,19 +174,27 @@ def search_apps(
 def agent_response(query: str, limit: int = 3) -> dict[str, Any]:
     """Return an Agent-safe response sourced only from the real catalog."""
     results = search_apps(query, limit=limit)
-    available = any(item["available"] for item in results)
+    accepted = any(
+        item["available"] and item["matched_capability"]["delivery_status"] == "completed"
+        for item in results
+    )
+    testing = any(
+        item["available"] and item["matched_capability"]["delivery_status"] == "testing"
+        for item in results
+    )
+    available = accepted or testing
+    if accepted:
+        message = "已从真实应用能力索引找到已验收可用应用。"
+    elif testing:
+        message = "已找到可启动测试的应用，请前往对应应用页进行实机验收。"
+    elif results:
+        message = "找到对应应用或规划能力，但匹配功能尚未交付，当前不可用。"
+    else:
+        message = "真实应用目录中暂无匹配能力，不会虚构应用。"
     return {
         "query": query,
         "found": bool(results),
         "available": available,
         "results": results,
-        "message": (
-            "已从真实应用能力索引找到可用应用。"
-            if available
-            else (
-                "找到对应应用或规划能力，但匹配功能尚未交付，当前不可用。"
-                if results
-                else "真实应用目录中暂无匹配能力，不会虚构应用。"
-            )
-        ),
+        "message": message,
     }
