@@ -67,7 +67,7 @@ administrator and cannot be represented by a source commit.
 3. Validate application discovery, offline fallback, dependency health, data
    backup/recovery, migrations, and semantic runtime health end to end.
 
-The Phase 2 implementation candidate uses the system integration center v0.2.0, Data Core
+The Phase 2 implementation candidate uses the system integration center v0.2.1, Data Core
 v0.7.0 and Audit v1.3.0. Capabilities 29 and 31 remain `testing` until live user
 acceptance; installed state alone does not make them available.
 

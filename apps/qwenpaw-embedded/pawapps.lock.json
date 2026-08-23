@@ -19,7 +19,7 @@
       "id": "zhiyun-integration-hub",
       "repository": "https://github.com/Gary0097/zhiyun-integration-hub.git",
       "ref": "main",
-      "commit": "abad579ab8a47acd2a6c77df6aeac7b100e65591",
+      "commit": "b0297c23dd9865cb6d3f565cc0253f47be223f60",
       "install_dir": "zhiyun-integration-hub"
     }
   ]

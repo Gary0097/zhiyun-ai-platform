@@ -131,7 +131,7 @@
       "app_id": "zhiyun-integration-hub",
       "name": "系统集成中心",
       "aliases": ["系统集成", "接口中心", "ERP对接", "WMS对接", "jkzx"],
-      "version": "0.2.0",
+      "version": "0.2.1",
       "category": "integration",
       "install_status": "installed",
       "route": "/apps/zhiyun-integration-hub",

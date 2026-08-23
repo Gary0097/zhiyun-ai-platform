@@ -82,7 +82,7 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual(apps["zhiyun-data-core"]["version"], "0.7.0")
         self.assertEqual(apps["zhiyun-audit"]["version"], "1.3.0")
         self.assertEqual(apps["zhiyun-audit"]["route"], "/apps/audit")
-        self.assertEqual(apps["zhiyun-integration-hub"]["version"], "0.2.0")
+        self.assertEqual(apps["zhiyun-integration-hub"]["version"], "0.2.1")
         self.assertEqual(apps["zhiyun-integration-hub"]["install_status"], "installed")
 
     def test_unaccepted_integration_capability_is_not_available(self) -> None:

@@ -4,8 +4,9 @@ Issue: `Gary0097/zhiyun-ai-platform#74`
 
 ## Formal external merge
 
-System Integration Center PR #5 added the guided Chinese workflow and was
-manually merged as `abad579ab8a47acd2a6c77df6aeac7b100e65591` (v0.2.0).
+System Integration Center PR #6 added automatic UTF-8, GBK/GB18030 and UTF-16 CSV decoding
+on top of the guided Chinese workflow and was manually merged as
+`b0297c23dd9865cb6d3f565cc0253f47be223f60` (v0.2.1).
 It replaces handwritten connector and mapping JSON with source-specific forms
 and automatic field matching. The platform lock uses only this formal SHA.
 
