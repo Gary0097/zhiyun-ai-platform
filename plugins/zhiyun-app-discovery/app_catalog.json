@@ -48,7 +48,7 @@
       "category": "service",
       "install_status": "installed",
       "route": "/apps/zhiyun-service-studio",
-      "repository_url": null,
+      "repository_url": "https://github.com/Gary0097/zhiyun-service-studio",
       "platforms": ["windows", "linux"],
       "health": "available",
       "capabilities": [
@@ -66,7 +66,7 @@
       "category": "supply",
       "install_status": "installed",
       "route": "/apps/zhiyun-supply-studio",
-      "repository_url": null,
+      "repository_url": "https://github.com/Gary0097/zhiyun-supply-studio",
       "platforms": ["windows", "linux"],
       "health": "available",
       "capabilities": [
@@ -82,7 +82,7 @@
       "category": "sales",
       "install_status": "installed",
       "route": "/apps/zhiyun-sales-studio",
-      "repository_url": null,
+      "repository_url": "https://github.com/Gary0097/zhiyun-sales-studio",
       "platforms": ["windows", "linux"],
       "health": "available",
       "capabilities": [
@@ -99,7 +99,7 @@
       "category": "finance",
       "install_status": "installed",
       "route": "/apps/zhiyun-finance-studio",
-      "repository_url": null,
+      "repository_url": "https://github.com/Gary0097/zhiyun-finance-studio",
       "platforms": ["windows", "linux"],
       "health": "available",
       "capabilities": [
@@ -116,7 +116,7 @@
       "category": "people",
       "install_status": "installed",
       "route": "/apps/zhiyun-people-studio",
-      "repository_url": null,
+      "repository_url": "https://github.com/Gary0097/zhiyun-people-studio",
       "platforms": ["windows", "linux"],
       "health": "available",
       "capabilities": [

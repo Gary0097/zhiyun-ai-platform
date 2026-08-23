@@ -19,14 +19,15 @@ into this repository only through pinned commits.
 As of the ledger date, the plan contains 31 capabilities:
 
 - 13 completed;
-- 1 in development;
-- 0 in testing; and
-- 17 planned.
+- 17 in testing at 90%; and
+- 1 in development.
 
 Therefore the product is not complete. Percentages are planning indicators, not
 acceptance evidence. A capability becomes `completed` only at 100% after its
 real-data path, UI, backend, Agent tools, persistence, error/empty states,
 platform checks, and issue acceptance criteria have passed.
+An entry marked `testing` is available on the running platform for user
+acceptance but is not yet claimed as delivered.
 
 ## Repository Ownership
 
@@ -35,7 +36,11 @@ platform checks, and issue acceptance criteria have passed.
 | QwenPaw runtime, launchers, Data Core, audit, app discovery | `Gary0097/zhiyun-ai-platform` | Direct release gate |
 | Features 1–6 | `Gary0097/zhiyun-data-studio` | Update `pawapps.lock.json` after its PR is merged |
 | Features 7–11 | `Gary0097/zhiyun-order-studio` | Update `pawapps.lock.json` after its PR is merged |
-| Future business studios | A dedicated PawApp repository per studio | Add catalog metadata and a full-SHA lock only after an installable release exists |
+| Features 12–15 | `Gary0097/zhiyun-service-studio` | Published as a PawApp and pinned by full SHA in `pawapps.lock.json` |
+| Features 16 and 30 | `Gary0097/zhiyun-supply-studio` | Published as a PawApp and pinned by full SHA in `pawapps.lock.json` |
+| Features 17–19 | `Gary0097/zhiyun-sales-studio` | Published as a PawApp and pinned by full SHA in `pawapps.lock.json` |
+| Features 20–22 | `Gary0097/zhiyun-finance-studio` | Published as a PawApp and pinned by full SHA in `pawapps.lock.json` |
+| Features 23, 24, 26–28 | `Gary0097/zhiyun-people-studio` | Published as a PawApp and pinned by full SHA in `pawapps.lock.json` |
 
 Generated runtime copies under `apps/qwenpaw-embedded/runtime/pawapps` are never
 development sources.
@@ -72,19 +77,23 @@ Data Core v0.7.0 and Audit v1.3.0. Capabilities 29 and 31 passed live user
 acceptance on 2026-08-23 and are available; installed state alone still does not
 make any other capability available.
 
-### Phase 3 — Add future PawApps by business value
+### Phase 3 — Publish and exercise the five studio PawApps
 
-Build one installable PawApp and one accepted capability at a time:
+The five business studios are published as installable PawApps and pinned by
+full SHA in `pawapps.lock.json`, so a fresh launch materializes and registers
+them:
 
-1. Service Studio (features 12–15).
-2. Supply Studio (features 16 and 30).
-3. Sales Studio (features 17–19).
-4. Finance Studio (features 20–22).
-5. People Studio (features 23, 24, and 26–28).
-6. Complete the Workspace knowledge workflow (feature 25).
+1. Service Studio (features 12–15), version 0.1.0.
+2. Supply Studio (features 16 and 30), version 0.1.0.
+3. Sales Studio (features 17–19), version 0.1.0.
+4. Finance Studio (features 20–22), version 0.1.0.
+5. People Studio (features 23, 24, and 26–28), version 0.1.0.
+6. Workspace knowledge workflow (feature 25) remains in development.
 
-Each new studio requires its own repository, manifest, tests, application card,
-health contract, versioned data contract, rollback method, and locked full SHA.
+Each studio has its own repository, manifest, tests, application card, health
+contract, versioned data contract, rollback method, and locked full SHA. They
+are currently `testing` because they await user machine acceptance before being
+marked `completed`.
 
 ## Per-Capability Definition of Done
 

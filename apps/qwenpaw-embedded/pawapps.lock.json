@@ -21,6 +21,41 @@
       "ref": "main",
       "commit": "b0297c23dd9865cb6d3f565cc0253f47be223f60",
       "install_dir": "zhiyun-integration-hub"
+    },
+    {
+      "id": "zhiyun-service-studio",
+      "repository": "https://github.com/Gary0097/zhiyun-service-studio.git",
+      "ref": "main",
+      "commit": "8d15703d00b919fa851ccf6648c31189a4112a2a",
+      "install_dir": "zhiyun-service-studio"
+    },
+    {
+      "id": "zhiyun-supply-studio",
+      "repository": "https://github.com/Gary0097/zhiyun-supply-studio.git",
+      "ref": "main",
+      "commit": "fd3b673d78dfb80a455f4d3c286a2a64308a4e7a",
+      "install_dir": "zhiyun-supply-studio"
+    },
+    {
+      "id": "zhiyun-sales-studio",
+      "repository": "https://github.com/Gary0097/zhiyun-sales-studio.git",
+      "ref": "main",
+      "commit": "5d0057d25d9d62b194c9cc111efd135950869862",
+      "install_dir": "zhiyun-sales-studio"
+    },
+    {
+      "id": "zhiyun-finance-studio",
+      "repository": "https://github.com/Gary0097/zhiyun-finance-studio.git",
+      "ref": "main",
+      "commit": "55a8521554c98d208db38a6a76ca3b3e4a93820e",
+      "install_dir": "zhiyun-finance-studio"
+    },
+    {
+      "id": "zhiyun-people-studio",
+      "repository": "https://github.com/Gary0097/zhiyun-people-studio.git",
+      "ref": "main",
+      "commit": "77048adba501a9aeef394740bfe107cbf0ed376a",
+      "install_dir": "zhiyun-people-studio"
     }
   ]
 }
