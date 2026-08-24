@@ -16,6 +16,20 @@ const runtime = resolveRuntime()
 const launchEnv = runtimeEnvironment(runtime)
 const qwenpawCommand = runtime.command || 'qwenpaw'
 
+// Point every Studio backend at a writable, shared runtime data directory so
+// module runs never fall back to a read-only per-user path.
+const runtimeData = join(repoRoot, '..', '.qwenpaw-runtime-data')
+Object.assign(launchEnv, {
+  QWENPAW_WORKING_DIR: join(appRoot, 'workspace'),
+  SERVICE_STUDIO_DB: join(runtimeData, 'zhiyun-service-studio', 'service.db'),
+  SUPPLY_STUDIO_DB: join(runtimeData, 'zhiyun-supply-studio', 'supply.db'),
+  SALES_STUDIO_DB: join(runtimeData, 'zhiyun-sales-studio', 'sales.db'),
+  FINANCE_STUDIO_DB: join(runtimeData, 'zhiyun-finance-studio', 'finance.db'),
+  PEOPLE_STUDIO_DB: join(runtimeData, 'zhiyun-people-studio', 'people.db'),
+  DATA_STUDIO_DB: join(runtimeData, 'zhiyun-data-studio', 'insights.db'),
+  ORDER_STUDIO_DB: join(runtimeData, 'zhiyun-order-studio', 'orders.db')
+})
+
 function run (command, args, hint, capture = false) {
   const result = spawnSync(command, args, {
     cwd: repoRoot,
