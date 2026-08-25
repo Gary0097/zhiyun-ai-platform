@@ -18,7 +18,7 @@
     "pawapp": {
       "icon": "🔎",
       "category": "system",
-      "entry_page": "/apps/app-discovery",
+      "entry_page": "/apps/zhiyun-app-discovery",
       "launch_scope": "page"
     },
     "permissions": {

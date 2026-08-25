@@ -18,7 +18,7 @@
     "pawapp": {
       "icon": "🛡️",
       "category": "system",
-      "entry_page": "/apps/audit",
+      "entry_page": "/apps/zhiyun-audit",
       "launch_scope": "page"
     },
     "permissions": {

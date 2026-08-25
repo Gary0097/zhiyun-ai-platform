@@ -5,6 +5,65 @@
   var antd = Q.host.antd;
   var h = React.createElement;
 
+  function zySpark() { return h("span", { style: { fontSize: 13 } }, "✦"); }
+  function zyPushAgent(ctx) {
+    if (Q.setAgentContext) Q.setAgentContext(ctx);
+    else window.dispatchEvent(new CustomEvent("qwenpaw:agent-context", { detail: ctx }));
+  }
+  function AgentDock(props) {
+    var listRef = React.useRef(null);
+    React.useEffect(function () {
+      if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+    }, [props.messages]);
+    if (!props.open) return null;
+    var S = {
+      mask: { position: "fixed", inset: 0, background: "rgba(15,23,42,0.32)", zIndex: 1200 },
+      dock: { position: "fixed", top: 0, right: 0, bottom: 0, width: "min(420px,92vw)", background: "#ffffff", borderLeft: "1px solid #e3e8ef", boxShadow: "-10px 0 30px rgba(16,24,40,0.16)", zIndex: 1201, display: "flex", flexDirection: "column" },
+      chat: { display: "flex", flexDirection: "column", height: "100%" },
+      head: { padding: "14px 16px", background: "#ffffff", borderBottom: "1px solid #e3e8ef" },
+      close: { border: "none", background: "transparent", cursor: "pointer", fontSize: 18, lineHeight: 1, color: "#98a2b3", padding: "4px 8px", borderRadius: 6 },
+      list: { flex: "1 1 auto", overflow: "auto", padding: 16 },
+      msg: { display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 },
+      bubble: { maxWidth: "92%", padding: "10px 12px", borderRadius: 11, fontSize: "12.5px", lineHeight: 1.6, boxShadow: "0 1px 2px rgba(16,24,40,0.04)", whiteSpace: "pre-wrap" },
+      card: { maxWidth: "92%", background: "#ffffff", border: "1px solid #e3e8ef", borderRadius: 11, padding: "12px 14px", boxShadow: "0 1px 2px rgba(16,24,40,0.04)", fontSize: 12.5 },
+      input: { padding: "12px 14px", background: "#ffffff", borderTop: "1px solid #e3e8ef" },
+      chips: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 },
+      chip: { border: "1px solid #e3e8ef", background: "#ffffff", borderRadius: 999, padding: "6px 12px", fontSize: 12, color: "#5b6472", cursor: "pointer" }
+    };
+    return h("div", null,
+      h("div", { style: S.mask, onClick: props.onClose }),
+      h("div", { style: S.dock },
+        h("div", { style: S.chat },
+          h("div", { style: S.head },
+            h("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 } },
+              h("span", { style: { fontWeight: 650, fontSize: 15, color: "#1f2933" } }, "智能体助手 · " + (props.moduleLabel || "")),
+              h("button", { "aria-label": "关闭", onClick: props.onClose, style: S.close }, "✕")
+            ),
+            h("div", { style: { fontSize: 12, color: "#5b6472", marginTop: 8, lineHeight: 1.5 } }, "直接打字告诉我要做什么，或点击下方快捷指令，自动载入示例并交给智能体处理。"),
+            h("div", { style: S.chips },
+              (props.chips || []).map(function (c) {
+                return h("span", { key: c.key, style: S.chip, onClick: function () { props.onCommand(c.key, c.label); } }, c.label);
+              })
+            )
+          ),
+          h("div", { style: S.list, ref: listRef },
+            (props.messages || []).map(function (msg, i) {
+              var user = msg.role === "user";
+              return h("div", { key: i, style: Object.assign({}, S.msg, user ? { alignItems: "flex-end" } : { alignItems: "flex-start" }) },
+                h("div", { style: Object.assign({}, S.bubble, user ? { background: "#2563eb", color: "#fff", borderBottomRightRadius: 3 } : { background: "#ffffff", border: "1px solid #e3e8ef", color: "#1f2933", borderBottomLeftRadius: 3 }) }, msg.text),
+                msg.card ? h("div", { style: S.card }, msg.card) : null
+              );
+            })
+          ),
+          h("div", { style: S.input },
+            h(antd.Input, { value: props.draft, placeholder: props.placeholder || "例如：帮我找交付风险应用", onChange: function (e) { props.setDraft(e.target.value); }, onPressEnter: function (e) { if (props.draft.trim()) { props.onSend(props.draft); e.preventDefault(); } } }),
+            h(antd.Button, { type: "primary", style: { marginTop: 10, width: "100%" }, loading: props.busy, onClick: function () { if (props.draft.trim()) props.onSend(props.draft); } }, "发送")
+          )
+        )
+      )
+    );
+  }
+
   function getJson(path) {
     return Q.host.fetch(path).then(function (response) {
       if (!response.ok) throw new Error("HTTP " + response.status);
@@ -13,7 +72,7 @@
   }
 
   function statusLabel(status) {
-    return ({ installed: "已安装", planned: "未开发", in_progress: "开发中", testing: "测试中", completed: "已完成" })[status] || status;
+    return ({ installed: "已安装", planned: "未开发", in_progress: "开发中", testing: "验证中", completed: "已完成" })[status] || status;
   }
 
   function statusColor(status) {
@@ -125,6 +184,31 @@
     var errorState = React.useState("");
     var error = errorState[0];
     var setError = errorState[1];
+    var agentOpenState = React.useState(false), agentOpen = agentOpenState[0], setAgentOpen = agentOpenState[1];
+    var agentDraftState = React.useState(""), agentDraft = agentDraftState[0], setAgentDraft = agentDraftState[1];
+    var agentMsgState = React.useState([]), agentMessages = agentMsgState[0], setAgentMessages = agentMsgState[1];
+    var agentBusyState = React.useState(false), agentBusy = agentBusyState[0], setAgentBusy = agentBusyState[1];
+    function agentAdd(role, text, card) { setAgentMessages(function (prev) { return prev.concat([{ role: role, text: text, card: card }]); }); }
+    function agentCommand(key, label) {
+      agentAdd("user", label || key);
+      setAgentBusy(true);
+      setTimeout(function () {
+        zyPushAgent({ app_id: "zhiyun-app-discovery", kind: key, label: label || key, summary: { apps: apps, progress: progress }, source_type: "real" });
+        setAgentBusy(false);
+        var text = key === "search" ? "已打开能力检索，可在应用搜索页输入业务问题查找对应应用。" : key === "progress" ? "已汇总 31 项 PRD 交付进度，可在项目进度页查看完成与验证中功能。" : "已定位至我的应用，当前已安装应用可一键打开使用。";
+        agentAdd("bot", text, null);
+      }, 240);
+    }
+    function agentSend(text) {
+      agentAdd("user", text);
+      setAgentBusy(true);
+      var key = /进度|完成|开发/.test(text) ? "progress" : (/我的|安装|打开/.test(text) ? "mine" : "search");
+      setTimeout(function () {
+        zyPushAgent({ app_id: "zhiyun-app-discovery", kind: key, label: text, summary: { apps: apps, progress: progress }, source_type: "real" });
+        setAgentBusy(false);
+        agentAdd("bot", "已将「" + text + "」交给应用中心智能体，可到对应 Tab 查看结果。", null);
+      }, 240);
+    }
     React.useEffect(function () {
       Promise.all([getJson("/zhiyun-app-discovery/catalog"), getJson("/zhiyun-app-discovery/progress")])
         .then(function (values) { setApps(values[0].apps || []); setProgress(values[1]); })
@@ -137,14 +221,18 @@
     ];
     return h("div", { style: { padding: 28, height: "100%", overflow: "auto", background: "#f7f8fa" } },
       h("div", { style: { maxWidth: 1280, margin: "0 auto" } },
-        h("h2", { style: { marginBottom: 4 } }, "应用与项目中心"),
-        h("p", { style: { color: "#667085", marginTop: 0 } }, "真实应用入口、能力检索和 31 项 PRD 交付进度。"),
+        h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 } },
+          h("div", null,
+            h("h2", { style: { marginBottom: 4 } }, "应用与项目中心"),
+            h("p", { style: { color: "#667085", marginTop: 0 } }, "真实应用入口、能力检索和 31 项 PRD 交付进度。")),
+          h(antd.Button, { type: "primary", onClick: function () { setAgentOpen(true); } }, zySpark(), " 问 Agent")),
         h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：按中文名称、业务功能或自然语言需求查找真实已登记应用，并区分已安装与功能已交付。"), h("ol", null, h("li", null, "在“我的应用”输入要解决的业务问题。"), h("li", null, "查看匹配功能、原因、健康和安装状态。"), h("li", null, "只有已验收能力才会显示可用；计划中功能不会被虚构为可用。"))) }] }),
         error ? h(antd.Alert, { type: "error", message: error, showIcon: true, style: { marginBottom: 16 } }) : null,
-        h(antd.Tabs, { defaultActiveKey: "mine", items: items })
+        h(antd.Tabs, { defaultActiveKey: "mine", items: items }),
+        h(AgentDock, { open: agentOpen, onClose: function () { setAgentOpen(false); }, moduleLabel: "应用与项目中心", chips: [{ key: "mine", label: "我的应用" }, { key: "search", label: "能力检索" }, { key: "progress", label: "查看进度" }], messages: agentMessages, draft: agentDraft, setDraft: setAgentDraft, busy: agentBusy, onSend: agentSend, onCommand: agentCommand })
       )
     );
   }
 
-  Q.registerRoutes("zhiyun-app-discovery", [{ path: "/apps/app-discovery", component: AppCenter, label: "应用与进度", icon: "🧭", priority: 80 }]);
+  Q.registerRoutes("zhiyun-app-discovery", [{ path: "/apps/zhiyun-app-discovery", component: AppCenter, label: "应用与进度", icon: "🧭", priority: 80 }]);
 })();

@@ -71,6 +71,26 @@ class BackupRestore(BaseModel):
     key_env: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]{2,100}$")
 
 
+class ContextSet(BaseModel):
+    env_id: str | None = None
+    data_mode: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+
+def _mode_q(value: str | None) -> str | None:
+    """Map an optional data environment query param; empty means 'all'."""
+    if value is None or value == "":
+        return None
+    return value
+
+
+def _mode_required(value: str | None) -> str:
+    """Normalize a data environment query for writes, defaulting to demo."""
+    if value is None or value == "":
+        return "demo"
+    return value
+
+
 def _handle(action):
     try:
         return action()
@@ -80,7 +100,7 @@ def _handle(action):
 
 @router.get("/health")
 async def health() -> dict[str, Any]:
-    return {**operations.health(), "version": "0.7.0", "database": str(core.database),
+    return {**operations.health(), "version": "0.8.0", "database": str(core.database),
             "migrations": core.migration_history()}
 
 
@@ -105,9 +125,27 @@ async def restore_backup(name: str, request: BackupRestore) -> dict[str, Any]:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
 
 
+@router.get("/context")
+async def read_context() -> dict[str, Any]:
+    return {"context": core.get_context()}
+
+
+@router.put("/context")
+async def write_context(request: ContextSet) -> dict[str, Any]:
+    return _handle(
+        lambda: {
+            "context": core.set_context(
+                env_id=request.env_id or "",
+                data_mode=request.data_mode or "",
+                start_date=request.start_date or "",
+                end_date=request.end_date or "",
+            )
+        }
+    )
+
 @router.get("/entities")
-async def entities() -> dict[str, Any]:
-    return {"entities": core.list_entities()}
+async def entities(data_mode: str | None = Query(default=None, max_length=20)) -> dict[str, Any]:
+    return {"entities": core.list_entities(data_mode=_mode_q(data_mode))}
 
 
 @router.post("/parse")
@@ -157,25 +195,32 @@ async def preview_import(entity: str, request: ImportPreview) -> dict[str, Any]:
 
 
 @router.post("/imports/{entity}/commit")
-async def commit_import(entity: str, request: ImportPreview) -> dict[str, Any]:
+async def commit_import(
+    entity: str, request: ImportPreview, data_mode: str | None = Query(default=None, max_length=20)
+) -> dict[str, Any]:
     return _handle(
         lambda: core.import_rows(
             entity,
             request.rows,
             mapping=request.mapping,
             source_name=request.source_name,
+            data_mode=_mode_required(data_mode),
         )
     )
 
 
 @router.post("/simulate/orders")
-async def simulate_orders(request: SimulationCreate) -> dict[str, Any]:
-    return _handle(lambda: core.generate_orders(request.count, request.seed))
+async def simulate_orders(
+    request: SimulationCreate, data_mode: str | None = Query(default=None, max_length=20)
+) -> dict[str, Any]:
+    return _handle(lambda: core.generate_orders(request.count, request.seed, data_mode=_mode_required(data_mode)))
 
 
 @router.post("/simulate/production")
-async def simulate_production(request: SimulationCreate) -> dict[str, Any]:
-    return _handle(lambda: core.generate_production(request.count, request.seed))
+async def simulate_production(
+    request: SimulationCreate, data_mode: str | None = Query(default=None, max_length=20)
+) -> dict[str, Any]:
+    return _handle(lambda: core.generate_production(request.count, request.seed, data_mode=_mode_required(data_mode)))
 
 
 @router.get("/records/{entity}")
@@ -183,14 +228,23 @@ async def records(
     entity: str,
     limit: int = Query(default=100, ge=1, le=1000),
     source_type: str | None = None,
+    data_mode: str | None = Query(default=None, max_length=20),
+    start_date: str | None = Query(default=None, max_length=16),
+    end_date: str | None = Query(default=None, max_length=16),
 ) -> dict[str, Any]:
     return _handle(
         lambda: {
             "entity": entity,
-            "records": core.list_records(entity, limit=limit, source_type=source_type),
+            "records": core.list_records(
+                entity,
+                limit=limit,
+                source_type=source_type,
+                data_mode=_mode_q(data_mode),
+                start_date=start_date,
+                end_date=end_date,
+            ),
         }
     )
-
 
 @router.get("/orders")
 async def orders(
@@ -199,6 +253,9 @@ async def orders(
     customer_name: str = Query(default="", max_length=200),
     status: str = Query(default="", max_length=200),
     source_type: str | None = Query(default=None),
+    data_mode: str | None = Query(default=None, max_length=20),
+    start_date: str | None = Query(default=None, max_length=16),
+    end_date: str | None = Query(default=None, max_length=16),
     limit: int = Query(default=100, ge=1, le=200),
 ) -> dict[str, Any]:
     """Expose the bounded order query contract used by business PawApps."""
@@ -217,6 +274,9 @@ async def orders(
             keyword=keyword,
             filters=filters,
             source_type=source_type,
+            data_mode=_mode_q(data_mode),
+            start_date=start_date,
+            end_date=end_date,
             limit=limit,
         )
         return {
@@ -225,14 +285,18 @@ async def orders(
             "keyword": keyword,
             "filters": filters,
             "source_type": source_type,
+            "data_mode": data_mode,
+            "start_date": start_date,
+            "end_date": end_date,
             "records": records,
         }
     return _handle(query)
 
-
 @router.get("/batches")
-async def batches(entity: str | None = None) -> dict[str, Any]:
-    return {"batches": core.list_batches(entity)}
+async def batches(
+    entity: str | None = None, data_mode: str | None = Query(default=None, max_length=20)
+) -> dict[str, Any]:
+    return {"batches": core.list_batches(entity, data_mode=_mode_q(data_mode))}
 
 
 @router.post("/batches/{batch_id}/rollback")
@@ -256,14 +320,14 @@ class DataCorePlugin:
         api.register_tool(
             tool_name="generate_simulated_production",
             tool_func=lambda count=60, seed=None: core.generate_production(count, seed),
-            description="按用户明确要求生成可撤销的模拟生产日报，用于测试部门人效、成本和损耗指标。",
+            description="按用户明确要求生成可撤销的演示生产日报，用于测试部门人效、成本和损耗指标。",
             icon="🏭",
             tool_type="internal",
         )
         api.register_tool(
             tool_name="generate_simulated_orders",
             tool_func=simulate_orders_tool,
-            description="按用户明确要求生成可撤销的模拟订单数据，并返回批次 ID。",
+            description="按用户明确要求生成可撤销的演示订单数据，并返回批次 ID。",
             icon="🧪",
             tool_type="internal",
         )

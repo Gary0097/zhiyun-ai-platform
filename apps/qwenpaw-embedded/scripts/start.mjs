@@ -11,10 +11,26 @@ const auditPlugin = join(repoRoot, 'plugins', 'zhiyun-audit')
 const logoPlugin = join(repoRoot, 'plugins', 'zhiyun-logo')
 const appDiscoveryPlugin = join(repoRoot, 'plugins', 'zhiyun-app-discovery')
 const dataCorePlugin = join(repoRoot, 'plugins', 'zhiyun-data-core')
+const authPlugin = join(repoRoot, 'plugins', 'zhiyun-auth')
+const enterpriseSeederPlugin = join(repoRoot, 'plugins', 'zhiyun-enterprise-seeder')
 const pawappsLock = join(appRoot, 'pawapps.lock.json')
 const runtime = resolveRuntime()
 const launchEnv = runtimeEnvironment(runtime)
 const qwenpawCommand = runtime.command || 'qwenpaw'
+
+// Point every Studio backend at a writable, shared runtime data directory so
+// module runs never fall back to a read-only per-user path.
+const runtimeData = join(repoRoot, '..', '.qwenpaw-runtime-data')
+Object.assign(launchEnv, {
+  QWENPAW_WORKING_DIR: join(appRoot, 'workspace'),
+  SERVICE_STUDIO_DB: join(runtimeData, 'zhiyun-service-studio', 'service.db'),
+  SUPPLY_STUDIO_DB: join(runtimeData, 'zhiyun-supply-studio', 'supply.db'),
+  SALES_STUDIO_DB: join(runtimeData, 'zhiyun-sales-studio', 'sales.db'),
+  FINANCE_STUDIO_DB: join(runtimeData, 'zhiyun-finance-studio', 'finance.db'),
+  PEOPLE_STUDIO_DB: join(runtimeData, 'zhiyun-people-studio', 'people.db'),
+  DATA_STUDIO_DB: join(runtimeData, 'zhiyun-data-studio', 'insights.db'),
+  ORDER_STUDIO_DB: join(runtimeData, 'zhiyun-order-studio', 'orders.db')
+})
 
 function run (command, args, hint, capture = false) {
   const result = spawnSync(command, args, {
@@ -40,6 +56,8 @@ run(qwenpawCommand, ['plugin', 'install', auditPlugin, '--force'], '日志审计
 run(qwenpawCommand, ['plugin', 'install', logoPlugin, '--force'], 'Logo 配置插件安装失败。')
 run(qwenpawCommand, ['plugin', 'install', appDiscoveryPlugin, '--force'], '应用发现插件安装失败。')
 run(qwenpawCommand, ['plugin', 'install', dataCorePlugin, '--force'], 'Data Core 插件安装失败。')
+run(qwenpawCommand, ['plugin', 'install', authPlugin, '--force'], '员工登录与权限插件安装失败。')
+run(qwenpawCommand, ['plugin', 'install', enterpriseSeederPlugin, '--force'], '企业环境初始化器插件安装失败。')
 run(process.execPath, [join(scriptsRoot, 'sync-pawapps.mjs')], '外部 PawApp 同步失败。')
 const externalApps = JSON.parse(readFileSync(pawappsLock, 'utf8')).apps
 for (const app of externalApps) {

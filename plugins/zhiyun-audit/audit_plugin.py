@@ -47,12 +47,44 @@ async def events(
 
 
 def _workspace() -> Path:
+    """Locate the directory that actually owns per-agent audit events.
+
+    The audit middleware is built from ``ctx.workspace_dir``, which QwenPaw
+    resolves to a per-agent workspace such as
+    ``<working>/workspace/workspaces/<agent>``.  It persists events there.
+    The system audit page is served by a stateless HTTP router without agent
+    context, so it must discover that same directory instead of assuming a
+    shared ``<working>/workspace`` root that the middleware never writes to.
+    """
     try:
         from qwenpaw.constant import WORKING_DIR
 
-        return Path(WORKING_DIR) / "workspace"
+        base = Path(WORKING_DIR)
     except ImportError:
-        return Path.home() / ".qwenpaw" / "workspace"
+        base = Path.home() / ".qwenpaw"
+
+    # Per-agent workspaces live under <working>/workspace/workspaces/<agent>.
+    # When several exist, prefer the one whose audit trail was touched most
+    # recently so the page follows the active agent's writes.
+    agents_root = base / "workspaces"
+    candidates: list[tuple[float, Path]] = []
+    if agents_root.is_dir():
+        for child in agents_root.iterdir():
+            audit = child / "logs" / "audit.jsonl"
+            if not audit.is_file():
+                continue
+            try:
+                mtime = audit.stat().st_mtime
+            except OSError:
+                continue
+            candidates.append((mtime, child))
+    if candidates:
+        candidates.sort(key=lambda entry: entry[0], reverse=True)
+        return candidates[0][1]
+
+    # No per-agent audit yet: fall back to the conventional shared workspace
+    # root used by Data Core (<working>/workspace) so the page stays usable.
+    return base / "workspace"
 
 
 class AuditMiddleware(MiddlewareBase):

@@ -725,3 +725,46 @@ Data Studio 参考 DataPaw 的接地模式，但第一版控制复杂度。
 11. `应用 → 我的` 和全局 Agent 必须支持基于真实功能清单快速检索 PawApp，并提供打开、安装或带目标启动入口。
 
 下一步进入 Phase 0 技术设计：应用模板、应用索引、独立仓库规则、打包校验和 Workspace Knowledge Base 接入验证；完成技术设计评审后再修改代码。
+
+---
+
+# 21. 需求变更（2026-08-24）
+
+> 本轮变更的记录以《[REQUIREMENT-CHANGES-2026-08-24.md](./REQUIREMENT-CHANGES-2026-08-24.md)》为准，包含 18 个基础功能模块矩阵、RBAC 与多租户设计、已修复缺陷清单与验收标准。下文为对主 PRD 的补充约定。
+
+## 21.1 界面重构与 Agent 内嵌
+
+1. 所有业务 PawApp（服务 / 供应 / 销售 / 财务 / 人力，以及 Data / Order Studio）均需为真实 GUI：顶部工具条 + 左侧功能导航 + 可编辑输入区 + 结构化结果面板（KPI 卡片、明细表、方法标签、Trace、接受 / 驳回 / 导出 / 交给 Agent），不得以原始 JSON 数组直出结果。
+2. 每个功能应用内嵌「问 Agent」对话框，交互目标为简洁高效的 B 端风格；结果以工件卡片回填，可在应用内审阅、撤销与导出。
+3. 一键导入模拟数据后须可运行出真实后端结果；所有模拟数据显式标注「模拟」。
+
+## 21.2 登录与权限 / 多租户
+
+4. 同一企业内，不同用户登录后可使用不同的智能体、数据与知识库（用户级隔离）。
+5. 不同企业分别启动独立系统（企业级隔离 = 单租户实例，每企业独立数据目录与模型配置）。
+6. 首版落地顺序：先做企业实例与用户级 Agent/数据/知识库边界的 API 层路由，再做界面化登录与权限管理。
+
+---
+
+# 22. 需求变更（2026-08-25）
+
+> 本轮为 2026-08-24 需求变更的落地推进，核心是把「用户级 Agent/数据/知识库边界」从前端矩阵建议推进到 API 层强制鉴权，并上线企业环境初始化器。详细记录见《REQUIREMENT-CHANGES-2026-08-24.md》。
+
+## 22.1 企业环境初始化器（zhiyun-enterprise-seeder）
+
+1. 新增 `zhiyun-enterprise-seeder` 插件：一次初始化生成企业、部门、用户、角色、权限、Agent、Skill、应用、数据源、会话、任务、Token、日志；落库 `enterprise.db`，按 `env_id + data_mode` 区分多环境。
+2. `/seed` 一次生成并同步账号到 `auth/users.json`；默认密码统一 `Zhiyun@2026`（与 admin 一致，仅演示用）。
+3. 修复 `/records/{entity}` 的环境隔离：强制 `env_id` + `data_mode` 过滤，避免多环境数据串扰。
+
+## 22.2 服务端 Bearer 鉴权（落地 21.2.6 的第一步）
+
+4. `zhiyun-enterprise-seeder`：`/config`、`/summary`、`/records/{entity}` 需 `Authorization: Bearer <token>`，匿名 401；`/seed` 仅 admin，非管理员 403。
+5. `/records` 非管理员按用户 `data_scope`（enterprise/department/agent）过滤：部门/绑定 Agent/用户账号范围。
+6. `zhiyun-auth` 已具备 `login / me / users / branding / agents/activate`，统一 user 提供 `agent_id / data_scope / kb_scope`。
+7. 前端 `ui/index.js` 登录后自动携带 token，未登录等待登录事件后再加载数据。
+
+## 22.3 验收口径
+
+8. 判定「可用」必须真实浏览器访问 `/apps/<plugin-id>`，能登录、导入/生成示例数据、得到结构化结果面板（非裸 JSON 数组），并有截图/报告在 `docs/qa`。
+9. 本轮 GUI（Playwright）22/22 pass；接口鉴权与数据隔离均实测通过。
+10. **未全部完成**：RBAC 仅覆盖 seeder 与 auth 自身；各 Studio 业务接口尚未统一接入；前端「模拟/Mock」标识待改；多实例（不同企业单独启动）仍为人工约定。

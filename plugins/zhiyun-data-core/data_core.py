@@ -14,10 +14,24 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Iterator
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 FIELD_NAME = re.compile(r"^[a-z][a-z0-9_]{0,62}$")
 FIELD_TYPES = {"text", "integer", "number", "boolean", "date", "datetime"}
 SOURCE_TYPES = {"real", "simulated"}
+DATA_MODES = {"demo", "production"}
+
+CONTEXT_KEY = "active_context"
+
+
+def _normalize_data_mode(value: str | None) -> str:
+    """Normalize a data environment to demo/production, defaulting to demo."""
+    if value is None or value == "":
+        return "demo"
+    if value == "live":
+        return "production"
+    if value not in DATA_MODES:
+        raise DataCoreError("data_mode 只能是 demo 或 production")
+    return value
 
 ORDER_FIELDS = [
     ("order_no", "订单编号", "text", True),
@@ -102,6 +116,7 @@ class DataCore:
                     batch_id TEXT PRIMARY KEY,
                     entity TEXT NOT NULL,
                     source_type TEXT NOT NULL,
+                    data_mode TEXT NOT NULL DEFAULT 'demo',
                     source_name TEXT NOT NULL,
                     row_count INTEGER NOT NULL,
                     status TEXT NOT NULL DEFAULT 'active',
@@ -113,6 +128,7 @@ class DataCore:
                     entity TEXT NOT NULL,
                     batch_id TEXT NOT NULL,
                     source_type TEXT NOT NULL,
+                    data_mode TEXT NOT NULL DEFAULT 'demo',
                     payload TEXT NOT NULL,
                     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (batch_id) REFERENCES data_batches(batch_id)
@@ -133,6 +149,16 @@ class DataCore:
                 connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(1, 'initial schema registry and reversible batches')")
             if current_version < 2:
                 connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(2, 'backup recovery and migration journal')")
+            if current_version < 3:
+                try:
+                    connection.execute("ALTER TABLE data_batches ADD COLUMN data_mode TEXT NOT NULL DEFAULT 'demo'")
+                    connection.execute("ALTER TABLE data_records ADD COLUMN data_mode TEXT NOT NULL DEFAULT 'demo'")
+                except sqlite3.OperationalError:
+                    # Column already exists (e.g. a fresh schema created this run).
+                    pass
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_records_mode ON data_records(entity, data_mode, created_at)")
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_batches_mode ON data_batches(entity, data_mode, created_at)")
+                connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(3, 'add demo/production data environment isolation')")
             connection.execute(
                 "INSERT OR REPLACE INTO data_core_meta(key, value) VALUES('schema_version', ?)",
                 (str(SCHEMA_VERSION),),
@@ -170,6 +196,64 @@ class DataCore:
             ).fetchall()
         return [dict(row) for row in rows]
 
+    def _empty_context(self) -> dict[str, str]:
+        return {"env_id": "", "data_mode": "", "start_date": "", "end_date": ""}
+
+    def get_context(self) -> dict[str, str]:
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT value FROM data_core_meta WHERE key = ?", (CONTEXT_KEY,)
+            ).fetchone()
+            if not row:
+                return self._empty_context()
+            try:
+                stored = json.loads(row["value"])
+            except (TypeError, ValueError):
+                return self._empty_context()
+            base = self._empty_context()
+            base.update({key: str(stored.get(key, "")) for key in base})
+            return base
+
+    def set_context(
+        self,
+        env_id: str = "",
+        data_mode: str = "",
+        start_date: str = "",
+        end_date: str = "",
+    ) -> dict[str, str]:
+        """Record the active enterprise environment for untagged reads."""
+        if data_mode:
+            if data_mode == "live":
+                data_mode = "production"
+            elif data_mode not in DATA_MODES:
+                raise DataCoreError("data_mode 只能是 demo 或 production")
+        for key, value in (("start_date", start_date), ("end_date", end_date)):
+            if value:
+                try:
+                    date.fromisoformat(str(value))
+                except ValueError as exc:
+                    raise DataCoreError(f"{key} 必须是 YYYY-MM-DD 格式") from exc
+        if start_date and end_date and str(start_date) > str(end_date):
+            raise DataCoreError("start_date 不能晚于 end_date")
+        payload = {
+            "env_id": env_id or "",
+            "data_mode": data_mode or "",
+            "start_date": start_date or "",
+            "end_date": end_date or "",
+        }
+        with self.connect() as connection:
+            connection.execute(
+                "INSERT OR REPLACE INTO data_core_meta(key, value) VALUES(?, ?)",
+                (CONTEXT_KEY, json.dumps(payload, ensure_ascii=False)),
+            )
+        return self.get_context()
+
+    def _date_field_for(self, entity: str) -> str | None:
+        schema = self.list_schema(entity)
+        for field in schema["fields"]:
+            if field["active"] and field["type"] == "date":
+                return field["name"]
+        return None
     def list_schema(self, entity: str) -> dict[str, Any]:
         with self.connect() as connection:
             schema = connection.execute(
@@ -202,20 +286,26 @@ class DataCore:
             ],
         }
 
-    def list_entities(self) -> list[dict[str, Any]]:
+    def list_entities(self, *, data_mode: str | None = None) -> list[dict[str, Any]]:
         """Return user-facing datasets with live record/source counts."""
+        mode = _normalize_data_mode(data_mode) if data_mode else None
+        where = "WHERE r.data_mode = ?" if mode else ""
+        mode_args = (mode,) if mode else ()
         with self.connect() as connection:
             rows = connection.execute(
-                """
+                f"""
                 SELECT s.entity, s.label, s.updated_at,
                        COUNT(r.record_id) AS record_count,
                        SUM(CASE WHEN r.source_type = 'real' THEN 1 ELSE 0 END) AS real_count,
-                       SUM(CASE WHEN r.source_type = 'simulated' THEN 1 ELSE 0 END) AS simulated_count
+                       SUM(CASE WHEN r.source_type = 'simulated' THEN 1 ELSE 0 END) AS simulated_count,
+                       SUM(CASE WHEN r.data_mode = 'demo' THEN 1 ELSE 0 END) AS demo_count,
+                       SUM(CASE WHEN r.data_mode = 'production' THEN 1 ELSE 0 END) AS production_count
                 FROM data_schemas AS s
-                LEFT JOIN data_records AS r ON r.entity = s.entity
+                LEFT JOIN data_records AS r ON r.entity = s.entity {where}
                 GROUP BY s.entity, s.label, s.updated_at
                 ORDER BY s.entity
-                """
+                """,
+                mode_args,
             ).fetchall()
         return [
             {
@@ -225,6 +315,8 @@ class DataCore:
                 "record_count": int(row["record_count"] or 0),
                 "real_count": int(row["real_count"] or 0),
                 "simulated_count": int(row["simulated_count"] or 0),
+                "demo_count": int(row["demo_count"] or 0),
+                "production_count": int(row["production_count"] or 0),
             }
             for row in rows
         ]
@@ -385,10 +477,12 @@ class DataCore:
         *,
         mapping: dict[str, str] | None = None,
         source_name: str = "manual-import",
+        data_mode: str = "production",
     ) -> dict[str, Any]:
         preview = self.preview_import(entity, rows, mapping)
         if preview["error_count"]:
             raise DataCoreError("import validation failed; fix preview errors before commit")
+        data_mode = _normalize_data_mode(data_mode)
         batch_id = self._insert_batch(
             entity,
             preview["preview"] if len(rows) <= 20 else [
@@ -397,10 +491,11 @@ class DataCore:
             ],
             source_type="real",
             source_name=source_name,
+            data_mode=data_mode,
         )
-        return {"batch_id": batch_id, "entity": entity, "row_count": len(rows), "source_type": "real"}
+        return {"batch_id": batch_id, "entity": entity, "row_count": len(rows), "source_type": "real", "data_mode": data_mode}
 
-    def generate_orders(self, count: int = 50, seed: int | None = None) -> dict[str, Any]:
+    def generate_orders(self, count: int = 50, seed: int | None = None, data_mode: str = "demo") -> dict[str, Any]:
         if count < 1 or count > 5000:
             raise DataCoreError("simulation count must be between 1 and 5000")
         generator = random.Random(seed)
@@ -428,11 +523,12 @@ class DataCore:
                 "production_delay_days": delay,
             })
         batch_id = self._insert_batch(
-            "orders", rows, source_type="simulated", source_name=f"AI simulated orders (seed={seed})"
+            "orders", rows, source_type="simulated", source_name=f"AI simulated orders (seed={seed})",
+            data_mode=_normalize_data_mode(data_mode),
         )
-        return {"batch_id": batch_id, "entity": "orders", "row_count": count, "source_type": "simulated", "seed": seed}
+        return {"batch_id": batch_id, "entity": "orders", "row_count": count, "source_type": "simulated", "seed": seed, "data_mode": _normalize_data_mode(data_mode)}
 
-    def generate_production(self, count: int = 60, seed: int | None = None) -> dict[str, Any]:
+    def generate_production(self, count: int = 60, seed: int | None = None, data_mode: str = "demo") -> dict[str, Any]:
         """Generate reversible production records for an end-to-end demo."""
         if count < 1 or count > 5000:
             raise DataCoreError("simulation count must be between 1 and 5000")
@@ -454,8 +550,8 @@ class DataCore:
                 "cost": round(output * generator.uniform(8, 28), 2),
                 "loss": round(output * generator.uniform(0.005, 0.08), 2),
             })
-        batch_id = self._insert_batch("production", rows, source_type="simulated", source_name=f"AI simulated production (seed={seed})")
-        return {"batch_id": batch_id, "entity": "production", "row_count": count, "source_type": "simulated", "seed": seed}
+        batch_id = self._insert_batch("production", rows, source_type="simulated", source_name=f"AI simulated production (seed={seed})", data_mode=_normalize_data_mode(data_mode))
+        return {"batch_id": batch_id, "entity": "production", "row_count": count, "source_type": "simulated", "seed": seed, "data_mode": _normalize_data_mode(data_mode)}
 
     def _insert_batch(
         self,
@@ -464,25 +560,27 @@ class DataCore:
         *,
         source_type: str,
         source_name: str,
+        data_mode: str = "demo",
     ) -> str:
         if source_type not in SOURCE_TYPES:
             raise DataCoreError(f"unsupported source type: {source_type}")
+        data_mode = _normalize_data_mode(data_mode)
         batch_id = f"batch-{uuid.uuid4()}"
         with self.connect() as connection:
             connection.execute(
                 """
-                INSERT INTO data_batches(batch_id, entity, source_type, source_name, row_count)
-                VALUES(?, ?, ?, ?, ?)
+                INSERT INTO data_batches(batch_id, entity, source_type, data_mode, source_name, row_count)
+                VALUES(?, ?, ?, ?, ?, ?)
                 """,
-                (batch_id, entity, source_type, source_name, len(rows)),
+                (batch_id, entity, source_type, data_mode, source_name, len(rows)),
             )
             connection.executemany(
                 """
-                INSERT INTO data_records(record_id, entity, batch_id, source_type, payload)
-                VALUES(?, ?, ?, ?, ?)
+                INSERT INTO data_records(record_id, entity, batch_id, source_type, data_mode, payload)
+                VALUES(?, ?, ?, ?, ?, ?)
                 """,
                 [
-                    (f"record-{uuid.uuid4()}", entity, batch_id, source_type, json.dumps(row, ensure_ascii=False))
+                    (f"record-{uuid.uuid4()}", entity, batch_id, source_type, data_mode, json.dumps(row, ensure_ascii=False))
                     for row in rows
                 ],
             )
@@ -518,7 +616,19 @@ class DataCore:
         *,
         limit: int = 100,
         source_type: str | None = None,
+        data_mode: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
     ) -> list[dict[str, Any]]:
+        context = None
+        if data_mode is None or start_date is None or end_date is None:
+            context = self.get_context()
+        if data_mode is None:
+            data_mode = context["data_mode"] or None
+        if start_date is None:
+            start_date = context["start_date"] or None
+        if end_date is None:
+            end_date = context["end_date"] or None
         clauses = ["entity = ?"]
         params: list[Any] = [entity]
         if source_type:
@@ -526,26 +636,55 @@ class DataCore:
                 raise DataCoreError(f"unsupported source type: {source_type}")
             clauses.append("source_type = ?")
             params.append(source_type)
-        params.append(max(1, min(limit, 1000)))
+        if data_mode:
+            mode = _normalize_data_mode(data_mode)
+            if mode:
+                clauses.append("data_mode = ?")
+                params.append(mode)
+        date_field = None
+        if start_date or end_date:
+            date_field = self._date_field_for(entity)
+            if not date_field:
+                raise DataCoreError(f"entity {entity} has no date field for window filtering")
+        want_limit = max(1, min(limit, 1000))
+        if start_date or end_date:
+            sql = (
+                "SELECT record_id, batch_id, source_type, data_mode, payload, created_at "
+                "FROM data_records WHERE " + " AND ".join(clauses) +
+                " ORDER BY created_at DESC, record_id"
+            )
+            sql_params: list[Any] = list(params)
+        else:
+            sql = (
+                "SELECT record_id, batch_id, source_type, data_mode, payload, created_at "
+                "FROM data_records WHERE " + " AND ".join(clauses) +
+                " ORDER BY created_at DESC, record_id LIMIT ?"
+            )
+            sql_params = list(params) + [want_limit]
         with self.connect() as connection:
-            rows = connection.execute(
-                f"""
-                SELECT record_id, batch_id, source_type, payload, created_at
-                FROM data_records WHERE {' AND '.join(clauses)}
-                ORDER BY created_at DESC, record_id LIMIT ?
-                """,
-                params,
-            ).fetchall()
-        return [
-            {
+            rows = connection.execute(sql, sql_params).fetchall()
+        records: list[dict[str, Any]] = []
+        for row in rows:
+            data = json.loads(row["payload"])
+            if date_field is not None:
+                value = str(data.get(date_field, ""))
+                if start_date and value < str(start_date):
+                    continue
+                if end_date and value > str(end_date):
+                    continue
+            records.append({
                 "record_id": row["record_id"],
                 "batch_id": row["batch_id"],
                 "source_type": row["source_type"],
+                "data_mode": row["data_mode"],
                 "created_at": row["created_at"],
-                "data": json.loads(row["payload"]),
-            }
-            for row in rows
-        ]
+                "data": data,
+            })
+            if date_field is None and len(records) >= want_limit:
+                break
+        if date_field is not None:
+            records = records[:want_limit]
+        return records
 
     def search_records(
         self,
@@ -554,6 +693,9 @@ class DataCore:
         keyword: str = "",
         filters: dict[str, Any] | None = None,
         source_type: str | None = None,
+        data_mode: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
         limit: int = 50,
     ) -> list[dict[str, Any]]:
         """Search active records without exposing raw SQL to callers."""
@@ -564,7 +706,14 @@ class DataCore:
         if unknown:
             raise DataCoreError(f"unknown filter fields: {', '.join(unknown)}")
 
-        records = self.list_records(entity, limit=1000, source_type=source_type)
+        records = self.list_records(
+            entity,
+            limit=1000,
+            source_type=source_type,
+            data_mode=data_mode,
+            start_date=start_date,
+            end_date=end_date,
+        )
         needle = keyword.strip().casefold()
         matched: list[dict[str, Any]] = []
         for record in records:
@@ -577,13 +726,20 @@ class DataCore:
             if len(matched) >= max(1, min(limit, 200)):
                 break
         return matched
-
-    def list_batches(self, entity: str | None = None) -> list[dict[str, Any]]:
+    def list_batches(self, entity: str | None = None, data_mode: str | None = None) -> list[dict[str, Any]]:
         query = "SELECT * FROM data_batches"
         params: tuple[Any, ...] = ()
+        clauses: list[str] = []
+        args: list[Any] = []
         if entity:
-            query += " WHERE entity = ?"
-            params = (entity,)
+            clauses.append("entity = ?")
+            args.append(entity)
+        if data_mode:
+            clauses.append("data_mode = ?")
+            args.append(_normalize_data_mode(data_mode))
+        if clauses:
+            query += " WHERE " + " AND ".join(clauses)
+            params = tuple(args)
         query += " ORDER BY created_at DESC, batch_id"
         with self.connect() as connection:
             rows = connection.execute(query, params).fetchall()

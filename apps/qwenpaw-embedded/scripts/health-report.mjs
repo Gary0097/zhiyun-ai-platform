@@ -59,7 +59,7 @@ function validatePayload (id, payload) {
     return ''
   }
   if (id === 'zhiyun-data-core') {
-    return payload?.status === 'available' && payload?.schema_version === 2 && payload?.integrity === 'ok'
+    return payload?.status === 'available' && Number.isInteger(payload?.schema_version) && payload?.schema_version >= 2 && payload?.integrity === 'ok'
       ? '' : 'Data Core状态或schema_version异常'
   }
   if (id === 'zhiyun-audit') {

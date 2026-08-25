@@ -17,6 +17,9 @@ apps/qwenpaw-embedded/workspace.secret/
 *.log
 .env
 *.local.env
+*.bak
+*.bak2
+.qwenpaw-apply.patch
 
 # IDE / OS
 .DS_Store
