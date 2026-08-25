@@ -80,9 +80,12 @@ class AgentChatRequest(BaseModel):
     session_id: str | None = Field(default=None, description="Persistent conversation id")
     user_id: str | None = Field(default="default", description="Calling user id")
     app_id: str | None = Field(default="zhiyun-app-discovery")
-    context: str | None = Field(default=None, description="Optional system context")
+    # 系统上下文与多轮历史必须受到长度约束，避免 API 调用方注入超大上下文/
+    # 海量轮次导致后端模型上下文溢出或过度消耗 Token（与 UI 的 12 轮上限保持兼容）。
+    context: str | None = Field(default=None, max_length=8000, description="Optional system context")
     history: list[dict[str, Any]] = Field(
         default_factory=list,
+        max_length=24,
         description="Prior turns [{role, text}] for multi-turn context",
     )
 
@@ -290,6 +293,9 @@ def _build_input(body: AgentChatRequest) -> list[dict[str, Any]]:
         text = turn.get("text")
         if not isinstance(text, str) or not text.strip():
             continue
+        # 防御性截断：历史单条文本同样限制长度（与 text 字段上限一致），
+        # 避免绕过模型层校验导致上下文溢出。
+        text = text[:4000]
         # The dock stores bot messages as "bot"; map to assistant.
         mapped_role = "assistant" if role in ("bot", "assistant") else "user"
         if mapped_role == "user":

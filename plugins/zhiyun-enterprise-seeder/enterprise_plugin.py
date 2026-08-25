@@ -764,6 +764,11 @@ DATA_SOURCE_MAP = {
 }
 
 
+# 知识库/工作区类应用在未导入真实文档前，data_sources.records 必须保持为空（0），
+# 避免在全新初始化环境中伪造虚构记录数（见 AGENTS.md：不得用伪造数据证明实现）。
+_EMPTY_RECORD_APPS = {"qwenpaw-knowledge-base"}
+
+
 APP_DEFAULT_AGENT_MAP = {
     # 应用 -> 默认智能体（每个应用对应一个智能体，用于应用内「智能体对话」与问数）
     "zhiyun-data-core": "business_analyst",     # 统一数据中心 -> 经营分析
@@ -900,10 +905,12 @@ def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
                 (env_id, tenant_id, data_mode, app["id"], app["name"], app["category"], _resolve_default_agent(app["id"], agents), app["icon"], 1, now),
             )
             source_name, source_type = DATA_SOURCE_MAP.get(app["id"], (app["name"], "workspace"))
+            # 无真实导入数据的知识库类应用记录数保持为空（0），其余按业务体量生成。
+            records = 0 if app["id"] in _EMPTY_RECORD_APPS else rng.randint(800, 5200)
             conn.execute(
                 "INSERT INTO data_sources (env_id, tenant_id, data_mode, source_id, name, source_type, app_id, records, shared, created_at) "
                 "VALUES (?,?,?,?,?,?,?,?,?,?)",
-                (env_id, tenant_id, data_mode, f"{app['id']}_ds", source_name, source_type, app["id"], rng.randint(800, 5200), 1 if app["category"] == "系统" else 0, now),
+                (env_id, tenant_id, data_mode, f"{app['id']}_ds", source_name, source_type, app["id"], records, 1 if app["category"] == "系统" else 0, now),
             )
 
         # 员工
