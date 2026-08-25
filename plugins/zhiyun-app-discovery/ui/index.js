@@ -208,26 +208,97 @@
     var agentDraftState = React.useState(""), agentDraft = agentDraftState[0], setAgentDraft = agentDraftState[1];
     var agentMsgState = React.useState([]), agentMessages = agentMsgState[0], setAgentMessages = agentMsgState[1];
     var agentBusyState = React.useState(false), agentBusy = agentBusyState[0], setAgentBusy = agentBusyState[1];
+    var agentSessionRef = React.useRef("app-dock-" + Date.now().toString(36));
     function agentAdd(role, text, card) { setAgentMessages(function (prev) { return prev.concat([{ role: role, text: text, card: card }]); }); }
     function agentCommand(key, label) {
-      agentAdd("user", label || key);
+      var prompt = key === "mine" ? "我有哪些已安装、可用的应用？"
+        : key === "search" ? "帮我检索能完成某业务的真实应用，应该用哪个？"
+        : key === "progress" ? "当前应用中心 31 项 PRD 交付进度是怎样的？"
+        : (label || key);
+      startAgentChat(prompt);
+    }
+    function startAgentChat(text) {
+      text = String(text == null ? "" : text).trim();
+      if (!text || agentBusy) return;
+      var history = (agentMessages || [])
+        .filter(function (m) { return m && m.role !== "system"; })
+        .map(function (m) { return { role: m.role === "bot" ? "assistant" : "user", text: m.text || "" }; })
+        .slice(-12);
+      agentAdd("user", text, null);
+      agentAdd("bot", "", null);
       setAgentBusy(true);
-      setTimeout(function () {
-        zyPushAgent({ app_id: "zhiyun-app-discovery", kind: key, label: label || key, summary: { apps: apps, progress: progress }, source_type: "real" });
+      zyPushAgent({ app_id: "zhiyun-app-discovery", kind: "chat", label: text, summary: { apps: apps, progress: progress }, source_type: "real" });
+      function setLastBot(value) {
+        setAgentMessages(function (prev) {
+          var next = prev.slice();
+          next[next.length - 1] = { role: "bot", text: value, card: null };
+          return next;
+        });
+      }
+      Q.host.fetch("/zhiyun-app-discovery/agent/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text, session_id: agentSessionRef.current, user_id: "default", history: history })
+      })
+      .then(function (response) {
+        if (!response.ok || !response.body) {
+          return response.text().then(function (t) { throw new Error("HTTP " + response.status + (t && t.trim() ? ": " + t.trim() : "")); });
+        }
+        var reader = response.body.getReader();
+        var decoder = new TextDecoder();
+        var buffer = "";
+        var full = "";
+        function read() {
+          return reader.read().then(function (chunk) {
+            if (chunk.done) return;
+            buffer += decoder.decode(chunk.value, { stream: true });
+            var lines = buffer.split("\n");
+            buffer = lines.pop();
+            lines.forEach(function (line) {
+              line = line.trim();
+              if (line.indexOf("data: ") !== 0) return;
+              var raw = line.slice(6).trim();
+              if (!raw || raw === "[DONE]") return;
+              var event;
+              try { event = JSON.parse(raw); } catch (e) { return; }
+              if (event.error) {
+                if (!full) { full = "智能体返回失败：" + event.error; setLastBot(full); }
+                return;
+              }
+              if (event.type === "text" && event.delta && typeof event.text === "string" && event.text) {
+                full += event.text;
+                setLastBot(full);
+              }
+              if (event.type === "message" && event.status === "completed" && Array.isArray(event.content)) {
+                for (var i = 0; i < event.content.length; i++) {
+                  var part = event.content[i];
+                  if (part && part.type === "text" && !part.delta && typeof part.text === "string" && part.text) {
+                    full = part.text;
+                    setLastBot(full);
+                  }
+                }
+              }
+              if (event.status === "failed" && !full) {
+                full = event.error || "智能体返回失败";
+                setLastBot(full);
+              }
+            });
+            return read();
+          });
+        }
+        return read();
+      })
+      .then(function () {
         setAgentBusy(false);
-        var text = key === "search" ? "已打开能力检索，可在应用搜索页输入业务问题查找对应应用。" : key === "progress" ? "已汇总 31 项 PRD 交付进度，可在项目进度页查看完成与验证中功能。" : "已定位至我的应用，当前已安装应用可一键打开使用。";
-        agentAdd("bot", text, null);
-      }, 240);
+        if (!full) setLastBot("（智能体未返回可显示内容）");
+      })
+      .catch(function (err) {
+        setAgentBusy(false);
+        setLastBot("调用智能体失败：" + (err && err.message ? err.message : String(err)));
+      });
     }
     function agentSend(text) {
-      agentAdd("user", text);
-      setAgentBusy(true);
-      var key = /进度|完成|开发/.test(text) ? "progress" : (/我的|安装|打开/.test(text) ? "mine" : "search");
-      setTimeout(function () {
-        zyPushAgent({ app_id: "zhiyun-app-discovery", kind: key, label: text, summary: { apps: apps, progress: progress }, source_type: "real" });
-        setAgentBusy(false);
-        agentAdd("bot", "已将「" + text + "」交给应用中心智能体，可到对应 Tab 查看结果。", null);
-      }, 240);
+      startAgentChat(text);
     }
     React.useEffect(function () {
       Promise.all([getJson("/zhiyun-app-discovery/catalog"), getJson("/zhiyun-app-discovery/progress")])
