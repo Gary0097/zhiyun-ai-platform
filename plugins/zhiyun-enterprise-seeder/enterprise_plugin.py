@@ -357,14 +357,14 @@ AGENT_TEMPLATES = {
 }
 
 APP_TEMPLATES = [
-    {"id": "data_center", "name": "统一数据中心", "category": "系统", "icon": "🗄️"},
-    {"id": "order_center", "name": "智能订单中心", "category": "业务", "icon": "📦"},
-    {"id": "sales_center", "name": "智能销售中心", "category": "业务", "icon": "📈"},
-    {"id": "finance_center", "name": "智能财务中心", "category": "业务", "icon": "💰"},
-    {"id": "supply_center", "name": "采购与供应链中心", "category": "业务", "icon": "🚚"},
-    {"id": "service_center", "name": "智能售后服务中心", "category": "业务", "icon": "🎧"},
-    {"id": "people_center", "name": "智能人力与协同中心", "category": "业务", "icon": "🧑‍🤝‍🧑"},
-    {"id": "project_center", "name": "应用与项目中心", "category": "系统", "icon": "🧭"},
+    {"id": "zhiyun-data-core", "name": "统一数据中心", "category": "系统", "icon": "🗄️"},
+    {"id": "zhiyun-order-studio", "name": "智能订单中心", "category": "业务", "icon": "📦"},
+    {"id": "zhiyun-sales-studio", "name": "智能销售中心", "category": "业务", "icon": "📈"},
+    {"id": "zhiyun-finance-studio", "name": "智能财务中心", "category": "业务", "icon": "💰"},
+    {"id": "zhiyun-supply-studio", "name": "采购与供应链中心", "category": "业务", "icon": "🚚"},
+    {"id": "zhiyun-service-studio", "name": "智能售后服务中心", "category": "业务", "icon": "🎧"},
+    {"id": "zhiyun-people-studio", "name": "智能人力与协同中心", "category": "业务", "icon": "🧑‍🤝‍🧑"},
+    {"id": "zhiyun-app-discovery", "name": "应用与项目中心", "category": "系统", "icon": "🧭"},
     {"id": "qwenpaw-knowledge-base", "name": "工作区知识库", "category": "知识", "icon": "📚"},
 ]
 
@@ -643,7 +643,7 @@ def _build_sessions_for_day(conn, day, active_users, enabled_agents, agents_by_i
         if not agent or agent["enabled"] == 0:
             continue
         app = rng.choice(dept_apps.get(user["department"], dept_apps.get("total", [
-            {"app_id": "data_center", "name": "统一数据中心"}])))
+            {"app_id": "zhiyun-data-core", "name": "统一数据中心"}])))
         session_id = "s_" + uuid.uuid4().hex[:12]
         started = _pick_time(rng)
         messages = rng.randint(2, 12)
@@ -741,39 +741,39 @@ def _shift_time(t: str, ms: int) -> str:
 # ---------------------------------------------------------------------------
 
 DEPT_APP_MAP = {
-    "销售部": ["sales_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "财务部": ["finance_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "采购部": ["supply_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "客服部": ["service_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "运营部": ["sales_center", "supply_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "生产部": ["order_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "管理层": ["finance_center", "sales_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "研发部": ["project_center", "data_center", "order_center", "qwenpaw-knowledge-base"],
+    "销售部": ["zhiyun-sales-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "财务部": ["zhiyun-finance-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "采购部": ["zhiyun-supply-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "客服部": ["zhiyun-service-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "运营部": ["zhiyun-sales-studio", "zhiyun-supply-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "生产部": ["zhiyun-order-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "管理层": ["zhiyun-finance-studio", "zhiyun-sales-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "研发部": ["zhiyun-app-discovery", "zhiyun-data-core", "zhiyun-order-studio", "qwenpaw-knowledge-base"],
 }
 
 DATA_SOURCE_MAP = {
-    "data_center": ("统一数据集市", "workspace"),
-    "order_center": ("销售订单执行数据", "excel"),
-    "sales_center": ("客户与商机数据", "excel"),
-    "finance_center": ("财务总账与票据", "excel"),
-    "supply_center": ("采购与库存数据", "excel"),
-    "service_center": ("售后服务工单", "excel"),
-    "people_center": ("组织与员工档案", "excel"),
-    "project_center": ("应用与项目台账", "workspace"),
+    "zhiyun-data-core": ("统一数据集市", "workspace"),
+    "zhiyun-order-studio": ("销售订单执行数据", "excel"),
+    "zhiyun-sales-studio": ("客户与商机数据", "excel"),
+    "zhiyun-finance-studio": ("财务总账与票据", "excel"),
+    "zhiyun-supply-studio": ("采购与库存数据", "excel"),
+    "zhiyun-service-studio": ("售后服务工单", "excel"),
+    "zhiyun-people-studio": ("组织与员工档案", "excel"),
+    "zhiyun-app-discovery": ("应用与项目台账", "workspace"),
     "qwenpaw-knowledge-base": ("企业知识库文档", "workspace"),
 }
 
 
 APP_DEFAULT_AGENT_MAP = {
     # 应用 -> 默认智能体（每个应用对应一个智能体，用于应用内「智能体对话」与问数）
-    "data_center": "business_analyst",     # 统一数据中心 -> 经营分析
-    "order_center": "sales_quote",          # 智能订单中心 -> 销售报价
-    "sales_center": "customer_followup",    # 智能销售中心 -> 客户跟进
-    "finance_center": "finance_invoice",    # 智能财务中心 -> 财务票据
-    "supply_center": "procurement_recon",   # 采购与供应链中心 -> 采购对账
-    "service_center": "after_sales",        # 智能售后服务中心 -> 售后客服
-    "people_center": "expense_audit",       # 智能人力与协同中心 -> 报销审核
-    "project_center": "business_analyst",   # 应用与项目中心 -> 经营分析
+    "zhiyun-data-core": "business_analyst",     # 统一数据中心 -> 经营分析
+    "zhiyun-order-studio": "sales_quote",          # 智能订单中心 -> 销售报价
+    "zhiyun-sales-studio": "customer_followup",    # 智能销售中心 -> 客户跟进
+    "zhiyun-finance-studio": "finance_invoice",    # 智能财务中心 -> 财务票据
+    "zhiyun-supply-studio": "procurement_recon",   # 采购与供应链中心 -> 采购对账
+    "zhiyun-service-studio": "after_sales",        # 智能售后服务中心 -> 售后客服
+    "zhiyun-people-studio": "expense_audit",       # 智能人力与协同中心 -> 报销审核
+    "zhiyun-app-discovery": "business_analyst",   # 应用与项目中心 -> 经营分析
     "qwenpaw-knowledge-base": "business_analyst",  # 工作区知识库 -> 经营分析
 }
 
@@ -920,7 +920,7 @@ def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
         # 应用->岗位映射
         dept_apps = {}
         for dept in depts:
-            app_ids = DEPT_APP_MAP.get(dept["name"], ["data_center", "project_center"])
+            app_ids = DEPT_APP_MAP.get(dept["name"], ["zhiyun-data-core", "zhiyun-app-discovery"])
             dept_apps[dept["name"]] = [{"app_id": apps_by_id[a]["id"], "name": apps_by_id[a]["name"], "category": apps_by_id[a]["category"]} for a in app_ids if a in apps_by_id]
         dept_apps["total"] = [{"app_id": a["id"], "name": a["name"], "category": a["category"]} for a in apps_by_id.values()]
 

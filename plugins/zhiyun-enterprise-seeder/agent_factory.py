@@ -120,14 +120,14 @@ CATEGORY_DEFAULT_TOOLS: dict[str, list[str]] = {
 
 # 部门 -> 可访问应用（与宿主 DEPT_APP_MAP 保持一致；不一致会被测试捕获）。
 APP_ACCESS_BY_DEPT: dict[str, list[str]] = {
-    "销售部": ["sales_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "财务部": ["finance_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "采购部": ["supply_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "客服部": ["service_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "运营部": ["sales_center", "supply_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "生产部": ["order_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "管理层": ["finance_center", "sales_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
-    "研发部": ["project_center", "data_center", "order_center", "qwenpaw-knowledge-base"],
+    "销售部": ["zhiyun-sales-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "财务部": ["zhiyun-finance-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "采购部": ["zhiyun-supply-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "客服部": ["zhiyun-service-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "运营部": ["zhiyun-sales-studio", "zhiyun-supply-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "生产部": ["zhiyun-order-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "管理层": ["zhiyun-finance-studio", "zhiyun-sales-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "研发部": ["zhiyun-app-discovery", "zhiyun-data-core", "zhiyun-order-studio", "qwenpaw-knowledge-base"],
 }
 
 
@@ -156,7 +156,7 @@ def resolve_tools(spec: dict[str, Any]) -> list[str]:
 def resolve_apps(spec: dict[str, Any]) -> list[str]:
     """解析应用权限：按岗位部门取可访问应用列表。"""
     dept = str(spec.get("department") or "")
-    return APP_ACCESS_BY_DEPT.get(dept, ["data_center", "project_center"])
+    return APP_ACCESS_BY_DEPT.get(dept, ["zhiyun-data-core", "zhiyun-app-discovery"])
 
 
 def build_agent_config(spec: dict[str, Any]) -> dict[str, Any]:

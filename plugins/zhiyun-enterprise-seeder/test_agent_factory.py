@@ -67,7 +67,7 @@ class TestAgentFactory(unittest.TestCase):
         self.assertEqual(cfg["model_id"], "local-qwen2.5-72b")
         self.assertIn("business_analyst_attribution", [s["skill_id"] for s in cfg["skills"]])
         self.assertTrue(all(t["tool_id"] in TOOL_CATALOG for t in cfg["tools"]))
-        self.assertIn("sales_center", cfg["apps"])
+        self.assertIn("zhiyun-sales-studio", cfg["apps"])
 
     def test_validate_ok(self) -> None:
         cfg = build_agent_config(SPEC)

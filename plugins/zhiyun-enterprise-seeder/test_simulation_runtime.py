@@ -128,7 +128,7 @@ class TestSimulationRuntime(unittest.TestCase):
             "VALUES (?,?,?,?,?,?,?,?,?)",
             (ENV_ID, TENANT_ID, MODE, "sales_quote", "query_enterprise_orders", "订单查询", "data", 1, "2026-01-01 09:00:00"),
         )
-        for app in [("data_center", "统一数据中心", "系统"), ("sales_center", "智能销售中心", "业务")]:
+        for app in [("zhiyun-data-core", "统一数据中心", "系统"), ("zhiyun-sales-studio", "智能销售中心", "业务")]:
             self.conn.execute(
                 "INSERT INTO apps (env_id, tenant_id, data_mode, app_id, name, category, agent_id, icon, enabled, created_at) "
                 "VALUES (?,?,?,?,?,?,?,?,?,?)",
