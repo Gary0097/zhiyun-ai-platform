@@ -7,8 +7,11 @@ app_discovery_plugin 依赖 fastapi/httpx 与宿主 qwenpaw 运行时；当测�
 Python 运行可完整执行本文件全部用例。
 """
 
+import os
 import sys
+import tempfile
 import unittest
+from pathlib import Path
 
 # 插件在缺少任意依赖（如全局 Python 缺 anyio）时会因 ImportError 失败，
 # 这里捕获并标记为「无插件依赖」，测试整体跳过，保证发布门禁仍通过。
@@ -16,7 +19,7 @@ try:
     import app_discovery_plugin as adp
 
     _HAS_PLUGIN = True
-except Exception:  # pragma: no cover - 依赖缺失环境
+except ImportError as _e:  # pragma: no cover - 依赖缺失环境
     adp = None
     _HAS_PLUGIN = False
 
@@ -77,5 +80,133 @@ class AppDiscoveryChatBoundTests(unittest.TestCase):
         self.assertEqual(user_payloads[1]["content"][0]["text"], "现在的问题")
 
 
+
+@unittest.skipUnless(_HAS_PLUGIN, "app_discovery_plugin 依赖（fastapi/httpx/qwenpaw）不可用")
+class AppDiscoveryAppAccessTests(unittest.TestCase):
+    """校验应用访问授权：非管理员必须拥有 agent_app_access，管理员可绕过。
+
+    这是「应用接入默认智能体 + 应用内智能体对话」的应用级授权护栏测试：
+    防止非管理员账号通过代理接口访问其未被授权的应用。
+    """
+
+    def setUp(self):
+        if not _HAS_PLUGIN:
+            return
+        self.tmp = Path(tempfile.mkdtemp(prefix="zi_discovery_access_"))
+        self._orig = (
+            adp.ENTERPRISE_DIR, adp.ENTERPRISE_DB,
+            adp.AUTH_USERS_FILE, adp.AUTH_SECRET_FILE, adp.CONFIG_FILE,
+        )
+        adp.ENTERPRISE_DIR = self.tmp
+        adp.ENTERPRISE_DB = self.tmp / "enterprise.db"
+        adp.AUTH_USERS_FILE = self.tmp / "users.json"
+        adp.AUTH_SECRET_FILE = self.tmp / "token_secret.txt"
+        adp.CONFIG_FILE = self.tmp / "config.json"
+        conn = adp._connect()
+        try:
+            conn.executescript(
+                """
+                CREATE TABLE IF NOT EXISTS org_users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    env_id TEXT, tenant_id TEXT, data_mode TEXT,
+                    username TEXT, display_name TEXT, email TEXT, phone TEXT, department TEXT,
+                    role TEXT, title TEXT, agent_id TEXT, data_scope TEXT, kb_scope TEXT,
+                    active INTEGER, dormant INTEGER, hired_on TEXT, created_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS agent_app_access (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    env_id TEXT, tenant_id TEXT, data_mode TEXT,
+                    agent_id TEXT, app_id TEXT, data_scope TEXT, kb_scope TEXT,
+                    enabled INTEGER, created_at TEXT
+                );
+                """
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+    def tearDown(self):
+        if not _HAS_PLUGIN:
+            return
+        (adp.ENTERPRISE_DIR, adp.ENTERPRISE_DB,
+         adp.AUTH_USERS_FILE, adp.AUTH_SECRET_FILE, adp.CONFIG_FILE) = self._orig
+
+    def _insert(self, sql: str, args: tuple) -> None:
+        conn = adp._connect()
+        try:
+            conn.execute(sql, args)
+            conn.commit()
+        finally:
+            conn.close()
+
+    def _seed_user(self, username: str, role: str = "member", agent_id: str | None = "agent_a",
+                   env_id: str = "envX") -> None:
+        self._insert(
+            "INSERT INTO org_users (env_id, data_mode, username, role, agent_id) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (env_id, "demo", username, role, agent_id),
+        )
+
+    def test_no_agent_binding_raises_403(self):
+        from fastapi import HTTPException
+        self._seed_user("alice", role="member", agent_id=None)
+        user = {"username": "alice", "role": "member"}
+        with self.assertRaises(HTTPException) as ctx:
+            adp._require_app_access(user, "envX", "demo", "app_1")
+        self.assertEqual(ctx.exception.status_code, 403)
+
+    def test_no_access_row_raises_403(self):
+        from fastapi import HTTPException
+        self._seed_user("bob", role="member", agent_id="agent_a")
+        user = {"username": "bob", "role": "member"}
+        with self.assertRaises(HTTPException) as ctx:
+            adp._require_app_access(user, "envX", "demo", "app_1")
+        self.assertEqual(ctx.exception.status_code, 403)
+
+    def test_disabled_access_row_raises_403(self):
+        from fastapi import HTTPException
+        self._seed_user("carol", role="member", agent_id="agent_a")
+        self._insert(
+            "INSERT INTO agent_app_access (env_id, data_mode, agent_id, app_id, enabled) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("envX", "demo", "agent_a", "app_1", 0),
+        )
+        user = {"username": "carol", "role": "member"}
+        with self.assertRaises(HTTPException) as ctx:
+            adp._require_app_access(user, "envX", "demo", "app_1")
+        self.assertEqual(ctx.exception.status_code, 403)
+
+    def test_wrong_env_no_access_raises_403(self):
+        # 用户有绑定，但授权记录在另一个环境：不得跨环境访问
+        from fastapi import HTTPException
+        self._seed_user("dave", role="member", agent_id="agent_a", env_id="envX")
+        self._insert(
+            "INSERT INTO agent_app_access (env_id, data_mode, agent_id, app_id, enabled) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("envY", "demo", "agent_a", "app_1", 1),
+        )
+        user = {"username": "dave", "role": "member"}
+        with self.assertRaises(HTTPException) as ctx:
+            adp._require_app_access(user, "envX", "demo", "app_1")
+        self.assertEqual(ctx.exception.status_code, 403)
+
+    def test_valid_access_row_passes(self):
+        self._seed_user("eve", role="member", agent_id="agent_a")
+        self._insert(
+            "INSERT INTO agent_app_access (env_id, data_mode, agent_id, app_id, enabled) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("envX", "demo", "agent_a", "app_1", 1),
+        )
+        user = {"username": "eve", "role": "member"}
+        # 不应抛异常
+        adp._require_app_access(user, "envX", "demo", "app_1")
+
+    def test_admin_bypasses_access(self):
+        # 管理员无需 agent_app_access 记录即可访问
+        self._seed_user("admin", role="admin", agent_id=None)
+        user = {"username": "admin", "role": "admin"}
+        adp._require_app_access(user, "envX", "demo", "app_1")
+
 if __name__ == "__main__":
     unittest.main()
+

@@ -24,7 +24,7 @@ from typing import Any, AsyncGenerator
 from uuid import uuid4
 
 import httpx
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from qwenpaw.plugins.api import PluginApi
@@ -254,6 +254,52 @@ def _lookup_app_agent(app_id: str, env_id: str, data_mode: str) -> str | None:
         return None
 
 
+def _user_agent_id(username: str, env_id: str = "") -> str:
+    """查询账号在其企业环境里绑定的默认 agent_id（来自 org_users）。"""
+    if not username or not env_id:
+        return ""
+    try:
+        conn = _connect()
+        try:
+            row = conn.execute(
+                "SELECT agent_id FROM org_users WHERE username = ? AND env_id = ? "
+                "ORDER BY id DESC LIMIT 1",
+                (username, env_id),
+            ).fetchone()
+            return row["agent_id"] if row and row["agent_id"] else ""
+        finally:
+            conn.close()
+    except Exception:
+        return ""
+
+
+def _require_app_access(user: dict[str, Any], env_id: str, data_mode: str, app_id: str) -> None:
+    """非管理员必须拥有该应用的 agent_app_access 授权，否则返回 403。"""
+    if str(user.get("role") or "") == "admin":
+        return
+    agent_id = _user_agent_id(str(user.get("username") or ""), env_id)
+    if not agent_id:
+        raise HTTPException(status_code=403, detail="无权访问该应用")
+    try:
+        conn = _connect()
+        try:
+            row = conn.execute(
+                "SELECT 1 FROM agent_app_access "
+                "WHERE env_id = ? AND data_mode = ? AND app_id = ? AND agent_id = ? "
+                "AND enabled = 1 LIMIT 1",
+                (env_id, data_mode, app_id, agent_id),
+            ).fetchone()
+            exists = row is not None
+        finally:
+            conn.close()
+    except HTTPException:
+        raise
+    except Exception:
+        exists = False
+    if not exists:
+        raise HTTPException(status_code=403, detail="无权访问该应用")
+
+
 def _runtime_agent_profile(enterprise_agent_id: str) -> str:
     """把企业 agent_id 映射为合法的运行时 agent profile key。
 
@@ -321,41 +367,37 @@ async def agent_chat(body: AgentChatRequest, request: Request) -> StreamingRespo
     render token-by-token.  ``session_id`` is preserved so the same conversation
     continues across turns.
 
-    若请求携带有效的 zhiyun Bearer token，则解析调用账号所属企业环境，并据此
-    查询该应用在其企业环境下绑定的默认智能体；仅当该企业 agent_id 合法映射到
-    运行时 agent profile 时才会发送 X-Agent-Id。否则全部优雅回退，保持既有
-    行为不变（data_mode 兜底为 ``real``，无 agent 查询时运行时回退 default）。
+    调用方必须携带有效 zhiyun Bearer token。我们据此解析账号所属企业环境，
+    并对非管理员校验该应用在 ``agent_app_access`` 中的授权；然后查询该应用
+    在该企业环境下绑定的默认智能体，仅当企业 agent_id 合法映射到运行时 agent
+    profile 时才发送 X-Agent-Id，否则运行时回退 default。data_mode 一律使用
+    账号真实环境（demo / production），不再兜底 ``real``。
     """
     session_id = body.session_id or f"zhiyun-app-discovery-{uuid4().hex}"
-    user_id = body.user_id or "default"
 
-    # 解析调用账号所属企业环境（graceful：无法解析则回退，不破坏现有行为）
-    env_id = ""
-    data_mode = ""
-    username = ""
+    # 1. 硬鉴权：必须携带有效 zhiyun Bearer token，禁止信任调用方 body.user_id
     authorization = request.headers.get("authorization", "")
-    token = _bearer_token(authorization)
-    if token:
-        name = _verify_token(token)
-        if name:
-            username = name
-            user = _find_user(name)
-            if user:
-                try:
-                    env_id, data_mode = _user_env(user)
-                except Exception:
-                    env_id, data_mode = "", ""
-                normalized = _normalize_mode(data_mode)
-                if normalized:
-                    data_mode = normalized
+    username = _verify_token(_bearer_token(authorization))
+    if not username:
+        raise HTTPException(status_code=401, detail="登录已失效，请重新登录")
+    user = _find_user(username)
+    if not user:
+        raise HTTPException(status_code=401, detail="账号不存在")
+    user_id = username
 
-    # 应用对应的企业默认智能体（仅审计元数据 / 映射运行时 profile）
-    enterprise_agent_id = ""
-    if env_id and data_mode:
-        enterprise_agent_id = (
-            _lookup_app_agent(body.app_id or "zhiyun-app-discovery", env_id, data_mode) or ""
-        )
+    # 2. 解析账号所属企业环境；无法解析则拒绝
+    env_id, data_mode = _user_env(user)
+    data_mode = _normalize_mode(data_mode)
+    if not env_id or not data_mode:
+        raise HTTPException(status_code=403, detail="无法确定当前账号所属企业环境")
 
+    # 3. 应用访问授权：非管理员必须拥有该应用的 agent_app_access 记录
+    app_id = body.app_id or "zhiyun-app-discovery"
+    if user.get("role") != "admin":
+        _require_app_access(user, env_id, data_mode, app_id)
+
+    # 4. 应用对应的企业默认智能体（绑定 AppDock 到种子默认智能体）
+    enterprise_agent_id = _lookup_app_agent(app_id, env_id, data_mode) or ""
     runtime_profile = _runtime_agent_profile(enterprise_agent_id)
 
     payload = {
@@ -364,9 +406,9 @@ async def agent_chat(body: AgentChatRequest, request: Request) -> StreamingRespo
         "user_id": user_id,
         "stream": True,
         "metadata": {
-            "app_id": body.app_id or "zhiyun-app-discovery",
+            "app_id": app_id,
             "source_kind": "agent_dock",
-            "data_mode": data_mode or "real",
+            "data_mode": data_mode,
             "enterprise_agent_id": enterprise_agent_id,
         },
     }

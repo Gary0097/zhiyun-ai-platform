@@ -1250,9 +1250,10 @@ def _records(entity: str, limit: int, offset: int, env_id: str = "", data_mode: 
             clauses.append("data_mode = ?")
             args.append(data_mode)
         if user is not None and user.get("role") != "admin":
-            scope = user.get("data_scope") or "enterprise"
-            if scope != "enterprise":
-                clause, scope_args = _scope_clause(entity, user)
+            # 数据域与知识域独立判定：即使 data_scope=enterprise，
+            # kb_scope=department 也必须对知识库类实体生效。
+            clause, scope_args = _scope_clause(entity, user, env_id)
+            if clause != "1 = 1":
                 clauses.append(clause)
                 args.extend(scope_args)
         # Epic 4 Time Machine：按实体时间列做时间范围过滤
@@ -1464,6 +1465,8 @@ async def records(
     end_date: str = Query(default="", max_length=10),
 ) -> dict[str, Any]:
     user = _require_auth(authorization)
+    if user.get("role") != "admin":
+        env_id, data_mode = _enforce_user_env(user)
     rows = _records(entity, limit, offset, env_id, data_mode, start_date, end_date, user)
     return {"entity": entity, "count": len(rows), "rows": rows, "data_mode": data_mode, "env_id": env_id, "range": {"start_date": start_date, "end_date": end_date}}
 
