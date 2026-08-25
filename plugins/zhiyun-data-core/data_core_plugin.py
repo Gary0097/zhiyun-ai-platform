@@ -3,27 +3,165 @@
 
 from __future__ import annotations
 
+import base64
+import hashlib
+import hmac
+import json
+import os
+import secrets
+import time
+from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, File, HTTPException, Query, UploadFile
-from pydantic import BaseModel, Field
-from qwenpaw.plugins.api import PluginApi
+try:
+    from fastapi import APIRouter, File, HTTPException, Header, Query, UploadFile
+except ImportError:  # pragma: no cover - 系统 Python 无宿主依赖时提供桩实现
+    class APIRouter:
+        def get(self, path, **kwargs): return lambda fn: fn
+        def post(self, path, **kwargs): return lambda fn: fn
+        def put(self, path, **kwargs): return lambda fn: fn
+        def patch(self, path, **kwargs): return lambda fn: fn
+        def delete(self, path, **kwargs): return lambda fn: fn
+
+    class HTTPException(Exception):
+        def __init__(self, status_code: int, detail: str = ""):
+            self.status_code = status_code
+            self.detail = detail
+            super().__init__(detail)
+
+    def Header(default=None, **kwargs): return default
+    def Query(default=None, **kwargs): return default
+    def File(default=None, **kwargs): return default
+
+    class UploadFile:
+        pass
+
+try:
+    from pydantic import BaseModel, Field
+except ImportError:  # pragma: no cover - 系统 Python 无 pydantic 时提供桩实现
+    class BaseModel:
+        def model_dump(self) -> dict[str, Any]:
+            return dict(getattr(self, "__dict__", {}))
+    def Field(default=None, **kwargs): return default
+
+try:
+    from qwenpaw.plugins.api import PluginApi
+except ImportError:  # pragma: no cover - 单元测试时可能没有宿主
+    PluginApi = object  # type: ignore[assignment, misc]
 
 try:
     from .data_core import DataCore, DataCoreError, default_database
-    from .agent_tools import build_agent_tools
     from .table_parser import parse_table
     from .operations import DataCoreOperations, DataOperationError
 except ImportError:
     from data_core import DataCore, DataCoreError, default_database
-    from agent_tools import build_agent_tools
     from table_parser import parse_table
     from operations import DataCoreOperations, DataOperationError
+
+try:
+    from .agent_tools import build_agent_tools
+except ImportError:
+    try:
+        from agent_tools import build_agent_tools
+    except ImportError:  # pragma: no cover - 系统 Python 无 agentscope 时提供桩实现
+        def build_agent_tools(core):
+            return (lambda *args, **kwargs: None), (lambda *args, **kwargs: None)
+
+
+def _working_dir() -> Path:
+    try:
+        from qwenpaw.constant import WORKING_DIR
+
+        return Path(WORKING_DIR)
+    except ImportError:
+        return Path(os.environ.get("QWENPAW_WORKING_DIR", Path.home() / ".qwenpaw"))
+
+
+WORKING_DIR = _working_dir()
+AUTH_DIR = WORKING_DIR / "auth"
+USERS_FILE = AUTH_DIR / "users.json"
+SECRET_FILE = AUTH_DIR / "token_secret.txt"
 
 core = DataCore(default_database())
 operations = DataCoreOperations(core.database)
 router = APIRouter()
 MAX_UPLOAD = 20 * 1024 * 1024
+
+
+# ---------------------------------------------------------------------------
+# 登录鉴权（与 zhiyun-auth 共用同一 token secret 与用户文件）
+# ---------------------------------------------------------------------------
+
+
+def _read_json(path: Path, default: Any) -> Any:
+    try:
+        if path.is_file():
+            return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        pass
+    return default
+
+
+def _find_user(username: str) -> dict[str, Any] | None:
+    data = _read_json(USERS_FILE, [])
+    if isinstance(data, list):
+        users = data
+    elif isinstance(data, dict):
+        users = data.get("users") or []
+    else:
+        users = []
+    for user in users:
+        if user.get("username") == username:
+            return user
+    return None
+
+
+def _token_secret() -> str:
+    try:
+        if SECRET_FILE.is_file():
+            val = SECRET_FILE.read_text(encoding="utf-8").strip()
+            if val:
+                return val
+    except OSError:
+        pass
+    secret = secrets.token_hex(32)
+    SECRET_FILE.parent.mkdir(parents=True, exist_ok=True)
+    SECRET_FILE.write_text(secret, encoding="utf-8")
+    return secret
+
+
+def _bearer_token(authorization: str) -> str:
+    if authorization.startswith("Bearer "):
+        return authorization[7:]
+    return ""
+
+
+def _verify_token(token: str) -> str | None:
+    try:
+        b64, sig = token.split(".", 1)
+        secret = _token_secret()
+        if not secret:
+            return None
+        expected = hmac.new(secret.encode("utf-8"), b64.encode("ascii"), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected):
+            return None
+        payload = json.loads(base64.urlsafe_b64decode(b64.encode("ascii")))
+        if int(payload.get("exp", 0)) < int(time.time()):
+            return None
+        username = str(payload.get("sub") or "")
+        user = _find_user(username)
+        if not user or not user.get("active", True):
+            return None
+        return username
+    except (ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def _require_auth(authorization: str) -> str:
+    username = _verify_token(_bearer_token(authorization))
+    if not username:
+        raise HTTPException(status_code=401, detail="登录已失效，请重新登录")
+    return username
 
 
 class FieldCreate(BaseModel):
@@ -77,6 +215,7 @@ class ContextSet(BaseModel):
     start_date: str | None = None
     end_date: str | None = None
 
+
 def _mode_q(value: str | None) -> str | None:
     """Map an optional data environment query param; empty means 'all'."""
     if value is None or value == "":
@@ -105,12 +244,14 @@ async def health() -> dict[str, Any]:
 
 
 @router.get("/backups")
-async def backups() -> dict[str, Any]:
+async def backups(authorization: str = Header(default="")) -> dict[str, Any]:
+    _require_auth(authorization)
     return {"backups": operations.list_backups()}
 
 
 @router.post("/backups")
-async def create_backup(request: BackupCreate) -> dict[str, Any]:
+async def create_backup(request: BackupCreate, authorization: str = Header(default="")) -> dict[str, Any]:
+    _require_auth(authorization)
     try:
         return operations.create_backup(key_env=request.key_env)
     except DataOperationError as exc:
@@ -118,7 +259,8 @@ async def create_backup(request: BackupCreate) -> dict[str, Any]:
 
 
 @router.post("/backups/{name}/restore")
-async def restore_backup(name: str, request: BackupRestore) -> dict[str, Any]:
+async def restore_backup(name: str, request: BackupRestore, authorization: str = Header(default="")) -> dict[str, Any]:
+    _require_auth(authorization)
     try:
         return operations.restore_backup(name, confirmed=request.confirmed, key_env=request.key_env)
     except DataOperationError as exc:
@@ -126,12 +268,14 @@ async def restore_backup(name: str, request: BackupRestore) -> dict[str, Any]:
 
 
 @router.get("/context")
-async def read_context() -> dict[str, Any]:
+async def read_context(authorization: str = Header(default="")) -> dict[str, Any]:
+    _require_auth(authorization)
     return {"context": core.get_context()}
 
 
 @router.put("/context")
-async def write_context(request: ContextSet) -> dict[str, Any]:
+async def write_context(request: ContextSet, authorization: str = Header(default="")) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(
         lambda: {
             "context": core.set_context(
@@ -143,13 +287,22 @@ async def write_context(request: ContextSet) -> dict[str, Any]:
         }
     )
 
+
 @router.get("/entities")
-async def entities(data_mode: str | None = Query(default=None, max_length=20)) -> dict[str, Any]:
+async def entities(
+    data_mode: str | None = Query(default=None, max_length=20),
+    authorization: str = Header(default=""),
+) -> dict[str, Any]:
+    _require_auth(authorization)
     return {"entities": core.list_entities(data_mode=_mode_q(data_mode))}
 
 
 @router.post("/parse")
-async def parse_upload(file: UploadFile = File(...)) -> dict[str, Any]:
+async def parse_upload(
+    file: UploadFile = File(...),
+    authorization: str = Header(default=""),
+) -> dict[str, Any]:
+    _require_auth(authorization)
     content = await file.read(MAX_UPLOAD + 1)
     if len(content) > MAX_UPLOAD:
         raise HTTPException(status_code=413, detail="文件不能超过20MB")
@@ -160,7 +313,8 @@ async def parse_upload(file: UploadFile = File(...)) -> dict[str, Any]:
 
 
 @router.post("/schemas")
-async def create_schema(request: SchemaCreate) -> dict[str, Any]:
+async def create_schema(request: SchemaCreate, authorization: str = Header(default="")) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(
         lambda: core.create_schema(
             request.entity,
@@ -171,33 +325,54 @@ async def create_schema(request: SchemaCreate) -> dict[str, Any]:
 
 
 @router.get("/schemas/{entity}")
-async def schema(entity: str) -> dict[str, Any]:
+async def schema(entity: str, authorization: str = Header(default="")) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(lambda: core.list_schema(entity))
 
 
 @router.post("/schemas/{entity}/fields")
-async def add_field(entity: str, request: FieldCreate) -> dict[str, Any]:
+async def add_field(
+    entity: str,
+    request: FieldCreate,
+    authorization: str = Header(default=""),
+) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(
         lambda: core.add_field(entity, request.name, request.label, request.field_type, request.required)
     )
 
 
 @router.patch("/schemas/{entity}/fields/{field_name}")
-async def update_field(entity: str, field_name: str, request: FieldPatch) -> dict[str, Any]:
+async def update_field(
+    entity: str,
+    field_name: str,
+    request: FieldPatch,
+    authorization: str = Header(default=""),
+) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(
         lambda: core.update_field(entity, field_name, label=request.label, active=request.active)
     )
 
 
 @router.post("/imports/{entity}/preview")
-async def preview_import(entity: str, request: ImportPreview) -> dict[str, Any]:
+async def preview_import(
+    entity: str,
+    request: ImportPreview,
+    authorization: str = Header(default=""),
+) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(lambda: core.preview_import(entity, request.rows, request.mapping))
 
 
 @router.post("/imports/{entity}/commit")
 async def commit_import(
-    entity: str, request: ImportPreview, data_mode: str | None = Query(default=None, max_length=20)
+    entity: str,
+    request: ImportPreview,
+    data_mode: str | None = Query(default=None, max_length=20),
+    authorization: str = Header(default=""),
 ) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(
         lambda: core.import_rows(
             entity,
@@ -211,15 +386,21 @@ async def commit_import(
 
 @router.post("/simulate/orders")
 async def simulate_orders(
-    request: SimulationCreate, data_mode: str | None = Query(default=None, max_length=20)
+    request: SimulationCreate,
+    data_mode: str | None = Query(default=None, max_length=20),
+    authorization: str = Header(default=""),
 ) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(lambda: core.generate_orders(request.count, request.seed, data_mode=_mode_required(data_mode)))
 
 
 @router.post("/simulate/production")
 async def simulate_production(
-    request: SimulationCreate, data_mode: str | None = Query(default=None, max_length=20)
+    request: SimulationCreate,
+    data_mode: str | None = Query(default=None, max_length=20),
+    authorization: str = Header(default=""),
 ) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(lambda: core.generate_production(request.count, request.seed, data_mode=_mode_required(data_mode)))
 
 
@@ -231,7 +412,9 @@ async def records(
     data_mode: str | None = Query(default=None, max_length=20),
     start_date: str | None = Query(default=None, max_length=16),
     end_date: str | None = Query(default=None, max_length=16),
+    authorization: str = Header(default=""),
 ) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(
         lambda: {
             "entity": entity,
@@ -246,6 +429,7 @@ async def records(
         }
     )
 
+
 @router.get("/orders")
 async def orders(
     keyword: str = Query(default="", max_length=200),
@@ -257,8 +441,10 @@ async def orders(
     start_date: str | None = Query(default=None, max_length=16),
     end_date: str | None = Query(default=None, max_length=16),
     limit: int = Query(default=100, ge=1, le=200),
+    authorization: str = Header(default=""),
 ) -> dict[str, Any]:
     """Expose the bounded order query contract used by business PawApps."""
+    _require_auth(authorization)
     filters = {
         key: value
         for key, value in {
@@ -292,15 +478,20 @@ async def orders(
         }
     return _handle(query)
 
+
 @router.get("/batches")
 async def batches(
-    entity: str | None = None, data_mode: str | None = Query(default=None, max_length=20)
+    entity: str | None = None,
+    data_mode: str | None = Query(default=None, max_length=20),
+    authorization: str = Header(default=""),
 ) -> dict[str, Any]:
+    _require_auth(authorization)
     return {"batches": core.list_batches(entity, data_mode=_mode_q(data_mode))}
 
 
 @router.post("/batches/{batch_id}/rollback")
-async def rollback(batch_id: str) -> dict[str, Any]:
+async def rollback(batch_id: str, authorization: str = Header(default="")) -> dict[str, Any]:
+    _require_auth(authorization)
     return _handle(lambda: core.rollback_batch(batch_id))
 
 

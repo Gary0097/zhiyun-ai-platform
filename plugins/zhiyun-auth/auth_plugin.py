@@ -23,8 +23,29 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Header, HTTPException
-from pydantic import BaseModel, Field
+try:
+    from fastapi import APIRouter, Header, HTTPException
+except ImportError:  # pragma: no cover - 系统 Python 无宿主依赖时提供桩实现
+    class APIRouter:
+        def get(self, path): return lambda fn: fn
+        def post(self, path): return lambda fn: fn
+        def put(self, path): return lambda fn: fn
+        def patch(self, path): return lambda fn: fn
+        def delete(self, path): return lambda fn: fn
+    class HTTPException(Exception):
+        def __init__(self, status_code: int, detail: str = ""):
+            self.status_code = status_code
+            self.detail = detail
+            super().__init__(detail)
+    def Header(default=None): return default
+
+try:
+    from pydantic import BaseModel, Field
+except ImportError:  # pragma: no cover
+    class BaseModel:
+        def __init__(self, **kwargs): self.__dict__.update(kwargs)
+        def model_dump(self): return dict(self.__dict__)
+    def Field(default=None, **kwargs): return default
 
 try:
     from qwenpaw.constant import WORKING_DIR
@@ -116,15 +137,60 @@ def _background_data_url() -> str:
 # ---------------------------------------------------------------------------
 
 
+PBKDF2_ITERATIONS = 200_000
+PBKDF2_PREFIX = "pbkdf2$"
+
+
 def _hash_password(password: str, salt: str | None = None) -> tuple[str, str]:
+    """Return an iterated PBKDF2 hash and the salt used to derive it.
+
+    The returned hash embeds the algorithm, iteration count, salt and digest as
+    ``pbkdf2$<iterations>$<salt_hex>$<digest_hex>`` so ``_verify_password`` can
+    always re-derive it without relying on the separate stored salt.
+    """
     salt = salt or secrets.token_hex(16)
-    digest = hashlib.sha256((salt + password).encode("utf-8")).hexdigest()
-    return digest, salt
+    digest = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), bytes.fromhex(salt), PBKDF2_ITERATIONS
+    ).hex()
+    return f"{PBKDF2_PREFIX}{PBKDF2_ITERATIONS}${salt}${digest}", salt
+
+
+def _verify_pbkdf2(password: str, stored_hash: str) -> bool:
+    try:
+        _, iterations_text, salt_hex, digest_hex = stored_hash.split("$", 3)
+        iterations = int(iterations_text)
+        expected = bytes.fromhex(digest_hex)
+        actual = hashlib.pbkdf2_hmac(
+            "sha256", password.encode("utf-8"), bytes.fromhex(salt_hex), iterations
+        )
+        return hmac.compare_digest(actual, expected)
+    except (ValueError, TypeError):
+        return False
 
 
 def _verify_password(password: str, stored_hash: str, salt: str) -> bool:
-    digest, _ = _hash_password(password, salt)
+    if stored_hash.startswith(PBKDF2_PREFIX):
+        return _verify_pbkdf2(password, stored_hash)
+    # Legacy single-round SHA256: verify and allow the login path to upgrade it.
+    digest = hashlib.sha256((salt + password).encode("utf-8")).hexdigest()
     return hmac.compare_digest(digest, stored_hash)
+
+
+def _is_legacy_hash(stored_hash: str) -> bool:
+    """A hash that predates PBKDF2 and should be re-hashed after a good login."""
+    return bool(stored_hash) and not stored_hash.startswith(PBKDF2_PREFIX)
+
+
+def _upgrade_password_for_user(username: str, password: str) -> None:
+    """Re-hash a legacy SHA256 account to PBKDF2 in place after a successful login."""
+    users = _load_users()
+    for user in users:
+        if user.get("username") == username and _is_legacy_hash(user.get("password_hash", "")):
+            pw_hash, salt = _hash_password(password)
+            user["password_hash"] = pw_hash
+            user["password_salt"] = salt
+            _save_users(users)
+            return
 
 
 def _token_secret() -> str:
@@ -290,6 +356,7 @@ async def login(request: LoginRequest) -> dict[str, Any]:
     if not user or not user.get("active", True) or not _verify_password(
             request.password, user.get("password_hash", ""), user.get("password_salt", "")):
         raise HTTPException(status_code=401, detail="账号或密码错误")
+    _upgrade_password_for_user(request.username.strip(), request.password)
     token = _create_token(user["username"])
     return {
         "token": token,

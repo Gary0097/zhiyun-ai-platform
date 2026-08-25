@@ -64,9 +64,17 @@
     );
   }
 
-  function getJson(path) {
-    return Q.host.fetch(path).then(function (response) {
-      if (!response.ok) throw new Error("HTTP " + response.status);
+  function readToken() {
+    try { return window.localStorage.getItem("zhiyun_token") || ""; } catch (e) { return ""; }
+  }
+  function request(path, options) {
+    var opts = Object.assign({}, options || {});
+    var token = readToken();
+    opts.headers = Object.assign({}, (options && options.headers) || {}, token ? { Authorization: "Bearer " + token } : {});
+    return Q.host.fetch(path, opts).then(function (response) {
+      if (!response.ok) return response.json().catch(function () { return {}; }).then(function (body) {
+        throw new Error(body.detail || ("HTTP " + response.status));
+      });
       return response.json();
     });
   }
@@ -116,7 +124,7 @@
       var text = String(value || "").trim();
       if (!text) { setResults([]); return; }
       setLoading(true); setError("");
-      getJson("/zhiyun-app-discovery/search?q=" + encodeURIComponent(text) + "&limit=12")
+      request("/zhiyun-app-discovery/search?q=" + encodeURIComponent(text) + "&limit=12")
         .then(function (data) { setResults(data.results || []); })
         .catch(function () { setError("应用索引暂时不可用，请检查插件状态。"); })
         .finally(function () { setLoading(false); });
@@ -209,10 +217,16 @@
         agentAdd("bot", "已将「" + text + "」交给应用中心智能体，可到对应 Tab 查看结果。", null);
       }, 240);
     }
-    React.useEffect(function () {
-      Promise.all([getJson("/zhiyun-app-discovery/catalog"), getJson("/zhiyun-app-discovery/progress")])
+    function loadAll() {
+      Promise.all([request("/zhiyun-app-discovery/catalog"), request("/zhiyun-app-discovery/progress")])
         .then(function (values) { setApps(values[0].apps || []); setProgress(values[1]); })
         .catch(function () { setError("应用与进度数据加载失败，请检查插件状态。"); });
+    }
+    React.useEffect(function () {
+      if (readToken()) { loadAll(); return; }
+      function onAuth() { loadAll(); }
+      window.addEventListener("zhiyun:auth", onAuth);
+      return function () { window.removeEventListener("zhiyun:auth", onAuth); };
     }, []);
     var items = [
       { key: "mine", label: "我的应用", children: h(MyApps, { apps: apps }) },

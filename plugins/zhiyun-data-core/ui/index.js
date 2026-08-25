@@ -5,8 +5,14 @@
   var antd = Q.host.antd;
   var h = React.createElement;
 
+  function readToken() {
+    try { return window.localStorage.getItem("zhiyun_token") || ""; } catch (e) { return ""; }
+  }
   function request(path, options) {
-    return Q.host.fetch(path, options).then(function (response) {
+    var opts = Object.assign({}, options || {});
+    var token = readToken();
+    opts.headers = Object.assign({}, (options && options.headers) || {}, token ? { Authorization: "Bearer " + token } : {});
+    return Q.host.fetch(path, opts).then(function (response) {
       if (!response.ok) return response.json().catch(function () { return {}; }).then(function (body) {
         throw new Error(body.detail || ("HTTP " + response.status));
       });
@@ -170,6 +176,11 @@
     }
 
     React.useEffect(function () { loadDataset(selected, source); loadOperations(); }, [selected, source, dataMode]);
+    React.useEffect(function () {
+      function onAuth() { loadDataset(selected, source); loadOperations(); }
+      window.addEventListener("zhiyun:auth", onAuth);
+      return function () { window.removeEventListener("zhiyun:auth", onAuth); };
+    }, [selected, source, dataMode]);
 
     function createBackup() {
       request("/zhiyun-data-core/backups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) })
