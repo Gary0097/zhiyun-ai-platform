@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import random
+import sqlite3
 import uuid
 from typing import Any
 
@@ -230,6 +231,22 @@ _ALL_APP_IDS = sorted({app for apps in APP_ACCESS_BY_DEPT.values() for app in ap
 # 持久化：把配置写入数据库关联表
 # ---------------------------------------------------------------------------
 
+def _sync_agent_model(conn, env_id: str, tenant_id: str, data_mode: str, agent_id: str, canonical_name: str) -> None:
+    """回写智能体绑定模型的名称，确保 agents.model 与 models 表一致。
+
+    当智能体行尚未落入或 agents 表不可用（如最小化单测环境）时静默跳过，
+    不破坏绑定本身的幂等性。
+    """
+    try:
+        conn.execute(
+            "UPDATE agents SET model=? WHERE env_id=? AND tenant_id=? AND data_mode=? AND agent_id=?",
+            (canonical_name, env_id, tenant_id, data_mode, agent_id),
+        )
+    except sqlite3.OperationalError:
+        # agents 表可能未创建（独立调用/最小化测试环境），可安全忽略
+        pass
+
+
 def persist_bindings(conn, env_id: str, tenant_id: str, data_mode: str, spec: dict[str, Any], now: str) -> dict[str, Any]:
     """为一个智能体落地 Model / Skill / Tool / App 权限关联记录，返回配置摘要。"""
     config = build_agent_config(spec)
@@ -248,6 +265,8 @@ def persist_bindings(conn, env_id: str, tenant_id: str, data_mode: str, spec: di
              model["context_window"], model["max_tokens"], model["input_price_per_k"], model["output_price_per_k"],
              model["enabled"], now),
         )
+    # 同步智能体模型名称，确保 agents.model 与 models 表一致
+    _sync_agent_model(conn, env_id, tenant_id, data_mode, config["agent_id"], model["name"])
     # 工具绑定（仅写编目内已注册工具，避免脏数据）
     for tool in config["tools"]:
         if tool["tool_id"] not in TOOL_CATALOG:
