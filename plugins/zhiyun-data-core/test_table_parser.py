@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import importlib.util
 import io
+import sys
+import types
 import unittest
+from unittest import mock
 
 from table_parser import build_export_bytes, parse_table
 
@@ -36,11 +38,28 @@ class TableParserTests(unittest.TestCase):
         self.assertEqual(result["headers"], ["order_no", "customer_name"])
         self.assertEqual(result["rows"][0]["customer_name"], "海川制造")
 
-    @unittest.skipUnless(importlib.util.find_spec("xlrd"), "xlrd not installed")
     def test_xls_parse_requires_xlrd(self) -> None:
-        # .xls parsing is only available when the optional xlrd dependency is installed.
-        with self.assertRaisesRegex(ValueError, "需要安装 xlrd"):
-            parse_table("legacy.xls", b"\xd0\xcf\x11\xe0")
+        # When the optional xlrd dependency is missing, .xls parsing must raise a
+        # clear ValueError instead of leaking an ImportError as an HTTP 500.
+        with mock.patch.dict(sys.modules, {"xlrd": None}):
+            with self.assertRaisesRegex(ValueError, "需要安装 xlrd"):
+                parse_table("legacy.xls", b"\xd0\xcf\x11\xe0")
+
+    def test_xls_parse_handles_corrupt_workbook(self) -> None:
+        # A malformed .xls byte stream must surface as a ValueError, not a 500.
+        class FakeXLRDError(Exception):
+            pass
+
+        fake_xlrd = types.ModuleType("xlrd")
+        fake_xlrd.biffh = types.SimpleNamespace(XLRDError=FakeXLRDError)
+
+        def _boom(file_contents: bytes) -> None:
+            raise FakeXLRDError("not a valid xls")
+
+        fake_xlrd.open_workbook = _boom
+        with mock.patch.dict(sys.modules, {"xlrd": fake_xlrd}):
+            with self.assertRaisesRegex(ValueError, "无法解析 .xls"):
+                parse_table("legacy.xls", b"\xd0\xcf\x11\xe0")
 
     def test_export_csv_bytes_are_bom_prefixed(self) -> None:
         data, media_type, suggested = build_export_bytes(

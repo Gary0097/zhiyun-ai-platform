@@ -34,9 +34,12 @@ def _read_xls(content: bytes) -> list[list[Any]]:
         from xlrd import open_workbook
     except ImportError as exc:  # pragma: no cover
         raise ValueError("解析 .xls 需要安装 xlrd") from exc
-    workbook = open_workbook(file_contents=content)
-    sheet = workbook.sheet_by_index(0)
-    return [sheet.row_values(index) for index in range(sheet.nrows)]
+    try:
+        workbook = open_workbook(file_contents=content)
+        sheet = workbook.sheet_by_index(0)
+        return [sheet.row_values(index) for index in range(sheet.nrows)]
+    except Exception as exc:
+        raise ValueError(f"无法解析 .xls 文件: {exc}") from exc
 
 
 def _safe_sheet_title(value: str) -> str:
