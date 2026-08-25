@@ -235,10 +235,14 @@
           return next;
         });
       }
+      var token = "";
+      try { token = window.localStorage.getItem("zhiyun_token") || ""; } catch (e) {}
+      var agentHeaders = { "Content-Type": "application/json" };
+      if (token) agentHeaders["Authorization"] = "Bearer " + token;
       Q.host.fetch("/zhiyun-app-discovery/agent/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: text, session_id: agentSessionRef.current, user_id: "default", history: history })
+        headers: agentHeaders,
+        body: JSON.stringify({ text: text, session_id: agentSessionRef.current, user_id: "default", app_id: "zhiyun-app-discovery", history: history })
       })
       .then(function (response) {
         if (!response.ok || !response.body) {

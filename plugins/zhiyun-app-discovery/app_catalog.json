@@ -161,7 +161,7 @@
       "app_id": "zhiyun-app-discovery",
       "name": "应用与项目中心",
       "aliases": ["应用中心", "项目进度", "功能清单"],
-      "version": "0.3.0",
+      "version": "0.4.0",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",

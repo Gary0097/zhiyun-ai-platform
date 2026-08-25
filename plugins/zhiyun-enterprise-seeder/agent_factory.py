@@ -120,14 +120,14 @@ CATEGORY_DEFAULT_TOOLS: dict[str, list[str]] = {
 
 # 部门 -> 可访问应用（与宿主 DEPT_APP_MAP 保持一致；不一致会被测试捕获）。
 APP_ACCESS_BY_DEPT: dict[str, list[str]] = {
-    "销售部": ["sales_center", "data_center", "project_center"],
-    "财务部": ["finance_center", "data_center", "project_center"],
-    "采购部": ["supply_center", "data_center", "project_center"],
-    "客服部": ["service_center", "data_center", "project_center"],
-    "运营部": ["sales_center", "supply_center", "data_center", "project_center"],
-    "生产部": ["order_center", "data_center", "project_center"],
-    "管理层": ["finance_center", "sales_center", "data_center", "project_center"],
-    "研发部": ["project_center", "data_center", "order_center"],
+    "销售部": ["sales_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "财务部": ["finance_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "采购部": ["supply_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "客服部": ["service_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "运营部": ["sales_center", "supply_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "生产部": ["order_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "管理层": ["finance_center", "sales_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "研发部": ["project_center", "data_center", "order_center", "qwenpaw-knowledge-base"],
 }
 
 

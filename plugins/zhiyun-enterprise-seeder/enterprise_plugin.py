@@ -365,6 +365,7 @@ APP_TEMPLATES = [
     {"id": "service_center", "name": "智能售后服务中心", "category": "业务", "icon": "🎧"},
     {"id": "people_center", "name": "智能人力与协同中心", "category": "业务", "icon": "🧑‍🤝‍🧑"},
     {"id": "project_center", "name": "应用与项目中心", "category": "系统", "icon": "🧭"},
+    {"id": "qwenpaw-knowledge-base", "name": "工作区知识库", "category": "知识", "icon": "📚"},
 ]
 
 ROLE_TEMPLATES = [
@@ -740,14 +741,14 @@ def _shift_time(t: str, ms: int) -> str:
 # ---------------------------------------------------------------------------
 
 DEPT_APP_MAP = {
-    "销售部": ["sales_center", "data_center", "project_center"],
-    "财务部": ["finance_center", "data_center", "project_center"],
-    "采购部": ["supply_center", "data_center", "project_center"],
-    "客服部": ["service_center", "data_center", "project_center"],
-    "运营部": ["sales_center", "supply_center", "data_center", "project_center"],
-    "生产部": ["order_center", "data_center", "project_center"],
-    "管理层": ["finance_center", "sales_center", "data_center", "project_center"],
-    "研发部": ["project_center", "data_center", "order_center"],
+    "销售部": ["sales_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "财务部": ["finance_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "采购部": ["supply_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "客服部": ["service_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "运营部": ["sales_center", "supply_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "生产部": ["order_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "管理层": ["finance_center", "sales_center", "data_center", "project_center", "qwenpaw-knowledge-base"],
+    "研发部": ["project_center", "data_center", "order_center", "qwenpaw-knowledge-base"],
 }
 
 DATA_SOURCE_MAP = {
@@ -759,6 +760,7 @@ DATA_SOURCE_MAP = {
     "service_center": ("售后服务工单", "excel"),
     "people_center": ("组织与员工档案", "excel"),
     "project_center": ("应用与项目台账", "workspace"),
+    "qwenpaw-knowledge-base": ("企业知识库文档", "workspace"),
 }
 
 
@@ -772,6 +774,7 @@ APP_DEFAULT_AGENT_MAP = {
     "service_center": "after_sales",        # 智能售后服务中心 -> 售后客服
     "people_center": "expense_audit",       # 智能人力与协同中心 -> 报销审核
     "project_center": "business_analyst",   # 应用与项目中心 -> 经营分析
+    "qwenpaw-knowledge-base": "business_analyst",  # 工作区知识库 -> 经营分析
 }
 
 
