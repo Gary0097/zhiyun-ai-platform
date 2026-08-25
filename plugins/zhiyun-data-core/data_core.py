@@ -14,11 +14,20 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Iterator
 
+try:
+    from .table_parser import build_export_bytes
+except ImportError:  # pragma: no cover
+    from table_parser import build_export_bytes
+
 SCHEMA_VERSION = 3
 FIELD_NAME = re.compile(r"^[a-z][a-z0-9_]{0,62}$")
 FIELD_TYPES = {"text", "integer", "number", "boolean", "date", "datetime"}
 SOURCE_TYPES = {"real", "simulated"}
 DATA_MODES = {"demo", "production"}
+
+_UNIQUE_FIELDS = {
+    "orders": ["order_no"],
+}
 
 CONTEXT_KEY = "active_context"
 
@@ -460,6 +469,7 @@ class DataCore:
             if row_errors:
                 errors.append({"row": row_number, "errors": row_errors})
             normalized.append(target)
+        duplicate_info = self.check_duplicates(entity, rows, mapping=field_mapping)
         return {
             "entity": entity,
             "mapping": field_mapping,
@@ -467,7 +477,63 @@ class DataCore:
             "valid_count": len(rows) - len(errors),
             "error_count": len(errors),
             "errors": errors[:100],
+            "duplicate_count": duplicate_info["duplicate_count"],
+            "duplicate_rows": duplicate_info["duplicate_rows"],
             "preview": normalized[:20],
+        }
+
+    def check_duplicates(
+        self,
+        entity: str,
+        rows: list[dict[str, Any]],
+        mapping: dict[str, str] | None = None,
+        unique_fields: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Report rows that share the same configured unique key within the batch."""
+        if not rows:
+            raise DataCoreError("import rows cannot be empty")
+        schema = self.list_schema(entity)
+        active_fields = {field["name"]: field for field in schema["fields"] if field["active"]}
+        field_mapping = mapping or {key: key for key in rows[0]}
+        unknown_targets = sorted(set(field_mapping.values()) - set(active_fields))
+        if unknown_targets:
+            raise DataCoreError(f"unknown target fields: {', '.join(unknown_targets)}")
+        if unique_fields is None:
+            unique_fields = _UNIQUE_FIELDS.get(entity, [])
+        unknown_unique = sorted(set(unique_fields) - set(active_fields))
+        if unknown_unique:
+            raise DataCoreError(f"unknown unique fields: {', '.join(unknown_unique)}")
+        seen: dict[tuple[str, ...], int] = {}
+        normalized: list[dict[str, Any]] = []
+        for source in rows:
+            target = {target_name: source.get(source_name) for source_name, target_name in field_mapping.items()}
+            normalized.append(target)
+            if not unique_fields:
+                continue
+            key_values = tuple(target.get(field) for field in unique_fields)
+            if any(value in (None, "") for value in key_values):
+                continue
+            key = tuple(str(value) for value in key_values)
+            seen[key] = seen.get(key, 0) + 1
+        duplicate_rows: list[dict[str, Any]] = []
+        duplicate_count = 0
+        if unique_fields:
+            for target in normalized:
+                key_values = tuple(target.get(field) for field in unique_fields)
+                if any(value in (None, "") for value in key_values):
+                    continue
+                key = tuple(str(value) for value in key_values)
+                count = seen.get(key, 0)
+                if count > 1:
+                    duplicate_count += 1
+                    duplicate_rows.append({
+                        "row": target,
+                        "fields": {field: target.get(field) for field in unique_fields},
+                        "count": count,
+                    })
+        return {
+            "duplicate_count": duplicate_count,
+            "duplicate_rows": duplicate_rows[:50],
         }
 
     def import_rows(
@@ -726,6 +792,33 @@ class DataCore:
             if len(matched) >= max(1, min(limit, 200)):
                 break
         return matched
+    def export_records(
+        self,
+        entity: str,
+        *,
+        format: str = "xlsx",
+        data_mode: str | None = None,
+        source_type: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        limit: int = 1000,
+    ) -> tuple[bytes, str, str]:
+        """Export active fields as CSV or XLSX bytes, respecting data-mode isolation."""
+        if format not in {"xlsx", "csv"}:
+            raise DataCoreError("export format 只能是 xlsx 或 csv")
+        schema = self.list_schema(entity)
+        headers = [field["name"] for field in schema["fields"] if field["active"]]
+        records = self.list_records(
+            entity,
+            limit=max(1, min(limit, 1000)),
+            source_type=source_type,
+            data_mode=data_mode,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        rows = [record["data"] for record in records]
+        return build_export_bytes(f"{entity}.{format}", headers, rows)
+
     def list_batches(self, entity: str | None = None, data_mode: str | None = None) -> list[dict[str, Any]]:
         query = "SELECT * FROM data_batches"
         params: tuple[Any, ...] = ()

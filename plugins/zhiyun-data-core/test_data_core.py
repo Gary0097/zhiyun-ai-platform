@@ -163,5 +163,43 @@ class DataCoreTests(unittest.TestCase):
         self.assertEqual(prod_batches[0]["data_mode"], "production")
 
 
+
+    def test_preview_import_reports_duplicate_rows(self) -> None:
+        rows = [
+            {"order_no": "DUP-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50},
+            {"order_no": "DUP-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50},
+        ]
+        preview = self.core.preview_import("orders", rows)
+        self.assertEqual(preview["duplicate_count"], 2)
+        self.assertEqual(len(preview["duplicate_rows"]), 2)
+
+    def test_export_respects_data_mode_isolation(self) -> None:
+        real = {"order_no": "PROD-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
+        self.core.import_rows("orders", [real])  # real import lands in production by default
+        self.core.generate_orders(3, seed=9)     # simulation lands in demo by default
+        data, media_type, suggested = self.core.export_records("orders", format="csv", data_mode="production")
+        self.assertEqual(media_type, "text/csv; charset=utf-8")
+        self.assertEqual(suggested, "orders.csv")
+        text = data.decode("utf-8-sig")
+        self.assertIn("PROD-1", text)
+        self.assertNotIn("SIM-", text)
+        demo_data, _, _ = self.core.export_records("orders", format="csv", data_mode="demo")
+        demo_text = demo_data.decode("utf-8-sig")
+        self.assertNotIn("PROD-1", demo_text)
+        self.assertIn("SIM-", demo_text)
+
+    def test_export_respects_source_type_filter(self) -> None:
+        real = {"order_no": "REAL-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
+        self.core.import_rows("orders", [real])
+        self.core.generate_orders(3, seed=11)
+        data, _, _ = self.core.export_records("orders", format="csv", data_mode="production", source_type="real")
+        text = data.decode("utf-8-sig")
+        self.assertIn("REAL-1", text)
+        self.assertNotIn("SIM-", text)
+
+    def test_export_rejects_invalid_format(self) -> None:
+        with self.assertRaisesRegex(DataCoreError, "xlsx"):
+            self.core.export_records("orders", format="json")
+
 if __name__ == "__main__":
     unittest.main()

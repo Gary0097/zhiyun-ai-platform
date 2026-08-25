@@ -9,7 +9,12 @@
     "backend": "data_core_plugin.py",
     "frontend": "ui/index.js"
   },
-  "dependencies": ["openpyxl>=3.1,<4", "python-multipart>=0.0.9,<1", "cryptography>=45,<51"],
+  "dependencies": [
+    "openpyxl>=3.1,<4",
+    "python-multipart>=0.0.9,<1",
+    "cryptography>=45,<51",
+    "xlrd>=2.0,<3"
+  ],
   "qwenpaw_version": {
     "min": "2.1.0",
     "max": "2.2.0"
@@ -25,6 +30,27 @@
       "chat": true,
       "storage": true
     },
-    "features": ["workspace-sqlite", "schema-registry", "migration-journal", "verified-backup", "encrypted-backup", "confirmed-recovery", "custom-datasets", "production-template", "generic-excel-import", "import-preview", "simulation-batches", "batch-rollback", "data-browser", "schema-preview", "bounded-order-query"]
+    "features": [
+      "workspace-sqlite",
+      "schema-registry",
+      "migration-journal",
+      "verified-backup",
+      "encrypted-backup",
+      "confirmed-recovery",
+      "custom-datasets",
+      "production-template",
+      "generic-excel-import",
+      "import-preview",
+      "simulation-batches",
+      "batch-rollback",
+      "data-browser",
+      "schema-preview",
+      "bounded-order-query",
+      "xls-parser",
+      "duplicate-detection",
+      "data-export",
+      "csv-export",
+      "xlsx-export"
+    ]
   }
 }

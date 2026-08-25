@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Safe CSV/XLSX parser for generic Data Core imports."""
+"""Safe CSV/XLSX/XLS parser and builder for generic Data Core imports/exports."""
 
 from __future__ import annotations
 
 import csv
 import io
+import re
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +29,24 @@ def _clean_rows(rows: list[list[Any]]) -> tuple[list[str], list[dict[str, Any]]]
     return active, records
 
 
+def _read_xls(content: bytes) -> list[list[Any]]:
+    try:
+        from xlrd import open_workbook
+    except ImportError as exc:  # pragma: no cover
+        raise ValueError("解析 .xls 需要安装 xlrd") from exc
+    workbook = open_workbook(file_contents=content)
+    sheet = workbook.sheet_by_index(0)
+    return [sheet.row_values(index) for index in range(sheet.nrows)]
+
+
+def _safe_sheet_title(value: str) -> str:
+    """Sanitize a workbook sheet title to Excel's allowed characters."""
+    cleaned = re.sub(r"[\[\]:*?/\\]", "", value).strip()
+    if not cleaned:
+        cleaned = "Sheet1"
+    return cleaned[:31]
+
+
 def parse_table(filename: str, content: bytes) -> dict[str, Any]:
     suffix = Path(filename).suffix.casefold()
     if suffix == ".csv":
@@ -41,4 +60,32 @@ def parse_table(filename: str, content: bytes) -> dict[str, Any]:
         sheet = workbook[workbook.sheetnames[0]]
         headers, rows = _clean_rows([list(row) for row in sheet.iter_rows(values_only=True)])
         return {"filename": filename, "sheet": sheet.title, "headers": headers, "rows": rows, "row_count": len(rows)}
-    raise ValueError("仅支持 .xlsx 和 .csv 文件")
+    if suffix == ".xls":
+        headers, rows = _clean_rows(_read_xls(content))
+        return {"filename": filename, "sheet": None, "headers": headers, "rows": rows, "row_count": len(rows)}
+    raise ValueError("仅支持 .xlsx、.xls 和 .csv 文件")
+
+
+def build_export_bytes(filename: str, headers: list[str], rows: list[dict[str, Any]]) -> tuple[bytes, str, str]:
+    """Build export bytes and return (bytes, media_type, suggested_filename)."""
+    base = Path(filename).stem
+    suffix = Path(filename).suffix.casefold()
+    if suffix == ".csv":
+        buffer = io.StringIO()
+        writer = csv.writer(buffer, lineterminator="\n")
+        writer.writerow(headers)
+        for row in rows:
+            writer.writerow([row.get(header) for header in headers])
+        data = ("\ufeff" + buffer.getvalue()).encode("utf-8")
+        return data, "text/csv; charset=utf-8", f"{base}.csv"
+    from openpyxl import Workbook
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = _safe_sheet_title(base)
+    sheet.append(headers)
+    for row in rows:
+        sheet.append([row.get(header) for header in headers])
+    buffer = io.BytesIO()
+    workbook.save(buffer)
+    return buffer.getvalue(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", f"{base}.xlsx"

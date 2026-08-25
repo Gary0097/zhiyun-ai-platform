@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, File, HTTPException, Query, Response, UploadFile
 from pydantic import BaseModel, Field
 from qwenpaw.plugins.api import PluginApi
 
@@ -245,6 +245,34 @@ async def records(
             ),
         }
     )
+
+@router.get("/export/{entity}")
+async def export_records(
+    entity: str,
+    format: str = Query(default="xlsx", pattern="^(xlsx|csv)$"),
+    data_mode: str | None = Query(default=None, max_length=20),
+    source_type: str | None = None,
+    start_date: str | None = Query(default=None, max_length=16),
+    end_date: str | None = Query(default=None, max_length=16),
+    limit: int = Query(default=1000, ge=1, le=1000),
+) -> Response:
+    def run() -> Response:
+        content, media_type, suggested = core.export_records(
+            entity,
+            format=format,
+            data_mode=_mode_q(data_mode),
+            source_type=source_type,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+        )
+        return Response(
+            content=content,
+            media_type=media_type,
+            headers={"Content-Disposition": f'attachment; filename="{suggested}"'},
+        )
+    return _handle(run)
+
 
 @router.get("/orders")
 async def orders(
