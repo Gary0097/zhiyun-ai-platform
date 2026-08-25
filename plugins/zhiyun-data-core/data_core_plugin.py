@@ -55,6 +55,7 @@ class ImportPreview(BaseModel):
     rows: list[dict[str, Any]] = Field(min_length=1, max_length=10000)
     mapping: dict[str, str] | None = None
     source_name: str = "manual-import"
+    data_mode: str | None = None
 
 
 class SimulationCreate(BaseModel):
@@ -191,7 +192,7 @@ async def update_field(entity: str, field_name: str, request: FieldPatch) -> dic
 
 @router.post("/imports/{entity}/preview")
 async def preview_import(entity: str, request: ImportPreview) -> dict[str, Any]:
-    return _handle(lambda: core.preview_import(entity, request.rows, request.mapping))
+    return _handle(lambda: core.preview_import(entity, request.rows, request.mapping, data_mode=_mode_required(request.data_mode)))
 
 
 @router.post("/imports/{entity}/commit")
@@ -204,7 +205,7 @@ async def commit_import(
             request.rows,
             mapping=request.mapping,
             source_name=request.source_name,
-            data_mode=_mode_required(data_mode),
+            data_mode=_mode_required(request.data_mode or data_mode),
         )
     )
 

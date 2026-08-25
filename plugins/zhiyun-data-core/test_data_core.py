@@ -173,6 +173,36 @@ class DataCoreTests(unittest.TestCase):
         self.assertEqual(preview["duplicate_count"], 2)
         self.assertEqual(len(preview["duplicate_rows"]), 2)
 
+    def test_cross_batch_duplicate_key_is_detected_against_existing_records(self) -> None:
+        row = {"order_no": "PROD-2", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
+        self.core.import_rows("orders", [row], data_mode="production")
+        duplicate = {"order_no": "PROD-2", "customer_name": "星联科技", "product_name": "伺服电机", "quantity": 5, "order_date": "2026-08-05", "promised_date": "2026-08-25", "status": "待排产", "progress": 0}
+        preview = self.core.preview_import("orders", [duplicate], data_mode="production")
+        self.assertEqual(preview["duplicate_count"], 1)
+        self.assertEqual(preview["duplicate_rows"][0]["fields"]["order_no"], "PROD-2")
+        self.assertTrue(preview["duplicate_rows"][0]["existing"])
+        with self.assertRaisesRegex(DataCoreError, "duplicate"):
+            self.core.import_rows("orders", [duplicate], data_mode="production")
+
+    def test_duplicate_rows_block_commit(self) -> None:
+        rows = [
+            {"order_no": "DUP-2", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50},
+            {"order_no": "DUP-2", "customer_name": "星联科技", "product_name": "伺服电机", "quantity": 5, "order_date": "2026-08-05", "promised_date": "2026-08-25", "status": "待排产", "progress": 0},
+        ]
+        preview = self.core.preview_import("orders", rows, data_mode="production")
+        self.assertEqual(preview["duplicate_count"], 2)
+        with self.assertRaisesRegex(DataCoreError, "duplicate"):
+            self.core.import_rows("orders", rows, data_mode="production")
+
+    def test_duplicate_key_across_environments_is_isolated(self) -> None:
+        prod = {"order_no": "SHARED-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
+        self.core.import_rows("orders", [prod], data_mode="production")
+        demo = {"order_no": "SHARED-1", "customer_name": "星联科技", "product_name": "伺服电机", "quantity": 5, "order_date": "2026-08-05", "promised_date": "2026-08-25", "status": "待排产", "progress": 0}
+        preview = self.core.preview_import("orders", [demo], data_mode="demo")
+        self.assertEqual(preview["duplicate_count"], 0)
+        batch = self.core.import_rows("orders", [demo], data_mode="demo")
+        self.assertEqual(batch["data_mode"], "demo")
+
     def test_export_respects_data_mode_isolation(self) -> None:
         real = {"order_no": "PROD-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
         self.core.import_rows("orders", [real])  # real import lands in production by default

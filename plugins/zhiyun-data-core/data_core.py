@@ -452,6 +452,7 @@ class DataCore:
         entity: str,
         rows: list[dict[str, Any]],
         mapping: dict[str, str] | None = None,
+        data_mode: str | None = None,
     ) -> dict[str, Any]:
         if not rows:
             raise DataCoreError("import rows cannot be empty")
@@ -469,7 +470,7 @@ class DataCore:
             if row_errors:
                 errors.append({"row": row_number, "errors": row_errors})
             normalized.append(target)
-        duplicate_info = self.check_duplicates(entity, rows, mapping=field_mapping)
+        duplicate_info = self.check_duplicates(entity, rows, mapping=field_mapping, data_mode=data_mode)
         return {
             "entity": entity,
             "mapping": field_mapping,
@@ -488,8 +489,9 @@ class DataCore:
         rows: list[dict[str, Any]],
         mapping: dict[str, str] | None = None,
         unique_fields: list[str] | None = None,
+        data_mode: str | None = None,
     ) -> dict[str, Any]:
-        """Report rows that share the same configured unique key within the batch."""
+        """Report rows that duplicate a unique key already in the target environment or within the batch."""
         if not rows:
             raise DataCoreError("import rows cannot be empty")
         schema = self.list_schema(entity)
@@ -503,6 +505,7 @@ class DataCore:
         unknown_unique = sorted(set(unique_fields) - set(active_fields))
         if unknown_unique:
             raise DataCoreError(f"unknown unique fields: {', '.join(unknown_unique)}")
+        existing_keys = self._existing_unique_keys(entity, unique_fields, data_mode)
         seen: dict[tuple[str, ...], int] = {}
         normalized: list[dict[str, Any]] = []
         for source in rows:
@@ -524,17 +527,51 @@ class DataCore:
                     continue
                 key = tuple(str(value) for value in key_values)
                 count = seen.get(key, 0)
-                if count > 1:
+                if count > 1 or key in existing_keys:
                     duplicate_count += 1
                     duplicate_rows.append({
                         "row": target,
                         "fields": {field: target.get(field) for field in unique_fields},
                         "count": count,
+                        "existing": key in existing_keys,
                     })
         return {
             "duplicate_count": duplicate_count,
             "duplicate_rows": duplicate_rows[:50],
         }
+
+    def _existing_unique_keys(
+        self,
+        entity: str,
+        unique_fields: list[str],
+        data_mode: str | None,
+    ) -> set[tuple[str, ...]]:
+        """Return unique keys already stored in the target environment for this entity."""
+        keys: set[tuple[str, ...]] = set()
+        if not unique_fields:
+            return keys
+        mode: str | None = None
+        if data_mode is not None:
+            mode = _normalize_data_mode(data_mode)
+        else:
+            mode = self.get_context()["data_mode"] or None
+        if not mode:
+            return keys
+        with self.connect() as connection:
+            rows = connection.execute(
+                "SELECT payload FROM data_records WHERE entity = ? AND data_mode = ?",
+                (entity, mode),
+            ).fetchall()
+        for row in rows:
+            try:
+                record = json.loads(row["payload"])
+            except (TypeError, ValueError):
+                continue
+            key_values = tuple(record.get(field) for field in unique_fields)
+            if any(value in (None, "") for value in key_values):
+                continue
+            keys.add(tuple(str(value) for value in key_values))
+        return keys
 
     def import_rows(
         self,
@@ -545,10 +582,12 @@ class DataCore:
         source_name: str = "manual-import",
         data_mode: str = "production",
     ) -> dict[str, Any]:
-        preview = self.preview_import(entity, rows, mapping)
+        data_mode = _normalize_data_mode(data_mode)
+        preview = self.preview_import(entity, rows, mapping, data_mode=data_mode)
         if preview["error_count"]:
             raise DataCoreError("import validation failed; fix preview errors before commit")
-        data_mode = _normalize_data_mode(data_mode)
+        if preview["duplicate_count"]:
+            raise DataCoreError("import validation failed; fix duplicate rows before commit")
         batch_id = self._insert_batch(
             entity,
             preview["preview"] if len(rows) <= 20 else [
