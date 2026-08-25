@@ -14,6 +14,65 @@
     });
   }
 
+  function zySpark() { return h("span", { style: { fontSize: 13 } }, "✦"); }
+  function zyPushAgent(ctx) {
+    if (Q.setAgentContext) Q.setAgentContext(ctx);
+    else window.dispatchEvent(new CustomEvent("qwenpaw:agent-context", { detail: ctx }));
+  }
+  function AgentDock(props) {
+    var listRef = React.useRef(null);
+    React.useEffect(function () {
+      if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+    }, [props.messages]);
+    if (!props.open) return null;
+    var S = {
+      mask: { position: "fixed", inset: 0, background: "rgba(15,23,42,0.32)", zIndex: 1200 },
+      dock: { position: "fixed", top: 0, right: 0, bottom: 0, width: "min(420px,92vw)", background: "#ffffff", borderLeft: "1px solid #e3e8ef", boxShadow: "-10px 0 30px rgba(16,24,40,0.16)", zIndex: 1201, display: "flex", flexDirection: "column" },
+      chat: { display: "flex", flexDirection: "column", height: "100%" },
+      head: { padding: "14px 16px", background: "#ffffff", borderBottom: "1px solid #e3e8ef" },
+      close: { border: "none", background: "transparent", cursor: "pointer", fontSize: 18, lineHeight: 1, color: "#98a2b3", padding: "4px 8px", borderRadius: 6 },
+      list: { flex: "1 1 auto", overflow: "auto", padding: 16 },
+      msg: { display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 },
+      bubble: { maxWidth: "92%", padding: "10px 12px", borderRadius: 11, fontSize: "12.5px", lineHeight: 1.6, boxShadow: "0 1px 2px rgba(16,24,40,0.04)", whiteSpace: "pre-wrap" },
+      card: { maxWidth: "92%", background: "#ffffff", border: "1px solid #e3e8ef", borderRadius: 11, padding: "12px 14px", boxShadow: "0 1px 2px rgba(16,24,40,0.04)", fontSize: 12.5 },
+      input: { padding: "12px 14px", background: "#ffffff", borderTop: "1px solid #e3e8ef" },
+      chips: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 },
+      chip: { border: "1px solid #e3e8ef", background: "#ffffff", borderRadius: 999, padding: "6px 12px", fontSize: 12, color: "#5b6472", cursor: "pointer" }
+    };
+    return h("div", null,
+      h("div", { style: S.mask, onClick: props.onClose }),
+      h("div", { style: S.dock },
+        h("div", { style: S.chat },
+          h("div", { style: S.head },
+            h("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 } },
+              h("span", { style: { fontWeight: 650, fontSize: 15, color: "#1f2933" } }, "智能体助手 · " + (props.moduleLabel || "")),
+              h("button", { "aria-label": "关闭", onClick: props.onClose, style: S.close }, "✕")
+            ),
+            h("div", { style: { fontSize: 12, color: "#5b6472", marginTop: 8, lineHeight: 1.5 } }, "直接打字告诉我要做什么，或点击下方快捷指令，自动载入示例并交给智能体处理。"),
+            h("div", { style: S.chips },
+              (props.chips || []).map(function (c) {
+                return h("span", { key: c.key, style: S.chip, onClick: function () { props.onCommand(c.key, c.label); } }, c.label);
+              })
+            )
+          ),
+          h("div", { style: S.list, ref: listRef },
+            (props.messages || []).map(function (msg, i) {
+              var user = msg.role === "user";
+              return h("div", { key: i, style: Object.assign({}, S.msg, user ? { alignItems: "flex-end" } : { alignItems: "flex-start" }) },
+                h("div", { style: Object.assign({}, S.bubble, user ? { background: "#2563eb", color: "#fff", borderBottomRightRadius: 3 } : { background: "#ffffff", border: "1px solid #e3e8ef", color: "#1f2933", borderBottomLeftRadius: 3 }) }, msg.text),
+                msg.card ? h("div", { style: S.card }, msg.card) : null
+              );
+            })
+          ),
+          h("div", { style: S.input },
+            h(antd.Input, { value: props.draft, placeholder: props.placeholder || "例如：帮我汇总当前数据", onChange: function (e) { props.setDraft(e.target.value); }, onPressEnter: function (e) { if (props.draft.trim()) { props.onSend(props.draft); e.preventDefault(); } } }),
+            h(antd.Button, { type: "primary", style: { marginTop: 10, width: "100%" }, loading: props.busy, onClick: function () { if (props.draft.trim()) props.onSend(props.draft); } }, "发送")
+          )
+        )
+      )
+    );
+  }
+
   function DataBrowser() {
     var entitiesState = React.useState([]);
     var entities = entitiesState[0];
@@ -30,6 +89,9 @@
     var sourceState = React.useState("");
     var source = sourceState[0];
     var setSource = sourceState[1];
+    var dataModeState = React.useState("");
+    var dataMode = dataModeState[0];
+    var setDataMode = dataModeState[1];
     var loadingState = React.useState(false);
     var loading = loadingState[0];
     var setLoading = loadingState[1];
@@ -56,9 +118,34 @@
     var backupsState = React.useState([]);
     var backups = backupsState[0];
     var setBackups = backupsState[1];
+    var agentOpenState = React.useState(false), agentOpen = agentOpenState[0], setAgentOpen = agentOpenState[1];
+    var agentDraftState = React.useState(""), agentDraft = agentDraftState[0], setAgentDraft = agentDraftState[1];
+    var agentMsgState = React.useState([]), agentMessages = agentMsgState[0], setAgentMessages = agentMsgState[1];
+    var agentBusyState = React.useState(false), agentBusy = agentBusyState[0], setAgentBusy = agentBusyState[1];
+    function agentAdd(role, text, card) { setAgentMessages(function (prev) { return prev.concat([{ role: role, text: text, card: card }]); }); }
+    function agentCommand(key, label) {
+      agentAdd("user", label || key);
+      setAgentBusy(true);
+      setTimeout(function () {
+        zyPushAgent({ app_id: "zhiyun-data-core", kind: key, label: label || key, summary: { entities: entities, records: records, health: health }, source_type: "real" });
+        setAgentBusy(false);
+        agentAdd("bot", key === "preview" ? "已汇总数据预览上下文，可直接在界面操作数据表、导入或生成演示数据。" : "已定位至数据管理操作，请在界面完成具体动作。", null);
+      }, 240);
+    }
+    function agentSend(text) {
+      agentAdd("user", text);
+      setAgentBusy(true);
+      var key = /预览|数据|表|记录/.test(text) ? "preview" : "health";
+      setTimeout(function () {
+        zyPushAgent({ app_id: "zhiyun-data-core", kind: key, label: text, summary: { entities: entities, records: records, health: health }, source_type: "real" });
+        setAgentBusy(false);
+        agentAdd("bot", "已将「" + text + "」交给数据智能体，可返回界面查看数据表与字段结构。", null);
+      }, 240);
+    }
 
     function loadEntities() {
-      return request("/zhiyun-data-core/entities").then(function (data) { setEntities(data.entities || []); });
+      var suffix = dataMode ? "?data_mode=" + encodeURIComponent(dataMode) : "";
+      return request("/zhiyun-data-core/entities" + suffix).then(function (data) { setEntities(data.entities || []); });
     }
 
     function loadOperations() {
@@ -69,7 +156,9 @@
 
     function loadDataset(entity, sourceType) {
       setLoading(true); setError("");
-      var suffix = sourceType ? "?limit=100&source_type=" + encodeURIComponent(sourceType) : "?limit=100";
+      var suffix = "?limit=100";
+      if (sourceType) suffix += "&source_type=" + encodeURIComponent(sourceType);
+      if (dataMode) suffix += "&data_mode=" + encodeURIComponent(dataMode);
       Promise.all([
         request("/zhiyun-data-core/schemas/" + encodeURIComponent(entity)),
         request("/zhiyun-data-core/records/" + encodeURIComponent(entity) + suffix),
@@ -80,7 +169,7 @@
         .finally(function () { setLoading(false); });
     }
 
-    React.useEffect(function () { loadDataset(selected, source); loadOperations(); }, [selected, source]);
+    React.useEffect(function () { loadDataset(selected, source); loadOperations(); }, [selected, source, dataMode]);
 
     function createBackup() {
       request("/zhiyun-data-core/backups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) })
@@ -98,10 +187,11 @@
 
     function simulate(entity) {
       setLoading(true); setError("");
-      request("/zhiyun-data-core/simulate/" + encodeURIComponent(entity), {
+      var q = dataMode ? "?data_mode=" + encodeURIComponent(dataMode) : "";
+      request("/zhiyun-data-core/simulate/" + encodeURIComponent(entity) + q, {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ count: 20 })
-      }).then(function () { message.success("已生成 20 条可撤销的模拟数据"); loadDataset(entity, source); })
-        .catch(function (reason) { setError(reason.message || "模拟数据生成失败"); setLoading(false); });
+      }).then(function () { message.success("已生成 20 条可撤销的演示数据"); loadDataset(entity, source); })
+        .catch(function (reason) { setError(reason.message || "演示数据生成失败"); setLoading(false); });
     }
 
     function createDataset() {
@@ -134,10 +224,11 @@
     }
 
     function commitImport() {
-      request("/zhiyun-data-core/imports/" + encodeURIComponent(selected) + "/commit", {
+      var q = dataMode ? "?data_mode=" + encodeURIComponent(dataMode) : "";
+      request("/zhiyun-data-core/imports/" + encodeURIComponent(selected) + "/commit" + q, {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rows: importData.rows, mapping: mapping, source_name: importData.filename })
       }).then(function (result) {
-        message.success("已导入 " + result.row_count + " 条真实数据"); setImportData(null); setPreview(null); return loadDataset(selected, source);
+        message.success("已导入 " + result.row_count + " 条正式数据"); setImportData(null); setPreview(null); return loadDataset(selected, source);
       }).catch(function (reason) { message.error(reason.message); });
     }
 
@@ -145,8 +236,11 @@
     var columns = activeFields.map(function (field) {
       return { title: field.label, dataIndex: ["data", field.name], key: field.name, width: 150, ellipsis: true };
     });
-    columns.push({ title: "数据来源", dataIndex: "source_type", key: "source_type", fixed: "right", width: 100,
-      render: function (value) { return h(antd.Tag, { color: value === "real" ? "green" : "blue" }, value === "real" ? "真实" : "模拟"); }
+    columns.push({ title: "数据环境", dataIndex: "data_mode", key: "data_mode", fixed: "right", width: 110,
+      render: function (value) { return h(antd.Tag, { color: value === "production" ? "green" : "blue" }, value === "production" ? "正式 Live" : "演示 Demo"); }
+    });
+    columns.push({ title: "来源", dataIndex: "source_type", key: "source_type", fixed: "right", width: 100,
+      render: function (value) { return h(antd.Tag, { color: value === "real" ? "geekblue" : "purple" }, value === "real" ? "已导入" : "系统生成"); }
     });
     var current = entities.find(function (item) { return item.entity === selected; }) || {};
 
@@ -154,18 +248,19 @@
       h("div", { style: { maxWidth: 1400, margin: "0 auto" } },
         h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 } },
           h("div", null, h("h2", { style: { marginBottom: 4 } }, "统一数据中心"),
-            h("p", { style: { color: "#667085", marginTop: 0 } }, "查看各 PawApp 共享数据库中的表结构、真实数据与模拟数据。")),
+            h("p", { style: { color: "#667085", marginTop: 0 } }, "查看各 PawApp 共享数据库中的表结构、演示数据与正式数据。")),
           h("div", { style: { display: "flex", gap: 8 } },
+            h(antd.Button, { type: "primary", onClick: function () { setAgentOpen(true); } }, zySpark(), " 问 Agent"),
             h(antd.Button, { onClick: function () { loadDataset(selected, source); } }, "刷新"),
             h(antd.Button, { onClick: createBackup }, "创建校验备份"),
             h(antd.Button, { onClick: function () { setCreateOpen(true); } }, "新建数据表"),
             h(antd.Upload, { accept: ".xlsx,.csv", showUploadList: false, beforeUpload: upload }, h(antd.Button, { type: selected === "orders" ? "default" : "primary" }, "导入 Excel/CSV")),
-            selected === "orders" || selected === "production" ? h(antd.Button, { type: "primary", onClick: function () { simulate(selected); }, loading: loading }, selected === "orders" ? "生成 20 条模拟订单" : "生成 20 条模拟生产数据") : null)
+            selected === "orders" || selected === "production" ? h(antd.Button, { type: "primary", onClick: function () { simulate(selected); }, loading: loading }, selected === "orders" ? "生成 20 条演示订单" : "生成 20 条演示生产数据") : null)
         ),
-        h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：集中管理所有智造云应用共享的数据、字段、导入批次、模拟数据、健康检查和安全备份。"), h("ol", null, h("li", null, "用“导入 Excel/CSV”导入真实业务数据并核对字段。"), h("li", null, "测试时可明确生成带来源标记的模拟数据，并可按批次撤销。"), h("li", null, "新增或调整字段请在字段管理中完成，核心字段受保护。"), h("li", null, "恢复备份前必须确认，系统会先创建安全备份。"))) }] }),
+        h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：集中管理所有智造云应用共享的数据、字段、导入批次、演示数据、健康检查和安全备份。"), h("ol", null, h("li", null, "用“导入 Excel/CSV”导入正式业务数据并核对字段。"), h("li", null, "可在“数据环境”中切换演示/正式；生成的演示数据可按批次撤销。"), h("li", null, "新增或调整字段请在字段管理中完成，核心字段受保护。"), h("li", null, "恢复备份前必须确认，系统会先创建安全备份。"))) }] }),
         error ? h(antd.Alert, { type: "error", showIcon: true, message: error, style: { marginBottom: 16 } }) : null,
         h(antd.Row, { gutter: [12, 12], style: { marginBottom: 16 } },
-          [["数据表", entities.length], ["当前记录", current.record_count || 0], ["真实数据", current.real_count || 0], ["模拟数据", current.simulated_count || 0]].map(function (item) {
+          [["数据表", entities.length], ["当前记录", current.record_count || 0], ["演示数据", current.demo_count || 0], ["正式数据", current.production_count || 0]].map(function (item) {
             return h(antd.Col, { xs: 12, md: 6, key: item[0] }, h(antd.Card, { size: "small" }, h(antd.Statistic, { title: item[0], value: item[1] })));
           })
         ),
@@ -174,9 +269,12 @@
             h("span", null, "数据表"),
             h(antd.Select, { value: selected, style: { width: 180 }, onChange: setSelected,
               options: entities.map(function (item) { return { value: item.entity, label: item.label + " (" + item.entity + ")" }; }) }),
+            h("span", null, "数据环境"),
+            h(antd.Select, { value: dataMode, style: { width: 150 }, onChange: setDataMode,
+              options: [{ value: "", label: "全部" }, { value: "demo", label: "演示 Demo" }, { value: "production", label: "正式 Live" }] }),
             h("span", null, "来源"),
             h(antd.Select, { value: source, style: { width: 140 }, onChange: setSource,
-              options: [{ value: "", label: "全部" }, { value: "real", label: "真实数据" }, { value: "simulated", label: "模拟数据" }] })
+              options: [{ value: "", label: "全部" }, { value: "real", label: "已导入" }, { value: "simulated", label: "系统生成" }] })
           )
         ),
         h(antd.Tabs, { items: [
@@ -230,10 +328,11 @@
             })),
             preview ? h(antd.Alert, { style: { marginTop: 14 }, type: preview.error_count ? "error" : "success", showIcon: true, message: preview.error_count ? ("发现 " + preview.error_count + " 行错误") : (preview.valid_count + " 行校验通过"), description: (preview.errors || []).slice(0, 5).map(function (item) { return "第" + item.row + "行：" + item.errors.join("，"); }).join("；") }) : null
           ) : null
-        )
+        ),
+        h(AgentDock, { open: agentOpen, onClose: function () { setAgentOpen(false); }, moduleLabel: "统一数据中心", chips: [{ key: "preview", label: "预览数据" }, { key: "health", label: "健康与备份" }], messages: agentMessages, draft: agentDraft, setDraft: setAgentDraft, busy: agentBusy, onSend: agentSend, onCommand: agentCommand })
       )
     );
   }
 
-  Q.registerRoutes("zhiyun-data-core", [{ path: "/apps/data-core", component: DataBrowser, label: "统一数据中心", icon: "🗄️", priority: 75 }]);
+  Q.registerRoutes("zhiyun-data-core", [{ path: "/apps/zhiyun-data-core", component: DataBrowser, label: "统一数据中心", icon: "🗄️", priority: 75 }]);
 })();

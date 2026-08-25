@@ -140,6 +140,28 @@ class DataCoreTests(unittest.TestCase):
         result = self.core.search_records("orders", limit=1000)
         self.assertEqual(len(result), 200)
 
+    def test_demo_and_production_environments_are_isolated(self) -> None:
+        real = {"order_no": "PROD-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
+        self.core.import_rows("orders", [real])  # real import lands in production env by default
+        self.core.generate_orders(3, seed=9)  # simulation lands in demo env by default
+
+        # Isolated views: each environment only sees its own records.
+        self.assertEqual(len(self.core.list_records("orders", data_mode="production")), 1)
+        self.assertEqual(len(self.core.list_records("orders", data_mode="demo")), 3)
+        self.assertEqual(len(self.core.list_records("orders", data_mode="production", source_type="real")), 1)
+        self.assertEqual(len(self.core.list_records("orders", data_mode="demo", source_type="real")), 0)
+
+        # Overview carries per-environment counts even when listing both.
+        overview = self.core.list_entities()[0]
+        self.assertEqual(overview["record_count"], 4)
+        self.assertEqual(overview["demo_count"], 3)
+        self.assertEqual(overview["production_count"], 1)
+
+        # Batches are segmented by environment too.
+        prod_batches = self.core.list_batches("orders", data_mode="production")
+        self.assertEqual(len(prod_batches), 1)
+        self.assertEqual(prod_batches[0]["data_mode"], "production")
+
 
 if __name__ == "__main__":
     unittest.main()

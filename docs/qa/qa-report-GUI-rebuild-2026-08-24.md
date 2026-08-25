@@ -26,7 +26,7 @@
 4. **Data Studio 渲染真实经营看板**（订单总数 100、高风险 18、风险率 38%、逾期 39、平均进度 69.7%，以及可审阅订单表 + 刷新数据 + 保存为待审阅工件）。
 5. **全部 16 个注册插件均带 `frontend_entry` 且为 React 组件化前端**（`useState` / `createElement` / `Card` / `Button` / `Table`），无「撒 JSON」应用。`/` 根路径返回 QwenPaw Console HTML 前端，而非 JSON。
 
-> 因此用户此前看到的「全是 JSON 数组 / 新功能无 GUI」，最可能是**浏览器保留了旧构建缓存（旧版本 bundle 只返回 JSON），或直接打开了后端接口页而非 `/apps/<plugin-id>` 应用页**。本轮已在最新构建上全量验证通过。若用户再次看到 JSON，请**硬刷新（Ctrl+F5 / Cmd+Shift+R）**；服务端确认已托管真实 GUI 构建。
+> 第二迭代复核（重要，替代本节旧结论）：用户反馈「系统应用无 GUI」属实并已定位——三个系统应用在 `app_catalog.json` 的 `route` 写成短名（`/apps/data-core` 等），与插件 `entry_page`/`registerRoutes` 的完整路由（`/apps/zhiyun-data-core` 等）不一致，导致从「应用中心」点「打开」落回「应用」列表。已改为完整路由并验证直达真实面板（数据核心 body 1249→2089，出现「统一数据中心 / 数据预览 / 订单明细」；应用中心命中 4 项；审计中心显示「审计链完整性已验证」+ Tool 审计表）。同时补充登录与权限（默认 `admin` / `Zhiyun@2026`）。其余业务 Studio 为真实结构化 GUI，具备一键导入示例数据 + 可运行 + 可审阅结果。
 
 ## 三、18 模块逐项验收矩阵
 
@@ -126,3 +126,27 @@
 2. 企业实例配置化：部署时按企业标识分配实例级数据目录与模型配置。
 3. 审计日志对接 `zhiyun-audit`，记录审阅人、动作、工件与 Agent 上下文导出。
 4. 统一 Workspace 数据核心，示例数据显式标记「模拟」，真实数据走 Excel 导入。
+
+---
+
+## 十、第二迭代补充：账号与访问（2026-08-24）
+
+### 10.1 默认账号
+- 账号：`admin`
+- 密码：`Zhiyun@2026`
+- token 有效期：7 天。
+
+### 10.2 访问方式（真实 GUI，非 JSON/列表）
+- 服务根：`http://127.0.0.1:8088`
+- 登录：首次打开任一路由会先进入登录页，用默认账号登录后进入工作区。
+- 正确应用页（完整路由）：
+  - 系统应用：`/apps/zhiyun-data-core`、`/apps/zhiyun-app-discovery`、`/apps/zhiyun-audit`
+  - 业务 Studio：`/apps/zhiyun-data-studio`、`/apps/zhiyun-order-studio`、`/apps/zhiyun-service-studio`、`/apps/zhiyun-supply-studio`、`/apps/zhiyun-sales-studio`、`/apps/zhiyun-finance-studio`、`/apps/zhiyun-people-studio`、`/apps/zhiyun-integration-hub`
+- 若仍见旧内容，请 **Ctrl+F5 硬刷新**。
+
+### 10.3 系统应用短路由缺陷（P0 已修复）
+- 短名 `/apps/data-core`、`/apps/app-discovery`、`/apps/audit` 会落回「应用」列表页；现已改为完整路由 `zhiyun-*` 前缀。
+
+### 10.4 复核方法（可复现）
+- 单次登录 → 打开 `/apps/zhiyun-app-discovery` → 点「统一数据中心」的「打开」（href=`/apps/zhiyun-data-core`）→ 落到真实面板，`VERDICT data_core_panel_rendered=True`。
+- 直接打开 `/apps/zhiyun-audit` 显示「审计链完整性已验证」+ Tool 审计表 + 分页。

@@ -95,6 +95,68 @@ contract, versioned data contract, rollback method, and locked full SHA. They
 are currently `testing` because they await user machine acceptance before being
 marked `completed`.
 
+## Phase 4 — Continuous Simulation & Dual-State
+
+The user direction (2026-08-24) upgrades the project from "populate demo data" to a
+long-running **Demo / Production dual-state verification system**. This is a new
+product track above the 31-capability ledger and is **not** folded into
+`plugins/zhiyun-app-discovery/feature_progress.json`; it is tracked in:
+
+- `docs/product/AI-OS-SIMULATION-DUAL-STATE-VISION.md` (requirements, naming, data flow, isolation)
+- `docs/product/DEMO-PRODUCTION-EPICS.md` (independent 6-Epic ledger)
+
+### Phase 4 Epics
+
+| Epic | Name | Scope |
+| --- | --- | --- |
+| 1 | Enterprise Seeder | One command generates enterprise, departments, users, roles, permissions, agents, apps, data sources, sessions, tasks, tokens, logs |
+| 2 | Agent Factory | Templates generate full agent config (prompt/model/skill/tool/knowledge/permission/token/frequency/success-rate/latency) and link real model calls |
+| 3 | Simulation Runtime | Local model drives business events through Agent → Skill → Tool → result → log → token → user behavior → stats |
+| 4 | Time Machine | Generates 2025-12-01→today, daily growth, and supports any time-range switch across all dashboards |
+| 5 | Data Platform | Unified Excel/CSV Import/Export SDK + `data_mode=demo|production` + DataContext + tenant/environment isolation |
+| 6 | Data Integrity | Cross-module consistency, anomaly detection, safe auto-repair, `Data Integrity Report` |
+
+### Phase 4 Product rules
+
+1. Frontend must not show "模拟 / Mock / 测试". Use "数据环境 / Demo / Live"; the underlying field is `data_mode`.
+2. All queries go through a unified `DataContext` (`User → App → DataContext → Demo/Production dataset → DB`).
+3. Demo and Production are isolated (`tenant_id` / `environment_id` / `data_source`); production must never read demo records.
+4. Stats must be traceable to records (usage ↔ conversations, token ↔ executions, files ↔ downloads, permissions ↔ accessible agents).
+5. A capability counts as `completed` only when it is runnable with persisted evidence in `docs/qa` and status reflects the same Definition of Done below.
+
+
+### Phase 4 verification note (2026-08-25)
+
+Epic 1 (Enterprise Seeder) and the first pass of Epic 4 (Time Machine) and Epic 6
+(Data Integrity) are now runnable with persisted evidence:
+
+- `zhiyun-enterprise-seeder` ships a real GUI (`/apps/zhiyun-enterprise-seeder`),
+  one-command `/seed`, multi-environment `/records` isolation by `env_id +
+  data_mode`, and Bearer auth (config/summary/records require token, `/seed` is
+  admin-only). GUI regression 22/22 pass.
+- `/summary` now reports `files / downloads / logins` in addition to
+  sessions/tasks/Token, and honors `start_date / end_date` for every time-based
+  entity, so the Time Machine "switch any time range" behavior is in place.
+- `files.created_at` was fixed to be distributed across
+  `2025-12-01..2026-08-25` (230 distinct days) instead of all landing on the
+  seed date; a narrow range query returns a partial file count as expected.
+- `/integrity` produces a 14-check `Data Integrity Report`
+  (`total=14 passed=14 failed=0 healthy=true`) in about 1.1s after adding 5
+  covering indexes; the 14th check (`business_event_scope`) closes the
+  business-event chain.
+- Epic 6 closed: safe auto-repair (`POST /integrity/repair`, admin-only, written to
+  `integrity_repair_log`), daily snapshot (`GET /integrity/daily`, idempotent
+  per-day update persisted to `integrity_reports`), and history
+  (`GET /integrity/history`). Live evidence 14/14 on demo and production;
+  unit tests 3/3; `verify-release.mjs` passes.
+- Frontend regression fixed: the seeder page crashed ("页面出现异常") because of a
+  missing comma in `statItems`; the file/download/login stat cards and the 14
+  entity chips now render, evidence at
+  `docs/qa/screenshots/seeder-spread-stats.png`.
+
+Live service: `http://127.0.0.1:8088`, QwenPaw 2.1.0, health 13/13. The model
+provider `kilo/kilo-auto/free` is unreachable (agent chat may report model
+unavailable), independent of platform health.
 ## Per-Capability Definition of Done
 
 A feature may be changed to `completed` only when all of the following are true:
@@ -121,3 +183,25 @@ node scripts/verify-project-plan.mjs
 The full release gate also runs this check. It rejects duplicate or invalid
 features, inconsistent status/progress combinations, missing evidence notes,
 and loss of the required Data Studio or Order Studio locks/catalog entries.
+
+### Full-platform GUI/function verification note (2026-08-25)
+
+The logged-in full-platform acceptance pass is complete across all 11 installed
+apps / Studio. Evidence:
+`docs/qa/qa-report-full-gui-functional-2026-08-25.md`,
+`docs/qa/ui-post-login-probe.json`,
+`docs/qa/functional-interaction-probe.json`,
+`docs/qa/screenshots/{post-login,functional}/*.png`.
+
+- Real login (`admin` / `Zhiyun@2026`) via `/api/zhiyun-auth/login`; JWT lands in
+  `localStorage.zhiyun_token` and the login layer disappears.
+- 11/11 apps render structured GUI (no bare JSON, no `<pre>` leak); 11/11 run
+  their core flow (load sample -> run -> non-empty result, no execution error);
+  11/11 expose a usable in-app "问 Agent" drawer with an input.
+- Backend unit tests all pass: 207 tests across 51 test files.
+- No P0/P1/P2 defects found this pass. Two P3 polish items noted (host
+  "桌面模式" onboarding toast repeats on each visit; shared Agent-dock placeholder
+  text is supply-flavored in all 5 template Studio). The "功能只有 JSON / 无 GUI"
+  P0 is fixed and regression-clean.
+- The 17 `testing` capabilities remain `testing` pending user acceptance; the
+  implementation/GUI/run path is now verified end-to-end via automation.

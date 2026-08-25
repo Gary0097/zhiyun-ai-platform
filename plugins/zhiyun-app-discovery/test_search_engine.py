@@ -41,7 +41,7 @@ class SearchEngineTests(unittest.TestCase):
     def test_audit_request_opens_installed_audit_viewer(self) -> None:
         result = search_apps("查看操作审计")
         self.assertEqual(result[0]["app_id"], "zhiyun-audit")
-        self.assertEqual(result[0]["route"], "/apps/audit")
+        self.assertEqual(result[0]["route"], "/apps/zhiyun-audit")
         self.assertTrue(result[0]["available"])
 
     def test_unknown_query_never_invents_app(self) -> None:
@@ -82,9 +82,9 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
         self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.7.1")
         self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
-        self.assertEqual(apps["zhiyun-data-core"]["version"], "0.7.0")
+        self.assertEqual(apps["zhiyun-data-core"]["version"], "0.8.0")
         self.assertEqual(apps["zhiyun-audit"]["version"], "1.3.0")
-        self.assertEqual(apps["zhiyun-audit"]["route"], "/apps/audit")
+        self.assertEqual(apps["zhiyun-audit"]["route"], "/apps/zhiyun-audit")
         self.assertEqual(apps["zhiyun-integration-hub"]["version"], "0.2.1")
         self.assertEqual(apps["zhiyun-integration-hub"]["install_status"], "installed")
 
