@@ -81,20 +81,40 @@
 
   function MyApps(props) {
     var apps = (props.apps || []).filter(function (item) { return item.install_status === "installed"; });
+    var catMap = {
+      data: "数据分析", order: "订单管理", service: "售后服务", supply: "供应链",
+      sales: "销售客户", finance: "财务", people: "组织协同", integration: "系统集成",
+      knowledge: "知识库", system: "系统组件"
+    };
+    var grouped = {};
+    apps.forEach(function (item) {
+      var cat = catMap[item.category] || item.category || "其他";
+      (grouped[cat] = grouped[cat] || []).push(item);
+    });
     return h("div", null,
-      h(antd.Alert, { type: "info", showIcon: true, message: "这里只展示当前真实安装的应用与系统组件。", style: { marginBottom: 18 } }),
-      h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 14 } },
-        apps.map(function (item) {
-          return h(antd.Card, { key: item.app_id, title: item.name, extra: h(antd.Tag, { color: "green" }, "已安装") },
-            h("p", { style: { color: "#667085", minHeight: 42 } }, item.category === "system" ? "AI-OS 系统组件" : "可运行的业务应用"),
-            h("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
-              h(antd.Tag, null, "v" + (item.version || "-")),
-              h(antd.Tag, { color: item.health === "available" ? "green" : "orange" }, item.health === "available" ? "运行可用" : item.health),
-              item.route ? h(antd.Button, { type: "primary", size: "small", href: item.route }, "打开") : h(antd.Button, { size: "small", disabled: true }, "后台服务")
-            )
-          );
-        })
-      )
+      h(antd.Alert, { type: "info", showIcon: true, message: "这里只展示当前真实安装的应用与系统组件，按功能大类分组。", style: { marginBottom: 18 } }),
+      Object.keys(grouped).map(function (cat) {
+        return h("div", { key: cat, style: { marginBottom: 22 } },
+          h("h3", { style: { marginBottom: 10, color: "#1f2933" } }, cat),
+          h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 14 } },
+            grouped[cat].map(function (item) {
+              return h(antd.Card, { key: item.app_id, title: item.name, extra: h(antd.Tag, { color: "green" }, "已安装") },
+                h("p", { style: { color: "#667085", minHeight: 22 } }, item.category === "system" ? "AI-OS 系统组件" : "可运行的业务应用"),
+                (item.capabilities || []).length ? h("div", { style: { marginBottom: 10 } },
+                  (item.capabilities || []).map(function (cap) {
+                    return h(antd.Button, { key: cap.id, size: "small", style: { margin: "2px 4px 2px 0" }, href: item.route, title: cap.name }, cap.name);
+                  })
+                ) : null,
+                h("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
+                  h(antd.Tag, null, "v" + (item.version || "-")),
+                  h(antd.Tag, { color: item.health === "available" ? "green" : "orange" }, item.health === "available" ? "运行可用" : item.health),
+                  item.route ? h(antd.Button, { type: "primary", size: "small", href: item.route }, "打开") : h(antd.Button, { size: "small", disabled: true }, "后台服务")
+                )
+              );
+            })
+          )
+        );
+      })
     );
   }
 
