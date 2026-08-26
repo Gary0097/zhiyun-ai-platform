@@ -87,7 +87,7 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'sync-pawapps.mjs')]],
   [process.execPath, ['--check', join(scripts, 'doctor.mjs')]],
   [process.execPath, ['--check', join(scripts, 'cleanup-legacy.mjs')]],
-  [process.execPath, ['--check', join(scripts, 'patch-console-ui.mjs')]],
+  [process.execPath, [join(scripts, 'patch-console-ui.mjs'), '--check']],
   [process.execPath, ['--check', join(scripts, 'set-logo.mjs')]],
   [process.execPath, ['--check', join(scripts, 'health-report.mjs')]],
   [process.execPath, [join(scripts, 'health-report.mjs'), '--check']],
@@ -150,3 +150,4 @@ for (const app of pawapps.apps) {
 }
 
 console.log('AI-OS 发布门禁通过：纯QwenPaw架构、跨平台启动、版本锁、系统插件和全部锁定PawApp测试均正常。')
+

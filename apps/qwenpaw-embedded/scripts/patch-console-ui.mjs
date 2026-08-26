@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, readdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveRuntime } from './runtime-env.mjs'
@@ -34,23 +34,93 @@ const REPLACEMENTS = [
   },
 ]
 
+const checkMode = process.argv.includes('--check')
+
+function warn (message) {
+  console.warn('[patch-console-ui] ' + message)
+}
+
+// In --check mode a mismatch is a hard failure so the release gate can catch upstream
+// bundle updates. In normal (startup) mode console customization is cosmetic and must
+// never block AI-OS startup, so we warn and exit 0 instead.
 function fail (message) {
-  console.error('[patch-console-ui] ' + message)
-  process.exit(1)
+  if (checkMode) {
+    console.error('[patch-console-ui] ' + message)
+    process.exit(1)
+  }
+  warn(message + '（已跳过，不影响启动）')
+  process.exit(0)
 }
 
 function hashOf (value) {
   return createHash('sha1').update(value).digest('hex').slice(0, 8)
 }
 
+// 依据项目运行环境目录推导常见 venv 布局下的 QwenPaw Console 路径，避免依赖
+// “python -c import qwenpaw”。在 Windows Desktop / CLI-only 场景下运行时 Python
+// 可能并不是安装了 QwenPaw 的解释器，从而导致 import 失败、误伤启动。此处的候选路径
+// 覆盖 Windows（venv/Lib/site-packages）与 Linux（venv/lib/pythonX.Y/site-packages）布局。
+function candidateConsoleDirs (runtime) {
+  if (!runtime || !runtime.root) return []
+  const root = runtime.root
+  const dirs = [
+    join(root, 'venv', 'Lib', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'Lib', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'venv', 'lib', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'lib', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'venv', 'lib', 'python3.13', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'venv', 'lib', 'python3.12', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'venv', 'lib', 'python3.11', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'venv', 'lib', 'python3.10', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'lib', 'python3.13', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'lib', 'python3.12', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'lib', 'python3.11', 'site-packages', 'qwenpaw', 'console'),
+    join(root, 'lib', 'python3.10', 'site-packages', 'qwenpaw', 'console'),
+  ]
+  return [...new Set(dirs)]
+}
+
+// 递归兜底：在运行环境目录下寻找任何 <...>/qwenpaw/console/index.html，以覆盖非标准布局。
+function findConsoleUnder (root, maxDepth = 8) {
+  if (!root || !existsSync(root)) return null
+  const stack = [{ dir: root, depth: 0 }]
+  while (stack.length) {
+    const { dir, depth } = stack.pop()
+    let entries
+    try {
+      entries = readdirSync(dir, { withFileTypes: true })
+    } catch {
+      continue
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+      const full = join(dir, entry.name)
+      if (entry.name === 'console' && existsSync(join(full, 'index.html'))) return full
+      if (depth < maxDepth) stack.push({ dir: full, depth: depth + 1 })
+    }
+  }
+  return null
+}
+
+function findConsoleDir (runtime) {
+  for (const dir of candidateConsoleDirs(runtime)) {
+    if (existsSync(join(dir, 'index.html'))) return dir
+  }
+  return findConsoleUnder(runtime && runtime.root)
+}
+
 function locateConsoleDir (runtime) {
+  const derived = findConsoleDir(runtime)
+  if (derived) return derived
   const python = runtime && runtime.python
-  if (!python) fail('无法定位 Python 运行环境，不能定制 Console 页面。')
-  const res = spawnSync(python, ['-c', 'import qwenpaw, os; print(os.path.join(os.path.dirname(qwenpaw.__file__), "console"))'], { encoding: 'utf8', stdio: 'pipe' })
-  if (res.status !== 0) fail('无法定位 QwenPaw Console 目录：' + ((res.stderr || '').trim()))
-  const dir = (res.stdout || '').trim().split(/\r?\n/)[0]
-  if (!dir || !existsSync(join(dir, 'index.html'))) fail('QwenPaw Console 目录无效：' + dir)
-  return dir
+  if (python) {
+    const res = spawnSync(python, ['-c', 'import qwenpaw, os; print(os.path.join(os.path.dirname(qwenpaw.__file__), "console"))'], { encoding: 'utf8', stdio: 'pipe' })
+    if (res.status === 0) {
+      const dir = (res.stdout || '').trim().split(/\r?\n/)[0]
+      if (dir && existsSync(join(dir, 'index.html'))) return dir
+    }
+  }
+  return null
 }
 
 function findMainBundle (consoleDir) {
@@ -87,9 +157,18 @@ function ensureCacheBust (consoleDir, bundleContent) {
   return { changed: true }
 }
 
-const checkMode = process.argv.includes('--check')
 const runtime = resolveRuntime()
 const consoleDir = locateConsoleDir(runtime)
+
+if (!consoleDir) {
+  if (checkMode) {
+    console.log('Console UI 定制检查跳过：未找到可用的 QwenPaw Console 目录。')
+    process.exit(0)
+  }
+  warn('Console UI 定制跳过：未找到可用的 QwenPaw Console 目录（CLI-only 或无本地控制台），不影响启动。')
+  process.exit(0)
+}
+
 const bundlePath = findMainBundle(consoleDir)
 const original = readFileSync(bundlePath, 'utf8')
 let content = original
@@ -134,5 +213,5 @@ if (cacheBust.changed) {
 }
 
 if (missing.length) {
-  console.warn('[patch-console-ui] 警告：以下目标未找到，bundle 可能已更新：' + missing.join('、'))
+  warn('以下目标未找到，bundle 可能已更新：' + missing.join('、'))
 }
