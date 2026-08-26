@@ -410,6 +410,11 @@ def _startup_bootstrap() -> None:
     _daily_integrity_report 在数十万行的企业库上需要较长时间，
     放到后台线程方不会阻塞单线程服务器启动。"""
     _ensure_schema()
+    try:
+        _rotate_legacy_employee_passwords()
+    except Exception:
+        # 员工口令轮换失败不应阻断启动，交由后续 seed 或人工修复兜底。
+        pass
     _spawn_daily_integrity_report()
 
 
@@ -444,6 +449,31 @@ def _read_auth_users() -> list[dict[str, Any]]:
     if isinstance(data, dict):
         return list(data.get("users") or [])
     return []
+
+
+def _rotate_legacy_employee_passwords() -> int:
+    """升级启动迁移：把仍使用 rebrand 前默认口令的非 admin 员工轮换为新默认口令。
+
+    zhiyun-auth 在优先级 0 的启动钩子中已负责轮换 admin 账号；本插件负责
+    其余员工账号。仅当账号仍能通过 LEGACY_DEFAULT_PASSWORD 校验时才更新，
+    绝不覆盖用户自定义口令。返回实际轮换的账号数。
+    """
+    users = _read_auth_users()
+    changed = 0
+    for user in users:
+        if (user.get("role") or "").lower() == "admin":
+            # admin 由 zhiyun-auth 在优先级 0 的启动钩子中处理，避免共享文件双写竞争。
+            continue
+        stored = user.get("password_hash", "")
+        salt = user.get("password_salt", "")
+        if stored and salt and _verify_password(LEGACY_DEFAULT_PASSWORD, stored, salt):
+            pw_hash, new_salt = _hash_password(DEFAULT_PASSWORD)
+            user["password_hash"] = pw_hash
+            user["password_salt"] = new_salt
+            changed += 1
+    if changed:
+        _write_json(AUTH_USERS_FILE, users)
+    return changed
 
 
 def _sync_auth_users(
