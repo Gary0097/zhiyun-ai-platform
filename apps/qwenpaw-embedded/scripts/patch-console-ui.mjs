@@ -1,11 +1,14 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, writeFileSync, readdirSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveRuntime } from './runtime-env.mjs'
 
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
+const assetsRoot = join(scriptsRoot, '..', '..', '..', 'plugins', 'zhiyun-logo', 'assets')
+const gearLogo = join(assetsRoot, 'gear-logo.png')
 
 const REPLACEMENTS = [
   {
@@ -25,6 +28,12 @@ const REPLACEMENTS = [
     from: 'p.jsx(Gh,{menu:{items:y},placement:"bottomRight",children:p.jsx(Zt,{type:"text",icon:p.jsx(ihe,{}),className:Rn.showOnMobile,title:i("header.resources")})})',
     to: 'false&&p.jsx(Gh,{menu:{items:y},placement:"bottomRight",children:p.jsx(Zt,{type:"text",icon:p.jsx(ihe,{}),className:Rn.showOnMobile,title:i("header.resources")})})',
     patched: 'false&&p.jsx(Gh,{menu:{items:y}',
+  },
+  {
+    name: '欢迎页智能体头像（online.svg → qwenpaw.svg）',
+    from: 'avatar:"/online.svg"',
+    to: 'avatar:"/qwenpaw.svg"',
+    patched: 'avatar:"/qwenpaw.svg"',
   },
   {
     name: '默认中文语言',
@@ -82,6 +91,34 @@ function fail (message) {
 
 function hashOf (value) {
   return createHash('sha1').update(value).digest('hex').slice(0, 8)
+}
+
+function workingDir () {
+  const explicit = process.env.QWENPAW_WORKING_DIR || process.env.COPAW_WORKING_DIR
+  if (explicit) return resolve(explicit)
+  const current = join(homedir(), '.qwenpaw')
+  const legacy = join(homedir(), '.copaw')
+  return !existsSync(current) && existsSync(legacy) ? legacy : current
+}
+
+function selectedLogo () {
+  const branding = join(workingDir(), 'branding')
+  const configPath = join(branding, 'logo.json')
+  const allowedMime = new Set(['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'])
+  try {
+    const config = JSON.parse(readFileSync(configPath, 'utf8'))
+    const path = resolve(String(config.path || ''))
+    const mime = String(config.mime || '')
+    if (dirname(path) === resolve(branding) && allowedMime.has(mime) && existsSync(path) && statSync(path).isFile() && statSync(path).size > 0) {
+      return { path, mime, source: 'Workspace 自定义 Logo' }
+    }
+  } catch {}
+  return { path: gearLogo, mime: 'image/png', source: '内置制造云齿轮 Logo' }
+}
+
+function logoSvg (logo) {
+  const encoded = readFileSync(logo.path).toString('base64')
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><image href="data:${logo.mime};base64,${encoded}" width="512" height="512" preserveAspectRatio="xMidYMid meet"/></svg>\n`
 }
 
 // 依据项目运行环境目录推导常见 venv 布局下的 QwenPaw Console 路径，避免依赖
@@ -201,6 +238,24 @@ function ensureCacheBust (consoleDir, bundleContent) {
   return { changed: true }
 }
 
+// 同步浏览器 favicon 与聊天智能体头像为当前平台 Logo。
+// console 目录被 .gitignore 忽略，因此资源必须于启动时从受控目录复制，
+// 否则升级或重新安装运行时后会回退为上游默认图标。
+function syncConsoleLogo (consoleDir) {
+  if (!existsSync(gearLogo)) {
+    fail('受控齿轮 LOGO 资源缺失：' + gearLogo)
+  }
+  const logo = selectedLogo()
+  const svgTarget = join(consoleDir, 'qwenpaw.svg')
+  writeFileSync(svgTarget, logoSvg(logo), 'utf8')
+  const htmlPath = join(consoleDir, 'index.html')
+  const html = readFileSync(htmlPath, 'utf8')
+  const nextHtml = html.replace(/<link rel="icon"[^>]*\/>/, '<link rel="icon" type="image/svg+xml" href="/qwenpaw.svg" />')
+  if (nextHtml !== html) {
+    writeFileSync(htmlPath, nextHtml, 'utf8')
+  }
+  console.log(`Console favicon 与聊天智能体头像已同步为${logo.source}。`)
+}
 const runtime = resolveRuntime()
 const consoleDir = locateConsoleDir(runtime)
 
@@ -216,6 +271,7 @@ if (!consoleDir) {
 const bundlePath = findMainBundle(consoleDir)
 const original = readFileSync(bundlePath, 'utf8')
 let content = original
+content = content.split('avatar:"/qwenpaw.png"').join('avatar:"/qwenpaw.svg"')
 const missing = []
 
 for (const r of REPLACEMENTS) {
@@ -261,7 +317,26 @@ if (checkMode) {
     console.error('[patch-console-ui] 检查失败：index.html 未引用已打补丁的 bundle 版本（' + expected + '）。请重新运行以应用缓存失效。')
     process.exit(1)
   }
-  console.log('Console UI 定制检查通过：' + bundlePath)
+  if (!existsSync(gearLogo) || statSync(gearLogo).size === 0) {
+    console.error('[patch-console-ui] 检查失败：受控齿轮 LOGO 资源缺失：' + gearLogo)
+    process.exit(1)
+  }
+  const consoleSvg = join(consoleDir, 'qwenpaw.svg')
+  if (!existsSync(consoleSvg) || statSync(consoleSvg).size === 0) {
+    console.error('[patch-console-ui] 检查失败：console 缺少 qwenpaw.svg（未同步当前平台 Logo）。')
+    process.exit(1)
+  }
+  const expectedLogo = logoSvg(selectedLogo())
+  if (readFileSync(consoleSvg, 'utf8') !== expectedLogo) {
+    console.error('[patch-console-ui] 检查失败：console Logo 与 Workspace 当前配置不一致。')
+    process.exit(1)
+  }
+  const faviconHtml = readFileSync(join(consoleDir, 'index.html'), 'utf8')
+  if (!faviconHtml.includes('type="image/svg+xml"') || !faviconHtml.includes('qwenpaw.svg')) {
+    console.error('[patch-console-ui] 检查失败：index.html favicon 未指向当前平台 Logo。')
+    process.exit(1)
+  }
+  console.log('Console UI 定制检查通过：' + bundlePath)
   process.exit(0)
 }
 
@@ -278,6 +353,7 @@ const cacheBust = ensureCacheBust(consoleDir, content)
 if (cacheBust.changed) {
   console.log('Console index.html 缓存失效已更新（?v=' + hashOf(content) + '）')
 }
+syncConsoleLogo(consoleDir)
 
 // 对其它 Console 资源（懒加载 chunk / vendor）执行同样的品牌替换。
 let extraBranded = 0
