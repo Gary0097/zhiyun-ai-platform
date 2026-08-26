@@ -12,7 +12,7 @@ const catalog = JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-app-discov
 
 const expected = {
   'zhiyun-data-studio': {
-    commit: 'd5734d1be6b288a170b6a2916dcd63d2bdebe9be', version: '0.9.2',
+    commit: 'a0657eea1fa99e1c3837bac31cb7c4b9998d0107', version: '0.9.2',
     files: ['backend/insight_workflow.py', 'tests/test_insight_workflow.py'],
     source: ['@router.post("/artifacts")', 'tool_name="analyze_order_delivery_risk"'],
   },

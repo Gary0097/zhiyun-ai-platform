@@ -261,6 +261,10 @@ class DataCoreAppAccessTests(unittest.TestCase):
                     app_id TEXT, env_id TEXT, data_mode TEXT,
                     agent_id TEXT, enabled INTEGER, created_at TEXT
                 );
+                CREATE TABLE IF NOT EXISTS enterprise_meta (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    env_id TEXT, data_mode TEXT, enterprise TEXT
+                );
                 """
             )
             conn.commit()
@@ -345,6 +349,26 @@ class DataCoreAppAccessTests(unittest.TestCase):
         self._seed_user("admin", role="admin", agent_id=None)
         user = {"username": "admin", "role": "admin"}
         dcp._require_app_access(user, "envX", "demo", "app_1")
+
+    def test_admin_without_fixed_env_uses_latest_enterprise_environment(self):
+        self._insert(
+            "INSERT INTO enterprise_meta (env_id, data_mode, enterprise) VALUES (?, ?, ?)",
+            ("env_latest", "demo", "另一企业"),
+        )
+        self.assertEqual(
+            dcp._user_env({"username": "admin", "role": "admin", "enterprise": "旧企业"}),
+            ("env_latest", "demo"),
+        )
+
+    def test_member_without_matching_enterprise_never_uses_admin_fallback(self):
+        self._insert(
+            "INSERT INTO enterprise_meta (env_id, data_mode, enterprise) VALUES (?, ?, ?)",
+            ("env_other", "demo", "另一企业"),
+        )
+        self.assertEqual(
+            dcp._user_env({"username": "member", "role": "member", "enterprise": "未知企业"}),
+            ("", ""),
+        )
 
     def test_lookup_app_agent_returns_bound_agent(self):
         self._insert(
