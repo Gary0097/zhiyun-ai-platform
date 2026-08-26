@@ -5,14 +5,14 @@
       "id": "zhiyun-data-studio",
       "repository": "https://github.com/Gary0097/zhiyun-data-studio.git",
       "ref": "main",
-      "commit": "de291fed581e5c8d684379682351011a4be4c73a",
+      "commit": "d5734d1be6b288a170b6a2916dcd63d2bdebe9be",
       "install_dir": "zhiyun-data-studio"
     },
     {
       "id": "zhiyun-order-studio",
       "repository": "https://github.com/Gary0097/zhiyun-order-studio.git",
       "ref": "main",
-      "commit": "612b2a2b48ee8321da208b4aa7ebdbce22e6f939",
+      "commit": "9edd776ab9c7038fc00f34b61509cd3466bddd76",
       "install_dir": "zhiyun-order-studio"
     },
     {
@@ -26,35 +26,35 @@
       "id": "zhiyun-service-studio",
       "repository": "https://github.com/Gary0097/zhiyun-service-studio.git",
       "ref": "main",
-      "commit": "8d15703d00b919fa851ccf6648c31189a4112a2a",
+      "commit": "8c1391b286246d5416288dd80a09d252b8f7a226",
       "install_dir": "zhiyun-service-studio"
     },
     {
       "id": "zhiyun-supply-studio",
       "repository": "https://github.com/Gary0097/zhiyun-supply-studio.git",
       "ref": "main",
-      "commit": "fd3b673d78dfb80a455f4d3c286a2a64308a4e7a",
+      "commit": "85163a50cc37ce79aabfc72511fde63919231c52",
       "install_dir": "zhiyun-supply-studio"
     },
     {
       "id": "zhiyun-sales-studio",
       "repository": "https://github.com/Gary0097/zhiyun-sales-studio.git",
       "ref": "main",
-      "commit": "5d0057d25d9d62b194c9cc111efd135950869862",
+      "commit": "94ca98a9b5921d2c0603f8b4aab10c62fb93c9af",
       "install_dir": "zhiyun-sales-studio"
     },
     {
       "id": "zhiyun-finance-studio",
       "repository": "https://github.com/Gary0097/zhiyun-finance-studio.git",
       "ref": "main",
-      "commit": "55a8521554c98d208db38a6a76ca3b3e4a93820e",
+      "commit": "8844b08f4b539cbd2a4dbdb694384aa3c10324db",
       "install_dir": "zhiyun-finance-studio"
     },
     {
       "id": "zhiyun-people-studio",
       "repository": "https://github.com/Gary0097/zhiyun-people-studio.git",
       "ref": "main",
-      "commit": "77048adba501a9aeef394740bfe107cbf0ed376a",
+      "commit": "daa29669ee1bc2cd72578fb49f5c07949c223c82",
       "install_dir": "zhiyun-people-studio"
     }
   ]

@@ -1,10 +1,10 @@
 {
   "generated_at": "2026-08-25",
-  "tmp_db": "C:\\Users\\garys\\AppData\\Local\\Temp\\seed_verify_vs9a9820\\enterprise\\enterprise.db",
+  "tmp_db": "C:\\Users\\Gary\\AppData\\Local\\Temp\\seed_verify_wpi2kt37\\enterprise\\enterprise.db",
   "summaries": {
     "demo": {
-      "env_id": "env_4b11d1fe54",
-      "tenant_id": "智云智造_env_4b11d1fe54",
+      "env_id": "env_b1e9a1d673",
+      "tenant_id": "智云智造_env_b1e9a1d673",
       "data_mode": "demo",
       "enterprise": "智云智造",
       "template": "manufacturing",
@@ -23,15 +23,15 @@
       "success": 28492,
       "failed": 2233,
       "auth": {
-        "auth_users_file": "C:\\Users\\garys\\AppData\\Local\\Temp\\seed_verify_vs9a9820\\work\\auth\\users.json",
+        "auth_users_file": "C:\\Users\\Gary\\AppData\\Local\\Temp\\seed_verify_wpi2kt37\\work\\auth\\users.json",
         "created": 40,
         "kept": 0,
         "updated": 0
       }
     },
     "production": {
-      "env_id": "env_b63ccb20b9",
-      "tenant_id": "智云智造_env_b63ccb20b9",
+      "env_id": "env_0bcc6650b5",
+      "tenant_id": "智云智造_env_0bcc6650b5",
       "data_mode": "production",
       "enterprise": "智云智造",
       "template": "manufacturing",
@@ -50,7 +50,7 @@
       "success": 28492,
       "failed": 2233,
       "auth": {
-        "auth_users_file": "C:\\Users\\garys\\AppData\\Local\\Temp\\seed_verify_vs9a9820\\work\\auth\\users.json",
+        "auth_users_file": "C:\\Users\\Gary\\AppData\\Local\\Temp\\seed_verify_wpi2kt37\\work\\auth\\users.json",
         "created": 0,
         "kept": 40,
         "updated": 40

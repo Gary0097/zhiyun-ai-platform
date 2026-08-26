@@ -40,14 +40,14 @@ _FILE_KINDS = {
 }
 
 DEPT_APP_MAP = {
-    "销售部": ["sales_center", "data_center", "project_center"],
-    "财务部": ["finance_center", "data_center", "project_center"],
-    "采购部": ["supply_center", "data_center", "project_center"],
-    "客服部": ["service_center", "data_center", "project_center"],
-    "运营部": ["sales_center", "supply_center", "data_center", "project_center"],
-    "生产部": ["order_center", "data_center", "project_center"],
-    "管理层": ["finance_center", "sales_center", "data_center", "project_center"],
-    "研发部": ["project_center", "data_center", "order_center"],
+    "销售部": ["zhiyun-sales-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "财务部": ["zhiyun-finance-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "采购部": ["zhiyun-supply-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "客服部": ["zhiyun-service-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "运营部": ["zhiyun-sales-studio", "zhiyun-supply-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "生产部": ["zhiyun-order-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "管理层": ["zhiyun-finance-studio", "zhiyun-sales-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "研发部": ["zhiyun-app-discovery", "zhiyun-data-core", "zhiyun-order-studio", "qwenpaw-knowledge-base"],
 }
 
 BUSINESS_EVENTS_SCHEMA = """
@@ -190,7 +190,7 @@ def build_day_events(
         if not agent or agent.get("enabled", 1) == 0:
             continue
         app = rng.choice(dept_apps.get(user["department"], dept_apps.get("total", [
-            {"app_id": "data_center", "name": "统一数据中心"}])))
+            {"app_id": "zhiyun-data-core", "name": "统一数据中心"}])))
         session_id = "s_" + uuid.uuid4().hex[:12]
         started = _pick_time(rng)
         messages = rng.randint(2, 12)
@@ -311,7 +311,7 @@ def build_day_events(
         login_pool = rng.sample(active_users, min(login_count, len(active_users)))
         for u in login_pool:
             lapp = rng.choice(dept_apps.get(u["department"], dept_apps.get("total", [
-                {"app_id": "data_center", "name": "统一数据中心"}])))
+                {"app_id": "zhiyun-data-core", "name": "统一数据中心"}])))
             login_ok = rng.random() < 0.96
             logins.append({
                 "user_id": u["username"],
@@ -330,7 +330,7 @@ def build_day_events(
     if active_users and rng.random() < 0.5:
         u = rng.choice(active_users)
         app = rng.choice(dept_apps.get(u["department"], dept_apps.get("total", [
-            {"app_id": "data_center", "name": "统一数据中心"}])))
+            {"app_id": "zhiyun-data-core", "name": "统一数据中心"}])))
         operations.append({
             "user_id": u["username"],
             "agent_id": u["agent_id"],
@@ -544,7 +544,7 @@ def _load_day_context(
     apps_by_id = {a["app_id"]: a for a in apps}
     dept_apps: dict[str, list[dict[str, Any]]] = {}
     for dep in sorted({u["department"] for u in users}):
-        app_ids = DEPT_APP_MAP.get(dep, ["data_center", "project_center"])
+        app_ids = DEPT_APP_MAP.get(dep, ["zhiyun-data-core", "zhiyun-app-discovery"])
         dept_apps[dep] = [
             {"app_id": apps_by_id[ai]["app_id"], "name": apps_by_id[ai]["name"], "category": apps_by_id[ai]["category"]}
             for ai in app_ids if ai in apps_by_id

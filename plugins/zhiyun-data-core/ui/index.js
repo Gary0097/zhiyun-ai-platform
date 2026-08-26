@@ -122,25 +122,100 @@
     var agentDraftState = React.useState(""), agentDraft = agentDraftState[0], setAgentDraft = agentDraftState[1];
     var agentMsgState = React.useState([]), agentMessages = agentMsgState[0], setAgentMessages = agentMsgState[1];
     var agentBusyState = React.useState(false), agentBusy = agentBusyState[0], setAgentBusy = agentBusyState[1];
+    var agentSessionRef = React.useRef("data-core-" + Date.now().toString(36));
     function agentAdd(role, text, card) { setAgentMessages(function (prev) { return prev.concat([{ role: role, text: text, card: card }]); }); }
     function agentCommand(key, label) {
-      agentAdd("user", label || key);
+      var prompt = key === "preview" ? "帮我汇总当前数据概览，哪些实体可用？"
+        : key === "health" ? "当前数据中心健康状态和备份情况如何？"
+        : (label || key);
+      startAgentChat(prompt);
+    }
+    function startAgentChat(text) {
+      text = String(text == null ? "" : text).trim();
+      if (!text || agentBusy) return;
+      var history = (agentMessages || [])
+        .filter(function (m) { return m && m.role !== "system"; })
+        .map(function (m) { return { role: m.role === "bot" ? "assistant" : "user", text: m.text || "" }; })
+        .slice(-12);
+      agentAdd("user", text, null);
+      agentAdd("bot", "", null);
       setAgentBusy(true);
-      setTimeout(function () {
-        zyPushAgent({ app_id: "zhiyun-data-core", kind: key, label: label || key, summary: { entities: entities, records: records, health: health }, source_type: "real" });
+      zyPushAgent({ app_id: "zhiyun-data-core", kind: "chat", label: text, summary: { entities: entities, records: records, health: health }, source_type: "real" });
+      function setLastBot(value) {
+        setAgentMessages(function (prev) {
+          var next = prev.slice();
+          next[next.length - 1] = { role: "bot", text: value, card: null };
+          return next;
+        });
+      }
+      var token = "";
+      try { token = window.localStorage.getItem("zhiyun_token") || ""; } catch (e) {}
+      var agentHeaders = { "Content-Type": "application/json" };
+      if (token) agentHeaders["Authorization"] = "Bearer " + token;
+      Q.host.fetch("/zhiyun-data-core/agent/chat", {
+        method: "POST",
+        headers: agentHeaders,
+        body: JSON.stringify({ text: text, session_id: agentSessionRef.current, user_id: "default", app_id: "zhiyun-data-core", history: history })
+      })
+      .then(function (response) {
+        if (!response.ok || !response.body) {
+          return response.text().then(function (t) { throw new Error("HTTP " + response.status + (t && t.trim() ? ": " + t.trim() : "")); });
+        }
+        var reader = response.body.getReader();
+        var decoder = new TextDecoder();
+        var buffer = "";
+        var full = "";
+        function read() {
+          return reader.read().then(function (chunk) {
+            if (chunk.done) return;
+            buffer += decoder.decode(chunk.value, { stream: true });
+            var lines = buffer.split("\n");
+            buffer = lines.pop();
+            lines.forEach(function (line) {
+              line = line.trim();
+              if (line.indexOf("data: ") !== 0) return;
+              var raw = line.slice(6).trim();
+              if (!raw || raw === "[DONE]") return;
+              var event;
+              try { event = JSON.parse(raw); } catch (e) { return; }
+              if (event.error) {
+                if (!full) { full = "智能体返回失败：" + event.error; setLastBot(full); }
+                return;
+              }
+              if (event.type === "text" && event.delta && typeof event.text === "string" && event.text) {
+                full += event.text;
+                setLastBot(full);
+              }
+              if (event.type === "message" && event.status === "completed" && Array.isArray(event.content)) {
+                for (var i = 0; i < event.content.length; i++) {
+                  var part = event.content[i];
+                  if (part && part.type === "text" && !part.delta && typeof part.text === "string" && part.text) {
+                    full = part.text;
+                    setLastBot(full);
+                  }
+                }
+              }
+              if (event.status === "failed" && !full) {
+                full = event.error || "智能体返回失败";
+                setLastBot(full);
+              }
+            });
+            return read();
+          });
+        }
+        return read();
+      })
+      .then(function () {
         setAgentBusy(false);
-        agentAdd("bot", key === "preview" ? "已汇总数据预览上下文，可直接在界面操作数据表、导入或生成演示数据。" : "已定位至数据管理操作，请在界面完成具体动作。", null);
-      }, 240);
+        if (!full) setLastBot("（智能体未返回可显示内容）");
+      })
+      .catch(function (err) {
+        setAgentBusy(false);
+        setLastBot("调用智能体失败：" + (err && err.message ? err.message : String(err)));
+      });
     }
     function agentSend(text) {
-      agentAdd("user", text);
-      setAgentBusy(true);
-      var key = /预览|数据|表|记录/.test(text) ? "preview" : "health";
-      setTimeout(function () {
-        zyPushAgent({ app_id: "zhiyun-data-core", kind: key, label: text, summary: { entities: entities, records: records, health: health }, source_type: "real" });
-        setAgentBusy(false);
-        agentAdd("bot", "已将「" + text + "」交给数据智能体，可返回界面查看数据表与字段结构。", null);
-      }, 240);
+      startAgentChat(text);
     }
 
     function loadEntities() {

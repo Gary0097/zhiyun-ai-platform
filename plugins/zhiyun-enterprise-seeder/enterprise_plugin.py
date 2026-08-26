@@ -357,14 +357,15 @@ AGENT_TEMPLATES = {
 }
 
 APP_TEMPLATES = [
-    {"id": "data_center", "name": "统一数据中心", "category": "系统", "icon": "🗄️"},
-    {"id": "order_center", "name": "智能订单中心", "category": "业务", "icon": "📦"},
-    {"id": "sales_center", "name": "智能销售中心", "category": "业务", "icon": "📈"},
-    {"id": "finance_center", "name": "智能财务中心", "category": "业务", "icon": "💰"},
-    {"id": "supply_center", "name": "采购与供应链中心", "category": "业务", "icon": "🚚"},
-    {"id": "service_center", "name": "智能售后服务中心", "category": "业务", "icon": "🎧"},
-    {"id": "people_center", "name": "智能人力与协同中心", "category": "业务", "icon": "🧑‍🤝‍🧑"},
-    {"id": "project_center", "name": "应用与项目中心", "category": "系统", "icon": "🧭"},
+    {"id": "zhiyun-data-core", "name": "统一数据中心", "category": "系统", "icon": "🗄️"},
+    {"id": "zhiyun-order-studio", "name": "智能订单中心", "category": "业务", "icon": "📦"},
+    {"id": "zhiyun-sales-studio", "name": "智能销售中心", "category": "业务", "icon": "📈"},
+    {"id": "zhiyun-finance-studio", "name": "智能财务中心", "category": "业务", "icon": "💰"},
+    {"id": "zhiyun-supply-studio", "name": "采购与供应链中心", "category": "业务", "icon": "🚚"},
+    {"id": "zhiyun-service-studio", "name": "智能售后服务中心", "category": "业务", "icon": "🎧"},
+    {"id": "zhiyun-people-studio", "name": "智能人力与协同中心", "category": "业务", "icon": "🧑‍🤝‍🧑"},
+    {"id": "zhiyun-app-discovery", "name": "应用与项目中心", "category": "系统", "icon": "🧭"},
+    {"id": "qwenpaw-knowledge-base", "name": "工作区知识库", "category": "知识", "icon": "📚"},
 ]
 
 ROLE_TEMPLATES = [
@@ -439,11 +440,17 @@ def _read_auth_users() -> list[dict[str, Any]]:
     return []
 
 
-def _sync_auth_users(rows: list[dict[str, Any]], enterprise: str) -> dict[str, Any]:
+def _sync_auth_users(
+    rows: list[dict[str, Any]],
+    enterprise: str,
+    env_id: str = "",
+    data_mode: str = "",
+) -> dict[str, Any]:
     """把生成的员工账号合并进 zhiyun-auth 的 users.json。
 
     保留已有 admin / 历史账号；生成的员工按 username 去重；默认密码
-    Zhiyun@2026；每个账号绑定 agent_id / data_scope / kb_scope。
+    Zhiyun@2026；每个账号绑定 agent_id / data_scope / kb_scope，并记录其
+    所属企业环境（env_id / data_mode），用于 RBAC 数据隔离。
     """
     users = _read_auth_users()
     by_username = {u.get("username"): u for u in users if u.get("username")}
@@ -456,7 +463,7 @@ def _sync_auth_users(rows: list[dict[str, Any]], enterprise: str) -> dict[str, A
             updated += 1
             continue
         pw_hash, salt = _hash_password(DEFAULT_PASSWORD)
-        users.append({
+        auth = {
             "username": username,
             "display_name": row["display_name"],
             "role": row["role"],
@@ -468,7 +475,12 @@ def _sync_auth_users(rows: list[dict[str, Any]], enterprise: str) -> dict[str, A
             "kb_scope": row["kb_scope"],
             "active": bool(row["active"]),
             "created_at": row["created_at"],
-        })
+        }
+        if env_id:
+            auth["env_id"] = env_id
+        if data_mode:
+            auth["data_mode"] = data_mode
+        users.append(auth)
         created += 1
     _write_json(AUTH_USERS_FILE, users)
     return {"auth_users_file": str(AUTH_USERS_FILE), "created": created, "kept": len(users) - created, "updated": updated}
@@ -631,7 +643,7 @@ def _build_sessions_for_day(conn, day, active_users, enabled_agents, agents_by_i
         if not agent or agent["enabled"] == 0:
             continue
         app = rng.choice(dept_apps.get(user["department"], dept_apps.get("total", [
-            {"app_id": "data_center", "name": "统一数据中心"}])))
+            {"app_id": "zhiyun-data-core", "name": "统一数据中心"}])))
         session_id = "s_" + uuid.uuid4().hex[:12]
         started = _pick_time(rng)
         messages = rng.randint(2, 12)
@@ -729,26 +741,59 @@ def _shift_time(t: str, ms: int) -> str:
 # ---------------------------------------------------------------------------
 
 DEPT_APP_MAP = {
-    "销售部": ["sales_center", "data_center", "project_center"],
-    "财务部": ["finance_center", "data_center", "project_center"],
-    "采购部": ["supply_center", "data_center", "project_center"],
-    "客服部": ["service_center", "data_center", "project_center"],
-    "运营部": ["sales_center", "supply_center", "data_center", "project_center"],
-    "生产部": ["order_center", "data_center", "project_center"],
-    "管理层": ["finance_center", "sales_center", "data_center", "project_center"],
-    "研发部": ["project_center", "data_center", "order_center"],
+    "销售部": ["zhiyun-sales-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "财务部": ["zhiyun-finance-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "采购部": ["zhiyun-supply-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "客服部": ["zhiyun-service-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "运营部": ["zhiyun-sales-studio", "zhiyun-supply-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "生产部": ["zhiyun-order-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "管理层": ["zhiyun-finance-studio", "zhiyun-sales-studio", "zhiyun-data-core", "zhiyun-app-discovery", "qwenpaw-knowledge-base"],
+    "研发部": ["zhiyun-app-discovery", "zhiyun-data-core", "zhiyun-order-studio", "qwenpaw-knowledge-base"],
 }
 
 DATA_SOURCE_MAP = {
-    "data_center": ("统一数据集市", "workspace"),
-    "order_center": ("销售订单执行数据", "excel"),
-    "sales_center": ("客户与商机数据", "excel"),
-    "finance_center": ("财务总账与票据", "excel"),
-    "supply_center": ("采购与库存数据", "excel"),
-    "service_center": ("售后服务工单", "excel"),
-    "people_center": ("组织与员工档案", "excel"),
-    "project_center": ("应用与项目台账", "workspace"),
+    "zhiyun-data-core": ("统一数据集市", "workspace"),
+    "zhiyun-order-studio": ("销售订单执行数据", "excel"),
+    "zhiyun-sales-studio": ("客户与商机数据", "excel"),
+    "zhiyun-finance-studio": ("财务总账与票据", "excel"),
+    "zhiyun-supply-studio": ("采购与库存数据", "excel"),
+    "zhiyun-service-studio": ("售后服务工单", "excel"),
+    "zhiyun-people-studio": ("组织与员工档案", "excel"),
+    "zhiyun-app-discovery": ("应用与项目台账", "workspace"),
+    "qwenpaw-knowledge-base": ("企业知识库文档", "workspace"),
 }
+
+
+# 知识库/工作区类应用在未导入真实文档前，data_sources.records 必须保持为空（0），
+# 避免在全新初始化环境中伪造虚构记录数（见 AGENTS.md：不得用伪造数据证明实现）。
+_EMPTY_RECORD_APPS = {"qwenpaw-knowledge-base"}
+
+
+APP_DEFAULT_AGENT_MAP = {
+    # 应用 -> 默认智能体（每个应用对应一个智能体，用于应用内「智能体对话」与问数）
+    "zhiyun-data-core": "business_analyst",     # 统一数据中心 -> 经营分析
+    "zhiyun-order-studio": "sales_quote",          # 智能订单中心 -> 销售报价
+    "zhiyun-sales-studio": "customer_followup",    # 智能销售中心 -> 客户跟进
+    "zhiyun-finance-studio": "finance_invoice",    # 智能财务中心 -> 财务票据
+    "zhiyun-supply-studio": "procurement_recon",   # 采购与供应链中心 -> 采购对账
+    "zhiyun-service-studio": "after_sales",        # 智能售后服务中心 -> 售后客服
+    "zhiyun-people-studio": "expense_audit",       # 智能人力与协同中心 -> 报销审核
+    "zhiyun-app-discovery": "business_analyst",   # 应用与项目中心 -> 经营分析
+    "qwenpaw-knowledge-base": "business_analyst",  # 工作区知识库 -> 经营分析
+}
+
+
+def _resolve_default_agent(app_id: str, agents: list[dict[str, Any]]) -> str:
+    """解析业务应用对应的默认智能体：优先精确映射，其次经营分析兜底，最后第一个智能体。"""
+    target = APP_DEFAULT_AGENT_MAP.get(str(app_id))
+    if target:
+        for agt in agents:
+            if agt.get("agent_id") == target or agt.get("id") == target:
+                return target
+    for agt in agents:
+        if agt.get("agent_id") == "business_analyst":
+            return "business_analyst"
+    return (agents[0].get("agent_id") or agents[0].get("id") or "") if agents else ""
 
 
 def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
@@ -857,13 +902,15 @@ def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
             conn.execute(
                 "INSERT INTO apps (env_id, tenant_id, data_mode, app_id, name, category, agent_id, icon, enabled, created_at) "
                 "VALUES (?,?,?,?,?,?,?,?,?,?)",
-                (env_id, tenant_id, data_mode, app["id"], app["name"], app["category"], agents[0]["id"] if agents else "", app["icon"], 1, now),
+                (env_id, tenant_id, data_mode, app["id"], app["name"], app["category"], _resolve_default_agent(app["id"], agents), app["icon"], 1, now),
             )
             source_name, source_type = DATA_SOURCE_MAP.get(app["id"], (app["name"], "workspace"))
+            # 无真实导入数据的知识库类应用记录数保持为空（0），其余按业务体量生成。
+            records = 0 if app["id"] in _EMPTY_RECORD_APPS else rng.randint(800, 5200)
             conn.execute(
                 "INSERT INTO data_sources (env_id, tenant_id, data_mode, source_id, name, source_type, app_id, records, shared, created_at) "
                 "VALUES (?,?,?,?,?,?,?,?,?,?)",
-                (env_id, tenant_id, data_mode, f"{app['id']}_ds", source_name, source_type, app["id"], rng.randint(800, 5200), 1 if app["category"] == "系统" else 0, now),
+                (env_id, tenant_id, data_mode, f"{app['id']}_ds", source_name, source_type, app["id"], records, 1 if app["category"] == "系统" else 0, now),
             )
 
         # 员工
@@ -880,7 +927,7 @@ def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
         # 应用->岗位映射
         dept_apps = {}
         for dept in depts:
-            app_ids = DEPT_APP_MAP.get(dept["name"], ["data_center", "project_center"])
+            app_ids = DEPT_APP_MAP.get(dept["name"], ["zhiyun-data-core", "zhiyun-app-discovery"])
             dept_apps[dept["name"]] = [{"app_id": apps_by_id[a]["id"], "name": apps_by_id[a]["name"], "category": apps_by_id[a]["category"]} for a in app_ids if a in apps_by_id]
         dept_apps["total"] = [{"app_id": a["id"], "name": a["name"], "category": a["category"]} for a in apps_by_id.values()]
 
@@ -950,7 +997,7 @@ def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
             "sessions": totals["sessions"], "tasks": totals["calls"],
             "token_total": totals["tokens"], "success": totals["success"], "failed": totals["failed"],
         }
-        sync = _sync_auth_users(user_rows, enterprise)
+        sync = _sync_auth_users(user_rows, enterprise, env_id, data_mode)
         summary["auth"] = sync
         return summary
     finally:
@@ -1028,6 +1075,9 @@ _TIME_COLUMNS = {
 }
 
 
+_KB_ENTITIES = {"data_sources", "files", "file_downloads", "agent_app_access"}
+
+
 def _range_sql(env_id: str, data_mode: str, table: str, date_col: str, start_date: str = "", end_date: str = "") -> tuple[str, list[Any]]:
     """构造某张表在指定时间范围内的 SQL 片段，返回 (where, args)。"""
     where = "WHERE env_id = ? AND data_mode = ?"
@@ -1042,17 +1092,57 @@ def _range_sql(env_id: str, data_mode: str, table: str, date_col: str, start_dat
 
 
 
-def _user_context(user: dict[str, Any]) -> tuple[str, str, str]:
+def _user_env(user: dict[str, Any]) -> tuple[str, str]:
+    """返回 (env_id, data_mode) 给调用方用于 RBAC 数据隔离。
+
+    优先取 auth 用户上持久化的 env_id / data_mode；若缺失则回退到
+    enterprise_meta 按企业名匹配最新一条。无法解析时返回 ("", "")，调用方
+    应拒绝访问。
+    """
+    env_id = str(user.get("env_id") or "")
+    data_mode = str(user.get("data_mode") or "")
+    if env_id and data_mode:
+        return env_id, data_mode
+    if not env_id or not data_mode:
+        enterprise = str(user.get("enterprise") or "")
+        conn = _connect()
+        try:
+            row = conn.execute(
+                "SELECT env_id, data_mode FROM enterprise_meta WHERE enterprise = ? ORDER BY id DESC LIMIT 1",
+                (enterprise,),
+            ).fetchone()
+            if row:
+                if not env_id:
+                    env_id = row["env_id"]
+                if not data_mode:
+                    data_mode = row["data_mode"]
+        finally:
+            conn.close()
+    return env_id, data_mode
+
+
+def _enforce_user_env(user: dict[str, Any]) -> tuple[str, str]:
+    """对非管理员解析并强制其所属企业环境；无法解析时返回 403。"""
+    env_id, data_mode = _user_env(user)
+    if not env_id or not data_mode:
+        raise HTTPException(status_code=403, detail="无法确定当前账号所属企业环境")
+    return env_id, data_mode
+
+
+def _user_context(user: dict[str, Any], env_id: str = "") -> tuple[str, str, str]:
     """返回 (department, agent_id, user_id)，供按用户范围过滤使用。"""
     username = str(user.get("username") or "")
     agent = str(user.get("agent_id") or "")
     dept = ""
     conn = _connect()
     try:
-        row = conn.execute(
-            "SELECT department, agent_id FROM org_users WHERE username = ? ORDER BY id DESC LIMIT 1",
-            (username,),
-        ).fetchone()
+        sql = "SELECT department, agent_id FROM org_users WHERE username = ?"
+        args: list[Any] = [username]
+        if env_id:
+            sql += " AND env_id = ?"
+            args.append(env_id)
+        sql += " ORDER BY id DESC LIMIT 1"
+        row = conn.execute(sql, args).fetchone()
         if row:
             dept = row["department"] or ""
             if not agent:
@@ -1062,9 +1152,60 @@ def _user_context(user: dict[str, Any]) -> tuple[str, str, str]:
     return dept, agent, username
 
 
-def _scope_clause(entity: str, user: dict[str, Any]) -> tuple[str, list[Any]]:
-    """构造非管理员用户的企业/部门/智能体数据范围 SQL 片段。"""
-    dept, agent, uid = _user_context(user)
+def _kb_department_clause(entity: str, dept: str, env_id: str = "") -> tuple[str, list[Any]]:
+    """知识库类实体的部门范围限制：当用户 kb_scope=department 时使用。"""
+    def _agents() -> tuple[str, list[Any]]:
+        sql = "SELECT agent_id FROM agents WHERE department = ?"
+        args: list[Any] = [dept]
+        if env_id:
+            sql += " AND env_id = ?"
+            args.append(env_id)
+        return sql, args
+
+    def _users() -> tuple[str, list[Any]]:
+        sql = "SELECT username FROM org_users WHERE department = ?"
+        args: list[Any] = [dept]
+        if env_id:
+            sql += " AND env_id = ?"
+            args.append(env_id)
+        return sql, args
+
+    if entity == "data_sources":
+        a_sql, a_args = _agents()
+        return (f"app_id IN (SELECT app_id FROM apps WHERE agent_id IN ({a_sql}))", a_args)
+    if entity in ("files", "file_downloads"):
+        a_sql, a_args = _agents()
+        u_sql, u_args = _users()
+        return (f"(agent_id IN ({a_sql}) OR user_id IN ({u_sql}))", a_args + u_args)
+    if entity == "agent_app_access":
+        a_sql, a_args = _agents()
+        return (f"agent_id IN ({a_sql})", a_args)
+    return ("1 = 1", [])
+
+
+def _scope_clause(entity: str, user: dict[str, Any], env_id: str = "") -> tuple[str, list[Any]]:
+    """构造非管理员用户的企业/部门/智能体/知识库数据范围 SQL 片段。
+
+    - 数据域 data_scope 控制业务实体：enterprise=本环境全部；department=本部门。
+    - 知识域 kb_scope 控制知识库类实体（files/data_sources/file_downloads/
+      agent_app_access）：enterprise=本环境全部；department=本部门。
+    env_id 用于在跨环境存在同名部门/智能体时仍隔离到正确环境。
+    """
+    dept, agent, uid = _user_context(user, env_id)
+    kb_scope = str(user.get("kb_scope") or "enterprise")
+    data_scope = str(user.get("data_scope") or "enterprise")
+
+    # 知识域：kb_scope=department 时按部门限制知识类实体
+    if entity in _KB_ENTITIES:
+        if kb_scope != "department" or not dept:
+            return ("1 = 1", [])
+        return _kb_department_clause(entity, dept, env_id)
+
+    # 非知识库实体按数据域控制
+    if entity == "roles":
+        return ("1 = 0", [])
+    if data_scope == "enterprise":
+        return ("1 = 1", [])
     if entity == "departments":
         return ("name = ?", [dept]) if dept else ("1 = 0", [])
     if entity == "org_users":
@@ -1083,8 +1224,6 @@ def _scope_clause(entity: str, user: dict[str, Any]) -> tuple[str, list[Any]]:
         return ("agent_id = ?", [agent]) if agent else ("user_id = ?", [uid])
     if entity == "operation_logs":
         return ("user_id = ?", [uid])
-    if entity == "roles":
-        return ("1 = 0", [])
     return ("1 = 1", [])
 
 
@@ -1111,9 +1250,10 @@ def _records(entity: str, limit: int, offset: int, env_id: str = "", data_mode: 
             clauses.append("data_mode = ?")
             args.append(data_mode)
         if user is not None and user.get("role") != "admin":
-            scope = user.get("data_scope") or "enterprise"
-            if scope != "enterprise":
-                clause, scope_args = _scope_clause(entity, user)
+            # 数据域与知识域独立判定：即使 data_scope=enterprise，
+            # kb_scope=department 也必须对知识库类实体生效。
+            clause, scope_args = _scope_clause(entity, user, env_id)
+            if clause != "1 = 1":
                 clauses.append(clause)
                 args.extend(scope_args)
         # Epic 4 Time Machine：按实体时间列做时间范围过滤
@@ -1325,6 +1465,8 @@ async def records(
     end_date: str = Query(default="", max_length=10),
 ) -> dict[str, Any]:
     user = _require_auth(authorization)
+    if user.get("role") != "admin":
+        env_id, data_mode = _enforce_user_env(user)
     rows = _records(entity, limit, offset, env_id, data_mode, start_date, end_date, user)
     return {"entity": entity, "count": len(rows), "rows": rows, "data_mode": data_mode, "env_id": env_id, "range": {"start_date": start_date, "end_date": end_date}}
 
