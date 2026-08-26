@@ -118,7 +118,7 @@
             opacity: busy ? 0.8 : 1
           } }, busy ? "登录中…" : "登录"),
           h("div", { style: { marginTop: 8, fontSize: 11.5, color: "#98a2b3", textAlign: "center" } },
-            "默认管理员：admin / ZhizaoYun@2026（可在登录插件配置中修改品牌与账号）")
+            "账号由企业管理员分配；忘记密码请联系系统管理员重置")
         )
       )
     );
