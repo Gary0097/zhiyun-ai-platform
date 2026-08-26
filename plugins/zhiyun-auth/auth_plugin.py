@@ -44,6 +44,8 @@ CONFIG_FILE = WORKING_DIR / "config.json"
 DEFAULT_ENTERPRISE = "制造云"
 DEFAULT_ADMIN_USER = "admin"
 DEFAULT_ADMIN_PASSWORD = "ZhizaoYun@2026"
+# rebrand 前系统默认管理员口令，仅用于升级后向后兼容轮换。
+LEGACY_DEFAULT_ADMIN_PASSWORD = "Zhiyun@2026"
 TOKEN_EXPIRY_SECONDS = 7 * 24 * 3600
 
 router = APIRouter()
@@ -187,27 +189,42 @@ def _find_user(username: str) -> dict[str, Any] | None:
 
 
 def _ensure_admin() -> None:
-    """启动时保证存在一个默认管理员账号。"""
+    """启动时保证存在一个默认管理员账号。
+
+    旧版本（rebrand 前）默认口令为 Zhiyun@2026；升级后若管理员账号仍使用该旧
+    默认口令，则自动轮换为新默认口令 ZhizaoYun@2026，确保文档 / 登录页展示
+    的凭据仍然可用。若管理员已手动改过口令，则不触碰。
+    """
     # 先让全局 secret 落盘，保证后续创建用户时签名秘钥稳定。
     _token_secret()
     users = _load_users()
-    if any(u.get("username") == DEFAULT_ADMIN_USER for u in users):
+    admin = next((u for u in users if u.get("username") == DEFAULT_ADMIN_USER), None)
+    if admin is None:
+        pw_hash, salt = _hash_password(DEFAULT_ADMIN_PASSWORD)
+        users.append({
+            "username": DEFAULT_ADMIN_USER,
+            "display_name": "系统管理员",
+            "role": "admin",
+            "password_hash": pw_hash,
+            "password_salt": salt,
+            "enterprise": _enterprise_name(),
+            "agent_id": "default",
+            "data_scope": "enterprise",
+            "kb_scope": "enterprise",
+            "active": True,
+            "created_at": _now(),
+        })
+        _save_users(users)
         return
-    pw_hash, salt = _hash_password(DEFAULT_ADMIN_PASSWORD)
-    users.append({
-        "username": DEFAULT_ADMIN_USER,
-        "display_name": "系统管理员",
-        "role": "admin",
-        "password_hash": pw_hash,
-        "password_salt": salt,
-        "enterprise": _enterprise_name(),
-        "agent_id": "default",
-        "data_scope": "enterprise",
-        "kb_scope": "enterprise",
-        "active": True,
-        "created_at": _now(),
-    })
-    _save_users(users)
+    # 向后兼容轮换：仅当管理员仍使用 rebrand 前的默认口令时才更新为新口令，
+    # 避免覆盖管理员已自行修改的密码。
+    stored = admin.get("password_hash", "")
+    salt = admin.get("password_salt", "")
+    if stored and salt and _verify_password(LEGACY_DEFAULT_ADMIN_PASSWORD, stored, salt):
+        pw_hash, new_salt = _hash_password(DEFAULT_ADMIN_PASSWORD)
+        admin["password_hash"] = pw_hash
+        admin["password_salt"] = new_salt
+        _save_users(users)
 
 
 def _available_agents() -> list[dict[str, Any]]:

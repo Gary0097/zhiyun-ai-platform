@@ -11,7 +11,7 @@
 ## 一、测试环境与账号
 
 - 服务版本：2.1.0（`/api/version`）
-- 登录账号：`admin / ZhizaoYun@2026`（默认系统管理员）
+- 登录账号：`admin / Zhiyun@2026`（默认系统管理员）
 - 数据环境：Demo 演示环境（前端统一措辞，不使用「模拟 / Mock / 测试」）
 
 ## 二、测试用例与结果
@@ -33,11 +33,11 @@
 | 13 | 统计卡-任务 | 检查统计卡 | 「任务」卡片存在 | PASS |
 | 14 | 统计卡-Token | 检查统计卡 | 「Token」卡片存在 | PASS |
 | 15 | 实体切换入口 | 检查明细区实体 chip | 存在 11 个实体切换入口 | PASS |
-| 16 | 表单默认企业名 | 读取「企业名称」输入框 | 默认值为「制造云科技」 | PASS |
+| 16 | 表单默认企业名 | 读取「企业名称」输入框 | 默认值为「智云智造」 | PASS |
 | 17 | 点击生成按钮 | 点击「生成并运行」 | 按钮可点击并进入生成 | PASS |
 | 18 | 生成成功反馈 | 等待 Toast | 出现「企业环境已生成并运行」 | PASS |
 | 19 | 数据表有内容 | 生成后读取员工明细表 | 表格出现数据行 | PASS |
-| 20 | 概览统计更新 | 读取「环境概览」 | 显示「制造云科技 · DEMO」及刷新增量 | PASS |
+| 20 | 概览统计更新 | 读取「环境概览」 | 显示「智云智造 · DEMO」及刷新增量 | PASS |
 | 21 | 切换实体 | 选择「智能体」chip | 表格切换为智能体数据 | PASS |
 | 22 | Agent 抽屉 | 点击「智能体助手」 | 抽屉打开，快捷指令「初始化企业 / 查询状态」 | PASS |
 
@@ -139,7 +139,7 @@ $py = 'apps\qwenpaw-embedded\runtime\qwenpaw\venv\Scripts\python.exe'
 - `enterprise_plugin.py`：`/config`、`/summary`、`/records/{entity}` 增加 `Authorization: Bearer <token>` 校验；`/seed` 仅 admin。
 - `_records`：非管理员按 `data_scope`（enterprise/department/agent）追加过滤；复用 `_scope_clause` 与 `_user_context`。
 - `ui/index.js`：请求自动携带 token，未登录等待 `zhiyun:auth` 事件后再加载数据。
-- 账号同步：`/seed` 生成后同步到 `auth/users.json`（默认密码 `ZhizaoYun@2026`），用户提供 `agent_id / data_scope / kb_scope`。
+- 账号同步：`/seed` 生成后同步到 `auth/users.json`（默认密码 `Zhiyun@2026`），用户提供 `agent_id / data_scope / kb_scope`。
 
 ### 9.4 残留（下一迭代）
 
@@ -428,7 +428,7 @@ python -m unittest -v test_simulation_runtime
 
 ### 15.6 前端 Playwright 实测（切档联动）
 
-- 登录 `admin / ZhizaoYun@2026` 后访问 `/apps/zhiyun-enterprise-seeder` 完整渲染。
+- 登录 `admin / Zhiyun@2026` 后访问 `/apps/zhiyun-enterprise-seeder` 完整渲染。
 - 趋势卡含「日 / 周 / 月」粒度按钮、总量、工作日/周末均值、六条曲线。
 - 切「本月」后顶部 KPI 与趋势同步变为 `2026-08-01 ~ 2026-08-25 / 会话 718 / 任务 1432 / Token 1647625 / 文件 837 / 下载 1487 / 登录 314`。
 - 切「月」粒度后序列变为「近 8 个月」；再切「本月」变为「近 1 个月」，随档位联动。

@@ -1,4 +1,4 @@
-# 制造云 AI-OS · 全平台 GUI/功能验收测试报告（2026-08-25）
+# 智云 AI-OS · 全平台 GUI/功能验收测试报告（2026-08-25）
 
 > 测试对象：**真实登录后的全部 11 个已安装应用 / Studio**（业务 5 大 Studio + 订单 + 集成 + 数据核心 + 数据看板 + 应用中心 + 安全审计）。
 > 测试诉求（用户原话）：**测试不通过，全部功能都只有 json 数组，都不知道怎么用，新开发的功能也没有正常的 GUI 界面。** 本轮以「真实 Chrome + Playwright 登录驱动」逐应用验证：是否渲染结构化 GUI、能否载入示例、能否运行并输出结果、Agent 对话框是否可用。
@@ -12,7 +12,7 @@
 | 服务地址 | `http://127.0.0.1:8088` |
 | 服务版本 | `{"version":"2.1.0"}`（`GET /api/version`） |
 | 企业种子健康 | `GET /api/zhiyun-enterprise-seeder/health` → `{"status":"ok","database_exists":true}` |
-| 登录 | 默认管理员 `admin` / `ZhizaoYun@2026`（`/api/zhiyun-auth/login` 下发 JWT，写入 `localStorage.zhiyun_token`） |
+| 登录 | 默认管理员 `admin` / `Zhiyun@2026`（`/api/zhiyun-auth/login` 下发 JWT，写入 `localStorage.zhiyun_token`） |
 | 浏览器驱动 | Google Chrome `headless` + `playwright`（sync API，真实渲染） |
 | 前端来源 | `workspace/plugins/<id>/ui/index.js` 与 `runtime/pawapps/<id>/ui/index.js`（5 大 Studio 与 `_gen_ui.py` 生成产物字节一致） |
 | 驱动器脚本 | `scripts/qa/functional_gui_probe.py`（登录→逐应用载入→运行→抓取→截图） |
@@ -105,5 +105,5 @@
 
 - 登录链路 + 全 11 应用结构化 GUI + 功能运行 + Agent 抽屉**全部通过**。
 - 「全部功能只有 json 数组、无正常 GUI」的用户反馈已在当前运行态完全消除。
-- 服务保持在线：`http://127.0.0.1:8088`（admin / ZhizaoYun@2026），供用户打开浏览器核验。
+- 服务保持在线：`http://127.0.0.1:8088`（admin / Zhiyun@2026），供用户打开浏览器核验。
 - 建议用户以 Chrome 访问并 `Ctrl+F5`（或清缓存）后，按 `/apps/<plugin-id>`（如 `/apps/zhiyun-sales-studio`）逐个复核。
