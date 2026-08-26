@@ -152,6 +152,7 @@
       try { token = window.localStorage.getItem("zhiyun_token") || ""; } catch (e) {}
       var agentHeaders = { "Content-Type": "application/json" };
       if (token) agentHeaders["Authorization"] = "Bearer " + token;
+      var full = "";
       Q.host.fetch("/zhiyun-data-core/agent/chat", {
         method: "POST",
         headers: agentHeaders,
@@ -164,7 +165,6 @@
         var reader = response.body.getReader();
         var decoder = new TextDecoder();
         var buffer = "";
-        var full = "";
         function read() {
           return reader.read().then(function (chunk) {
             if (chunk.done) return;

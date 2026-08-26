@@ -468,6 +468,7 @@ def _user_env(user: dict[str, Any]) -> tuple[str, str]:
     data_mode = str(user.get("data_mode") or "")
     if env_id and data_mode:
         return env_id, data_mode
+    is_admin = str(user.get("role") or "") == "admin"
     if not env_id or not data_mode:
         enterprise = str(user.get("enterprise") or "")
         try:
@@ -482,6 +483,18 @@ def _user_env(user: dict[str, Any]) -> tuple[str, str]:
                         env_id = row["env_id"]
                     if not data_mode:
                         data_mode = row["data_mode"]
+                # 系统管理员可能早于企业初始化创建，因此账号记录中没有
+                # 固定 env_id。管理员可使用当前最新企业环境；普通账号仍
+                # 必须精确匹配自身企业，避免跨企业读取。
+                if (not env_id or not data_mode) and is_admin:
+                    row = conn.execute(
+                        "SELECT env_id, data_mode FROM enterprise_meta ORDER BY id DESC LIMIT 1"
+                    ).fetchone()
+                    if row:
+                        if not env_id:
+                            env_id = row["env_id"]
+                        if not data_mode:
+                            data_mode = row["data_mode"]
             finally:
                 conn.close()
         except Exception:
