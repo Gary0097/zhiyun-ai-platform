@@ -99,3 +99,75 @@ class TestKnowledgeBaseZeroRecords(SeedRecordsTestBase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLegacyPasswordRotation(SeedRecordsTestBase):
+    """rebrand 后：已同步员工若仍使用旧默认口令，应向后兼容轮换；自定义口令不触碰。"""
+
+    def setUp(self):
+        super().setUp()
+        ep._write_json(ep.AUTH_USERS_FILE, [])
+
+    def _seed_row(self, username: str = "u001") -> dict:
+        return {
+            "username": username,
+            "display_name": "测试员工",
+            "role": "member",
+            "agent_id": "agent-001",
+            "data_scope": "department",
+            "kb_scope": "department",
+            "active": True,
+            "created_at": ep._now(),
+        }
+
+    def _existing_user(self, username: str, password: str) -> dict:
+        pw_hash, salt = ep._hash_password(password)
+        return {
+            "username": username,
+            "display_name": "旧员工",
+            "role": "member",
+            "password_hash": pw_hash,
+            "password_salt": salt,
+            "enterprise": "制造云",
+            "agent_id": "agent-001",
+            "data_scope": "department",
+            "kb_scope": "department",
+            "active": True,
+            "created_at": ep._now(),
+        }
+
+    def test_legacy_default_password_is_rotated(self):
+        legacy = ep.LEGACY_DEFAULT_PASSWORD
+        new_default = ep.DEFAULT_PASSWORD
+        ep._write_json(ep.AUTH_USERS_FILE, [self._existing_user("u001", legacy)])
+        _ = ep._sync_auth_users([self._seed_row("u001")], "制造云", env_id="env-1", data_mode="demo")
+
+        users = ep._read_auth_users()
+        self.assertEqual(len(users), 1, "已存在员工不应被重复创建")
+        u = users[0]
+        # 轮换后应验证新默认口令，且旧口令不再匹配
+        self.assertTrue(
+            ep._verify_password(new_default, u["password_hash"], u["password_salt"]),
+            "员工仍使用旧默认口令时应轮换为新默认口令",
+        )
+        self.assertFalse(
+            ep._verify_password(legacy, u["password_hash"], u["password_salt"]),
+            "轮换后旧默认口令不应再匹配",
+        )
+
+    def test_custom_password_is_not_overwritten(self):
+        custom = "MyCustom@2026"
+        ep._write_json(ep.AUTH_USERS_FILE, [self._existing_user("u001", custom)])
+        _ = ep._sync_auth_users([self._seed_row("u001")], "制造云")
+
+        users = ep._read_auth_users()
+        self.assertEqual(len(users), 1)
+        u = users[0]
+        self.assertTrue(
+            ep._verify_password(custom, u["password_hash"], u["password_salt"]),
+            "已修改为自定义口令的员工不应被覆盖",
+        )
+        self.assertFalse(
+            ep._verify_password(ep.DEFAULT_PASSWORD, u["password_hash"], u["password_salt"]),
+            "自定义口令不应被改为默认口令",
+        )

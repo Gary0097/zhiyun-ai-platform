@@ -78,6 +78,8 @@ AUTH_USERS_FILE = WORKING_DIR / "auth" / "users.json"
 AUTH_SECRET_FILE = WORKING_DIR / "auth" / "token_secret.txt"
 
 DEFAULT_PASSWORD = "ZhizaoYun@2026"
+# rebrand 前企业员工默认口令；仅用于升级后向后兼容轮换，不用于新建账号。
+LEGACY_DEFAULT_PASSWORD = "Zhiyun@2026"
 DEFAULT_START = "2025-12-01"
 DEFAULT_ACTIVITY = "medium"
 DEFAULT_TEMPLATE = "manufacturing"
@@ -416,6 +418,10 @@ def _hash_password(password: str, salt: str | None = None) -> tuple[str, str]:
     digest = hashlib.sha256((salt + password).encode("utf-8")).hexdigest()
     return digest, salt
 
+def _verify_password(password: str, stored_hash: str, salt: str) -> bool:
+    digest, _ = _hash_password(password, salt)
+    return hmac.compare_digest(digest, stored_hash)
+
 
 def _token_secret() -> str:
     try:
@@ -458,8 +464,16 @@ def _sync_auth_users(
     updated = 0
     for row in rows:
         username = row["username"]
-        # 跳过已存在的历史账号（admin 等），避免覆盖密码
+        # 已存在的历史账号（admin 等）：跳过以避免覆盖自定义密码，但若仍使用
+        # rebrand 前的默认口令，则向后兼容轮换为新默认口令。
         if username in by_username:
+            existing = by_username[username]
+            stored = existing.get("password_hash", "")
+            salt = existing.get("password_salt", "")
+            if stored and salt and _verify_password(LEGACY_DEFAULT_PASSWORD, stored, salt):
+                pw_hash, new_salt = _hash_password(DEFAULT_PASSWORD)
+                existing["password_hash"] = pw_hash
+                existing["password_salt"] = new_salt
             updated += 1
             continue
         pw_hash, salt = _hash_password(DEFAULT_PASSWORD)
