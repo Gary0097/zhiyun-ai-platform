@@ -125,6 +125,9 @@
   }
 
   function mount() {
+    // 宿主在不同加载路径下可能把本脚本执行两次；重复挂载会产生两个登录层，
+    // 上层按钮没有事件处理器，真实用户将无法登录。这里做幂等保护。
+    if (document.getElementById("zhiyun-auth-root")) return;
     var container = document.createElement("div");
     container.id = "zhiyun-auth-root";
     document.body.appendChild(container);

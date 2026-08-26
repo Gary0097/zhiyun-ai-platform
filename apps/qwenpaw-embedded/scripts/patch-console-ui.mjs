@@ -224,15 +224,17 @@ function findUnpatched (content, from, patched) {
   return -1
 }
 
-// 给 index.html 中的主 bundle src 追加基于内容的版本号，用于强制浏览器重新拉取已打补丁的 bundle，
-// 避免因 bundle 文件名哈希不变导致的陈旧缓存。
+// 移除 index.html 主 bundle src 上的 ?v= 查询参数。
+// QwenPaw console 的懒加载块（如 ACPDrawer）会以不带查询参数的原路径动态 import 入口
+// chunk；若 index.html 入口带 ?v=，两者会成为不同的模块标识，导致整个 console 执行两次
+// （登录层/PluginLoader/引导浮层全部翻倍，且应用容器互相遮挡）。资源服务端已带 ETag，
+// 去掉 ?v= 后浏览器仍会按 ETag 重验证，不会长期吃陈旧缓存。
 function ensureCacheBust (consoleDir, bundleContent) {
   const htmlPath = join(consoleDir, 'index.html')
   const html = readFileSync(htmlPath, 'utf8')
-  const version = hashOf(bundleContent)
-  const re = /(src="\/assets\/index-[^"?\s]+\.js)(?:\?v=[^"]*)?(")/
+  const re = /(src="\/assets\/index-[^"?\s]+\.js)\?v=[^"]*(")/
   if (!re.test(html)) return { changed: false }
-  const newHtml = html.replace(re, '$1?v=' + version + '$2')
+  const newHtml = html.replace(re, '$1$2')
   if (newHtml === html) return { changed: false }
   writeFileSync(htmlPath, newHtml, 'utf8')
   return { changed: true }
@@ -312,9 +314,9 @@ if (checkMode) {
   }
   const html = readFileSync(join(consoleDir, 'index.html'), 'utf8')
   const bundleName = bundlePath.split(/[\\/]/).pop()
-  const expected = 'src="/assets/' + bundleName + '?v=' + hashOf(content) + '"'
+  const expected = 'src="/assets/' + bundleName + '"'
   if (!html.includes(expected)) {
-    console.error('[patch-console-ui] 检查失败：index.html 未引用已打补丁的 bundle 版本（' + expected + '）。请重新运行以应用缓存失效。')
+    console.error('[patch-console-ui] 检查失败：index.html 未以原路径（不带 ?v= 查询参数）引用主 bundle。带 ?v= 会与懒加载块的动态 import 形成双重模块标识，导致 console 执行两次。')
     process.exit(1)
   }
   if (!existsSync(gearLogo) || statSync(gearLogo).size === 0) {
@@ -336,7 +338,7 @@ if (checkMode) {
     console.error('[patch-console-ui] 检查失败：index.html favicon 未指向当前平台 Logo。')
     process.exit(1)
   }
-  console.log('Console UI 定制检查通过：' + bundlePath)
+  console.log('Console UI 定制检查通过：' + bundlePath)
   process.exit(0)
 }
 
@@ -351,7 +353,7 @@ if (content !== original) {
 
 const cacheBust = ensureCacheBust(consoleDir, content)
 if (cacheBust.changed) {
-  console.log('Console index.html 缓存失效已更新（?v=' + hashOf(content) + '）')
+  console.log('Console index.html 已移除主 bundle ?v= 查询参数（避免 console 双重执行）')
 }
 syncConsoleLogo(consoleDir)
 
