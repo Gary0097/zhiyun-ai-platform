@@ -229,7 +229,7 @@ class AppDiscoveryEnterpriseContextTests(unittest.TestCase):
                   agent_id TEXT, data_scope TEXT, kb_scope TEXT, active INTEGER);
                 CREATE TABLE agents (id INTEGER PRIMARY KEY, env_id TEXT, data_mode TEXT, agent_id TEXT,
                   name TEXT, position TEXT, department TEXT, model TEXT, data_scope TEXT, kb_scope TEXT, enabled INTEGER);
-                CREATE TABLE apps (id INTEGER PRIMARY KEY, env_id TEXT, data_mode TEXT, app_id TEXT, enabled INTEGER);
+                CREATE TABLE apps (id INTEGER PRIMARY KEY, env_id TEXT, data_mode TEXT, app_id TEXT, agent_id TEXT, enabled INTEGER);
                 CREATE TABLE data_sources (id INTEGER PRIMARY KEY, env_id TEXT, data_mode TEXT, source_id TEXT,
                   name TEXT, source_type TEXT, app_id TEXT, records INTEGER, shared INTEGER);
                 """
@@ -239,9 +239,12 @@ class AppDiscoveryEnterpriseContextTests(unittest.TestCase):
             conn.execute("INSERT INTO departments VALUES (1,'envA','production','销售部')")
             conn.execute("INSERT INTO org_users VALUES (1,'envA','production','alice','艾丽丝','secret@example.com','13800000000','销售部','member','经理','sales_agent','department','department',1)")
             conn.execute("INSERT INTO agents VALUES (1,'envA','production','sales_agent','销售助手','销售分析','销售部','model-a','department','department',1)")
-            conn.execute("INSERT INTO apps VALUES (1,'envA','production','zhiyun-sales-studio',1)")
+            conn.execute("INSERT INTO agents VALUES (2,'envA','production','finance_agent','财务助手','财务分析','财务部','model-a','department','department',1)")
+            conn.execute("INSERT INTO apps VALUES (1,'envA','production','zhiyun-sales-studio','sales_agent',1)")
+            conn.execute("INSERT INTO apps VALUES (2,'envA','production','zhiyun-finance-studio','finance_agent',1)")
             conn.execute("INSERT INTO data_sources VALUES (1,'envA','production','sales','销售订单','sqlite','zhiyun-sales-studio',123,0)")
             conn.execute("INSERT INTO data_sources VALUES (2,'envB','production','other','乙公司客户','sqlite','zhiyun-sales-studio',999,1)")
+            conn.execute("INSERT INTO data_sources VALUES (3,'envA','production','finance','跨部门财务','sqlite','zhiyun-finance-studio',456,1)")
             conn.commit()
         finally:
             conn.close()
@@ -259,6 +262,8 @@ class AppDiscoveryEnterpriseContextTests(unittest.TestCase):
         self.assertIn('"records":123', context)
         self.assertNotIn("乙公司", context)
         self.assertNotIn("999", context)
+        self.assertNotIn("跨部门财务", context)
+        self.assertNotIn("456", context)
         self.assertNotIn("secret@example.com", context)
         self.assertNotIn("13800000000", context)
         self.assertLessEqual(len(context), 6100)

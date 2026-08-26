@@ -422,12 +422,30 @@ def _enterprise_context(
                 ).fetchone()
                 counts[label] = int(row["total"] if row else 0)
 
-            source_rows = conn.execute(
+            source_sql = (
                 "SELECT name, source_type, app_id, records, shared FROM data_sources "
-                "WHERE env_id = ? AND data_mode = ? AND (app_id = ? OR shared = 1) "
-                "ORDER BY shared DESC, records DESC, id DESC LIMIT 12",
-                (env_id, data_mode, app_id),
-            ).fetchall()
+                "WHERE env_id = ? AND data_mode = ? AND (app_id = ? OR shared = 1)"
+            )
+            source_args: list[Any] = [env_id, data_mode, app_id]
+            effective_kb_scope = str(
+                org_user["kb_scope"] if org_user and org_user["kb_scope"] else user.get("kb_scope") or "enterprise"
+            )
+            department = str(org_user["department"] or "") if org_user else ""
+            if str(user.get("role") or "") != "admin" and effective_kb_scope == "department":
+                if department:
+                    # Keep this equivalent to enterprise-seeder's
+                    # _kb_department_clause("data_sources", ...), with explicit
+                    # env/mode predicates at every subquery boundary.
+                    source_sql += (
+                        " AND app_id IN (SELECT app_id FROM apps "
+                        "WHERE env_id = ? AND data_mode = ? AND agent_id IN ("
+                        "SELECT agent_id FROM agents WHERE env_id = ? AND data_mode = ? AND department = ?))"
+                    )
+                    source_args.extend([env_id, data_mode, env_id, data_mode, department])
+                else:
+                    source_sql += " AND 1 = 0"
+            source_sql += " ORDER BY shared DESC, records DESC, id DESC LIMIT 12"
+            source_rows = conn.execute(source_sql, source_args).fetchall()
         finally:
             conn.close()
     except (sqlite3.Error, OSError, ValueError, TypeError):
