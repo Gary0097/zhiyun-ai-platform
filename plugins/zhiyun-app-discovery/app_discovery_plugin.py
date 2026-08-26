@@ -73,6 +73,43 @@ APP_CONTEXT = (
 )
 
 
+def _resolve_app_info(app_id: str) -> dict[str, Any] | None:
+    """从本地能力目录解析指定应用的信息（名称、能力、示例问法）。"""
+    if not app_id:
+        return None
+    try:
+        catalog = load_catalog()
+        for app in catalog.get("apps", []) or []:
+            if app.get("app_id") == app_id:
+                return app
+    except Exception:
+        pass
+    return None
+
+
+def _app_context(app_id: str) -> str:
+    """按应用动态生成系统上下文，让模型知道自己在哪个应用、能做什么。"""
+    app = _resolve_app_info(app_id)
+    if not app:
+        return APP_CONTEXT
+    name = app.get("name") or app_id
+    lines = ["你是「智云 AI OS」中「{name}」应用的智能体助手。".format(name=name)]
+    caps = app.get("capabilities") or []
+    if caps:
+        names = [c.get("name") for c in caps if c.get("name")]
+        if names:
+            lines.append("本应用已具备能力：" + "；".join(names) + "。")
+        qs: list[str] = []
+        for c in caps:
+            for q in (c.get("questions") or []):
+                if q and q not in qs:
+                    qs.append(q)
+        if qs:
+            lines.append("用户可以这样提问：" + "；".join(qs[:6]) + "。")
+    lines.append("请用自然语言帮助用户完成本应用内的业务问数与对话；如果问题超出本应用范围，请如实说明并建议可用应用。")
+    return " ".join(lines)
+
+
 class AgentChatRequest(BaseModel):
     """Client payload for the streaming in-app agent chat."""
 
@@ -213,11 +250,12 @@ def _user_env(user: dict[str, Any]) -> tuple[str, str]:
     data_mode = str(user.get("data_mode") or "")
     if env_id and data_mode:
         return env_id, data_mode
-    if not env_id or not data_mode:
-        enterprise = str(user.get("enterprise") or "")
+    enterprise = str(user.get("enterprise") or "")
+    is_admin = str(user.get("role") or "") == "admin"
+    try:
+        conn = _connect()
         try:
-            conn = _connect()
-            try:
+            if not env_id or not data_mode:
                 row = conn.execute(
                     "SELECT env_id, data_mode FROM enterprise_meta WHERE enterprise = ? ORDER BY id DESC LIMIT 1",
                     (enterprise,),
@@ -227,10 +265,21 @@ def _user_env(user: dict[str, Any]) -> tuple[str, str]:
                         env_id = row["env_id"]
                     if not data_mode:
                         data_mode = row["data_mode"]
-            finally:
-                conn.close()
-        except Exception:
-            pass
+            # 管理员账号允许回退到最新企业环境（演示/生产环境），
+            # 否则保持严格隔离并返回空交由调用方拒绝。
+            if (not env_id or not data_mode) and is_admin:
+                row = conn.execute(
+                    "SELECT env_id, data_mode FROM enterprise_meta ORDER BY id DESC LIMIT 1"
+                ).fetchone()
+                if row:
+                    if not env_id:
+                        env_id = row["env_id"]
+                    if not data_mode:
+                        data_mode = row["data_mode"]
+        finally:
+            conn.close()
+    except Exception:
+        pass
     return env_id, data_mode
 
 
@@ -320,13 +369,14 @@ def _runtime_agent_profile(enterprise_agent_id: str) -> str:
     return ""
 
 
-def _build_input(body: AgentChatRequest) -> list[dict[str, Any]]:
+def _build_input(body: AgentChatRequest, context: str = "") -> list[dict[str, Any]]:
     """Build the console ``input`` message list from the dock payload.
 
     A system context is only injected when the caller supplies one, so
     multi-turn sessions do not accumulate duplicate system prompts.
     """
-    context = body.context or APP_CONTEXT
+    if not context:
+        context = body.context or _app_context(body.app_id or "zhiyun-app-discovery")
     input_messages: list[dict[str, Any]] = []
     if context:
         input_messages.append(
@@ -400,8 +450,11 @@ async def agent_chat(body: AgentChatRequest, request: Request) -> StreamingRespo
     enterprise_agent_id = _lookup_app_agent(app_id, env_id, data_mode) or ""
     runtime_profile = _runtime_agent_profile(enterprise_agent_id)
 
+    # 4.1 动态注入该应用的系统上下文，支持应用级问数而不只是全局应用中心。
+    context = body.context or _app_context(app_id)
+
     payload = {
-        "input": _build_input(body),
+        "input": _build_input(body, context),
         "session_id": session_id,
         "user_id": user_id,
         "stream": True,
