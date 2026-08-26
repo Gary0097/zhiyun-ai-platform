@@ -3,8 +3,8 @@
   "name": "AI-OS Logo 配置",
   "version": "1.0.0",
   "type": "general",
-  "description": "仅替换 QwenPaw 顶部 Logo；不创建桌面应用，不修改对话和主题。",
-  "author": "Zhiyun AI",
+  "description": "仅替换顶部 Logo；不创建桌面应用，不修改对话和主题。",
+  "author": "制造云 AI",
   "entry": {
     "backend": "logo_plugin.py",
     "frontend": "ui/index.js"

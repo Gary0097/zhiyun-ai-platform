@@ -34,6 +34,34 @@ const REPLACEMENTS = [
   },
 ]
 
+const PROTECTED = [
+  'window.QwenPaw',
+  'QwenPaw.app',
+  'agentscope-ai/QwenPaw',
+  'QwenPawRichFile',
+  '[QwenPaw audit]',
+  '[QwenPaw registry]',
+  '[QwenPaw]',
+  'cd QwenPaw',
+]
+
+// 将用户可见的 QwenPaw 品牌文案替换为“制造云”，同时保护技术标识、URL、日志前缀与
+// 操作命令，避免破坏 host API / 仓库地址 / macOS 路径 / 审计日志。
+function applyBrand (content) {
+  const tokens = PROTECTED.slice().sort((a, b) => b.length - a.length)
+  const placeholders = []
+  let out = content
+  for (const t of tokens) {
+    if (!out.includes(t)) continue
+    const ph = '\u0001QWP\u0001' + placeholders.length + '\u0001'
+    placeholders.push({ ph, t })
+    out = out.split(t).join(ph)
+  }
+  out = out.split('QwenPaw').join('制造云')
+  for (const { ph, t } of placeholders) out = out.split(ph).join(t)
+  return out
+}
+
 const checkMode = process.argv.includes('--check')
 
 function warn (message) {
@@ -132,6 +160,22 @@ function findMainBundle (consoleDir) {
   return bundlePath
 }
 
+function collectBrandableFiles (root) {
+  const files = []
+  const stack = [root]
+  while (stack.length) {
+    const dir = stack.pop()
+    let entries
+    try { entries = readdirSync(dir, { withFileTypes: true }) } catch { continue }
+    for (const entry of entries) {
+      const full = join(dir, entry.name)
+      if (entry.isDirectory()) { stack.push(full); continue }
+      if (entry.name.endsWith('.js') || entry.name.endsWith('.html')) files.push(full)
+    }
+  }
+  return files
+}
+
 function findUnpatched (content, from, patched) {
   if (content.includes(patched)) return -1
   let idx = content.indexOf(from)
@@ -184,9 +228,30 @@ for (const r of REPLACEMENTS) {
   }
 }
 
+const branded = applyBrand(content)
+
 if (checkMode) {
   if (missing.length) {
     console.error('[patch-console-ui] 检查失败：console bundle 中未找到以下目标：' + missing.join('、') + '。bundle 可能已随上游升级更新。')
+    process.exit(1)
+  }
+  if (branded !== content) {
+    console.error('[patch-console-ui] 检查失败：console bundle 中仍存在未替换的 QwenPaw 品牌文案（应替换为 制造云）。')
+    process.exit(1)
+  }
+  // 校验所有可打补丁的 JS/HTML 资源文件均已替换 QwenPaw 品牌文案。
+  const unpatchedFiles = []
+  for (const file of collectBrandableFiles(consoleDir)) {
+    const cc = readFileSync(file, 'utf8')
+    if (cc.includes('QwenPaw') && applyBrand(cc) !== cc) unpatchedFiles.push(file)
+  }
+  if (unpatchedFiles.length) {
+    console.error('[patch-console-ui] 检查失败：以下文件仍包含未替换的 QwenPaw 品牌文案（应替换为 制造云）：\n' + unpatchedFiles.join('\n'))
+    process.exit(1)
+  }
+  const htmlTitle = readFileSync(join(consoleDir, 'index.html'), 'utf8')
+  if (htmlTitle.includes('QwenPaw')) {
+    console.error('[patch-console-ui] 检查失败：index.html 仍包含 QwenPaw 品牌标题（应替换为 制造云）。')
     process.exit(1)
   }
   const html = readFileSync(join(consoleDir, 'index.html'), 'utf8')
@@ -200,6 +265,8 @@ if (checkMode) {
   process.exit(0)
 }
 
+content = branded
+
 if (content !== original) {
   writeFileSync(bundlePath, content, 'utf8')
   console.log('Console UI 定制已应用：' + bundlePath)
@@ -211,6 +278,20 @@ const cacheBust = ensureCacheBust(consoleDir, content)
 if (cacheBust.changed) {
   console.log('Console index.html 缓存失效已更新（?v=' + hashOf(content) + '）')
 }
+
+// 对其它 Console 资源（懒加载 chunk / vendor）执行同样的品牌替换。
+let extraBranded = 0
+for (const file of collectBrandableFiles(consoleDir)) {
+  if (file === bundlePath) continue
+  const cc = readFileSync(file, 'utf8')
+  if (!cc.includes('QwenPaw')) continue
+  const out = applyBrand(cc)
+  if (out !== cc) {
+    writeFileSync(file, out, 'utf8')
+    extraBranded++
+  }
+}
+if (extraBranded) console.log('已更新 ' + extraBranded + ' 个额外 Console 资源文件品牌文案。')
 
 if (missing.length) {
   warn('以下目标未找到，bundle 可能已更新：' + missing.join('、'))

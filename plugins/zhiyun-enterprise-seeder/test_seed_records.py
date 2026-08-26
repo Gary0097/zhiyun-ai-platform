@@ -43,7 +43,7 @@ class SeedRecordsTestBase(unittest.TestCase):
     def _seed(self) -> str:
         """生成一个小型演示企业，返回 env_id。"""
         result = ep._generate_enterprise({
-            "enterprise": "智云智造测试",
+            "enterprise": "制造云科技测试",
             "start_date": "2026-01-02",
             "end_date": "2026-01-02",
             "scale": 5,
@@ -99,3 +99,143 @@ class TestKnowledgeBaseZeroRecords(SeedRecordsTestBase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLegacyPasswordRotation(SeedRecordsTestBase):
+    """rebrand 后：已同步员工若仍使用旧默认口令，应向后兼容轮换；自定义口令不触碰。"""
+
+    def setUp(self):
+        super().setUp()
+        ep._write_json(ep.AUTH_USERS_FILE, [])
+
+    def _seed_row(self, username: str = "u001") -> dict:
+        return {
+            "username": username,
+            "display_name": "测试员工",
+            "role": "member",
+            "agent_id": "agent-001",
+            "data_scope": "department",
+            "kb_scope": "department",
+            "active": True,
+            "created_at": ep._now(),
+        }
+
+    def _existing_user(self, username: str, password: str) -> dict:
+        pw_hash, salt = ep._hash_password(password)
+        return {
+            "username": username,
+            "display_name": "旧员工",
+            "role": "member",
+            "password_hash": pw_hash,
+            "password_salt": salt,
+            "enterprise": "制造云",
+            "agent_id": "agent-001",
+            "data_scope": "department",
+            "kb_scope": "department",
+            "active": True,
+            "created_at": ep._now(),
+        }
+
+    def test_legacy_default_password_is_rotated(self):
+        legacy = ep.LEGACY_DEFAULT_PASSWORD
+        new_default = ep.DEFAULT_PASSWORD
+        ep._write_json(ep.AUTH_USERS_FILE, [self._existing_user("u001", legacy)])
+        _ = ep._sync_auth_users([self._seed_row("u001")], "制造云", env_id="env-1", data_mode="demo")
+
+        users = ep._read_auth_users()
+        self.assertEqual(len(users), 1, "已存在员工不应被重复创建")
+        u = users[0]
+        # 轮换后应验证新默认口令，且旧口令不再匹配
+        self.assertTrue(
+            ep._verify_password(new_default, u["password_hash"], u["password_salt"]),
+            "员工仍使用旧默认口令时应轮换为新默认口令",
+        )
+        self.assertFalse(
+            ep._verify_password(legacy, u["password_hash"], u["password_salt"]),
+            "轮换后旧默认口令不应再匹配",
+        )
+
+    def test_custom_password_is_not_overwritten(self):
+        custom = "MyCustom@2026"
+        ep._write_json(ep.AUTH_USERS_FILE, [self._existing_user("u001", custom)])
+        _ = ep._sync_auth_users([self._seed_row("u001")], "制造云")
+
+        users = ep._read_auth_users()
+        self.assertEqual(len(users), 1)
+        u = users[0]
+        self.assertTrue(
+            ep._verify_password(custom, u["password_hash"], u["password_salt"]),
+            "已修改为自定义口令的员工不应被覆盖",
+        )
+        self.assertFalse(
+            ep._verify_password(ep.DEFAULT_PASSWORD, u["password_hash"], u["password_salt"]),
+            "自定义口令不应被改为默认口令",
+        )
+
+
+class TestStartupLegacyPasswordRotation(SeedRecordsTestBase):
+    """升级启动迁移：非 admin 员工若仍使用 rebrand 前默认口令则自动轮换（PR #88 阻塞项）。
+
+    zhiyun-auth 在优先级 0 启动钩子处理 admin；本测验聚焦员工账号在启动
+    bootstrap 阶段被轮换，且自定义口令 / admin 不被触碰。
+    """
+
+    def setUp(self):
+        super().setUp()
+        ep._write_json(ep.AUTH_USERS_FILE, [])
+
+    def _user(self, username: str, password: str, role: str = "member") -> dict:
+        pw_hash, salt = ep._hash_password(password)
+        return {
+            "username": username,
+            "display_name": "启动迁移员工",
+            "role": role,
+            "password_hash": pw_hash,
+            "password_salt": salt,
+            "enterprise": "制造云",
+            "agent_id": "agent-001",
+            "data_scope": "department",
+            "kb_scope": "department",
+            "active": True,
+            "created_at": ep._now(),
+        }
+
+    def test_startup_rotates_legacy_employee(self):
+        ep._write_json(ep.AUTH_USERS_FILE, [
+            self._user("u001", ep.LEGACY_DEFAULT_PASSWORD),
+        ])
+        changed = ep._rotate_legacy_employee_passwords()
+        self.assertEqual(changed, 1, "旧默认口令员工应在启动时被轮换")
+        u = ep._read_auth_users()[0]
+        self.assertTrue(
+            ep._verify_password(ep.DEFAULT_PASSWORD, u["password_hash"], u["password_salt"]),
+            "轮换后应验证新默认口令",
+        )
+        self.assertFalse(
+            ep._verify_password(ep.LEGACY_DEFAULT_PASSWORD, u["password_hash"], u["password_salt"]),
+            "轮换后旧默认口令不应再匹配",
+        )
+
+    def test_startup_leaves_custom_password_untouched(self):
+        custom = "Custom@2026#Secret"
+        ep._write_json(ep.AUTH_USERS_FILE, [self._user("u001", custom)])
+        changed = ep._rotate_legacy_employee_passwords()
+        self.assertEqual(changed, 0, "自定义口令不应被轮换")
+        u = ep._read_auth_users()[0]
+        self.assertTrue(
+            ep._verify_password(custom, u["password_hash"], u["password_salt"]),
+            "自定义口令必须保持不变",
+        )
+
+    def test_startup_skips_admin_even_on_legacy(self):
+        # admin 由 zhiyun-auth 优先级 0 钩子负责；seeder 启动迁移应跳过，避免双写竞争。
+        ep._write_json(ep.AUTH_USERS_FILE, [
+            self._user("admin", ep.LEGACY_DEFAULT_PASSWORD, role="admin"),
+        ])
+        changed = ep._rotate_legacy_employee_passwords()
+        self.assertEqual(changed, 0, "admin 不应由 seeder 启动迁移轮换")
+        u = ep._read_auth_users()[0]
+        self.assertTrue(
+            ep._verify_password(ep.LEGACY_DEFAULT_PASSWORD, u["password_hash"], u["password_salt"]),
+            "admin 在 seeder 阶段应保持原样（由 auth 插件处理）",
+        )

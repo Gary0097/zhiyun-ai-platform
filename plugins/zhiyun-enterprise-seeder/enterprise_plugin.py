@@ -77,7 +77,9 @@ DB = ENTERPRISE_DIR / "enterprise.db"
 AUTH_USERS_FILE = WORKING_DIR / "auth" / "users.json"
 AUTH_SECRET_FILE = WORKING_DIR / "auth" / "token_secret.txt"
 
-DEFAULT_PASSWORD = "Zhiyun@2026"
+DEFAULT_PASSWORD = "ZhizaoYun@2026"
+# rebrand 前企业员工默认口令；仅用于升级后向后兼容轮换，不用于新建账号。
+LEGACY_DEFAULT_PASSWORD = "Zhiyun@2026"
 DEFAULT_START = "2025-12-01"
 DEFAULT_ACTIVITY = "medium"
 DEFAULT_TEMPLATE = "manufacturing"
@@ -408,6 +410,11 @@ def _startup_bootstrap() -> None:
     _daily_integrity_report 在数十万行的企业库上需要较长时间，
     放到后台线程方不会阻塞单线程服务器启动。"""
     _ensure_schema()
+    try:
+        _rotate_legacy_employee_passwords()
+    except Exception:
+        # 员工口令轮换失败不应阻断启动，交由后续 seed 或人工修复兜底。
+        pass
     _spawn_daily_integrity_report()
 
 
@@ -415,6 +422,10 @@ def _hash_password(password: str, salt: str | None = None) -> tuple[str, str]:
     salt = salt or secrets.token_hex(16)
     digest = hashlib.sha256((salt + password).encode("utf-8")).hexdigest()
     return digest, salt
+
+def _verify_password(password: str, stored_hash: str, salt: str) -> bool:
+    digest, _ = _hash_password(password, salt)
+    return hmac.compare_digest(digest, stored_hash)
 
 
 def _token_secret() -> str:
@@ -440,6 +451,31 @@ def _read_auth_users() -> list[dict[str, Any]]:
     return []
 
 
+def _rotate_legacy_employee_passwords() -> int:
+    """升级启动迁移：把仍使用 rebrand 前默认口令的非 admin 员工轮换为新默认口令。
+
+    zhiyun-auth 在优先级 0 的启动钩子中已负责轮换 admin 账号；本插件负责
+    其余员工账号。仅当账号仍能通过 LEGACY_DEFAULT_PASSWORD 校验时才更新，
+    绝不覆盖用户自定义口令。返回实际轮换的账号数。
+    """
+    users = _read_auth_users()
+    changed = 0
+    for user in users:
+        if (user.get("role") or "").lower() == "admin":
+            # admin 由 zhiyun-auth 在优先级 0 的启动钩子中处理，避免共享文件双写竞争。
+            continue
+        stored = user.get("password_hash", "")
+        salt = user.get("password_salt", "")
+        if stored and salt and _verify_password(LEGACY_DEFAULT_PASSWORD, stored, salt):
+            pw_hash, new_salt = _hash_password(DEFAULT_PASSWORD)
+            user["password_hash"] = pw_hash
+            user["password_salt"] = new_salt
+            changed += 1
+    if changed:
+        _write_json(AUTH_USERS_FILE, users)
+    return changed
+
+
 def _sync_auth_users(
     rows: list[dict[str, Any]],
     enterprise: str,
@@ -449,7 +485,7 @@ def _sync_auth_users(
     """把生成的员工账号合并进 zhiyun-auth 的 users.json。
 
     保留已有 admin / 历史账号；生成的员工按 username 去重；默认密码
-    Zhiyun@2026；每个账号绑定 agent_id / data_scope / kb_scope，并记录其
+    ZhizaoYun@2026；每个账号绑定 agent_id / data_scope / kb_scope，并记录其
     所属企业环境（env_id / data_mode），用于 RBAC 数据隔离。
     """
     users = _read_auth_users()
@@ -458,8 +494,16 @@ def _sync_auth_users(
     updated = 0
     for row in rows:
         username = row["username"]
-        # 跳过已存在的历史账号（admin 等），避免覆盖密码
+        # 已存在的历史账号（admin 等）：跳过以避免覆盖自定义密码，但若仍使用
+        # rebrand 前的默认口令，则向后兼容轮换为新默认口令。
         if username in by_username:
+            existing = by_username[username]
+            stored = existing.get("password_hash", "")
+            salt = existing.get("password_salt", "")
+            if stored and salt and _verify_password(LEGACY_DEFAULT_PASSWORD, stored, salt):
+                pw_hash, new_salt = _hash_password(DEFAULT_PASSWORD)
+                existing["password_hash"] = pw_hash
+                existing["password_salt"] = new_salt
             updated += 1
             continue
         pw_hash, salt = _hash_password(DEFAULT_PASSWORD)
@@ -798,7 +842,7 @@ def _resolve_default_agent(app_id: str, agents: list[dict[str, Any]]) -> str:
 
 def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
     template = str(params.get("template") or DEFAULT_TEMPLATE)
-    enterprise = str(params.get("enterprise") or "智云智造").strip() or "智云智造"
+    enterprise = str(params.get("enterprise") or "制造云科技").strip() or "制造云科技"
     start = _parse_date(params.get("start_date") or DEFAULT_START)
     end = _parse_date(params.get("end_date") or _today())
     if start > end:
@@ -1010,7 +1054,7 @@ def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
 
 class SeedRequest(BaseModel):
     template: str = Field(default=DEFAULT_TEMPLATE, max_length=80)
-    enterprise: str = Field(default="智云智造", max_length=80)
+    enterprise: str = Field(default="制造云科技", max_length=80)
     start_date: str = Field(default=DEFAULT_START)
     end_date: str | None = None
     scale: int = Field(default=50, ge=5, le=200)
@@ -1295,7 +1339,7 @@ async def config(authorization: str = Header(default="")) -> dict[str, Any]:
         "database": str(DB),
         "defaults": {
             "template": DEFAULT_TEMPLATE,
-            "enterprise": "智云智造",
+            "enterprise": "制造云科技",
             "start_date": DEFAULT_START,
             "end_date": _today(),
             "scale": 50,
