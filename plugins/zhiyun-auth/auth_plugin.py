@@ -41,9 +41,9 @@ BRANDING_DIR = WORKING_DIR / "branding"
 LOGIN_CONFIG_FILE = BRANDING_DIR / "login-config.json"
 CONFIG_FILE = WORKING_DIR / "config.json"
 
-DEFAULT_ENTERPRISE = "智云AI"
+DEFAULT_ENTERPRISE = "制造云"
 DEFAULT_ADMIN_USER = "admin"
-DEFAULT_ADMIN_PASSWORD = "Zhiyun@2026"
+DEFAULT_ADMIN_PASSWORD = "ZhizaoYun@2026"
 TOKEN_EXPIRY_SECONDS = 7 * 24 * 3600
 
 router = APIRouter()
@@ -91,7 +91,7 @@ def _login_config() -> dict[str, Any]:
 
 def _brand_name() -> str:
     cfg = _login_config()
-    return str(cfg.get("brand_name") or "智云 AI-Agent OS").strip() or "智云 AI-Agent OS"
+    return str(cfg.get("brand_name") or "制造云 AI-Agent OS").strip() or "制造云 AI-Agent OS"
 
 
 def _enterprise_name() -> str:

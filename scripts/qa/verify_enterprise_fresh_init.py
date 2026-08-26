@@ -70,7 +70,7 @@ def main() -> int:
     summaries = {}
     for mode in ("demo", "production"):
         s = ep._generate_enterprise({
-            "template": "manufacturing", "enterprise": "智云智造",
+            "template": "manufacturing", "enterprise": "制造云科技",
             "start_date": "2025-12-01", "end_date": today,
             "scale": 40, "departments": 6, "agents": 12,
             "activity": "medium", "data_mode": mode, "seed": 20260825,

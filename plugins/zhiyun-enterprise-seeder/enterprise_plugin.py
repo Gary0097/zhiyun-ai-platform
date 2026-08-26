@@ -77,7 +77,7 @@ DB = ENTERPRISE_DIR / "enterprise.db"
 AUTH_USERS_FILE = WORKING_DIR / "auth" / "users.json"
 AUTH_SECRET_FILE = WORKING_DIR / "auth" / "token_secret.txt"
 
-DEFAULT_PASSWORD = "Zhiyun@2026"
+DEFAULT_PASSWORD = "ZhizaoYun@2026"
 DEFAULT_START = "2025-12-01"
 DEFAULT_ACTIVITY = "medium"
 DEFAULT_TEMPLATE = "manufacturing"
@@ -449,7 +449,7 @@ def _sync_auth_users(
     """把生成的员工账号合并进 zhiyun-auth 的 users.json。
 
     保留已有 admin / 历史账号；生成的员工按 username 去重；默认密码
-    Zhiyun@2026；每个账号绑定 agent_id / data_scope / kb_scope，并记录其
+    ZhizaoYun@2026；每个账号绑定 agent_id / data_scope / kb_scope，并记录其
     所属企业环境（env_id / data_mode），用于 RBAC 数据隔离。
     """
     users = _read_auth_users()
@@ -798,7 +798,7 @@ def _resolve_default_agent(app_id: str, agents: list[dict[str, Any]]) -> str:
 
 def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
     template = str(params.get("template") or DEFAULT_TEMPLATE)
-    enterprise = str(params.get("enterprise") or "智云智造").strip() or "智云智造"
+    enterprise = str(params.get("enterprise") or "制造云科技").strip() or "制造云科技"
     start = _parse_date(params.get("start_date") or DEFAULT_START)
     end = _parse_date(params.get("end_date") or _today())
     if start > end:
@@ -1010,7 +1010,7 @@ def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
 
 class SeedRequest(BaseModel):
     template: str = Field(default=DEFAULT_TEMPLATE, max_length=80)
-    enterprise: str = Field(default="智云智造", max_length=80)
+    enterprise: str = Field(default="制造云科技", max_length=80)
     start_date: str = Field(default=DEFAULT_START)
     end_date: str | None = None
     scale: int = Field(default=50, ge=5, le=200)
@@ -1295,7 +1295,7 @@ async def config(authorization: str = Header(default="")) -> dict[str, Any]:
         "database": str(DB),
         "defaults": {
             "template": DEFAULT_TEMPLATE,
-            "enterprise": "智云智造",
+            "enterprise": "制造云科技",
             "start_date": DEFAULT_START,
             "end_date": _today(),
             "scale": 50,

@@ -39,7 +39,7 @@
     var busyState = React.useState(false); var busy = busyState[0]; var setBusy = busyState[1];
 
     React.useEffect(function () {
-      request("/config").then(setCfg).catch(function () { setCfg({ brand_name: "智云 AI-Agent OS", enterprise: "智云AI", background_data_url: "" }); });
+      request("/config").then(setCfg).catch(function () { setCfg({ brand_name: "制造云 AI-Agent OS", enterprise: "制造云", background_data_url: "" }); });
       request("/me").then(function (body) {
         window.dispatchEvent(new CustomEvent("zhiyun:auth", { detail: body.user }));
         setUser(body.user); setStatus("ready");
@@ -63,8 +63,8 @@
       setUser(null); setPassword(""); setStatus("locked");
     }
 
-    var brand = (cfg && cfg.brand_name) || "智云 AI-Agent OS";
-    var enterprise = (cfg && cfg.enterprise) || "智云AI";
+    var brand = (cfg && cfg.brand_name) || "制造云 AI-Agent OS";
+    var enterprise = (cfg && cfg.enterprise) || "制造云";
     var bg = (cfg && cfg.background_data_url) || "";
 
     if (status === "loading") return null;
@@ -118,7 +118,7 @@
             opacity: busy ? 0.8 : 1
           } }, busy ? "登录中…" : "登录"),
           h("div", { style: { marginTop: 8, fontSize: 11.5, color: "#98a2b3", textAlign: "center" } },
-            "默认管理员：admin / Zhiyun@2026（可在登录插件配置中修改品牌与账号）")
+            "默认管理员：admin / ZhizaoYun@2026（可在登录插件配置中修改品牌与账号）")
         )
       )
     );

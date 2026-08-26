@@ -1,6 +1,6 @@
 # 需求变更记录（2026-08-24）
 
-> 状态：已纳入当前迭代。本文件是「智造云 AI-OS · 五大业务 Studio」在 2026-08-24 迭代的需求变更说明，后续所有 PRD、测试与交付参考本文件。
+> 状态：已纳入当前迭代。本文件是「制造云 AI-OS · 五大业务 Studio」在 2026-08-24 迭代的需求变更说明，后续所有 PRD、测试与交付参考本文件。
 >
 > 变更范围：服务 / 供应 / 销售 / 财务 / 人力 五个 Studio，共 18 个功能模块。Data Studio 与 Order Studio 作为基础数据与订单底座一并纳入部署与数据可写修复，不在 18 模块矩阵内。
 
@@ -110,7 +110,7 @@
 # 第二迭代码段（2026-08-24 追加）
 
 > 本段记录「登录与权限 + 系统应用直达路由 + 真实 GUI 全量复核」第二次迭代的最终事实。
-> 对应的交付以「员工账号登录」（默认账号 `admin` / `Zhiyun@2026`）与「六个系统应用（数据核心 / 应用中心 / 审计中心 / Logo / 登录）共用完整路由 `/apps/<plugin-id>`」为基准。
+> 对应的交付以「员工账号登录」（默认账号 `admin` / `ZhizaoYun@2026`）与「六个系统应用（数据核心 / 应用中心 / 审计中心 / Logo / 登录）共用完整路由 `/apps/<plugin-id>`」为基准。
 
 ## 1. 本次新增与修复
 
@@ -129,7 +129,7 @@
 
 ### 1.2 默认账号（交付测试用）
 - 账号：`admin`
-- 密码：`Zhiyun@2026`
+- 密码：`ZhizaoYun@2026`
 - token 有效期：7 天；密码采用 salted SHA-256。
 
 ### 1.3 系统应用直达路由（已修复，P0）
@@ -198,7 +198,7 @@
 
 | 对象 | 现状 | 双态体系下的处理 |
 | --- | --- | --- |
-| `zhiyun-auth` | 已有登录门、默认账号 `admin/Zhiyun@2026`、前端 RBAC 展示 | 作为企业 IAM 底座；服务端强制鉴权与路由待接入 |
+| `zhiyun-auth` | 已有登录门、默认账号 `admin/ZhizaoYun@2026`、前端 RBAC 展示 | 作为企业 IAM 底座；服务端强制鉴权与路由待接入 |
 | `zhiyun-data-core` | 已有 `data_core_meta / batches / records`、`source_type=real\|simulated`、`preview_import / import_rows / list_records / list_batches / rollback_batch`、`generate_orders / generate_production` | 作为 Simulation/Data Platform/Time Machine 的底座；**改造点**：UI 的「模拟订单/生产数据」按钮与「模拟」徽标按命名规范改为「数据环境 Demo/Live 措辞」，本轮只记录不改码 |
 | `zhiyun-audit` | 已有审计链完整性、Tool 表、防篡改哈希链 | 作为 Data Integrity 的校验与审计底座 |
 | `feature_progress.json` | 当前 1-31 项能力台账 | 保持不动；Epic 产出的可交付能力若需入账，先评估与校验器兼容性 |
@@ -224,7 +224,7 @@
 - 插件：`plugins/zhiyun-enterprise-seeder`（后端 `enterprise_plugin.py`，前端 `ui/index.js`）。
 - 一次初始化：`POST /api/zhiyun-enterprise-seeder/seed` 生成企业/部门/用户/角色/权限/Agent/Skill/应用/数据源/会话/任务/Token/日志。
 - 多环境：记录带 `env_id + data_mode`，`/records` 强制按 `env_id + data_mode` 过滤。
-- 账号同步：生成后同步到 `auth/users.json`，默认密码 `Zhiyun@2026`。
+- 账号同步：生成后同步到 `auth/users.json`，默认密码 `ZhizaoYun@2026`。
 - 交互：前端为真实 GUI（参数表单 + 概览 + 明细表 + 实体切换 + Agent 抽屉），非裸 JSON。
 
 ## 2. 服务端鉴权（RBAC 落地）

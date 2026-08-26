@@ -43,7 +43,7 @@ class SeedRecordsTestBase(unittest.TestCase):
     def _seed(self) -> str:
         """生成一个小型演示企业，返回 env_id。"""
         result = ep._generate_enterprise({
-            "enterprise": "智云智造测试",
+            "enterprise": "制造云科技测试",
             "start_date": "2026-01-02",
             "end_date": "2026-01-02",
             "scale": 5,
