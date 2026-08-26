@@ -1,11 +1,13 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, writeFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, readdirSync, copyFileSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveRuntime } from './runtime-env.mjs'
 
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
+const assetsRoot = join(scriptsRoot, '..', '..', '..', 'plugins', 'zhiyun-logo', 'assets')
+const gearLogo = join(assetsRoot, 'gear-logo.png')
 
 const REPLACEMENTS = [
   {
@@ -25,6 +27,12 @@ const REPLACEMENTS = [
     from: 'p.jsx(Gh,{menu:{items:y},placement:"bottomRight",children:p.jsx(Zt,{type:"text",icon:p.jsx(ihe,{}),className:Rn.showOnMobile,title:i("header.resources")})})',
     to: 'false&&p.jsx(Gh,{menu:{items:y},placement:"bottomRight",children:p.jsx(Zt,{type:"text",icon:p.jsx(ihe,{}),className:Rn.showOnMobile,title:i("header.resources")})})',
     patched: 'false&&p.jsx(Gh,{menu:{items:y}',
+  },
+  {
+    name: '欢迎页智能体头像（online.svg → qwenpaw.png）',
+    from: 'avatar:"/online.svg"',
+    to: 'avatar:"/qwenpaw.png"',
+    patched: 'avatar:"/qwenpaw.png"',
   },
   {
     name: '默认中文语言',
@@ -201,6 +209,23 @@ function ensureCacheBust (consoleDir, bundleContent) {
   return { changed: true }
 }
 
+// 同步浏览器 favicon 与聊天智能体头像为制造云齿轮 LOGO。
+// console 目录被 .gitignore 忽略，因此资源必须于启动时从受控目录复制，
+// 否则升级或重新安装运行时后会回退为上游默认图标。
+function syncConsoleLogo (consoleDir) {
+  if (!existsSync(gearLogo)) {
+    fail('受控齿轮 LOGO 资源缺失：' + gearLogo)
+  }
+  const pngTarget = join(consoleDir, 'qwenpaw.png')
+  copyFileSync(gearLogo, pngTarget)
+  const htmlPath = join(consoleDir, 'index.html')
+  const html = readFileSync(htmlPath, 'utf8')
+  const nextHtml = html.replace(/<link rel="icon"[^>]*\/>/, '<link rel="icon" type="image/png" href="/qwenpaw.png" />')
+  if (nextHtml !== html) {
+    writeFileSync(htmlPath, nextHtml, 'utf8')
+  }
+  console.log('Console favicon 与聊天智能体头像已同步为制造云齿轮 LOGO。')
+}
 const runtime = resolveRuntime()
 const consoleDir = locateConsoleDir(runtime)
 
@@ -261,7 +286,21 @@ if (checkMode) {
     console.error('[patch-console-ui] 检查失败：index.html 未引用已打补丁的 bundle 版本（' + expected + '）。请重新运行以应用缓存失效。')
     process.exit(1)
   }
-  console.log('Console UI 定制检查通过：' + bundlePath)
+  if (!existsSync(gearLogo) || statSync(gearLogo).size === 0) {
+    console.error('[patch-console-ui] 检查失败：受控齿轮 LOGO 资源缺失：' + gearLogo)
+    process.exit(1)
+  }
+  const consolePng = join(consoleDir, 'qwenpaw.png')
+  if (!existsSync(consolePng) || statSync(consolePng).size === 0) {
+    console.error('[patch-console-ui] 检查失败：console 缺少 qwenpaw.png（未同步制造云齿轮 LOGO）。')
+    process.exit(1)
+  }
+  const faviconHtml = readFileSync(join(consoleDir, 'index.html'), 'utf8')
+  if (!faviconHtml.includes('type="image/png"') || !faviconHtml.includes('qwenpaw.png')) {
+    console.error('[patch-console-ui] 检查失败：index.html favicon 未指向制造云齿轮 LOGO。')
+    process.exit(1)
+  }
+  console.log('Console UI 定制检查通过：' + bundlePath)
   process.exit(0)
 }
 
@@ -278,6 +317,7 @@ const cacheBust = ensureCacheBust(consoleDir, content)
 if (cacheBust.changed) {
   console.log('Console index.html 缓存失效已更新（?v=' + hashOf(content) + '）')
 }
+syncConsoleLogo(consoleDir)
 
 // 对其它 Console 资源（懒加载 chunk / vendor）执行同样的品牌替换。
 let extraBranded = 0
