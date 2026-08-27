@@ -147,7 +147,15 @@ class DataCore:
                 "SELECT value FROM data_core_meta WHERE key = 'schema_version'"
             ).fetchone()
             if current and int(current["value"]) > SCHEMA_VERSION:
-                raise RuntimeError("Data Core database is newer than this plugin")
+                # 回滚恢复路径：旧版本插件遇到更高 schema 版时降级登记并继续，
+                # 多出的 owner_* 列对旧代码无影响（SELECT * 按名取列）。
+                connection.execute(
+                    "INSERT OR REPLACE INTO data_core_meta(key, value) VALUES('schema_version', ?)",
+                    (str(SCHEMA_VERSION),),
+                )
+                current = connection.execute(
+                    "SELECT value FROM data_core_meta WHERE key = 'schema_version'"
+                ).fetchone()
             current_version = int(current["value"]) if current else 0
             if current_version < 1:
                 connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(1, 'initial schema registry and reversible batches')")

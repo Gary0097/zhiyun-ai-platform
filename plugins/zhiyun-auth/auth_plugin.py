@@ -378,6 +378,7 @@ async def list_users(authorization: str = Header(default="")) -> dict[str, Any]:
             "agent_id": user.get("agent_id", "default"),
             "data_scope": user.get("data_scope", "enterprise"),
             "kb_scope": user.get("kb_scope", "enterprise"),
+            "department": user.get("department", ""),
             "active": user.get("active", True),
             "created_at": user.get("created_at", ""),
         })
@@ -412,7 +413,8 @@ async def upsert_user(request: UserUpsertRequest, authorization: str = Header(de
         existing["agent_id"] = request.agent_id
         existing["data_scope"] = request.data_scope
         existing["kb_scope"] = request.kb_scope
-        existing["department"] = request.department.strip()
+        if request.department.strip():
+            existing["department"] = request.department.strip()
         existing["active"] = request.active
         _save_users(users)
         return {"ok": True, "updated": request.username}

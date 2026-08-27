@@ -3,6 +3,7 @@
 import json
 import pathlib
 import sys
+import os
 import urllib.request
 import uuid
 
@@ -16,7 +17,7 @@ TOKEN = ""
 def admin_token() -> str:
     request = urllib.request.Request(
         BASE + "/api/zhiyun-auth/login",
-        data=json.dumps({"username": "admin", "password": "ZhizaoYun@2026"}).encode(),
+        data=json.dumps({"username": os.environ.get("DEMO_IMPORT_USER", "admin"), "password": os.environ.get("DEMO_IMPORT_PASSWORD", "ZhizaoYun@2026")}).encode(),
         headers={"Content-Type": "application/json"},
         method="POST",
     )
