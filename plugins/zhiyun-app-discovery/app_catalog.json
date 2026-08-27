@@ -195,7 +195,7 @@
         "客服运营",
         "shkf"
       ],
-      "version": "0.2.2",
+      "version": "0.3.0",
       "category": "service",
       "install_status": "installed",
       "route": "/apps/zhiyun-service-studio",
@@ -267,7 +267,7 @@
         "智能补货",
         "gyl"
       ],
-      "version": "0.2.2",
+      "version": "0.3.0",
       "category": "supply",
       "install_status": "installed",
       "route": "/apps/zhiyun-supply-studio",
@@ -315,7 +315,7 @@
         "客户关系",
         "xsfx"
       ],
-      "version": "0.2.2",
+      "version": "0.3.0",
       "category": "sales",
       "install_status": "installed",
       "route": "/apps/zhiyun-sales-studio",
@@ -377,7 +377,7 @@
         "财务票据",
         "cw"
       ],
-      "version": "0.2.2",
+      "version": "0.3.0",
       "category": "finance",
       "install_status": "installed",
       "route": "/apps/zhiyun-finance-studio",
@@ -439,7 +439,7 @@
         "审批",
         "hr"
       ],
-      "version": "0.2.2",
+      "version": "0.3.0",
       "category": "people",
       "install_status": "installed",
       "route": "/apps/zhiyun-people-studio",
