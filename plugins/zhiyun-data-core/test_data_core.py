@@ -410,7 +410,7 @@ class DataCoreRouteGuardTests(unittest.TestCase):
     def test_guarded_route_counts(self):
         import re
         src = io.open(Path(__file__).parent / "data_core_plugin.py", encoding="utf-8").read()
-        self.assertEqual(len(re.findall(r"Depends\(require_admin\)", src)), 6)
+        self.assertEqual(len(re.findall(r"Depends\(require_admin\)", src)), 7)
         self.assertEqual(len(re.findall(r"Depends\(require_auth\)", src)), 12)
 
     def test_require_admin_rejects_member(self):

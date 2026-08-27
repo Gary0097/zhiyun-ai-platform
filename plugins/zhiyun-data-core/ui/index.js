@@ -229,7 +229,7 @@
     }
 
     function loadOperations() {
-      return Promise.all([request("/zhiyun-data-core/health"), request("/zhiyun-data-core/backups")]).then(function (values) {
+      return Promise.all([request("/zhiyun-data-core/health"), request("/zhiyun-data-core/backups").catch(function () { return { backups: [] }; })]).then(function (values) {
         setHealth(values[0]); setBackups(values[1].backups || []);
       });
     }

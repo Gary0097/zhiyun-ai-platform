@@ -268,7 +268,7 @@ async def add_field(entity: str, request: FieldCreate) -> dict[str, Any]:
     )
 
 
-@router.patch("/schemas/{entity}/fields/{field_name}")
+@router.patch("/schemas/{entity}/fields/{field_name}", dependencies=[Depends(require_admin)])
 async def update_field(entity: str, field_name: str, request: FieldPatch) -> dict[str, Any]:
     return _handle(
         lambda: core.update_field(entity, field_name, label=request.label, active=request.active)

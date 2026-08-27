@@ -392,7 +392,7 @@ async def upsert_user(request: UserUpsertRequest, authorization: str = Header(de
         # 仅管理员可改角色；保留原密码，除非显式传入新密码。
         if (
             existing.get("role") == "admin"
-            and request.role != "admin"
+            and (request.role != "admin" or request.active is False)
             and not any(
                 u.get("username") != request.username
                 and u.get("role") == "admin"
@@ -447,6 +447,8 @@ async def update_branding(request: BrandingRequest, authorization: str = Header(
         cfg["background_image"] = request.background_image.strip()
     if request.background_data_url:
         cfg["background_data_url"] = request.background_data_url.strip()
+        # 上传了新封面数据时清掉旧 background_image 路径，否则旧路径优先级更高
+        cfg["background_image"] = ""
     _write_json(LOGIN_CONFIG_FILE, cfg)
     return {"ok": True, "config": {
         "brand_name": _brand_name(),
