@@ -81,36 +81,74 @@
 
   function MyApps(props) {
     var openAppAgent = props.openAppAgent || function () {};
+    var user = props.user || {};
     var apps = (props.apps || []).filter(function (item) { return item.install_status === "installed"; });
     var catMap = {
       data: "数据分析", order: "订单管理", service: "售后服务", supply: "供应链",
       sales: "销售客户", finance: "财务", people: "组织协同", integration: "系统集成",
       knowledge: "知识库", system: "系统组件"
     };
+    var catStyle = {
+      data: ["📊", "#1f5ed6"], order: ["📦", "#4338ca"], service: ["🎧", "#0e7490"], supply: ["🚚", "#c2570a"],
+      sales: ["📈", "#0e9f6e"], finance: ["💰", "#b45309"], people: ["👥", "#6d28d9"], integration: ["🔌", "#0891b2"],
+      knowledge: ["📚", "#475569"], system: ["⚙️", "#64748b"]
+    };
     var grouped = {};
+    var order = [];
     apps.forEach(function (item) {
       var cat = catMap[item.category] || item.category || "其他";
-      (grouped[cat] = grouped[cat] || []).push(item);
+      if (!grouped[cat]) { grouped[cat] = []; order.push({ key: cat, raw: item.category }); }
+      grouped[cat].push(item);
     });
+    var bizCount = apps.filter(function (a) { return a.category !== "system"; }).length;
+    var capCount = apps.reduce(function (n, a) { return n + ((a.capabilities || []).length); }, 0);
+    var healthy = apps.filter(function (a) { return a.health === "available"; }).length;
+    var now = new Date();
+    var dateText = (now.getMonth() + 1) + "月" + now.getDate() + "日 " + "星期" + "日一二三四五六"[now.getDay()];
+    var hello = user.display_name || user.username || "";
+    var stat = function (label, value, color) {
+      return h("div", { style: { background: "#fff", border: "1px solid #e8edf4", borderRadius: 10, padding: "14px 18px", minWidth: 128 } },
+        h("div", { style: { fontSize: 12, color: "#667085" } }, label),
+        h("div", { style: { fontSize: 24, fontWeight: 750, color: color || "#182640", marginTop: 2 } }, value));
+    };
     return h("div", null,
-      h(antd.Alert, { type: "info", showIcon: true, message: "这里只展示当前真实安装的应用与系统组件，按功能大类分组。", style: { marginBottom: 18 } }),
-      Object.keys(grouped).map(function (cat) {
-        return h("div", { key: cat, style: { marginBottom: 22 } },
-          h("h3", { style: { marginBottom: 10, color: "#1f2933" } }, cat),
-          h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 14 } },
-            grouped[cat].map(function (item) {
-              return h(antd.Card, { key: item.app_id, title: item.name, extra: h(antd.Tag, { color: "green" }, "已安装") },
-                h("p", { style: { color: "#667085", minHeight: 22 } }, item.category === "system" ? "AI-OS 系统组件" : "可运行的业务应用"),
-                (item.capabilities || []).length ? h("div", { style: { marginBottom: 10 } },
-                  (item.capabilities || []).map(function (cap) {
-                    return h(antd.Button, { key: cap.id, size: "small", style: { margin: "2px 4px 2px 0" }, href: item.route, title: cap.name }, cap.name);
-                  })
-                ) : null,
-                h("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
-                  h(antd.Tag, null, "v" + (item.version || "-")),
-                  h(antd.Tag, { color: item.health === "available" ? "green" : "orange" }, item.health === "available" ? "运行可用" : item.health),
-                                        h(antd.Button, { size: "small", type: "default", style: { marginRight: 4 }, onClick: function () { openAppAgent(item.app_id, item.name, item.capabilities); } }, "问数"),
-                  item.route ? h(antd.Button, { type: "primary", size: "small", href: item.route }, "打开") : h(antd.Button, { size: "small", disabled: true }, "后台服务")
+      h("div", { style: { borderRadius: 12, padding: "22px 26px", marginBottom: 18, color: "#fff", background: "linear-gradient(120deg, #1749a8 0%, #1f5ed6 55%, #3d7ce4 100%)", boxShadow: "0 8px 24px rgba(23,73,168,0.25)" } },
+        h("div", { style: { fontSize: 21, fontWeight: 750 } }, (hello ? hello + "，" : "") + "欢迎回来"),
+        h("div", { style: { fontSize: 12.5, opacity: 0.85, marginTop: 6 } }, (user.enterprise || "制造云") + " · " + dateText + " · 今天要从哪个应用开始？")
+      ),
+      h("div", { style: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 } },
+        stat("业务应用", bizCount, "#1f5ed6"), stat("系统组件", apps.length - bizCount, "#64748b"),
+        stat("可交付能力", capCount, "#0e9f6e"), stat("运行可用", healthy + "/" + apps.length, healthy === apps.length ? "#0e9f6e" : "#c2570a")
+      ),
+      order.map(function (grp) {
+        var style = catStyle[grp.raw] || ["🧩", "#475569"];
+        return h("div", { key: grp.key, style: { marginBottom: 20 } },
+          h("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 10 } },
+            h("span", { style: { width: 4, height: 16, borderRadius: 2, background: style[1] } }),
+            h("span", { style: { fontWeight: 700, fontSize: 14.5, color: "#182640" } }, grp.key),
+            h("span", { style: { fontSize: 12, color: "#98a2b3" } }, grouped[grp.key].length + " 个应用")
+          ),
+          h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 12 } },
+            grouped[grp.key].map(function (item) {
+              return h("div", { key: item.app_id, style: { background: "#fff", border: "1px solid #e8edf4", borderRadius: 10, padding: "14px 16px", display: "flex", gap: 12, transition: "box-shadow .15s ease", cursor: item.route ? "pointer" : "default" },
+                  onClick: function () { if (item.route) window.location.href = item.route; } },
+                h("div", { style: { width: 42, height: 42, borderRadius: 9, background: style[1] + "14", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21, flex: "0 0 auto" } }, style[0]),
+                h("div", { style: { flex: "1 1 auto", minWidth: 0 } },
+                  h("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+                    h("span", { style: { fontWeight: 700, fontSize: 13.5, color: "#182640" } }, item.name),
+                    h(antd.Tag, { style: { margin: 0, fontSize: 11 } }, "v" + (item.version || "-")),
+                    item.health === "available" ? h(antd.Tag, { color: "green", style: { margin: 0, fontSize: 11 } }, "可用") : h(antd.Tag, { color: "orange", style: { margin: 0, fontSize: 11 } }, item.health)
+                  ),
+                  (item.capabilities || []).length ? h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 } },
+                    (item.capabilities || []).slice(0, 4).map(function (cap) {
+                      return h("span", { key: cap.id, style: { fontSize: 11.5, color: "#35405a", background: "#f1f5fb", borderRadius: 5, padding: "3px 8px", cursor: "pointer" },
+                          onClick: function (e) { e.stopPropagation(); if (item.route) window.location.href = item.route; } }, cap.name);
+                    })
+                  ) : h("div", { style: { color: "#98a2b3", fontSize: 12, marginTop: 6 } }, item.category === "system" ? "AI-OS 系统组件" : "业务应用"),
+                  h("div", { style: { display: "flex", gap: 6, marginTop: 10 } },
+                    item.route ? h(antd.Button, { size: "small", type: "primary", onClick: function (e) { e.stopPropagation(); window.location.href = item.route; } }, "打开") : h(antd.Button, { size: "small", disabled: true }, "后台服务"),
+                    h(antd.Button, { size: "small", onClick: function (e) { e.stopPropagation(); openAppAgent(item.app_id, item.name, item.capabilities); } }, "问数")
+                  )
                 )
               );
             })
@@ -329,13 +367,20 @@
     function agentSend(text) {
       startAgentChat(text);
     }
+    var userState = React.useState({}); var user = userState[0]; var setUser = userState[1];
     React.useEffect(function () {
       Promise.all([getJson("/zhiyun-app-discovery/catalog"), getJson("/zhiyun-app-discovery/progress")])
         .then(function (values) { setApps(values[0].apps || []); setProgress(values[1]); })
         .catch(function () { setError("应用与进度数据加载失败，请检查插件状态。"); });
+      try {
+        var token = window.localStorage.getItem("zhiyun_token") || "";
+        Q.host.fetch("/zhiyun-auth/me", { headers: token ? { Authorization: "Bearer " + token } : {} })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (body) { if (body && body.user) setUser(body.user); });
+      } catch (e) {}
     }, []);
     var items = [
-      { key: "mine", label: "我的应用", children: h(MyApps, { apps: apps, openAppAgent: openAppAgent }) },
+      { key: "mine", label: "我的应用", children: h(MyApps, { apps: apps, user: user, openAppAgent: openAppAgent }) },
       { key: "search", label: "应用搜索", children: h(AppSearch, { openAppAgent: openAppAgent }) },
       { key: "progress", label: "项目进度", children: h(ProjectProgress, { apps: apps, progress: progress }) }
     ];
