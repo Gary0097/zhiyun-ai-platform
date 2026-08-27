@@ -86,9 +86,10 @@
     function save() {
       setBusy(true); setMsg("");
       var jobs = [];
-      jobs.push(request("/branding", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-        brand_name: brandName, enterprise: enterprise, background_data_url: cover
-      }) }));
+      var brandingBody = { brand_name: brandName, enterprise: enterprise };
+      // 只有用户本次选择了新封面才提交，避免空值清空已有封面
+      if (cover) brandingBody.background_data_url = cover;
+      jobs.push(request("/branding", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(brandingBody) }));
       if (logo) jobs.push(logoRequest("/zhiyun-logo/config", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ logo: logo }) }));
       Promise.all(jobs).then(function () {
         setMsg("已保存，刷新登录页即可生效");
@@ -183,7 +184,7 @@
           h("button", { onClick: props.onClose, style: { border: "none", background: "transparent", fontSize: 17, color: "#98a2b3", cursor: "pointer" } }, "✕")
         ),
         h("div", { style: { padding: "12px 22px 0", fontSize: 12, color: "#667085", lineHeight: 1.6 } },
-          "每个账号绑定一个智能体：登录后自动切换到该智能体，其会话、定时任务、收件箱与知识文件随智能体隔离；数据范围与知识库范围在业务应用接口层强制生效。"),
+          "每个账号绑定一个智能体：登录后自动切换到该智能体，其会话、定时任务、收件箱与知识文件随智能体隔离；数据范围与知识库范围当前在数据中心/应用中心链路强制生效，各 Studio 业务接口的统一 RBAC 强制路由在后续迭代接入。"),
         h("div", { style: { padding: "12px 22px 0", display: "flex", justifyContent: "flex-end" } },
           btn({ background: "#fff", color: BLUE, border: "1px solid " + BLUE }, "+ 新建账号", function () {
             setEditing({ isNew: true, username: "", display_name: "", password: "", role: "member", agent_id: (agents[0] || "default"), data_scope: "enterprise", kb_scope: "", active: true });
@@ -361,7 +362,7 @@
               width: "100%", padding: "11px 0", fontSize: 14, fontWeight: 650, color: "#ffffff",
               background: busy ? "#98a2b3" : BLUE, border: "none", borderRadius: 7, cursor: busy ? "default" : "pointer",
               opacity: busy ? 0.85 : 1, boxShadow: "0 6px 16px rgba(31,94,214,0.28)"
-            } }, busy ? "登录中…" : "登 录"),
+            } }, busy ? "登录中…" : "登录"),
             h("div", { style: { marginTop: 10, fontSize: 11.5, color: "#98a2b3", textAlign: "center" } },
               "账号由企业管理员分配；忘记密码请联系系统管理员重置")
           ),
