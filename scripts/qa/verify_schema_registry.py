@@ -79,11 +79,14 @@ def main() -> int:
     records2 = call("/api/zhiyun-data-core/records/%s?data_mode=production&limit=10" % ENTITY, token=token)["records"]
     check("停用字段不影响历史记录", any(r["data"].get("sales_region") == "华东" for r in records2))
 
-    # 7. 按批次撤销且不影响其他批次
+    # 7. 按批次撤销：先撤 b1 验证隔离，再撤 b2 清理全部验收数据（不留正式脏数据）
     call("/api/zhiyun-data-core/batches/%s/rollback" % b1["batch_id"], {"confirmed": True}, token=token)
     records3 = call("/api/zhiyun-data-core/records/%s?data_mode=production&limit=10" % ENTITY, token=token)["records"]
     nos = {r["data"].get("order_no") for r in records3}
     check("批次撤销精确隔离", nos == {"E2E-003"}, str(nos))
+    call("/api/zhiyun-data-core/batches/%s/rollback" % b2["batch_id"], {"confirmed": True}, token=token)
+    records4 = call("/api/zhiyun-data-core/records/%s?data_mode=production&limit=10" % ENTITY, token=token)["records"]
+    check("验收数据清理干净", not records4)
 
     passed = sum(1 for _, ok, _ in results if ok)
     print("\nSUMMARY: %d/%d passed" % (passed, len(results)))

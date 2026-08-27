@@ -255,7 +255,8 @@
       function submitAddField(values) {
         if (!selected) return Promise.reject(new Error("请先选择数据表"));
         return request("/zhiyun-data-core/schemas/" + encodeURIComponent(selected) + "/fields", {
-          method: "POST", body: { name: values.field_name, label: values.field_label || values.field_name, field_type: values.field_type || "text", required: !!values.field_required }
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: values.field_name, label: values.field_label || values.field_name, field_type: values.field_type || "text", required: !!values.field_required })
         }).then(function () {
           message.success("字段已添加：" + values.field_name);
           loadDataset(selected, source);
@@ -263,7 +264,7 @@
       }
       function patchField(fieldName, patch) {
         return request("/zhiyun-data-core/schemas/" + encodeURIComponent(selected) + "/fields/" + encodeURIComponent(fieldName), {
-          method: "PATCH", body: patch
+          method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch)
         }).then(function () { loadDataset(selected, source); }).catch(function (e) { message.error(e.message || "字段更新失败"); });
       }
 

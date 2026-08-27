@@ -138,7 +138,7 @@ for (const app of pawapps.apps) {
 }
 
 const python = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3')
-for (const plugin of ['zhiyun-app-discovery', 'zhiyun-audit', 'zhiyun-data-core']) {
+for (const plugin of ['zhiyun-app-discovery', 'zhiyun-audit', 'zhiyun-data-core', 'zhiyun-auth']) {
   const result = spawnSync(python, ['-m', 'unittest', 'discover', '-s', join(root, 'plugins', plugin), '-p', 'test*.py', '-v'], { cwd: join(root, 'plugins', plugin), stdio: 'inherit' })
   assert.equal(result.status, 0, `Python tests failed: ${plugin}`)
 }
