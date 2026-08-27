@@ -6,7 +6,12 @@
   var h = React.createElement;
 
   function request(path, options) {
-    return Q.host.fetch(path, options).then(function (response) {
+    var opts = Object.assign({}, options || {});
+    try {
+      var t = window.localStorage.getItem("zhiyun_token");
+      if (t) opts.headers = Object.assign({}, (options && options.headers) || {}, { Authorization: "Bearer " + t });
+    } catch (e) {}
+    return Q.host.fetch(path, opts).then(function (response) {
       if (!response.ok) return response.json().catch(function () { return {}; }).then(function (body) {
         throw new Error(body.detail || ("HTTP " + response.status));
       });

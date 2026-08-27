@@ -2,6 +2,7 @@
 """Data Core behavioral tests with an isolated SQLite database."""
 
 import tempfile
+import io
 import unittest
 from pathlib import Path
 
@@ -393,6 +394,32 @@ class DataCoreAppAccessTests(unittest.TestCase):
             ("app_1", "envY", "demo", "agent_a", 1),
         )
         self.assertIsNone(dcp._lookup_app_agent("app_1", "envX", "demo"))
+
+
+
+class DataCoreRouteGuardTests(unittest.TestCase):
+    """路由分层鉴权（PRD §15/§17.16）：需要 fastapi，缺失时整组跳过（CI 兼容）。"""
+
+    def setUp(self):
+        try:
+            import data_core_plugin as dcp
+        except Exception:
+            raise unittest.SkipTest("data_core_plugin 依赖（fastapi/httpx/qwenpaw）不可用")
+        self.dcp = dcp
+
+    def test_guarded_route_counts(self):
+        import re
+        src = io.open(Path(__file__).parent / "data_core_plugin.py", encoding="utf-8").read()
+        self.assertEqual(len(re.findall(r"Depends\(require_admin\)", src)), 6)
+        self.assertEqual(len(re.findall(r"Depends\(require_auth\)", src)), 12)
+
+    def test_require_admin_rejects_member(self):
+        from fastapi import HTTPException
+        dcp = self.dcp
+        dcp._find_user = lambda username: {"username": username, "role": "member", "active": True}
+        with self.assertRaises(HTTPException) as ctx:
+            dcp.require_admin("Bearer bad-token")
+        self.assertEqual(ctx.exception.status_code, 401)
 
 
 if __name__ == "__main__":
