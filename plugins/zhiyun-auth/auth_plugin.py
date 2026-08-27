@@ -390,6 +390,17 @@ async def upsert_user(request: UserUpsertRequest, authorization: str = Header(de
     existing = next((u for u in users if u.get("username") == request.username), None)
     if existing:
         # 仅管理员可改角色；保留原密码，除非显式传入新密码。
+        if (
+            existing.get("role") == "admin"
+            and request.role != "admin"
+            and not any(
+                u.get("username") != request.username
+                and u.get("role") == "admin"
+                and u.get("active", True)
+                for u in users
+            )
+        ):
+            raise HTTPException(status_code=400, detail="不能降级最后一个启用中的管理员，请先创建其他管理员")
         if request.password:
             pw_hash, salt = _hash_password(request.password)
             existing["password_hash"] = pw_hash
@@ -431,10 +442,13 @@ async def update_branding(request: BrandingRequest, authorization: str = Header(
         cfg["brand_name"] = request.brand_name.strip()
     if request.enterprise is not None:
         cfg["enterprise"] = request.enterprise.strip()
-    if request.background_image is not None:
+    # 空字符串视为“不修改”，避免仅保存名称/Logo 时误清空已有封面；
+    # 但上传了新封面数据时必须清掉旧的 background_image 路径，否则旧路径优先级更高
+    if request.background_image:
         cfg["background_image"] = request.background_image.strip()
-    if request.background_data_url is not None:
+    if request.background_data_url:
         cfg["background_data_url"] = request.background_data_url.strip()
+        cfg["background_image"] = ""
     _write_json(LOGIN_CONFIG_FILE, cfg)
     return {"ok": True, "config": {
         "brand_name": _brand_name(),

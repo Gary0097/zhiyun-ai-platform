@@ -32,7 +32,19 @@
 
 ## 快速运行
 
-### 前置要求
+### 方式一：一键安装包（推荐）
+
+从 GitHub Releases 下载一键安装包并解压：
+
+**https://github.com/Gary0097/zhiyun-ai-platform/releases/latest**
+
+- Windows：解压后双击 **`install-oneclick.cmd`** —— 自动安装运行时与锁定应用、启动服务并打开浏览器
+- Ubuntu / Linux：`bash install-oneclick.sh`
+- 包内含 `INSTALLER-VERSION.txt` 与 `.sha256` 校验文件；安装器按锁定的正式提交拉取运行时与应用
+
+### 方式二：源码安装
+
+#### 前置要求
 
 - Windows 10/11 x64 或 Ubuntu 22.04/24.04 LTS x86_64
 - [Node.js](https://nodejs.org) ≥ 20、Git
@@ -42,7 +54,7 @@
 ### Windows
 
 ```powershell
-git clone https://github.com/Gary0097/zhiyun-ai-platform.git
+git clone https://github.com/Gary0097/zhiyun-ai-platform.git  # 或直接使用一键安装包
 cd zhiyun-ai-platform
 .\setup-ai-os.ps1      # 首次安装：自举运行时并物化锁定的应用
 .\start-ai-os.cmd      # 启动（唯一入口，服务端口 8088）
@@ -57,7 +69,9 @@ cd zhiyun-ai-platform
 ./start-ai-os.sh
 ```
 
-浏览器打开 **http://127.0.0.1:8088**。首次启动会自动创建管理员账号（账号信息见 `docs/operations/QUICKSTART.md`，请立即修改密码）。
+浏览器打开 **http://127.0.0.1:8088**。
+
+**默认管理员账号：`admin` / `ZhizaoYun@2026`**（⚠️ 首次登录后请立即在「账号管理」中修改密码；正式部署务必更换）。
 
 离线部署：预置 `AI_OS_OFFLINE=1` 环境变量后执行安装脚本，使用提前下载的依赖缓存完成无公网安装，详见 [运维文档](docs/operations/QUICKSTART.md)。
 
