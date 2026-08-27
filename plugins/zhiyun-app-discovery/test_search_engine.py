@@ -78,14 +78,14 @@ class SearchEngineTests(unittest.TestCase):
 
     def test_installed_catalog_is_truthful(self) -> None:
         apps = {app["app_id"]: app for app in load_catalog()["apps"]}
-        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.9.2")
+        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.9.3")
         self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
-        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.7.2")
+        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.7.3")
         self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
         self.assertEqual(apps["zhiyun-data-core"]["version"], "0.8.0")
         self.assertEqual(apps["zhiyun-audit"]["version"], "1.3.0")
         self.assertEqual(apps["zhiyun-audit"]["route"], "/apps/zhiyun-audit")
-        self.assertEqual(apps["zhiyun-integration-hub"]["version"], "0.2.1")
+        self.assertEqual(apps["zhiyun-integration-hub"]["version"], "0.2.2")
         self.assertEqual(apps["zhiyun-integration-hub"]["install_status"], "installed")
 
     def test_accepted_integration_capability_is_available(self) -> None:
