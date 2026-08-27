@@ -444,7 +444,7 @@ class DepartmentScopingTests(unittest.TestCase):
             self.assertEqual(len(core.list_batches("dept_t")), 3)
             with core.connect() as conn:
                 version = conn.execute("SELECT value FROM data_core_meta WHERE key = 'schema_version'").fetchone()["value"]
-            self.assertEqual(int(version), 4)
+            self.assertEqual(int(version), 5)
 
 
 
@@ -461,6 +461,19 @@ class DepartmentScopingTests(unittest.TestCase):
             self.assertEqual(len(core.list_records("bf_t", owner_department="财务部")), 1)
             # 二次补盖不重复影响
             self.assertEqual(core.backfill_department("bf_t", "销售部"), 0)
+
+
+
+    def test_agent_scope_filter(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            core = DataCore(Path(tmp) / "dc.sqlite")
+            core.create_schema("ag_t", "智能体范围", [{"name": "order_no", "label": "订单号", "field_type": "text", "required": True}])
+            core.import_rows("ag_t", [{"order_no": "A1"}], source_name="a", owner_agent="default")
+            core.import_rows("ag_t", [{"order_no": "A2"}], source_name="b", owner_agent="business_analyst")
+            mine = [r["data"]["order_no"] for r in core.list_records("ag_t", owner_agent="default")]
+            self.assertEqual(mine, ["A1"])
+            self.assertEqual(len(core.list_records("ag_t")), 2)
+            self.assertEqual(len(core.list_batches("ag_t", owner_agent="business_analyst")), 1)
 
 
 if __name__ == "__main__":

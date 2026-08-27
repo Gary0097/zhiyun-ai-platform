@@ -72,6 +72,17 @@ def _dept_filter(user: dict[str, Any]) -> str | None:
     return None
 
 
+def _agent_filter(user: dict[str, Any]) -> str | None:
+    """agent 范围成员返回其绑定智能体；其余返回 None（不过滤）。"""
+    if str(user.get("data_scope") or "") == "agent":
+        return str(user.get("agent_id") or "default")
+    return None
+
+
+def _scope_filters(user: dict[str, Any]) -> dict[str, Any]:
+    return {"owner_department": _dept_filter(user), "owner_agent": _agent_filter(user)}
+
+
 def require_auth(authorization: str = Header(default="")) -> None:
     """读接口：任何有效登录账号可用。"""
     _resolve_auth_user(authorization)
@@ -307,7 +318,7 @@ async def commit_import(
             mapping=request.mapping,
             source_name=request.source_name,
             data_mode=_mode_required(data_mode),
-            owner_department=str(user.get("department") or ""),
+            owner_department=str(user.get("department") or ""), owner_agent=str(user.get("agent_id") or "default"),
         )
     )
 
@@ -344,7 +355,7 @@ async def records(
                 limit=limit,
                 source_type=source_type,
                 data_mode=_mode_q(data_mode),
-            owner_department=_dept_filter(user),
+            owner_department=_scope_filters(user)["owner_department"], owner_agent=_scope_filters(user)["owner_agent"],
                 start_date=start_date,
                 end_date=end_date,
             ),
@@ -380,7 +391,8 @@ async def orders(
             keyword=keyword,
             filters=filters,
             source_type=source_type,
-            data_mode=_mode_q(data_mode, owner_department=_dept_filter(user)),
+            data_mode=_mode_q(data_mode),
+            owner_department=_scope_filters(user)["owner_department"], owner_agent=_scope_filters(user)["owner_agent"],
             start_date=start_date,
             end_date=end_date,
             limit=limit,
@@ -403,7 +415,7 @@ async def batches(
     entity: str | None = None, data_mode: str | None = Query(default=None, max_length=20),
     user: dict[str, Any] = Depends(require_auth_user),
 ) -> dict[str, Any]:
-    return {"batches": core.list_batches(entity, data_mode=data_mode, owner_department=_dept_filter(user))}
+    return {"batches": core.list_batches(entity, data_mode=data_mode, owner_department=_scope_filters(user)["owner_department"], owner_agent=_scope_filters(user)["owner_agent"])}
 
 
 class DepartmentBackfill(BaseModel):

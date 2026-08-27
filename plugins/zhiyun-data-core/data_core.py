@@ -14,7 +14,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Iterator
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 FIELD_NAME = re.compile(r"^[a-z][a-z0-9_]{0,62}$")
 FIELD_TYPES = {"text", "integer", "number", "boolean", "date", "datetime"}
 SOURCE_TYPES = {"real", "simulated"}
@@ -118,6 +118,7 @@ class DataCore:
                     source_type TEXT NOT NULL,
                     data_mode TEXT NOT NULL DEFAULT 'demo',
                     owner_department TEXT NOT NULL DEFAULT '',
+                    owner_agent TEXT NOT NULL DEFAULT '',
                     source_name TEXT NOT NULL,
                     row_count INTEGER NOT NULL,
                     status TEXT NOT NULL DEFAULT 'active',
@@ -131,6 +132,7 @@ class DataCore:
                     source_type TEXT NOT NULL,
                     data_mode TEXT NOT NULL DEFAULT 'demo',
                     owner_department TEXT NOT NULL DEFAULT '',
+                    owner_agent TEXT NOT NULL DEFAULT '',
                     payload TEXT NOT NULL,
                     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (batch_id) REFERENCES data_batches(batch_id)
@@ -169,6 +171,14 @@ class DataCore:
                     pass
                 connection.execute("CREATE INDEX IF NOT EXISTS idx_records_dept ON data_records(entity, owner_department, data_mode)")
                 connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(4, 'record-level owner department for scoped access')")
+            if current_version < 5:
+                for table in ("data_batches", "data_records"):
+                    try:
+                        connection.execute(f"ALTER TABLE {table} ADD COLUMN owner_agent TEXT NOT NULL DEFAULT ''")
+                    except sqlite3.OperationalError:
+                        pass
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_records_agent ON data_records(entity, owner_agent, data_mode)")
+                connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(5, 'record-level owner agent for agent-scoped access')")
             connection.execute(
                 "INSERT OR REPLACE INTO data_core_meta(key, value) VALUES('schema_version', ?)",
                 (str(SCHEMA_VERSION),),
@@ -489,6 +499,7 @@ class DataCore:
         source_name: str = "manual-import",
         data_mode: str = "production",
         owner_department: str = "",
+        owner_agent: str = "",
     ) -> dict[str, Any]:
         preview = self.preview_import(entity, rows, mapping)
         if preview["error_count"]:
@@ -504,6 +515,7 @@ class DataCore:
             source_name=source_name,
             data_mode=data_mode,
             owner_department=owner_department,
+            owner_agent=owner_agent,
         )
         return {"batch_id": batch_id, "entity": entity, "row_count": len(rows), "source_type": "real", "data_mode": data_mode}
 
@@ -574,6 +586,7 @@ class DataCore:
         source_name: str,
         data_mode: str = "demo",
         owner_department: str = "",
+        owner_agent: str = "",
     ) -> str:
         if source_type not in SOURCE_TYPES:
             raise DataCoreError(f"unsupported source type: {source_type}")
@@ -582,18 +595,18 @@ class DataCore:
         with self.connect() as connection:
             connection.execute(
                 """
-                INSERT INTO data_batches(batch_id, entity, source_type, data_mode, source_name, row_count, owner_department)
-                VALUES(?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO data_batches(batch_id, entity, source_type, data_mode, source_name, row_count, owner_department, owner_agent)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (batch_id, entity, source_type, data_mode, source_name, len(rows), owner_department),
+                (batch_id, entity, source_type, data_mode, source_name, len(rows), owner_department, owner_agent),
             )
             connection.executemany(
                 """
-                INSERT INTO data_records(record_id, entity, batch_id, source_type, data_mode, payload, owner_department)
-                VALUES(?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO data_records(record_id, entity, batch_id, source_type, data_mode, payload, owner_department, owner_agent)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 [
-                    (f"record-{uuid.uuid4()}", entity, batch_id, source_type, data_mode, json.dumps(row, ensure_ascii=False), owner_department)
+                    (f"record-{uuid.uuid4()}", entity, batch_id, source_type, data_mode, json.dumps(row, ensure_ascii=False), owner_department, owner_agent)
                     for row in rows
                 ],
             )
@@ -633,6 +646,7 @@ class DataCore:
         start_date: str | None = None,
         end_date: str | None = None,
         owner_department: str | None = None,
+        owner_agent: str | None = None,
     ) -> list[dict[str, Any]]:
         context = None
         if data_mode is None or start_date is None or end_date is None:
@@ -648,6 +662,9 @@ class DataCore:
         if owner_department is not None:
             clauses.append("owner_department = ?")
             params.append(owner_department)
+        if owner_agent is not None:
+            clauses.append("owner_agent = ?")
+            params.append(owner_agent)
         if source_type:
             if source_type not in SOURCE_TYPES:
                 raise DataCoreError(f"unsupported source type: {source_type}")
@@ -715,6 +732,7 @@ class DataCore:
         end_date: str | None = None,
         limit: int = 50,
         owner_department: str | None = None,
+        owner_agent: str | None = None,
     ) -> list[dict[str, Any]]:
         """Search active records without exposing raw SQL to callers."""
         schema = self.list_schema(entity)
@@ -732,6 +750,7 @@ class DataCore:
             start_date=start_date,
             end_date=end_date,
             owner_department=owner_department,
+            owner_agent=owner_agent,
         )
         needle = keyword.strip().casefold()
         matched: list[dict[str, Any]] = []
@@ -767,7 +786,7 @@ class DataCore:
                     (department, entity))
             return cur.rowcount
 
-    def list_batches(self, entity: str | None = None, data_mode: str | None = None, owner_department: str | None = None) -> list[dict[str, Any]]:
+    def list_batches(self, entity: str | None = None, data_mode: str | None = None, owner_department: str | None = None, owner_agent: str | None = None) -> list[dict[str, Any]]:
         query = "SELECT * FROM data_batches"
         params: tuple[Any, ...] = ()
         clauses: list[str] = []
@@ -775,6 +794,9 @@ class DataCore:
         if owner_department is not None:
             clauses.append("owner_department = ?")
             args.append(owner_department)
+        if owner_agent is not None:
+            clauses.append("owner_agent = ?")
+            args.append(owner_agent)
         if entity:
             clauses.append("entity = ?")
             args.append(entity)
