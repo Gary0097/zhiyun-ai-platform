@@ -15,7 +15,7 @@ try:
 except Exception:  # CI 环境可能缺 fastapi/pydantic，此时优雅跳过（宿主环境全量执行）
     _HAS_DEPS = False
 
-_skip_no_deps = unittest.skipUnless(_HAS_DEPS, "auth_plugin 依赖（fastapi/pydantic）不可用")
+unittest_skip = unittest.skipUnless(_HAS_DEPS, "auth_plugin 依赖（fastapi/pydantic）不可用")
 
 
 def _repoint(ap, tmp):
@@ -28,7 +28,7 @@ def _repoint(ap, tmp):
     ap.CONFIG_FILE = Path(tmp) / "config.json"
 
 
-@_skip_no_deps
+@unittest_skip
 class BrandingSemanticsTests(unittest.TestCase):
     def test_empty_background_keeps_existing_cover(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -58,7 +58,7 @@ class BrandingSemanticsTests(unittest.TestCase):
         return "Bearer " + ap._create_token("admin")
 
 
-@_skip_no_deps
+@unittest_skip
 class LastAdminGuardTests(unittest.TestCase):
     def test_cannot_demote_last_active_admin(self):
         with tempfile.TemporaryDirectory() as tmp:

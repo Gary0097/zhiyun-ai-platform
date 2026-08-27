@@ -273,7 +273,6 @@ class UserUpsertRequest(BaseModel):
     agent_id: str = Field(default="default", max_length=120)
     data_scope: str = Field(default="enterprise", max_length=80)
     kb_scope: str = Field(default="enterprise", max_length=80)
-    department: str = Field(default="", max_length=120)
     active: bool = True
 
 
@@ -378,7 +377,6 @@ async def list_users(authorization: str = Header(default="")) -> dict[str, Any]:
             "agent_id": user.get("agent_id", "default"),
             "data_scope": user.get("data_scope", "enterprise"),
             "kb_scope": user.get("kb_scope", "enterprise"),
-            "department": user.get("department", ""),
             "active": user.get("active", True),
             "created_at": user.get("created_at", ""),
         })
@@ -394,7 +392,7 @@ async def upsert_user(request: UserUpsertRequest, authorization: str = Header(de
         # 仅管理员可改角色；保留原密码，除非显式传入新密码。
         if (
             existing.get("role") == "admin"
-            and (request.role != "admin" or request.active is False)
+            and request.role != "admin"
             and not any(
                 u.get("username") != request.username
                 and u.get("role") == "admin"
@@ -413,8 +411,6 @@ async def upsert_user(request: UserUpsertRequest, authorization: str = Header(de
         existing["agent_id"] = request.agent_id
         existing["data_scope"] = request.data_scope
         existing["kb_scope"] = request.kb_scope
-        if request.department.strip():
-            existing["department"] = request.department.strip()
         existing["active"] = request.active
         _save_users(users)
         return {"ok": True, "updated": request.username}
@@ -431,7 +427,6 @@ async def upsert_user(request: UserUpsertRequest, authorization: str = Header(de
         "agent_id": request.agent_id,
         "data_scope": request.data_scope,
         "kb_scope": request.kb_scope,
-        "department": request.department.strip(),
         "active": request.active,
         "created_at": _now(),
     })
@@ -447,12 +442,12 @@ async def update_branding(request: BrandingRequest, authorization: str = Header(
         cfg["brand_name"] = request.brand_name.strip()
     if request.enterprise is not None:
         cfg["enterprise"] = request.enterprise.strip()
-    # 空字符串视为“不修改”，避免仅保存名称/Logo 时误清空已有封面
+    # 空字符串视为“不修改”，避免仅保存名称/Logo 时误清空已有封面；
+    # 但上传了新封面数据时必须清掉旧的 background_image 路径，否则旧路径优先级更高
     if request.background_image:
         cfg["background_image"] = request.background_image.strip()
     if request.background_data_url:
         cfg["background_data_url"] = request.background_data_url.strip()
-        # 上传了新封面数据时清掉旧 background_image 路径，否则旧路径优先级更高
         cfg["background_image"] = ""
     _write_json(LOGIN_CONFIG_FILE, cfg)
     return {"ok": True, "config": {
