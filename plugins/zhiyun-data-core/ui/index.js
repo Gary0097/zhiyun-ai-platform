@@ -268,6 +268,12 @@
       }
 
     React.useEffect(function () { loadDataset(selected, source); loadOperations(); }, [selected, source, dataMode]);
+    React.useEffect(function () {
+      // 未登录时首次加载会 401；登录成功事件后自动重载（配合端点强制鉴权）
+      function onAuth() { loadDataset(selected, source); loadOperations(); }
+      window.addEventListener("zhiyun:auth", onAuth);
+      return function () { window.removeEventListener("zhiyun:auth", onAuth); };
+    }, [selected, source, dataMode]);
 
     function createBackup() {
       request("/zhiyun-data-core/backups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) })
