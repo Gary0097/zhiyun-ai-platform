@@ -6,7 +6,12 @@
   var h = React.createElement;
 
   function request(path, options) {
-    return Q.host.fetch(path, options).then(function (response) {
+    var opts = Object.assign({}, options || {});
+    try {
+      var t = window.localStorage.getItem("zhiyun_token");
+      if (t) opts.headers = Object.assign({}, (options && options.headers) || {}, { Authorization: "Bearer " + t });
+    } catch (e) {}
+    return Q.host.fetch(path, opts).then(function (response) {
       if (!response.ok) return response.json().catch(function () { return {}; }).then(function (body) {
         throw new Error(body.detail || ("HTTP " + response.status));
       });
@@ -86,6 +91,9 @@
     var recordsState = React.useState([]);
     var records = recordsState[0];
     var setRecords = recordsState[1];
+    var addFieldOpenState = React.useState(false); var addFieldOpen = addFieldOpenState[0]; var setAddFieldOpen = addFieldOpenState[1];
+    var newFieldState = React.useState({ field_name: "", field_label: "", field_type: "text", field_required: false });
+    var newField = newFieldState[0]; var setNewField = newFieldState[1];
     var sourceState = React.useState("");
     var source = sourceState[0];
     var setSource = sourceState[1];
@@ -224,7 +232,7 @@
     }
 
     function loadOperations() {
-      return Promise.all([request("/zhiyun-data-core/health"), request("/zhiyun-data-core/backups")]).then(function (values) {
+      return Promise.all([request("/zhiyun-data-core/health"), request("/zhiyun-data-core/backups").catch(function () { return { backups: [] }; })]).then(function (values) {
         setHealth(values[0]); setBackups(values[1].backups || []);
       });
     }
@@ -242,9 +250,31 @@
         setSchema(values[0]); setRecords(values[1].records || []);
       }).catch(function (reason) { setError(reason.message || "数据加载失败"); })
         .finally(function () { setLoading(false); });
-    }
+      }
+
+      function submitAddField(values) {
+        if (!selected) return Promise.reject(new Error("请先选择数据表"));
+        return request("/zhiyun-data-core/schemas/" + encodeURIComponent(selected) + "/fields", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: values.field_name, label: values.field_label || values.field_name, field_type: values.field_type || "text", required: !!values.field_required })
+        }).then(function () {
+          message.success("字段已添加：" + values.field_name);
+          loadDataset(selected, source);
+        }).catch(function (e) { message.error(e.message || "添加字段失败"); throw e; });
+      }
+      function patchField(fieldName, patch) {
+        return request("/zhiyun-data-core/schemas/" + encodeURIComponent(selected) + "/fields/" + encodeURIComponent(fieldName), {
+          method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch)
+        }).then(function () { loadDataset(selected, source); }).catch(function (e) { message.error(e.message || "字段更新失败"); });
+      }
 
     React.useEffect(function () { loadDataset(selected, source); loadOperations(); }, [selected, source, dataMode]);
+    React.useEffect(function () {
+      // 未登录时首次加载会 401；登录成功事件后自动重载（配合端点强制鉴权）
+      function onAuth() { loadDataset(selected, source); loadOperations(); }
+      window.addEventListener("zhiyun:auth", onAuth);
+      return function () { window.removeEventListener("zhiyun:auth", onAuth); };
+    }, [selected, source, dataMode]);
 
     function createBackup() {
       request("/zhiyun-data-core/backups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) })
@@ -354,12 +384,29 @@
         ),
         h(antd.Tabs, { items: [
           { key: "records", label: "数据预览（最多 100 条）", children: h(antd.Table, { rowKey: "record_id", size: "small", loading: loading, columns: columns, dataSource: records, scroll: { x: Math.max(900, columns.length * 150) }, pagination: { pageSize: 20 } }) },
-          { key: "schema", label: "字段结构", children: h(antd.Table, { rowKey: "name", size: "small", loading: loading, pagination: false, dataSource: schema ? schema.fields : [], columns: [
+          { key: "schema", label: "字段结构", children: h("div", null,
+            h("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 12 } },
+              h(antd.Input, { size: "small", style: { width: 170 }, placeholder: "字段名（小写字母/数字/_）", value: newField.field_name, onChange: function (e) { setNewField(Object.assign({}, newField, { field_name: e.target.value })); } }),
+              h(antd.Input, { size: "small", style: { width: 150 }, placeholder: "显示名称", value: newField.field_label, onChange: function (e) { setNewField(Object.assign({}, newField, { field_label: e.target.value })); } }),
+              h(antd.Select, { size: "small", style: { width: 110 }, value: newField.field_type, options: ["text", "number", "date"].map(function (v) { return { value: v, label: v }; }), onChange: function (v) { setNewField(Object.assign({}, newField, { field_type: v })); } }),
+              h(antd.Checkbox, { checked: newField.field_required, onChange: function (e) { setNewField(Object.assign({}, newField, { field_required: e.target.checked })); } }, "必填"),
+              h(antd.Button, { size: "small", type: "primary", onClick: function () {
+                  if (!/^[a-z][a-z0-9_]{0,63}$/.test(newField.field_name)) { message.warning("字段名需为小写字母/数字/下划线"); return; }
+                  submitAddField(newField).then(function () { setNewField({ field_name: "", field_label: "", field_type: "text", field_required: false }); });
+                } }, "新增字段"),
+              h("span", { style: { fontSize: 11, color: "#98a2b3" } }, "新增字段即时生效，导入映射与数据预览自动包含；改显示名/停用需管理员")
+            ),
+            h(antd.Table, { rowKey: "name", size: "small", loading: loading, pagination: false, dataSource: schema ? schema.fields : [], columns: [
             { title: "字段名", dataIndex: "name" }, { title: "显示名称", dataIndex: "label" }, { title: "类型", dataIndex: "type" },
             { title: "必填", dataIndex: "required", render: function (value) { return value ? "是" : "否"; } },
             { title: "状态", dataIndex: "active", render: function (value) { return h(antd.Tag, { color: value ? "green" : "default" }, value ? "启用" : "停用"); } },
-            { title: "内置字段", dataIndex: "built_in", render: function (value) { return value ? "是" : "否"; } }
-          ] }) },
+            { title: "内置字段", dataIndex: "built_in", render: function (value) { return value ? "是" : "否"; } },
+            { title: "操作", key: "_op", width: 130, render: function (_, field) { return field.built_in ? null : h("div", { style: { display: "flex", gap: 6 } },
+              h(antd.Button, { size: "small", onClick: function () { var label = window.prompt("新的显示名称", field.label); if (label && label.trim()) patchField(field.name, { label: label.trim() }); } }, "改名"),
+              h(antd.Button, { size: "small", danger: true, onClick: function () { patchField(field.name, { active: !field.active }); } }, field.active ? "停用" : "启用")
+            ); } }
+          ] })
+          ) },
           { key: "operations", label: "健康与备份", children: h(React.Fragment, null,
             h(antd.Alert, { type: health && health.status === "available" ? "success" : "error", showIcon: true,
               message: health ? ("数据库完整性：" + health.integrity + "；Schema v" + health.schema_version + "；备份 " + health.backup_count + " 个") : "正在读取健康状态",

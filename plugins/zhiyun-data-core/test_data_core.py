@@ -2,6 +2,7 @@
 """Data Core behavioral tests with an isolated SQLite database."""
 
 import tempfile
+import io
 import unittest
 from pathlib import Path
 
@@ -393,6 +394,86 @@ class DataCoreAppAccessTests(unittest.TestCase):
             ("app_1", "envY", "demo", "agent_a", 1),
         )
         self.assertIsNone(dcp._lookup_app_agent("app_1", "envX", "demo"))
+
+
+
+class DataCoreRouteGuardTests(unittest.TestCase):
+    """路由分层鉴权（PRD §15/§17.16）：需要 fastapi，缺失时整组跳过（CI 兼容）。"""
+
+    def setUp(self):
+        try:
+            import data_core_plugin as dcp
+        except Exception:
+            raise unittest.SkipTest("data_core_plugin 依赖（fastapi/httpx/qwenpaw）不可用")
+        self.dcp = dcp
+
+    def test_guarded_route_counts(self):
+        import re
+        src = io.open(Path(__file__).parent / "data_core_plugin.py", encoding="utf-8").read()
+        self.assertEqual(len(re.findall(r"Depends\(require_admin\)", src)), 8)
+        self.assertEqual(len(re.findall(r"Depends\(require_auth\)", src)), 12)
+
+    def test_require_admin_rejects_member(self):
+        from fastapi import HTTPException
+        dcp = self.dcp
+        dcp._find_user = lambda username: {"username": username, "role": "member", "active": True}
+        with self.assertRaises(HTTPException) as ctx:
+            dcp.require_admin("Bearer bad-token")
+        self.assertEqual(ctx.exception.status_code, 401)
+
+
+
+class DepartmentScopingTests(unittest.TestCase):
+    """记录级部门数据范围（PRD 21.2/§15）：v4 迁移、导入盖章、读取过滤。"""
+
+    def test_v4_migration_and_department_filter(self):
+        import tempfile
+        from data_core import DataCore
+        with tempfile.TemporaryDirectory() as tmp:
+            core = DataCore(Path(tmp) / "dc.sqlite")
+            core.create_schema("dept_t", "部门验收", [
+                {"name": "order_no", "label": "订单号", "field_type": "text", "required": True}])
+            core.import_rows("dept_t", [{"order_no": "D1"}], source_name="s1", owner_department="销售部")
+            core.import_rows("dept_t", [{"order_no": "D2"}], source_name="s2", owner_department="财务部")
+            core.import_rows("dept_t", [{"order_no": "D3"}], source_name="s3")
+            sales = [r["data"]["order_no"] for r in core.list_records("dept_t", owner_department="销售部")]
+            self.assertEqual(sales, ["D1"])
+            all_rows = [r["data"]["order_no"] for r in core.list_records("dept_t")]
+            self.assertEqual(sorted(all_rows), ["D1", "D2", "D3"])
+            self.assertEqual(len(core.list_batches("dept_t", owner_department="销售部")), 1)
+            self.assertEqual(len(core.list_batches("dept_t")), 3)
+            with core.connect() as conn:
+                version = conn.execute("SELECT value FROM data_core_meta WHERE key = 'schema_version'").fetchone()["value"]
+            self.assertEqual(int(version), 5)
+
+
+
+    def test_backfill_only_empty(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            core = DataCore(Path(tmp) / "dc.sqlite")
+            core.create_schema("bf_t", "补盖", [{"name": "order_no", "label": "订单号", "field_type": "text", "required": True}])
+            core.import_rows("bf_t", [{"order_no": "B1"}], source_name="x")            # 空戳
+            core.import_rows("bf_t", [{"order_no": "B2"}], source_name="y", owner_department="财务部")
+            updated = core.backfill_department("bf_t", "销售部")
+            self.assertEqual(updated, 1)
+            got = {r["data"]["order_no"]: r for r in core.list_records("bf_t", limit=10)}
+            self.assertEqual(len(core.list_records("bf_t", owner_department="销售部")), 1)
+            self.assertEqual(len(core.list_records("bf_t", owner_department="财务部")), 1)
+            # 二次补盖不重复影响
+            self.assertEqual(core.backfill_department("bf_t", "销售部"), 0)
+
+
+
+    def test_agent_scope_filter(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            core = DataCore(Path(tmp) / "dc.sqlite")
+            core.create_schema("ag_t", "智能体范围", [{"name": "order_no", "label": "订单号", "field_type": "text", "required": True}])
+            core.import_rows("ag_t", [{"order_no": "A1"}], source_name="a", owner_agent="default")
+            core.import_rows("ag_t", [{"order_no": "A2"}], source_name="b", owner_agent="business_analyst")
+            mine = [r["data"]["order_no"] for r in core.list_records("ag_t", owner_agent="default")]
+            self.assertEqual(mine, ["A1"])
+            self.assertEqual(len(core.list_records("ag_t")), 2)
+            self.assertEqual(len(core.list_batches("ag_t", owner_agent="business_analyst")), 1)
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@
 import json
 import pathlib
 import sys
+import os
 import urllib.request
 import uuid
 
@@ -10,6 +11,18 @@ BASE = "http://127.0.0.1:8088"
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 MANIFEST = ROOT / "docs" / "qa" / "demo-data" / "manifest.json"
+TOKEN = ""
+
+
+def admin_token() -> str:
+    request = urllib.request.Request(
+        BASE + "/api/zhiyun-auth/login",
+        data=json.dumps({"username": os.environ.get("DEMO_IMPORT_USER", "admin"), "password": os.environ.get("DEMO_IMPORT_PASSWORD", "ZhizaoYun@2026")}).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=15) as response:
+        return json.loads(response.read().decode("utf-8"))["token"]
 
 
 def parse_via_api(file_path: pathlib.Path):
@@ -24,7 +37,7 @@ def parse_via_api(file_path: pathlib.Path):
     request = urllib.request.Request(
         BASE + "/api/zhiyun-data-core/parse",
         data=body,
-        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}", "Authorization": "Bearer " + TOKEN},
         method="POST",
     )
     with urllib.request.urlopen(request, timeout=15) as response:
@@ -32,6 +45,8 @@ def parse_via_api(file_path: pathlib.Path):
 
 
 def main() -> int:
+    global TOKEN
+    TOKEN = admin_token()
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     passed, failed = 0, 0
     for item in manifest:

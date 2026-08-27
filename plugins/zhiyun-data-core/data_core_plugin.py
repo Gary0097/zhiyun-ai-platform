@@ -17,7 +17,7 @@ from typing import Any, AsyncGenerator
 from uuid import uuid4
 
 import httpx
-from fastapi import APIRouter, File, HTTPException, Query, Request, UploadFile
+from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, Request, UploadFile
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from qwenpaw.plugins.api import PluginApi
@@ -46,6 +46,55 @@ WORKING_DIR = (
 
 core = DataCore(default_database())
 operations = DataCoreOperations(core.database)
+def _resolve_auth_user(authorization: str) -> dict[str, Any]:
+    """从 Authorization 头解析并校验登录账号；失败抛 401。"""
+    username = _verify_token(_bearer_token(authorization))
+    if not username:
+        raise HTTPException(status_code=401, detail="登录已失效，请重新登录")
+    user = _find_user(username)
+    if not user:
+        raise HTTPException(status_code=401, detail="账号不存在")
+    return user
+
+
+def require_auth_user(authorization: str = Header(default="")) -> dict[str, Any]:
+    """鉴权并返回用户；data_scope=department 的成员强制要求已配置部门。"""
+    user = _resolve_auth_user(authorization)
+    if str(user.get("data_scope") or "") == "department" and not str(user.get("department") or "").strip():
+        raise HTTPException(status_code=403, detail="账号为部门数据范围但未配置部门，请联系管理员")
+    return user
+
+
+def _dept_filter(user: dict[str, Any]) -> str | None:
+    """部门范围成员返回其部门；管理员/企业范围返回 None（不过滤）。"""
+    if str(user.get("data_scope") or "") == "department":
+        return str(user.get("department") or "").strip()
+    return None
+
+
+def _agent_filter(user: dict[str, Any]) -> str | None:
+    """agent 范围成员返回其绑定智能体；其余返回 None（不过滤）。"""
+    if str(user.get("data_scope") or "") == "agent":
+        return str(user.get("agent_id") or "default")
+    return None
+
+
+def _scope_filters(user: dict[str, Any]) -> dict[str, Any]:
+    return {"owner_department": _dept_filter(user), "owner_agent": _agent_filter(user)}
+
+
+def require_auth(authorization: str = Header(default="")) -> None:
+    """读接口：任何有效登录账号可用。"""
+    _resolve_auth_user(authorization)
+
+
+def require_admin(authorization: str = Header(default="")) -> None:
+    """破坏性/运维接口：回滚、备份恢复、模拟生成等仅管理员。"""
+    user = _resolve_auth_user(authorization)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="需要管理员权限")
+
+
 router = APIRouter()
 MAX_UPLOAD = 20 * 1024 * 1024
 
@@ -167,12 +216,12 @@ async def health() -> dict[str, Any]:
             "migrations": core.migration_history()}
 
 
-@router.get("/backups")
+@router.get("/backups", dependencies=[Depends(require_admin)])
 async def backups() -> dict[str, Any]:
     return {"backups": operations.list_backups()}
 
 
-@router.post("/backups")
+@router.post("/backups", dependencies=[Depends(require_admin)])
 async def create_backup(request: BackupCreate) -> dict[str, Any]:
     try:
         return operations.create_backup(key_env=request.key_env)
@@ -180,7 +229,7 @@ async def create_backup(request: BackupCreate) -> dict[str, Any]:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
-@router.post("/backups/{name}/restore")
+@router.post("/backups/{name}/restore", dependencies=[Depends(require_admin)])
 async def restore_backup(name: str, request: BackupRestore) -> dict[str, Any]:
     try:
         return operations.restore_backup(name, confirmed=request.confirmed, key_env=request.key_env)
@@ -188,12 +237,12 @@ async def restore_backup(name: str, request: BackupRestore) -> dict[str, Any]:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
 
 
-@router.get("/context")
+@router.get("/context", dependencies=[Depends(require_auth)])
 async def read_context() -> dict[str, Any]:
     return {"context": core.get_context()}
 
 
-@router.put("/context")
+@router.put("/context", dependencies=[Depends(require_auth)])
 async def write_context(request: ContextSet) -> dict[str, Any]:
     return _handle(
         lambda: {
@@ -206,12 +255,12 @@ async def write_context(request: ContextSet) -> dict[str, Any]:
         }
     )
 
-@router.get("/entities")
+@router.get("/entities", dependencies=[Depends(require_auth)])
 async def entities(data_mode: str | None = Query(default=None, max_length=20)) -> dict[str, Any]:
     return {"entities": core.list_entities(data_mode=_mode_q(data_mode))}
 
 
-@router.post("/parse")
+@router.post("/parse", dependencies=[Depends(require_auth)])
 async def parse_upload(file: UploadFile = File(...)) -> dict[str, Any]:
     content = await file.read(MAX_UPLOAD + 1)
     if len(content) > MAX_UPLOAD:
@@ -222,7 +271,7 @@ async def parse_upload(file: UploadFile = File(...)) -> dict[str, Any]:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
-@router.post("/schemas")
+@router.post("/schemas", dependencies=[Depends(require_auth)])
 async def create_schema(request: SchemaCreate) -> dict[str, Any]:
     return _handle(
         lambda: core.create_schema(
@@ -233,33 +282,34 @@ async def create_schema(request: SchemaCreate) -> dict[str, Any]:
     )
 
 
-@router.get("/schemas/{entity}")
+@router.get("/schemas/{entity}", dependencies=[Depends(require_auth)])
 async def schema(entity: str) -> dict[str, Any]:
     return _handle(lambda: core.list_schema(entity))
 
 
-@router.post("/schemas/{entity}/fields")
+@router.post("/schemas/{entity}/fields", dependencies=[Depends(require_auth)])
 async def add_field(entity: str, request: FieldCreate) -> dict[str, Any]:
     return _handle(
         lambda: core.add_field(entity, request.name, request.label, request.field_type, request.required)
     )
 
 
-@router.patch("/schemas/{entity}/fields/{field_name}")
+@router.patch("/schemas/{entity}/fields/{field_name}", dependencies=[Depends(require_admin)])
 async def update_field(entity: str, field_name: str, request: FieldPatch) -> dict[str, Any]:
     return _handle(
         lambda: core.update_field(entity, field_name, label=request.label, active=request.active)
     )
 
 
-@router.post("/imports/{entity}/preview")
+@router.post("/imports/{entity}/preview", dependencies=[Depends(require_auth)])
 async def preview_import(entity: str, request: ImportPreview) -> dict[str, Any]:
     return _handle(lambda: core.preview_import(entity, request.rows, request.mapping))
 
 
-@router.post("/imports/{entity}/commit")
+@router.post("/imports/{entity}/commit", dependencies=[Depends(require_auth)])
 async def commit_import(
-    entity: str, request: ImportPreview, data_mode: str | None = Query(default=None, max_length=20)
+    entity: str, request: ImportPreview, data_mode: str | None = Query(default=None, max_length=20),
+    user: dict[str, Any] = Depends(require_auth_user),
 ) -> dict[str, Any]:
     return _handle(
         lambda: core.import_rows(
@@ -268,25 +318,26 @@ async def commit_import(
             mapping=request.mapping,
             source_name=request.source_name,
             data_mode=_mode_required(data_mode),
+            owner_department=str(user.get("department") or ""), owner_agent=str(user.get("agent_id") or "default"),
         )
     )
 
 
-@router.post("/simulate/orders")
+@router.post("/simulate/orders", dependencies=[Depends(require_admin)])
 async def simulate_orders(
     request: SimulationCreate, data_mode: str | None = Query(default=None, max_length=20)
 ) -> dict[str, Any]:
     return _handle(lambda: core.generate_orders(request.count, request.seed, data_mode=_mode_required(data_mode)))
 
 
-@router.post("/simulate/production")
+@router.post("/simulate/production", dependencies=[Depends(require_admin)])
 async def simulate_production(
     request: SimulationCreate, data_mode: str | None = Query(default=None, max_length=20)
 ) -> dict[str, Any]:
     return _handle(lambda: core.generate_production(request.count, request.seed, data_mode=_mode_required(data_mode)))
 
 
-@router.get("/records/{entity}")
+@router.get("/records/{entity}", dependencies=[Depends(require_auth)])
 async def records(
     entity: str,
     limit: int = Query(default=100, ge=1, le=1000),
@@ -294,6 +345,7 @@ async def records(
     data_mode: str | None = Query(default=None, max_length=20),
     start_date: str | None = Query(default=None, max_length=16),
     end_date: str | None = Query(default=None, max_length=16),
+    user: dict[str, Any] = Depends(require_auth_user),
 ) -> dict[str, Any]:
     return _handle(
         lambda: {
@@ -303,13 +355,14 @@ async def records(
                 limit=limit,
                 source_type=source_type,
                 data_mode=_mode_q(data_mode),
+            owner_department=_scope_filters(user)["owner_department"], owner_agent=_scope_filters(user)["owner_agent"],
                 start_date=start_date,
                 end_date=end_date,
             ),
         }
     )
 
-@router.get("/orders")
+@router.get("/orders", dependencies=[Depends(require_auth)])
 async def orders(
     keyword: str = Query(default="", max_length=200),
     order_no: str = Query(default="", max_length=200),
@@ -320,6 +373,7 @@ async def orders(
     start_date: str | None = Query(default=None, max_length=16),
     end_date: str | None = Query(default=None, max_length=16),
     limit: int = Query(default=100, ge=1, le=200),
+    user: dict[str, Any] = Depends(require_auth_user),
 ) -> dict[str, Any]:
     """Expose the bounded order query contract used by business PawApps."""
     filters = {
@@ -338,6 +392,7 @@ async def orders(
             filters=filters,
             source_type=source_type,
             data_mode=_mode_q(data_mode),
+            owner_department=_scope_filters(user)["owner_department"], owner_agent=_scope_filters(user)["owner_agent"],
             start_date=start_date,
             end_date=end_date,
             limit=limit,
@@ -355,14 +410,26 @@ async def orders(
         }
     return _handle(query)
 
-@router.get("/batches")
+@router.get("/batches", dependencies=[Depends(require_auth)])
 async def batches(
-    entity: str | None = None, data_mode: str | None = Query(default=None, max_length=20)
+    entity: str | None = None, data_mode: str | None = Query(default=None, max_length=20),
+    user: dict[str, Any] = Depends(require_auth_user),
 ) -> dict[str, Any]:
-    return {"batches": core.list_batches(entity, data_mode=_mode_q(data_mode))}
+    return {"batches": core.list_batches(entity, data_mode=data_mode, owner_department=_scope_filters(user)["owner_department"], owner_agent=_scope_filters(user)["owner_agent"])}
 
 
-@router.post("/batches/{batch_id}/rollback")
+class DepartmentBackfill(BaseModel):
+    department: str = Field(min_length=1, max_length=120)
+    batch_id: str | None = Field(default=None, max_length=80)
+
+
+@router.post("/records/{entity}/backfill-department", dependencies=[Depends(require_admin)])
+async def backfill_department(entity: str, request: DepartmentBackfill) -> dict[str, Any]:
+    """管理员为历史无部门戳的记录补盖部门（可选限定批次），仅影响空戳行。"""
+    return _handle(lambda: {"entity": entity, "department": request.department, "updated_records": core.backfill_department(entity, request.department, request.batch_id)})
+
+
+@router.post("/batches/{batch_id}/rollback", dependencies=[Depends(require_admin)])
 async def rollback(batch_id: str) -> dict[str, Any]:
     return _handle(lambda: core.rollback_batch(batch_id))
 
