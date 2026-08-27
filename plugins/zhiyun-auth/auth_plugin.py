@@ -442,11 +442,13 @@ async def update_branding(request: BrandingRequest, authorization: str = Header(
         cfg["brand_name"] = request.brand_name.strip()
     if request.enterprise is not None:
         cfg["enterprise"] = request.enterprise.strip()
-    # 空字符串视为“不修改”，避免仅保存名称/Logo 时误清空已有封面
+    # 空字符串视为“不修改”，避免仅保存名称/Logo 时误清空已有封面；
+    # 但上传了新封面数据时必须清掉旧的 background_image 路径，否则旧路径优先级更高
     if request.background_image:
         cfg["background_image"] = request.background_image.strip()
     if request.background_data_url:
         cfg["background_data_url"] = request.background_data_url.strip()
+        cfg["background_image"] = ""
     _write_json(LOGIN_CONFIG_FILE, cfg)
     return {"ok": True, "config": {
         "brand_name": _brand_name(),

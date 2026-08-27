@@ -14,6 +14,12 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
+for /f "tokens=1 delims=." %%v in ('node -p "process.versions.node.split('.')[0]"') do set NODE_MAJOR=%%v
+if %NODE_MAJOR% LSS 20 (
+  echo [错误] Node.js 版本过低（需要 20 或以上，当前版本号主版本 %NODE_MAJOR%）。
+  pause
+  exit /b 1
+)
 
 where git >nul 2>nul
 if errorlevel 1 (

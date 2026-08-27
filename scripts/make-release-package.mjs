@@ -46,17 +46,25 @@ if (existsSync(gitEntry)) {
 }
 
 // 跨平台压缩
-if (process.platform === 'win32') {
-  run(`powershell -NoProfile -Command "Compress-Archive -Path '${join(workDir, '*')}' -DestinationPath '${zipPath}' -Force"`)
-} else {
+ else {
   run(`cd "${workDir}" && zip -r -q "${zipPath}" . -x '.git/*'`)
+}
+
+try {
+  // 跨平台压缩
+  if (process.platform === 'win32') {
+    run(`powershell -NoProfile -Command "Compress-Archive -Path '${join(workDir, '*')}' -DestinationPath '${zipPath}' -Force"`)
+  } else {
+    run(`cd "${workDir}" && zip -r -q "${zipPath}" . -x '.git'`)
+  }
+} finally {
+  // 无论成败都清理 worktree（失败后 prune，保证下次可重建）
+  try { run('git worktree remove --force .release-worktree') } catch { run('git worktree prune'); rmSync(workDir, { recursive: true, force: true }) }
 }
 
 const sha256 = createHash('sha256').update(readFileSync(zipPath)).digest('hex')
 writeFileSync(`${zipPath}.sha256`, `${sha256}  ${zipName}\n`, 'utf8')
 writeFileSync(join(distDir, 'INSTALLER-VERSION.txt'), manifest.join('\n') + '\n', 'utf8')
-try { run('git worktree remove --force .release-worktree') } catch { run('git worktree prune'); rmSync(workDir, { recursive: true, force: true }) }
-
 const sizeMb = (statSync(zipPath).size / 1024 / 1024).toFixed(2)
 console.log(`打包完成：dist/${zipName}（${sizeMb} MB）`)
 console.log(`SHA256：${sha256}`)
