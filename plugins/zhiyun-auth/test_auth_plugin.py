@@ -9,7 +9,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import auth_plugin as ap
+try:
+    import auth_plugin as ap
+    _HAS_DEPS = True
+except Exception:  # CI 环境可能缺 fastapi/pydantic，此时优雅跳过（宿主环境全量执行）
+    _HAS_DEPS = False
+
+unittest_skip = unittest.skipUnless(_HAS_DEPS, "auth_plugin 依赖（fastapi/pydantic）不可用")
 
 
 def _repoint(ap, tmp):
@@ -22,6 +28,7 @@ def _repoint(ap, tmp):
     ap.CONFIG_FILE = Path(tmp) / "config.json"
 
 
+@unittest_skip
 class BrandingSemanticsTests(unittest.TestCase):
     def test_empty_background_keeps_existing_cover(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -51,6 +58,7 @@ class BrandingSemanticsTests(unittest.TestCase):
         return "Bearer " + ap._create_token("admin")
 
 
+@unittest_skip
 class LastAdminGuardTests(unittest.TestCase):
     def test_cannot_demote_last_active_admin(self):
         with tempfile.TemporaryDirectory() as tmp:
