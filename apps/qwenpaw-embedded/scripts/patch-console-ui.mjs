@@ -258,6 +258,24 @@ function syncConsoleLogo (consoleDir) {
   }
   console.log(`Console favicon 与聊天智能体头像已同步为${logo.source}。`)
 }
+// 抑制宿主“试试桌面模式”新手引导：该引导每次进入应用都会弹出并带全屏遮罩
+// 拦截点击，且不记忆已完成状态。桌面模式仍可从宿主快捷设置进入，这里只隐藏
+// 打扰性的引导弹层与遮罩。
+function suppressConsoleTour (consoleDir) {
+  const htmlPath = join(consoleDir, 'index.html')
+  const html = readFileSync(htmlPath, 'utf8')
+  const styleId = 'zy-tour-suppress'
+  if (html.includes(`id="${styleId}"`)) return
+  const style = `<style id="${styleId}">.qwenpaw-tour-mask,.qwenpaw-tour{display:none !important;}</style>`
+  const nextHtml = html.replace(/<\/head>/, style + '</head>')
+  if (nextHtml === html) {
+    warn('未找到 </head>，无法注入引导抑制样式。')
+    return
+  }
+  writeFileSync(htmlPath, nextHtml, 'utf8')
+  console.log('Console 新手引导弹层已抑制（style#zy-tour-suppress 注入）。')
+}
+
 const runtime = resolveRuntime()
 const consoleDir = locateConsoleDir(runtime)
 
@@ -356,6 +374,8 @@ if (cacheBust.changed) {
   console.log('Console index.html 已移除主 bundle ?v= 查询参数（避免 console 双重执行）')
 }
 syncConsoleLogo(consoleDir)
+suppressConsoleTour(consoleDir)
+
 
 // 对其它 Console 资源（懒加载 chunk / vendor）执行同样的品牌替换。
 let extraBranded = 0

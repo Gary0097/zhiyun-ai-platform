@@ -127,7 +127,7 @@
   }
 
   install(fallback);
-  Q.host.fetch(getApiUrl("/zhiyun-logo/config"), { headers: authHeaders() })
+  Q.host.fetch("/zhiyun-logo/config", { headers: authHeaders() })
     .then(function (response) {
       if (!response.ok) throw new Error("HTTP " + response.status);
       return response.json();
