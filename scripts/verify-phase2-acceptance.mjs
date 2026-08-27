@@ -10,8 +10,8 @@ const catalog = JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-app-discov
 const progress = JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-app-discovery', 'feature_progress.json'), 'utf8'))
 
 const hub = lock.apps.find(app => app.id === 'zhiyun-integration-hub')
-assert.equal(hub?.commit, 'b0297c23dd9865cb6d3f565cc0253f47be223f60', 'Integration Hub must use formal PR #6 merge SHA')
-assert.equal(catalog.apps.find(app => app.app_id === hub.id)?.version, '0.2.1')
+assert.equal(hub?.commit, 'be45c71103a593697f5a5d9bd360b0718f825997', 'Integration Hub must use formal PR #6 merge SHA')
+assert.equal(catalog.apps.find(app => app.app_id === hub.id)?.version, '0.2.2')
 assert.equal(JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-data-core', 'plugin.json'), 'utf8')).version, '0.8.0')
 assert.equal(JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-audit', 'plugin.json'), 'utf8')).version, '1.3.0')
 

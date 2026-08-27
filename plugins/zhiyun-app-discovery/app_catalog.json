@@ -12,7 +12,7 @@
         "sjfx",
         "data paw"
       ],
-      "version": "0.9.2",
+      "version": "0.9.3",
       "category": "data",
       "install_status": "installed",
       "route": "/apps/zhiyun-data-studio",
@@ -111,7 +111,7 @@
         "ddzx",
         "订单处理"
       ],
-      "version": "0.7.2",
+      "version": "0.7.3",
       "category": "order",
       "install_status": "installed",
       "route": "/apps/zhiyun-order-studio",
@@ -195,7 +195,7 @@
         "客服运营",
         "shkf"
       ],
-      "version": "0.3.0",
+      "version": "0.5.0",
       "category": "service",
       "install_status": "installed",
       "route": "/apps/zhiyun-service-studio",
@@ -267,7 +267,7 @@
         "智能补货",
         "gyl"
       ],
-      "version": "0.3.0",
+      "version": "0.5.0",
       "category": "supply",
       "install_status": "installed",
       "route": "/apps/zhiyun-supply-studio",
@@ -315,7 +315,7 @@
         "客户关系",
         "xsfx"
       ],
-      "version": "0.3.0",
+      "version": "0.5.0",
       "category": "sales",
       "install_status": "installed",
       "route": "/apps/zhiyun-sales-studio",
@@ -377,7 +377,7 @@
         "财务票据",
         "cw"
       ],
-      "version": "0.3.0",
+      "version": "0.5.0",
       "category": "finance",
       "install_status": "installed",
       "route": "/apps/zhiyun-finance-studio",
@@ -439,7 +439,7 @@
         "审批",
         "hr"
       ],
-      "version": "0.3.0",
+      "version": "0.5.0",
       "category": "people",
       "install_status": "installed",
       "route": "/apps/zhiyun-people-studio",
@@ -523,7 +523,7 @@
         "WMS对接",
         "jkzx"
       ],
-      "version": "0.2.1",
+      "version": "0.2.2",
       "category": "integration",
       "install_status": "installed",
       "route": "/apps/zhiyun-integration-hub",
