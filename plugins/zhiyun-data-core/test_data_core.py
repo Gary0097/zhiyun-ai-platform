@@ -410,7 +410,7 @@ class DataCoreRouteGuardTests(unittest.TestCase):
     def test_guarded_route_counts(self):
         import re
         src = io.open(Path(__file__).parent / "data_core_plugin.py", encoding="utf-8").read()
-        self.assertEqual(len(re.findall(r"Depends\(require_admin\)", src)), 7)
+        self.assertEqual(len(re.findall(r"Depends\(require_admin\)", src)), 8)
         self.assertEqual(len(re.findall(r"Depends\(require_auth\)", src)), 12)
 
     def test_require_admin_rejects_member(self):
@@ -445,6 +445,22 @@ class DepartmentScopingTests(unittest.TestCase):
             with core.connect() as conn:
                 version = conn.execute("SELECT value FROM data_core_meta WHERE key = 'schema_version'").fetchone()["value"]
             self.assertEqual(int(version), 4)
+
+
+
+    def test_backfill_only_empty(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            core = DataCore(Path(tmp) / "dc.sqlite")
+            core.create_schema("bf_t", "补盖", [{"name": "order_no", "label": "订单号", "field_type": "text", "required": True}])
+            core.import_rows("bf_t", [{"order_no": "B1"}], source_name="x")            # 空戳
+            core.import_rows("bf_t", [{"order_no": "B2"}], source_name="y", owner_department="财务部")
+            updated = core.backfill_department("bf_t", "销售部")
+            self.assertEqual(updated, 1)
+            got = {r["data"]["order_no"]: r for r in core.list_records("bf_t", limit=10)}
+            self.assertEqual(len(core.list_records("bf_t", owner_department="销售部")), 1)
+            self.assertEqual(len(core.list_records("bf_t", owner_department="财务部")), 1)
+            # 二次补盖不重复影响
+            self.assertEqual(core.backfill_department("bf_t", "销售部"), 0)
 
 
 if __name__ == "__main__":

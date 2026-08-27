@@ -745,6 +745,28 @@ class DataCore:
             if len(matched) >= max(1, min(limit, 200)):
                 break
         return matched
+    def backfill_department(self, entity: str, department: str, batch_id: str | None = None) -> int:
+        """为历史无部门戳的记录/批次补盖部门（仅影响 owner_department 为空的行）。"""
+        department = str(department or "").strip()
+        if not department:
+            raise DataCoreError("department is required")
+        with self.connect() as connection:
+            if batch_id:
+                cur = connection.execute(
+                    "UPDATE data_records SET owner_department = ? WHERE entity = ? AND batch_id = ? AND owner_department = ''",
+                    (department, entity, batch_id))
+                connection.execute(
+                    "UPDATE data_batches SET owner_department = ? WHERE entity = ? AND batch_id = ? AND owner_department = ''",
+                    (department, entity, batch_id))
+            else:
+                cur = connection.execute(
+                    "UPDATE data_records SET owner_department = ? WHERE entity = ? AND owner_department = ''",
+                    (department, entity))
+                connection.execute(
+                    "UPDATE data_batches SET owner_department = ? WHERE entity = ? AND owner_department = ''",
+                    (department, entity))
+            return cur.rowcount
+
     def list_batches(self, entity: str | None = None, data_mode: str | None = None, owner_department: str | None = None) -> list[dict[str, Any]]:
         query = "SELECT * FROM data_batches"
         params: tuple[Any, ...] = ()

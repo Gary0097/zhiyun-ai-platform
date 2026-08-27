@@ -406,6 +406,17 @@ async def batches(
     return {"batches": core.list_batches(entity, data_mode=data_mode, owner_department=_dept_filter(user))}
 
 
+class DepartmentBackfill(BaseModel):
+    department: str = Field(min_length=1, max_length=120)
+    batch_id: str | None = Field(default=None, max_length=80)
+
+
+@router.post("/records/{entity}/backfill-department", dependencies=[Depends(require_admin)])
+async def backfill_department(entity: str, request: DepartmentBackfill) -> dict[str, Any]:
+    """管理员为历史无部门戳的记录补盖部门（可选限定批次），仅影响空戳行。"""
+    return _handle(lambda: {"entity": entity, "department": request.department, "updated_records": core.backfill_department(entity, request.department, request.batch_id)})
+
+
 @router.post("/batches/{batch_id}/rollback", dependencies=[Depends(require_admin)])
 async def rollback(batch_id: str) -> dict[str, Any]:
     return _handle(lambda: core.rollback_batch(batch_id))
