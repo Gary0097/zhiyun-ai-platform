@@ -187,7 +187,7 @@
           "每个账号绑定一个智能体：登录后自动切换到该智能体，其会话、定时任务、收件箱与知识文件随智能体隔离；数据范围与知识库范围当前在数据中心/应用中心链路强制生效，各 Studio 业务接口的统一 RBAC 强制路由在后续迭代接入。"),
         h("div", { style: { padding: "12px 22px 0", display: "flex", justifyContent: "flex-end" } },
           btn({ background: "#fff", color: BLUE, border: "1px solid " + BLUE }, "+ 新建账号", function () {
-            setEditing({ isNew: true, username: "", display_name: "", password: "", role: "member", agent_id: (agents[0] || "default"), data_scope: "enterprise", kb_scope: "", active: true });
+            setEditing({ isNew: true, username: "", display_name: "", password: "", role: "member", agent_id: (agents[0] || "default"), data_scope: "enterprise", kb_scope: "", department: "", active: true });
           })
         ),
         editing ? h("div", { style: { margin: "12px 22px", border: "1px solid #d6e2f0", borderRadius: 8, padding: 14, background: "#f8fbff" } },

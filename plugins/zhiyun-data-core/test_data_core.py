@@ -422,5 +422,30 @@ class DataCoreRouteGuardTests(unittest.TestCase):
         self.assertEqual(ctx.exception.status_code, 401)
 
 
+
+class DepartmentScopingTests(unittest.TestCase):
+    """记录级部门数据范围（PRD 21.2/§15）：v4 迁移、导入盖章、读取过滤。"""
+
+    def test_v4_migration_and_department_filter(self):
+        import tempfile
+        from data_core import DataCore
+        with tempfile.TemporaryDirectory() as tmp:
+            core = DataCore(Path(tmp) / "dc.sqlite")
+            core.create_schema("dept_t", "部门验收", [
+                {"name": "order_no", "label": "订单号", "field_type": "text", "required": True}])
+            core.import_rows("dept_t", [{"order_no": "D1"}], source_name="s1", owner_department="销售部")
+            core.import_rows("dept_t", [{"order_no": "D2"}], source_name="s2", owner_department="财务部")
+            core.import_rows("dept_t", [{"order_no": "D3"}], source_name="s3")
+            sales = [r["data"]["order_no"] for r in core.list_records("dept_t", owner_department="销售部")]
+            self.assertEqual(sales, ["D1"])
+            all_rows = [r["data"]["order_no"] for r in core.list_records("dept_t")]
+            self.assertEqual(sorted(all_rows), ["D1", "D2", "D3"])
+            self.assertEqual(len(core.list_batches("dept_t", owner_department="销售部")), 1)
+            self.assertEqual(len(core.list_batches("dept_t")), 3)
+            with core.connect() as conn:
+                version = conn.execute("SELECT value FROM data_core_meta WHERE key = 'schema_version'").fetchone()["value"]
+            self.assertEqual(int(version), 4)
+
+
 if __name__ == "__main__":
     unittest.main()

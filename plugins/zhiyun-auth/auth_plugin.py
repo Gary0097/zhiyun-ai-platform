@@ -273,6 +273,7 @@ class UserUpsertRequest(BaseModel):
     agent_id: str = Field(default="default", max_length=120)
     data_scope: str = Field(default="enterprise", max_length=80)
     kb_scope: str = Field(default="enterprise", max_length=80)
+    department: str = Field(default="", max_length=120)
     active: bool = True
 
 
@@ -411,6 +412,7 @@ async def upsert_user(request: UserUpsertRequest, authorization: str = Header(de
         existing["agent_id"] = request.agent_id
         existing["data_scope"] = request.data_scope
         existing["kb_scope"] = request.kb_scope
+        existing["department"] = request.department.strip()
         existing["active"] = request.active
         _save_users(users)
         return {"ok": True, "updated": request.username}
@@ -427,6 +429,7 @@ async def upsert_user(request: UserUpsertRequest, authorization: str = Header(de
         "agent_id": request.agent_id,
         "data_scope": request.data_scope,
         "kb_scope": request.kb_scope,
+        "department": request.department.strip(),
         "active": request.active,
         "created_at": _now(),
     })
