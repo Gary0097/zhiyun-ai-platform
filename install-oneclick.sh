@@ -11,10 +11,11 @@ command -v node >/dev/null 2>&1 || { echo "[错误] 未检测到 Node.js（需�
 command -v git  >/dev/null 2>&1 || { echo "[错误] 未检测到 Git：https://git-scm.com/download/linux"; exit 1; }
 
 echo "[1/3] 安装运行时与锁定应用（首次约 3-10 分钟）..."
-./setup-ai-os.sh
+bash ./setup-ai-os.sh
 
-echo "[2/3] 启动服务..."
-./start-ai-os.sh
+echo "[2/3] 启动服务（后台运行，日志见 ai-os-install.log）..."
+nohup bash ./start-ai-os.sh > ai-os-install.log 2>&1 &
+echo $! > ai-os-install.pid
 
 echo "[3/3] 等待服务就绪..."
 for i in $(seq 1 40); do

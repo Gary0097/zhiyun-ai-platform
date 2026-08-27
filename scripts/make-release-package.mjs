@@ -37,7 +37,15 @@ const manifest = [
 ]
 writeFileSync(join(workDir, 'INSTALLER-VERSION.txt'), manifest.join('\n') + '\n', 'utf8')
 
-// 跨平台压缩（worktree 内全部文件，不含 .git）
+// 先移除 worktree 的 .git 指针（文件或目录），避免压缩包泄漏本机绝对路径
+const gitEntry = join(workDir, '.git')
+if (existsSync(gitEntry)) {
+  const st = statSync(gitEntry)
+  if (st.isDirectory()) rmSync(gitEntry, { recursive: true, force: true })
+  else rmSync(gitEntry, { force: true })
+}
+
+// 跨平台压缩
 if (process.platform === 'win32') {
   run(`powershell -NoProfile -Command "Compress-Archive -Path '${join(workDir, '*')}' -DestinationPath '${zipPath}' -Force"`)
 } else {
@@ -47,7 +55,7 @@ if (process.platform === 'win32') {
 const sha256 = createHash('sha256').update(readFileSync(zipPath)).digest('hex')
 writeFileSync(`${zipPath}.sha256`, `${sha256}  ${zipName}\n`, 'utf8')
 writeFileSync(join(distDir, 'INSTALLER-VERSION.txt'), manifest.join('\n') + '\n', 'utf8')
-run('git worktree remove --force .release-worktree')
+try { run('git worktree remove --force .release-worktree') } catch { run('git worktree prune'); rmSync(workDir, { recursive: true, force: true }) }
 
 const sizeMb = (statSync(zipPath).size / 1024 / 1024).toFixed(2)
 console.log(`打包完成：dist/${zipName}（${sizeMb} MB）`)
