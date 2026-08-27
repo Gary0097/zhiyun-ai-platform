@@ -376,33 +376,6 @@ if (cacheBust.changed) {
 syncConsoleLogo(consoleDir)
 suppressConsoleTour(consoleDir)
 
-// 金蝶云星空风格主题：顶栏改为星空蓝渐变、白色文字。只做保守的顶栏配色，
-// 不改布局与交互，避免影响宿主功能。
-function applyKingdeeTheme (consoleDir) {
-  const htmlPath = join(consoleDir, 'index.html')
-  const html = readFileSync(htmlPath, 'utf8')
-  const styleId = 'zy-kingdee-theme'
-  if (html.includes(`id="${styleId}"`)) return
-  const style = `<style id="${styleId}">
-.qwenpaw-layout-header, header[class*="index-module__header"] {
-  background: linear-gradient(180deg, #1749a8 0%, #1f5ed6 100%) !important;
-  box-shadow: 0 2px 6px rgba(16,42,96,0.25) !important;
-}
-.qwenpaw-layout-header *, header[class*="index-module__header"] * {
-  color: #eaf1ff !important;
-}
-.qwenpaw-layout-header svg, header[class*="index-module__header"] svg { opacity: 0.92; }
-</style>`
-  const nextHtml = html.replace(/<\/head>/, style + '</head>')
-  if (nextHtml === html) {
-    warn('未找到 </head>，无法注入金蝶主题样式。')
-    return
-  }
-  writeFileSync(htmlPath, nextHtml, 'utf8')
-  console.log('Console 顶栏已应用金蝶星空蓝主题（style#zy-kingdee-theme 注入）。')
-}
-
-applyKingdeeTheme(consoleDir)
 
 // 对其它 Console 资源（懒加载 chunk / vendor）执行同样的品牌替换。
 let extraBranded = 0
