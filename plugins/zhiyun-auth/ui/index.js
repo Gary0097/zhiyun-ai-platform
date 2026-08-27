@@ -118,13 +118,16 @@
             opacity: busy ? 0.8 : 1
           } }, busy ? "登录中…" : "登录"),
           h("div", { style: { marginTop: 8, fontSize: 11.5, color: "#98a2b3", textAlign: "center" } },
-            "默认管理员：admin / ZhizaoYun@2026（可在登录插件配置中修改品牌与账号）")
+            "账号由企业管理员分配；忘记密码请联系系统管理员重置")
         )
       )
     );
   }
 
   function mount() {
+    // 宿主在不同加载路径下可能把本脚本执行两次；重复挂载会产生两个登录层，
+    // 上层按钮没有事件处理器，真实用户将无法登录。这里做幂等保护。
+    if (document.getElementById("zhiyun-auth-root")) return;
     var container = document.createElement("div");
     container.id = "zhiyun-auth-root";
     document.body.appendChild(container);
