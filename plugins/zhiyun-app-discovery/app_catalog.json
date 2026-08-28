@@ -700,6 +700,45 @@
       ],
       "health": "available",
       "capabilities": []
+    },
+    {
+      "app_id": "zhiyun-chanjet-hub",
+      "name": "畅捷通连接中心",
+      "aliases": [
+        "用友",
+        "畅捷通",
+        "T+",
+        "取数",
+        "问数",
+        "ERP"
+      ],
+      "version": "0.1.0",
+      "category": "integration",
+      "install_status": "installed",
+      "route": "/apps/zhiyun-chanjet-hub",
+      "repository_url": "https://github.com/Gary0097/zhiyun-chanjet-hub",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "health": "available",
+      "capabilities": [
+        {
+          "id": "chanjet_fetch",
+          "name": "畅捷通取数",
+          "keywords": [
+            "畅捷通",
+            "用友",
+            "T+",
+            "取数",
+            "订单"
+          ],
+          "questions": [
+            "从畅捷通取销售发货单",
+            "用友T+订单导入"
+          ]
+        }
+      ]
     }
   ]
 }

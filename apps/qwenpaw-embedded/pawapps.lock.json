@@ -56,6 +56,13 @@
       "ref": "main",
       "commit": "1600da37ed6e848693ba82a2409c999260c87660",
       "install_dir": "zhiyun-people-studio"
+    },
+    {
+      "id": "zhiyun-chanjet-hub",
+      "repository": "https://github.com/Gary0097/zhiyun-chanjet-hub.git",
+      "ref": "main",
+      "commit": "10599f35e744baf8c3d81e758107b72e63a1ddc6",
+      "install_dir": "zhiyun-chanjet-hub"
     }
   ]
 }
