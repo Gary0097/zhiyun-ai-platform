@@ -132,14 +132,17 @@ def search_apps(
             matches = [_match_score(query_terms, label, value) for label, value in _text_values(app, capability)]
             score, reason = max(matches, key=lambda item: item[0], default=(0.0, ""))
             if score:
-                delivery = progress_by_id.get(capability.get("id"), {})
-                delivery_status = capability.get("delivery_status", delivery.get("status", "planned"))
+                ext_id = str(capability.get("id") or "").startswith("ext_")
+                delivery = {} if ext_id else progress_by_id.get(capability.get("id"), {})
+                delivery_status = capability.get(
+                    "delivery_status", "completed" if ext_id else delivery.get("status", "planned"))
                 app_matches.append({
                     "capability_id": capability.get("id"),
                     "capability_name": capability.get("name"),
                     "delivery_status": delivery_status,
-                    "delivery_progress": delivery.get("progress", 0),
-                    "delivery_note": delivery.get("note", "交付状态未登记。"),
+                    "delivery_progress": 100 if ext_id else delivery.get("progress", 0),
+                    "delivery_note": capability.get("delivery_note",
+                                                    "平台扩展能力。") if ext_id else delivery.get("note", "交付状态未登记。"),
                     "score": round(score, 2),
                     "reason": reason,
                 })
