@@ -113,6 +113,11 @@ QwenPaw 2.1.0（唯一宿主，端口 8088）
 - 数据库、日志、知识文件全部落在 Workspace，升级与回滚不触碰用户数据
 - 不要直接修改 `apps/qwenpaw-embedded/runtime/pawapps` 或 `~/.qwenpaw/plugins` 中的安装副本；变更请在对应应用仓库进行后更新锁文件
 
+## 国内镜像（Gitee）
+
+- **https://gitee.com/gary0097/zhiyun-ai-platform** —— 无需翻墙即可克隆/下载
+- 一键安装包：[Gitee Release v1.0.0](https://gitee.com/gary0097/zhiyun-ai-platform/releases/v1.0.0)
+
 ## 相关仓库
 
 | 仓库 | 说明 |
