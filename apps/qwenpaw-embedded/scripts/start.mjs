@@ -51,6 +51,7 @@ run(process.execPath, [join(scriptsRoot, 'doctor.mjs')], '启动诊断未通过�
 if (process.argv.includes('--check')) process.exit(0)
 
 run(process.execPath, [join(scriptsRoot, 'cleanup-legacy.mjs')], '清理旧品牌、应用和企业 Tool 配置失败。')
+run(process.execPath, [join(scriptsRoot, 'ensure-workspace.mjs')], 'Workspace 初始化失败。')
 run(process.execPath, [join(scriptsRoot, 'patch-console-ui.mjs')], 'Console UI 定制脚本执行失败。')
 console.log(`QwenPaw 运行环境：${runtime.source === 'project' ? runtime.root : '全局安装'} (${runtime.version})`)
 run(qwenpawCommand, ['plugin', 'install', auditPlugin, '--force'], '日志审计插件安装失败。')
