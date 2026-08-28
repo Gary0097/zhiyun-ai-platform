@@ -18,6 +18,7 @@ function catalog () {
       { app_id: 'zhiyun-sales-studio', version: '0.1.0', install_status: 'installed', health: 'available', capabilities: [] },
       { app_id: 'zhiyun-finance-studio', version: '0.1.0', install_status: 'installed', health: 'available', capabilities: [] },
       { app_id: 'zhiyun-people-studio', version: '0.1.0', install_status: 'installed', health: 'available', capabilities: [] },
+      { app_id: 'zhiyun-chanjet-hub', version: '0.1.0', install_status: 'installed', health: 'available', capabilities: [{ id: 'ext_chanjet_fetch' }] },
       { app_id: 'zhiyun-data-core', version: '0.5.0', capabilities: [] },
       { app_id: 'zhiyun-audit', version: '1.1.1', capabilities: [] },
       { app_id: 'zhiyun-logo', version: '1.0.0', capabilities: [] },
