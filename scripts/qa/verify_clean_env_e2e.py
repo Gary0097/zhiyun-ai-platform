@@ -13,6 +13,9 @@ import time
 import urllib.error
 import urllib.request
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 BASE = "http://127.0.0.1:8088"
 
 
