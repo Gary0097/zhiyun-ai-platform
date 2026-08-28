@@ -16,10 +16,12 @@ concurrency:
 jobs:
   verify:
     timeout-minutes: 25
+    # 成本优化：PR 阶段只在 ubuntu 跑（Windows 分钟按 2x 计费）；
+    # master push / tag / 手动触发时双平台全跑（发布门禁）。
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, windows-2022]
+        os: ${{ github.event_name == 'pull_request' && fromJSON('["ubuntu-24.04"]') || fromJSON('["ubuntu-24.04", "windows-2022"]') }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
