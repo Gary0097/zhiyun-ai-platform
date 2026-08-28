@@ -3,7 +3,7 @@
 **运行在 QwenPaw 上的企业 AI 应用工作台**：一个统一桌面，一组面向真实岗位任务的业务应用，一条"导入数据 → 智能分析 → 审阅交付"的完整闭环。
 
 [![release gate](https://github.com/Gary0097/zhiyun-ai-platform/actions/workflows/release-gate.yml/badge.svg)](https://github.com/Gary0097/zhiyun-ai-platform/actions/workflows/release-gate.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 ## 项目介绍
 
@@ -31,6 +31,8 @@
 系统插件：登录与权限（zhiyun-auth）、统一数据中心（zhiyun-data-core）、安全审计中心（zhiyun-audit）、应用与项目中心（zhiyun-app-discovery）、企业环境初始化器（zhiyun-enterprise-seeder）、品牌 Logo。
 
 ## 快速运行
+
+> **登录账号：`admin` / `ZhizaoYun@2026`**（详见下方说明）
 
 ### 方式一：一键安装包（推荐）
 
@@ -70,6 +72,9 @@ cd zhiyun-ai-platform
 ```
 
 浏览器打开 **http://127.0.0.1:8088**。
+
+> **默认管理员账号：`admin` / `ZhizaoYun@2026`**
+> ⚠️ 首次登录后请立即在右下角用户卡 → 「账号管理」中修改密码；正式部署务必更换。
 
 **默认管理员账号：`admin` / `ZhizaoYun@2026`**（⚠️ 首次登录后请立即在「账号管理」中修改密码；正式部署务必更换）。
 
@@ -146,4 +151,4 @@ node scripts/verify-project-plan.mjs
 
 ## 许可证
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
