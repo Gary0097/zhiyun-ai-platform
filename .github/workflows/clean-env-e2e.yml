@@ -31,7 +31,7 @@ jobs:
           node-version: '20'
       - name: Install AI-OS into a clean working directory
         run: |
-          if [ "$RUNNER_OS" = "Linux" ]; then bash ./setup-ai-os.sh; else powershell -NoProfile -ExecutionPolicy Bypass -File ./setup-ai-os.ps1; fi
+          if [ "$RUNNER_OS" = "Linux" ]; then bash ./setup-ai-os.sh; else pwsh -NoProfile -Command "& ./setup-ai-os.ps1"; fi
         shell: bash
       - name: Start the service in the background
         shell: bash
