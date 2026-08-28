@@ -135,14 +135,14 @@ def search_apps(
                 ext_id = str(capability.get("id") or "").startswith("ext_")
                 delivery = {} if ext_id else progress_by_id.get(capability.get("id"), {})
                 delivery_status = capability.get(
-                    "delivery_status", "completed" if ext_id else delivery.get("status", "planned"))
+                    "delivery_status", "testing" if ext_id else delivery.get("status", "planned"))
                 app_matches.append({
                     "capability_id": capability.get("id"),
                     "capability_name": capability.get("name"),
                     "delivery_status": delivery_status,
-                    "delivery_progress": 100 if ext_id else delivery.get("progress", 0),
+                    "delivery_progress": int(capability.get("delivery_progress", 70)) if ext_id else delivery.get("progress", 0),
                     "delivery_note": capability.get("delivery_note",
-                                                    "平台扩展能力。") if ext_id else delivery.get("note", "交付状态未登记。"),
+                                                    "平台扩展能力（验收中）。") if ext_id else delivery.get("note", "交付状态未登记。"),
                     "score": round(score, 2),
                     "reason": reason,
                 })
