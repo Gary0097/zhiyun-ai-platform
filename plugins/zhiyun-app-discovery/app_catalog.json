@@ -724,7 +724,7 @@
       "health": "available",
       "capabilities": [
         {
-          "id": "chanjet_fetch",
+          "id": "ext_chanjet_fetch",
           "name": "畅捷通取数",
           "keywords": [
             "畅捷通",
@@ -736,7 +736,8 @@
           "questions": [
             "从畅捷通取销售发货单",
             "用友T+订单导入"
-          ]
+          ],
+          "delivery_status": "completed"
         }
       ]
     }
