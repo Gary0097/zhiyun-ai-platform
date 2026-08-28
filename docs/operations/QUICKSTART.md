@@ -85,7 +85,7 @@ chmod +x check-ai-os.sh
 node apps/qwenpaw-embedded/scripts/health-report.mjs --json
 ```
 
-健康检查只访问本机只读接口，不修改数据库、配置或插件。它不仅检查HTTP状态，还校验Logo数据、Data Core Schema、Studio运行版本与应用目录版本，以及31项PRD能力台账的完整性；HTTP 200但返回空壳JSON、旧版本或错误结构仍会判定失败。若失败，它会列出具体不可用模块和原因；QwenPaw自身或无关第三方插件的日志不会被误报为某个制造云业务模块健康。
+健康检查只访问本机只读接口，不修改数据库、配置或插件。它不仅检查HTTP状态，还校验Logo数据、Data Core Schema、Studio运行版本与应用目录版本，以及31项PRD能力台账的完整性；HTTP 200但返回空壳JSON、旧版本或错误结构仍会判定失败。若失败，它会列出具体不可用模块和原因；QwenPaw自身或无关第三方插件的日志不会被误报为某个智造云业务模块健康。
 
 ## 一键诊断
 

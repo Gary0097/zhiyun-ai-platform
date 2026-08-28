@@ -108,8 +108,8 @@
         h("div", { style: section },
           h("div", { style: { fontWeight: 650, marginBottom: 6 } }, "登录企业名称 / 品牌名称"),
           h("div", { style: { display: "flex", gap: 10 } },
-            h("input", { value: enterprise, onChange: function (e) { setEnterprise(e.target.value); }, placeholder: "企业名称（如：制造云）", style: inputStyle }),
-            h("input", { value: brandName, onChange: function (e) { setBrandName(e.target.value); }, placeholder: "品牌名称（如：制造云 AI-OS）", style: inputStyle })
+            h("input", { value: enterprise, onChange: function (e) { setEnterprise(e.target.value); }, placeholder: "企业名称（如：智造云）", style: inputStyle }),
+            h("input", { value: brandName, onChange: function (e) { setBrandName(e.target.value); }, placeholder: "品牌名称（如：智造云 AI-OS）", style: inputStyle })
           )
         ),
         h("div", { style: section },
@@ -252,11 +252,12 @@
     var passwordState = React.useState(""); var password = passwordState[0]; var setPassword = passwordState[1];
     var errState = React.useState(""); var err = errState[0]; var setErr = errState[1];
     var busyState = React.useState(false); var busy = busyState[0]; var setBusy = busyState[1];
-    var settingsState = React.useState(false); var settingsOpen = settingsState[0]; var setSettingsOpen = settingsState[1];
+    var settingsState = React.useState(false);
+    var userOpenState = React.useState(false); var userOpen = userOpenState[0]; var setUserOpen = userOpenState[1]; var settingsOpen = settingsState[0]; var setSettingsOpen = settingsState[1];
     var usersState = React.useState(false); var usersOpen = usersState[0]; var setUsersOpen = usersState[1];
 
     function loadConfig() {
-      request("/config").then(setCfg).catch(function () { setCfg({ brand_name: "制造云 AI-OS", enterprise: "制造云", background_data_url: "" }); });
+      request("/config").then(setCfg).catch(function () { setCfg({ brand_name: "智造云 AI-OS", enterprise: "智造云", background_data_url: "" }); });
       logoRequest("/zhiyun-logo/config").then(function (body) { if (body && body.logo) setLogo(body.logo); }).catch(function () {});
     }
     React.useEffect(function () {
@@ -288,31 +289,41 @@
       setUser(null); setPassword(""); setStatus("locked");
     }
 
-    var brand = (cfg && cfg.brand_name) || "制造云 AI-OS";
-    var enterprise = (cfg && cfg.enterprise) || "制造云";
+    var brand = (cfg && cfg.brand_name) || "智造云 AI-OS";
+    var enterprise = (cfg && cfg.enterprise) || "智造云";
     var bg = (cfg && cfg.background_data_url) || "";
 
     if (status === "loading") return null;
     if (status === "ready" && user) {
       return h("div", { style: { fontFamily: FONT } },
-        h("div", { style: {
-          position: "fixed", right: 16, bottom: 16, zIndex: 2100, display: "flex", gap: 10, alignItems: "center",
-          padding: "9px 12px", background: "#ffffff", border: "1px solid #e3e8ef", borderRadius: 10,
-          boxShadow: "0 4px 18px rgba(16,24,40,0.12)", fontSize: 12, color: "#1f2933"
-        } },
-          logo ? h("img", { src: logo, style: { height: 30, borderRadius: 4 } }) : null,
-          h("div", { style: { display: "flex", flexDirection: "column", gap: 2, lineHeight: 1.4 } },
-            h("span", { style: { fontWeight: 650 } }, (user.display_name || user.username) + " · " + (user.role === "admin" ? "系统管理员" : "成员")),
-            h("span", { style: { color: "#5b6472" } }, enterprise + " · 智能体：" + (user.agent_id || "default"))
-          ),
-          user.role === "admin" ? h("div", { style: { display: "flex", gap: 6 } },
-            btn({ padding: "5px 10px", fontSize: 12 }, "系统设置", function () { setSettingsOpen(true); }),
-            btn({ padding: "5px 10px", fontSize: 12 }, "账号管理", function () { setUsersOpen(true); })
-          ) : null,
-          h("button", { onClick: logout, style: {
-            border: "1px solid #d0d5dd", background: "#ffffff", color: "#475467", borderRadius: 6,
-            padding: "5px 10px", fontSize: 12, cursor: "pointer"
-          } }, "退出")
+        h("div", { style: { position: "fixed", right: 12, bottom: 12, zIndex: 2100, userSelect: "none" } },
+          h("div", { style: {
+            display: "flex", gap: 10, alignItems: "center",
+            padding: userOpen ? "9px 12px" : "0",
+            background: "#ffffff", border: "1px solid #e3e8ef", borderRadius: userOpen ? 10 : 20,
+            boxShadow: "0 4px 18px rgba(16,24,40,0.12)", fontSize: 12, color: "#1f2933",
+            cursor: "pointer", transition: "all .18s ease", maxWidth: userOpen ? "none" : 36,
+            overflow: "hidden", whiteSpace: "nowrap"
+          }, onClick: function () { setUserOpen(!userOpen); },
+            title: userOpen ? "点击收起" : "点击展开用户信息" },
+            h("div", { style: {
+              width: 28, height: 28, borderRadius: "50%", background: "#1f5ed6", color: "#fff",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700,
+              flexShrink: 0, margin: userOpen ? 0 : 4
+            } }, (user.display_name || user.username || "?").slice(0, 1)),
+            userOpen ? h("div", { style: { display: "flex", flexDirection: "column", gap: 2, lineHeight: 1.4 } },
+              h("span", { style: { fontWeight: 650 } }, (user.display_name || user.username) + " · " + (user.role === "admin" ? "系统管理员" : "成员")),
+              h("span", { style: { color: "#5b6472" } }, enterprise + " · 智能体：" + (user.agent_id || "default")),
+              user.role === "admin" ? h("div", { style: { display: "flex", gap: 6, marginTop: 4 } },
+                btn({ padding: "5px 10px", fontSize: 12 }, "系统设置", function () { setSettingsOpen(true); }),
+                btn({ padding: "5px 10px", fontSize: 12 }, "账号管理", function () { setUsersOpen(true); })
+              ) : null
+            ) : null,
+            userOpen ? h("button", { onClick: function (e) { e.stopPropagation(); logout(); }, style: {
+              border: "1px solid #d0d5dd", background: "#ffffff", color: "#475467", borderRadius: 6,
+              padding: "5px 10px", fontSize: 12, cursor: "pointer", flexShrink: 0
+            } }, "退出") : null
+          )
         ),
         settingsOpen ? h(BrandingModal, { config: cfg, onClose: function () { setSettingsOpen(false); }, onSaved: loadConfig }) : null,
         usersOpen ? h(UsersModal, { onClose: function () { setUsersOpen(false); } }) : null
@@ -367,7 +378,7 @@
               "账号由企业管理员分配；忘记密码请联系系统管理员重置")
           ),
           h("div", { style: { marginTop: 34, fontSize: 11.5, color: "#b3bdcc", textAlign: "center" } },
-            "© 2026 " + enterprise + " · 制造云 AI-OS")
+            "© 2026 " + enterprise + " · 智造云 AI-OS")
         )
       )
     );

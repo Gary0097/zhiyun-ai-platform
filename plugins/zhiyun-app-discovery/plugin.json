@@ -4,7 +4,7 @@
   "version": "0.4.0",
   "type": "app",
   "description": "统一展示真实安装应用、能力级可用状态及31项PRD功能交付进度，明确区分应用已安装与具体功能已交付。",
-  "author": "制造云 AI",
+  "author": "智造云 AI",
   "entry": {
     "backend": "app_discovery_plugin.py",
     "frontend": "ui/index.js"

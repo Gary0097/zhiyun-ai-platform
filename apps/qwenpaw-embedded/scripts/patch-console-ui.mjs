@@ -54,7 +54,7 @@ const PROTECTED = [
   'cd QwenPaw',
 ]
 
-// 将用户可见的 QwenPaw 品牌文案替换为“制造云”，同时保护技术标识、URL、日志前缀与
+// 将用户可见的 QwenPaw 品牌文案替换为“智造云”，同时保护技术标识、URL、日志前缀与
 // 操作命令，避免破坏 host API / 仓库地址 / macOS 路径 / 审计日志。
 function applyBrand (content) {
   const tokens = PROTECTED.slice().sort((a, b) => b.length - a.length)
@@ -66,7 +66,7 @@ function applyBrand (content) {
     placeholders.push({ ph, t })
     out = out.split(t).join(ph)
   }
-  out = out.split('QwenPaw').join('制造云')
+  out = out.split('QwenPaw').join('智造云')
   for (const { ph, t } of placeholders) out = out.split(ph).join(t)
   return out
 }
@@ -113,7 +113,7 @@ function selectedLogo () {
       return { path, mime, source: 'Workspace 自定义 Logo' }
     }
   } catch {}
-  return { path: gearLogo, mime: 'image/png', source: '内置制造云齿轮 Logo' }
+  return { path: gearLogo, mime: 'image/png', source: '内置智造云齿轮 Logo' }
 }
 
 function logoSvg (logo) {
@@ -312,7 +312,7 @@ if (checkMode) {
     process.exit(1)
   }
   if (branded !== content) {
-    console.error('[patch-console-ui] 检查失败：console bundle 中仍存在未替换的 QwenPaw 品牌文案（应替换为 制造云）。')
+    console.error('[patch-console-ui] 检查失败：console bundle 中仍存在未替换的 QwenPaw 品牌文案（应替换为 智造云）。')
     process.exit(1)
   }
   // 校验所有可打补丁的 JS/HTML 资源文件均已替换 QwenPaw 品牌文案。
@@ -322,12 +322,12 @@ if (checkMode) {
     if (cc.includes('QwenPaw') && applyBrand(cc) !== cc) unpatchedFiles.push(file)
   }
   if (unpatchedFiles.length) {
-    console.error('[patch-console-ui] 检查失败：以下文件仍包含未替换的 QwenPaw 品牌文案（应替换为 制造云）：\n' + unpatchedFiles.join('\n'))
+    console.error('[patch-console-ui] 检查失败：以下文件仍包含未替换的 QwenPaw 品牌文案（应替换为 智造云）：\n' + unpatchedFiles.join('\n'))
     process.exit(1)
   }
   const htmlTitle = readFileSync(join(consoleDir, 'index.html'), 'utf8')
   if (htmlTitle.includes('QwenPaw')) {
-    console.error('[patch-console-ui] 检查失败：index.html 仍包含 QwenPaw 品牌标题（应替换为 制造云）。')
+    console.error('[patch-console-ui] 检查失败：index.html 仍包含 QwenPaw 品牌标题（应替换为 智造云）。')
     process.exit(1)
   }
   const html = readFileSync(join(consoleDir, 'index.html'), 'utf8')

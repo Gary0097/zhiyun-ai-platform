@@ -76,7 +76,7 @@ def main():
         chip_counts = page.locator("button:has-text('部门'), button:has-text('员工'), button:has-text('角色'), button:has-text('智能体'), button:has-text('应用'), button:has-text('数据源'), button:has-text('会话'), button:has-text('任务'), button:has-text('Token'), button:has-text('操作日志')").count()
         results.append(report("实体切换入口", chip_counts >= 10, "count=" + str(chip_counts)))
 
-        ent = page.locator("input[placeholder='例如：制造云科技']").first
+        ent = page.locator("input[placeholder='例如：智造云科技']").first
         ent_val = ent.input_value() if ent.count() > 0 else ""
         results.append(report("表单默认企业名", ent_val != "", "value=" + ent_val))
 
@@ -104,7 +104,7 @@ def main():
                 stats_text = page.get_by_text("环境概览").locator("..").inner_text(timeout=5000)
             except Exception:
                 stats_text = ""
-            results.append(report("概览统计更新", ("制造云科技" in stats_text) or ("生成" in stats_text), stats_text[:80].replace("\n", " ")))
+            results.append(report("概览统计更新", ("智造云科技" in stats_text) or ("生成" in stats_text), stats_text[:80].replace("\n", " ")))
             page.screenshot(path=os.path.join(SS_DIR, "seeder-after-generate.png"), full_page=True)
 
         # ---- 切换实体 ----

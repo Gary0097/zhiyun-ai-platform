@@ -114,7 +114,7 @@ CONFIG_FILE = WORKING_DIR / "config.json"
 
 # 面向数据中心的默认系统上下文：注入一次，让模型知晓可调用 query_enterprise_orders。
 APP_CONTEXT = (
-    "你是「制造云 AI OS」统一数据中心的智能体助手。"
+    "你是「智造云 AI OS」统一数据中心的智能体助手。"
     "你可以调用 `query_enterprise_orders` 工具查询企业订单、客户、状态和交付进度；"
     "当用户询问订单数据、生产进度或数据概览时，请先调用该工具再回答；"
     "不要凭空编造业务数据。如果问题与本数据中心无关，请如实说明。"

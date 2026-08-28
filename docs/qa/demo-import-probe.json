@@ -15,7 +15,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 899,
+    "body_len": 883,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-sales-studio-bi.png"
   },
   {
@@ -29,7 +29,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 872,
+    "body_len": 875,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-sales-studio-customers.png"
   },
   {
@@ -43,7 +43,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 883,
+    "body_len": 884,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-sales-studio-performance.png"
   },
   {
@@ -57,7 +57,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 970,
+    "body_len": 1034,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-finance-studio-expense.png"
   },
   {
@@ -71,7 +71,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 908,
+    "body_len": 892,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-finance-studio-finance.png"
   },
   {
@@ -85,7 +85,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 898,
+    "body_len": 962,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-people-studio-permission.png"
   },
   {
@@ -99,7 +99,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 996,
+    "body_len": 1060,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-people-studio-contact.png"
   },
   {
@@ -113,7 +113,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 844,
+    "body_len": 830,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-people-studio-anniversary.png"
   },
   {
@@ -127,7 +127,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 954,
+    "body_len": 1035,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-people-studio-hr.png"
   },
   {
@@ -141,7 +141,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 917,
+    "body_len": 998,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-supply-studio-supplier.png"
   },
   {
@@ -155,7 +155,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 957,
+    "body_len": 1021,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-supply-studio-replenishment.png"
   },
   {
@@ -169,7 +169,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 946,
+    "body_len": 947,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-supply-studio-risk.png"
   },
   {
@@ -183,7 +183,7 @@
     "empty_result": false,
     "has_source": true,
     "has_error": false,
-    "body_len": 911,
+    "body_len": 912,
     "screenshot": "H:\\zhiyunAIOS\\docs\\qa\\screenshots\\demo-import\\zhiyun-service-studio-knowledge.png"
   }
 ]

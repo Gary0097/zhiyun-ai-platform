@@ -15,8 +15,8 @@ const pawappHealthIds = [
 ]
 
 export const endpoints = [
-  { id: 'qwenpaw-ui', name: '制造云 桌面', path: '/', contentType: null },
-  { id: 'zhiyun-logo', name: '制造云 Logo', path: '/api/zhiyun-logo/config', contentType: 'application/json' },
+  { id: 'qwenpaw-ui', name: '智造云 桌面', path: '/', contentType: null },
+  { id: 'zhiyun-logo', name: '智造云 Logo', path: '/api/zhiyun-logo/config', contentType: 'application/json' },
   { id: 'zhiyun-app-discovery', name: '应用发现', path: '/api/zhiyun-app-discovery/catalog', contentType: 'application/json' },
   { id: 'zhiyun-data-core', name: 'Data Core', path: '/api/zhiyun-data-core/health', contentType: 'application/json' },
   { id: 'zhiyun-audit', name: '安全审计', path: '/api/zhiyun-audit/integrity', contentType: 'application/json' },

@@ -43,7 +43,7 @@ class SeedRecordsTestBase(unittest.TestCase):
     def _seed(self) -> str:
         """生成一个小型演示企业，返回 env_id。"""
         result = ep._generate_enterprise({
-            "enterprise": "制造云科技测试",
+            "enterprise": "智造云科技测试",
             "start_date": "2026-01-02",
             "end_date": "2026-01-02",
             "scale": 5,
@@ -128,7 +128,7 @@ class TestLegacyPasswordRotation(SeedRecordsTestBase):
             "role": "member",
             "password_hash": pw_hash,
             "password_salt": salt,
-            "enterprise": "制造云",
+            "enterprise": "智造云",
             "agent_id": "agent-001",
             "data_scope": "department",
             "kb_scope": "department",
@@ -140,7 +140,7 @@ class TestLegacyPasswordRotation(SeedRecordsTestBase):
         legacy = ep.LEGACY_DEFAULT_PASSWORD
         new_default = ep.DEFAULT_PASSWORD
         ep._write_json(ep.AUTH_USERS_FILE, [self._existing_user("u001", legacy)])
-        _ = ep._sync_auth_users([self._seed_row("u001")], "制造云", env_id="env-1", data_mode="demo")
+        _ = ep._sync_auth_users([self._seed_row("u001")], "智造云", env_id="env-1", data_mode="demo")
 
         users = ep._read_auth_users()
         self.assertEqual(len(users), 1, "已存在员工不应被重复创建")
@@ -158,7 +158,7 @@ class TestLegacyPasswordRotation(SeedRecordsTestBase):
     def test_custom_password_is_not_overwritten(self):
         custom = "MyCustom@2026"
         ep._write_json(ep.AUTH_USERS_FILE, [self._existing_user("u001", custom)])
-        _ = ep._sync_auth_users([self._seed_row("u001")], "制造云")
+        _ = ep._sync_auth_users([self._seed_row("u001")], "智造云")
 
         users = ep._read_auth_users()
         self.assertEqual(len(users), 1)
@@ -192,7 +192,7 @@ class TestStartupLegacyPasswordRotation(SeedRecordsTestBase):
             "role": role,
             "password_hash": pw_hash,
             "password_salt": salt,
-            "enterprise": "制造云",
+            "enterprise": "智造云",
             "agent_id": "agent-001",
             "data_scope": "department",
             "kb_scope": "department",

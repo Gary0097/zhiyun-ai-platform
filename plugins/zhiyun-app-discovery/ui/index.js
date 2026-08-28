@@ -114,7 +114,7 @@
     return h("div", null,
       h("div", { style: { borderRadius: 12, padding: "22px 26px", marginBottom: 18, color: "#fff", background: "linear-gradient(120deg, #1749a8 0%, #1f5ed6 55%, #3d7ce4 100%)", boxShadow: "0 8px 24px rgba(23,73,168,0.25)" } },
         h("div", { style: { fontSize: 21, fontWeight: 750 } }, (hello ? hello + "，" : "") + "欢迎回来"),
-        h("div", { style: { fontSize: 12.5, opacity: 0.85, marginTop: 6 } }, (user.enterprise || "制造云") + " · " + dateText + " · 今天要从哪个应用开始？")
+        h("div", { style: { fontSize: 12.5, opacity: 0.85, marginTop: 6 } }, (user.enterprise || "智造云") + " · " + dateText + " · 今天要从哪个应用开始？")
       ),
       h("div", { style: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 } },
         stat("业务应用", bizCount, "#1f5ed6"), stat("系统组件", apps.length - bizCount, "#64748b"),

@@ -41,7 +41,7 @@ BRANDING_DIR = WORKING_DIR / "branding"
 LOGIN_CONFIG_FILE = BRANDING_DIR / "login-config.json"
 CONFIG_FILE = WORKING_DIR / "config.json"
 
-DEFAULT_ENTERPRISE = "制造云"
+DEFAULT_ENTERPRISE = "智造云"
 DEFAULT_ADMIN_USER = "admin"
 DEFAULT_ADMIN_PASSWORD = "ZhizaoYun@2026"
 # rebrand 前系统默认管理员口令，仅用于升级后向后兼容轮换。
@@ -93,7 +93,7 @@ def _login_config() -> dict[str, Any]:
 
 def _brand_name() -> str:
     cfg = _login_config()
-    return str(cfg.get("brand_name") or "制造云 AI-Agent OS").strip() or "制造云 AI-Agent OS"
+    return str(cfg.get("brand_name") or "智造云 AI-Agent OS").strip() or "智造云 AI-Agent OS"
 
 
 def _enterprise_name() -> str:

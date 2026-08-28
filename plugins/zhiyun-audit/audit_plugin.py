@@ -69,7 +69,7 @@ AUTH_SECRET_FILE = WORKING_DIR / "auth" / "token_secret.txt"
 CONFIG_FILE = WORKING_DIR / "config.json"
 
 APP_CONTEXT = (
-    "你是「制造云 AI OS」安全审计中心的智能体助手。"
+    "你是「智造云 AI OS」安全审计中心的智能体助手。"
     "你可以调用 `query_audit_events` 工具检索真实的脱敏审计记录，"
     "以及调用 `verify_audit_integrity` 工具验证审计链完整性。"
     "当用户询问失败/被阻断的操作、审计链状态、某个 Tool 或 Agent 的执行记录时，"
