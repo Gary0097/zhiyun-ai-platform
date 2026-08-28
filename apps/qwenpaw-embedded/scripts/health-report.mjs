@@ -12,6 +12,7 @@ const pawappHealthIds = [
   'zhiyun-sales-studio',
   'zhiyun-finance-studio',
   'zhiyun-people-studio',
+  'zhiyun-chanjet-hub',
 ]
 
 export const endpoints = [
@@ -27,6 +28,7 @@ export const endpoints = [
   { id: 'zhiyun-supply-studio', name: 'Supply Studio', path: '/api/zhiyun-supply-studio/health', contentType: 'application/json' },
   { id: 'zhiyun-sales-studio', name: 'Sales Studio', path: '/api/zhiyun-sales-studio/health', contentType: 'application/json' },
   { id: 'zhiyun-finance-studio', name: 'Finance Studio', path: '/api/zhiyun-finance-studio/health', contentType: 'application/json' },
+  { id: 'zhiyun-chanjet-hub', name: 'Chanjet Hub', path: '/api/zhiyun-chanjet-hub/health', contentType: 'application/json' },
   { id: 'zhiyun-people-studio', name: 'People Studio', path: '/api/zhiyun-people-studio/health', contentType: 'application/json' },
 ]
 
@@ -54,8 +56,10 @@ function validatePayload (id, payload) {
       const app = byId.get(id)
       if (app.install_status !== 'installed' || app.health !== 'available' || !app.version) return `${id}目录状态不真实`
     }
-    const capabilityIds = payload.apps.flatMap(app => app.capabilities || []).map(item => item.id)
-    if (new Set(capabilityIds).size !== 31 || capabilityIds.length !== 31) return `PRD能力台账应为31项，实际${capabilityIds.length}项`
+    const prdCapabilityIds = payload.apps.flatMap(app => (app.capabilities || []))
+      .filter(item => !String(item.id || '').startsWith('ext_'))
+      .map(item => item.id)
+    if (new Set(prdCapabilityIds).size !== 31 || prdCapabilityIds.length !== 31) return `PRD能力台账应为31项，实际${prdCapabilityIds.length}项`
     return ''
   }
   if (id === 'zhiyun-data-core') {

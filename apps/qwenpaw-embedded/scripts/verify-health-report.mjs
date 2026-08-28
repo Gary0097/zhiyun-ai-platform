@@ -18,6 +18,7 @@ function catalog () {
       { app_id: 'zhiyun-sales-studio', version: '0.1.0', install_status: 'installed', health: 'available', capabilities: [] },
       { app_id: 'zhiyun-finance-studio', version: '0.1.0', install_status: 'installed', health: 'available', capabilities: [] },
       { app_id: 'zhiyun-people-studio', version: '0.1.0', install_status: 'installed', health: 'available', capabilities: [] },
+      { app_id: 'zhiyun-chanjet-hub', version: '0.1.0', install_status: 'installed', health: 'available', capabilities: [{ id: 'ext_chanjet_fetch' }] },
       { app_id: 'zhiyun-data-core', version: '0.5.0', capabilities: [] },
       { app_id: 'zhiyun-audit', version: '1.1.1', capabilities: [] },
       { app_id: 'zhiyun-logo', version: '1.0.0', capabilities: [] },
@@ -47,6 +48,7 @@ async function scenario (overrides = {}) {
       '/api/zhiyun-sales-studio/health': { status: 'available', version: '0.1.0' },
       '/api/zhiyun-finance-studio/health': { status: 'available', version: '0.1.0' },
       '/api/zhiyun-people-studio/health': { status: 'available', version: '0.1.0' },
+      '/api/zhiyun-chanjet-hub/health': { status: 'available', version: '0.1.0' },
       ...overrides,
     }
     response.end(JSON.stringify(bodies[request.url] || {}))
@@ -72,7 +74,7 @@ const healthy = await scenario()
 assert.equal(healthy.code, 0, healthy.stderr || healthy.stdout)
 const healthyReport = JSON.parse(healthy.stdout)
 assert.equal(healthyReport.ok, true)
-assert.equal(healthyReport.passed, 13)
+assert.equal(healthyReport.passed, 14)
 
 const mismatched = await scenario({
   '/api/zhiyun-data-studio/health': { status: 'available', version: '0.6.0' },
