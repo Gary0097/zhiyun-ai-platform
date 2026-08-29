@@ -8,7 +8,7 @@ const lockPath = join(appRoot, 'qwenpaw.lock.json')
 
 export function runtimeLock () {
   const lock = JSON.parse(readFileSync(lockPath, 'utf8'))
-  if (lock.schema_version !== 1 || lock.package !== 'qwenpaw' || !/^\d+\.\d+\.\d+$/.test(lock.version)) {
+  if (lock.schema_version !== 1 || lock.package !== 'qwenpaw' || !/^\d+\.\d+\.\d+(b\d+)?$/.test(lock.version)) {
     throw new Error('qwenpaw.lock.json 缺少有效的 schema_version、package 或 version')
   }
   if (!/^[0-9a-f]{40}$/.test(lock.commit)) throw new Error('QwenPaw 必须锁定完整 Commit SHA')
@@ -42,8 +42,9 @@ function versionOf (command, cwd, env = process.env) {
 }
 
 export function matchesVersion (output, expected) {
+  const numericExpected = expected.replace(/b\d+$/, '')
   const match = String(output).match(/(?:version\s+|v)(\d+\.\d+\.\d+)/i)
-  return match?.[1] === expected
+  return match?.[1] === numericExpected
 }
 
 export function resolveRuntime ({

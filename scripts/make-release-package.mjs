@@ -29,7 +29,7 @@ const lock = JSON.parse(readFileSync(join(workDir, 'apps', 'qwenpaw-embedded', '
 const manifest = [
   'product: zhiyun-ai-os',
   `version: ${version}`,
-  'qwenpaw: 2.1.0',
+  'qwenpaw: 2.2.0b3 (Hub)',
   `locked_pawapps: ${lock.apps.length}`,
   ...lock.apps.map(a => `  - ${a.id} @ ${a.commit}`),
   'channel: online-installer',

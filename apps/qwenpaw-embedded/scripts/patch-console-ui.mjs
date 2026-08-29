@@ -13,24 +13,28 @@ const gearLogo = join(assetsRoot, 'gear-logo.png')
 const REPLACEMENTS = [
   {
     name: '文档资料下拉菜单（桌面）',
+    optional: true,
     from: 'v.length>0&&p.jsx(Gh,{menu:{items:v},children:p.jsxs(Zt,{type:"text",className:Rn.hideOnMobile,children:[i("header.resources")," ",p.jsx(b4,{})]})})',
     to: 'false&&p.jsx(Gh,{menu:{items:v},children:p.jsxs(Zt,{type:"text",className:Rn.hideOnMobile,children:[i("header.resources")," ",p.jsx(b4,{})]})})',
     patched: 'false&&p.jsx(Gh,{menu:{items:v}',
   },
   {
     name: 'GitHub 按钮',
+    optional: true,
     from: 'p.jsx(Ci,{title:i("header.github"),children:p.jsx(Zt,{type:"text",icon:p.jsx(she,{}),onClick:()=>L(rge),className:Rn.hideOnMobile,children:i("header.github")})})',
     to: 'false&&p.jsx(Ci,{title:i("header.github"),children:p.jsx(Zt,{type:"text",icon:p.jsx(she,{}),onClick:()=>L(rge),className:Rn.hideOnMobile,children:i("header.github")})})',
     patched: 'false&&p.jsx(Ci,{title:i("header.github")',
   },
   {
     name: '文档资料下拉菜单（移动端）',
+    optional: true,
     from: 'p.jsx(Gh,{menu:{items:y},placement:"bottomRight",children:p.jsx(Zt,{type:"text",icon:p.jsx(ihe,{}),className:Rn.showOnMobile,title:i("header.resources")})})',
     to: 'false&&p.jsx(Gh,{menu:{items:y},placement:"bottomRight",children:p.jsx(Zt,{type:"text",icon:p.jsx(ihe,{}),className:Rn.showOnMobile,title:i("header.resources")})})',
     patched: 'false&&p.jsx(Gh,{menu:{items:y}',
   },
   {
     name: '欢迎页智能体头像（online.svg → qwenpaw.svg）',
+    optional: true,
     from: 'avatar:"/online.svg"',
     to: 'avatar:"/qwenpaw.svg"',
     patched: 'avatar:"/qwenpaw.svg"',
@@ -300,15 +304,16 @@ for (const r of REPLACEMENTS) {
   if (idx !== -1) {
     content = content.slice(0, idx) + r.to + content.slice(idx + r.from.length)
   } else {
-    missing.push(r.name)
+    if (!r.optional) missing.push(r.name)
   }
 }
 
 const branded = applyBrand(content)
 
 if (checkMode) {
-  if (missing.length) {
-    console.error('[patch-console-ui] 检查失败：console bundle 中未找到以下目标：' + missing.join('、') + '。bundle 可能已随上游升级更新。')
+  if (missing.filter(name => !REPLACEMENTS.find(r => r.name === name)?.optional).length) {
+    const required = missing.filter(name => !REPLACEMENTS.find(r => r.name === name)?.optional)
+    console.error('[patch-console-ui] 检查失败：console bundle 中未找到以下必需目标：' + required.join('、') + '。bundle 可能已随上游升级更新。')
     process.exit(1)
   }
   if (branded !== content) {
