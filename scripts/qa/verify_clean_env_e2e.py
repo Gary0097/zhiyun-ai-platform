@@ -52,7 +52,7 @@ def main() -> int:
     # 0) 服务版本
     try:
         code, version = call("/api/version")
-        check("服务启动与版本", code == 200 and version.get("version", "").startswith("2.2"), version)
+        check("服务启动与版本", code == 200 and version.get("version") == "2.1.0", version)
     except Exception as exc:  # noqa: BLE001
         check("服务启动与版本", False, exc)
 
