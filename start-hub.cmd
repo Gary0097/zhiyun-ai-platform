@@ -13,5 +13,5 @@ ipconfig | findstr /i "IPv4"
 echo.
 
 set PYTHONIOENCODING=utf-8
-"%~dp0apps\qwenpaw-embedded\runtime\qwenpaw\venv\Scripts\qwenpaw.exe" hub --host 0.0.0.0 --port 8000 --force-public --config "%~dp0hub.yaml"
+"%~dp0apps\qwenpaw-embedded\runtime\qwenpaw-hub\venv\Scripts\qwenpaw.exe" hub --host 0.0.0.0 --port 8000 --force-public --config "%~dp0hub.yaml"
 pause

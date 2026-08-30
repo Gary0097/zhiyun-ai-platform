@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, readdirSync, rmSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -95,6 +95,22 @@ function fail (message) {
 
 function hashOf (value) {
   return createHash('sha1').update(value).digest('hex').slice(0, 8)
+}
+
+// uv 以硬链接方式安装包文件，直接 writeFileSync 会连 uv 缓存里的原始副本一起改写，
+// 之后任何重装都会把“已定制”的旧内容带回来（曾导致 制造云 旧品牌在重装后复活）。
+// 写入前若发现硬链接（nlink>1），先断链再落盘。
+function writeIndependent (file, data) {
+  try {
+    if (statSync(file).nlink > 1) {
+      const previous = readFileSync(file)
+      rmSync(file)
+      writeFileSync(file, previous)
+    }
+  } catch {
+    // 文件不存在或无法 stat 时按普通写入处理
+  }
+  writeFileSync(file, data)
 }
 
 function workingDir () {
@@ -240,7 +256,7 @@ function ensureCacheBust (consoleDir, bundleContent) {
   if (!re.test(html)) return { changed: false }
   const newHtml = html.replace(re, '$1$2')
   if (newHtml === html) return { changed: false }
-  writeFileSync(htmlPath, newHtml, 'utf8')
+  writeIndependent(htmlPath, newHtml)
   return { changed: true }
 }
 
@@ -253,12 +269,12 @@ function syncConsoleLogo (consoleDir) {
   }
   const logo = selectedLogo()
   const svgTarget = join(consoleDir, 'qwenpaw.svg')
-  writeFileSync(svgTarget, logoSvg(logo), 'utf8')
+  writeIndependent(svgTarget, logoSvg(logo))
   const htmlPath = join(consoleDir, 'index.html')
   const html = readFileSync(htmlPath, 'utf8')
   const nextHtml = html.replace(/<link rel="icon"[^>]*\/>/, '<link rel="icon" type="image/svg+xml" href="/qwenpaw.svg" />')
   if (nextHtml !== html) {
-    writeFileSync(htmlPath, nextHtml, 'utf8')
+    writeIndependent(htmlPath, nextHtml)
   }
   console.log(`Console favicon 与聊天智能体头像已同步为${logo.source}。`)
 }
@@ -276,7 +292,7 @@ function suppressConsoleTour (consoleDir) {
     warn('未找到 </head>，无法注入引导抑制样式。')
     return
   }
-  writeFileSync(htmlPath, nextHtml, 'utf8')
+  writeIndependent(htmlPath, nextHtml)
   console.log('Console 新手引导弹层已抑制（style#zy-tour-suppress 注入）。')
 }
 
@@ -368,7 +384,7 @@ if (checkMode) {
 content = branded
 
 if (content !== original) {
-  writeFileSync(bundlePath, content, 'utf8')
+  writeIndependent(bundlePath, content)
   console.log('Console UI 定制已应用：' + bundlePath)
 } else {
   console.log('Console UI 定制已是最新状态：' + bundlePath)
@@ -390,7 +406,7 @@ for (const file of collectBrandableFiles(consoleDir)) {
   if (!cc.includes('QwenPaw')) continue
   const out = applyBrand(cc)
   if (out !== cc) {
-    writeFileSync(file, out, 'utf8')
+    writeIndependent(file, out)
     extraBranded++
   }
 }
