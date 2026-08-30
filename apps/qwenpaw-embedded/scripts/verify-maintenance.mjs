@@ -27,8 +27,8 @@ try {
   assert.equal(existsSync(join(temp, 'branding', 'logo.json')), false)
 
   const workspace = join(temp, 'workspaces', 'default')
-  const disabledIds = ['zhiyun-orders', 'cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']
-  for (const pluginId of [...disabledIds, 'user-kept-plugin']) {
+  const disabledIds = ['zhiyun-orders', 'cospaw', 'ai_decision', 'team_chat']
+  for (const pluginId of [...disabledIds, 'qwenpaw-creator', 'user-kept-plugin']) {
     mkdirSync(join(temp, 'plugins', pluginId), { recursive: true })
   }
   mkdirSync(workspace, { recursive: true })
@@ -43,6 +43,7 @@ try {
     assert.equal(existsSync(join(temp, 'plugins', pluginId)), false, `${pluginId} should be disabled`)
   }
   assert.ok(existsSync(join(temp, 'plugins', 'user-kept-plugin')), 'unknown user plugins must be preserved')
+  assert.ok(existsSync(join(temp, 'plugins', 'qwenpaw-creator')), 'qwenpaw-creator is a controlled product app and must NOT be quarantined')
   const backups = readdirSync(join(temp, 'disabled_plugins'))
   for (const pluginId of disabledIds) {
     assert.ok(backups.some(name => name.startsWith(`${pluginId}-`)), `${pluginId} backup is missing`)

@@ -30,6 +30,8 @@ export const endpoints = [
   { id: 'zhiyun-finance-studio', name: 'Finance Studio', path: '/api/zhiyun-finance-studio/health', contentType: 'application/json' },
   { id: 'zhiyun-chanjet-hub', name: 'Chanjet Hub', path: '/api/zhiyun-chanjet-hub/health', contentType: 'application/json' },
   { id: 'zhiyun-people-studio', name: 'People Studio', path: '/api/zhiyun-people-studio/health', contentType: 'application/json' },
+  { id: 'qwenpaw-creator', name: '视频压缩工坊（QwenPaw Creator）', path: '/api/qwenpaw-creator/capabilities', contentType: 'application/json' },
+  { id: 'agent-kanban', name: 'Agent 看板', path: '/api/agent-kanban/issues', contentType: 'application/json' },
 ]
 
 if (checkOnly) {

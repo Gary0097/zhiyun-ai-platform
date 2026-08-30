@@ -740,6 +740,54 @@
           "delivery_status": "completed"
         }
       ]
+    },
+    {
+      "app_id": "qwenpaw-creator",
+      "name": "视频压缩工坊（QwenPaw Creator）",
+      "aliases": [
+        "视频压缩",
+        "压缩视频",
+        "视频转码",
+        "减小视频体积",
+        "H.265",
+        "HEVC",
+        "spjyys",
+        "creator"
+      ],
+      "version": "1.2.0",
+      "category": "productivity",
+      "install_status": "installed",
+      "route": "/apps/qwenpaw-creator",
+      "repository_url": "",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "health": "available",
+      "capabilities": []
+    },
+    {
+      "app_id": "agent-kanban",
+      "name": "Agent 看板",
+      "aliases": [
+        "看板",
+        "任务板",
+        "问题跟踪",
+        "智能体任务",
+        "kanban",
+        "agent 看板"
+      ],
+      "version": "0.1.0",
+      "category": "productivity",
+      "install_status": "installed",
+      "route": "/apps/agent-kanban",
+      "repository_url": "",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "health": "available",
+      "capabilities": []
     }
   ]
 }

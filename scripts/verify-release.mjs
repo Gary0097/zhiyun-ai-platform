@@ -60,9 +60,11 @@ assert.ok(sync.includes("rmSync(join(staging, '.git')"), 'sync must remove Git m
 assert.ok(sync.includes('AI_OS_OFFLINE') && sync.includes("'bundle', 'create'"), 'sync must support verified PawApp offline bundles')
 const cleanup = readFileSync(join(scripts, 'cleanup-legacy.mjs'), 'utf8')
 assert.ok(cleanup.includes('QWENPAW_WORKING_DIR') && cleanup.includes('COPAW_WORKING_DIR'), 'cleanup must follow the QwenPaw working directory contract')
-for (const pluginId of ['cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']) {
+for (const pluginId of ['cospaw', 'ai_decision', 'team_chat']) {
   assert.ok(cleanup.includes(pluginId), `cleanup must quarantine incompatible plugin: ${pluginId}`)
 }
+assert.ok(cleanup.includes('转为受控产品应用'), 'cleanup must document that qwenpaw-creator is now a controlled product app')
+assert.ok(existsSync(join(root, 'plugins', 'qwenpaw-creator', 'backend', 'main.py')), 'controlled creator app is missing')
 assert.ok(existsSync(join(root, 'plugins', 'zhiyun-logo', 'assets', 'default-logo.png')), 'packaged default logo is missing')
 
 const allowedToolTypes = new Set(['file', 'internal', 'network', 'shell'])
@@ -138,7 +140,7 @@ for (const app of pawapps.apps) {
 }
 
 const python = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3')
-for (const plugin of ['zhiyun-app-discovery', 'zhiyun-audit', 'zhiyun-data-core', 'zhiyun-auth']) {
+for (const plugin of ['zhiyun-app-discovery', 'zhiyun-audit', 'zhiyun-data-core', 'zhiyun-auth', 'qwenpaw-creator']) {
   const result = spawnSync(python, ['-m', 'unittest', 'discover', '-s', join(root, 'plugins', plugin), '-p', 'test*.py', '-v'], { cwd: join(root, 'plugins', plugin), stdio: 'inherit' })
   assert.equal(result.status, 0, `Python tests failed: ${plugin}`)
 }

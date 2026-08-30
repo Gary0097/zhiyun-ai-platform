@@ -13,7 +13,8 @@ and the applicable progress ledger before changing product behavior.
   system plugins, launchers, the shared Workspace contract, and version locks.
 - Data Studio and Order Studio are independent repositories. Update their lock
   entries here only after the corresponding external commit is available.
-- Creator is reference-only and must not be loaded as a product application.
+- QwenPaw Creator ships as a controlled product app (video-compression edition,
+  `plugins/qwenpaw-creator`); other upstream Creator capabilities stay out of scope.
 - Do not edit generated installations under
   `apps/qwenpaw-embedded/runtime/pawapps`; change the owning repository instead.
 

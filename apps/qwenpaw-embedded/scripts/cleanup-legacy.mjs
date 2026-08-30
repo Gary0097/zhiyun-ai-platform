@@ -16,7 +16,8 @@ const QWENPAW_HOME = workingDir()
 const PLUGINS_DIR = join(QWENPAW_HOME, 'plugins')
 const DISABLED_DIR = join(QWENPAW_HOME, 'disabled_plugins')
 const LEGACY_PLUGINS = ['zhiyun-brand', 'zhiyun-orders']
-const INCOMPATIBLE_PLUGINS = ['cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']
+// qwenpaw-creator 已于 2026-08-30 转为受控产品应用（视频压缩版，见 plugins/qwenpaw-creator），不再隔离
+const INCOMPATIBLE_PLUGINS = ['cospaw', 'ai_decision', 'team_chat']
 const LEGACY_TOOLS = [
   'enterprise_platform_status', 'enterprise_query_orders', 'enterprise_query_inventory',
   'enterprise_query_customers', 'enterprise_search_knowledge', 'orders_query', 'orders_delivery_risk',
