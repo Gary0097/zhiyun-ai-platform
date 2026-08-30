@@ -51,8 +51,8 @@ if (!existsSync(secretFile)) {
 const brandingFile = join(workspace, 'branding', 'login-config.json')
 if (!existsSync(brandingFile)) {
   writeFileSync(brandingFile, JSON.stringify({
-    brand_name: '智造云 AI-OS',
-    enterprise: '智造云',
+    brand_name: '灵泽万川智造云',
+    enterprise: '灵泽万川智造云',
     background_image: '',
     background_data_url: ''
   }, null, 2) + '\n', 'utf8')

@@ -58,7 +58,7 @@ def generate_session_file(rng: random.Random, day: date, session_id: str) -> dic
     n_turns = rng.randint(2, 8)
 
     system_prompt = (
-        f"你是智造云 AI-OS 的智能体助手。当前会话：{session_id}。"
+        f"你是灵泽万川智造云 的智能体助手。当前会话：{session_id}。"
         "请基于真实数据回答业务问题，不要编造。"
     )
     messages.append({

@@ -849,7 +849,7 @@ def _resolve_default_agent(app_id: str, agents: list[dict[str, Any]]) -> str:
 
 def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
     template = str(params.get("template") or DEFAULT_TEMPLATE)
-    enterprise = str(params.get("enterprise") or "智造云科技").strip() or "智造云科技"
+    enterprise = str(params.get("enterprise") or "灵泽万川智造云科技").strip() or "灵泽万川智造云科技"
     start = _parse_date(params.get("start_date") or DEFAULT_START)
     end = _parse_date(params.get("end_date") or _today())
     if start > end:
@@ -1061,7 +1061,7 @@ def _generate_enterprise(params: dict[str, Any]) -> dict[str, Any]:
 
 class SeedRequest(BaseModel):
     template: str = Field(default=DEFAULT_TEMPLATE, max_length=80)
-    enterprise: str = Field(default="智造云科技", max_length=80)
+    enterprise: str = Field(default="灵泽万川智造云科技", max_length=80)
     start_date: str = Field(default=DEFAULT_START)
     end_date: str | None = None
     scale: int = Field(default=50, ge=5, le=200)
@@ -1346,7 +1346,7 @@ async def config(authorization: str = Header(default="")) -> dict[str, Any]:
         "database": str(DB),
         "defaults": {
             "template": DEFAULT_TEMPLATE,
-            "enterprise": "智造云科技",
+            "enterprise": "灵泽万川智造云科技",
             "start_date": DEFAULT_START,
             "end_date": _today(),
             "scale": 50,

@@ -108,8 +108,8 @@
         h("div", { style: section },
           h("div", { style: { fontWeight: 650, marginBottom: 6 } }, "登录企业名称 / 品牌名称"),
           h("div", { style: { display: "flex", gap: 10 } },
-            h("input", { value: enterprise, onChange: function (e) { setEnterprise(e.target.value); }, placeholder: "企业名称（如：智造云）", style: inputStyle }),
-            h("input", { value: brandName, onChange: function (e) { setBrandName(e.target.value); }, placeholder: "品牌名称（如：智造云 AI-OS）", style: inputStyle })
+            h("input", { value: enterprise, onChange: function (e) { setEnterprise(e.target.value); }, placeholder: "企业名称（如：灵泽万川智造云）", style: inputStyle }),
+            h("input", { value: brandName, onChange: function (e) { setBrandName(e.target.value); }, placeholder: "品牌名称（如：灵泽万川智造云）", style: inputStyle })
           )
         ),
         h("div", { style: section },
@@ -257,7 +257,7 @@
     var usersState = React.useState(false); var usersOpen = usersState[0]; var setUsersOpen = usersState[1];
 
     function loadConfig() {
-      request("/config").then(setCfg).catch(function () { setCfg({ brand_name: "智造云 AI-OS", enterprise: "智造云", background_data_url: "" }); });
+      request("/config").then(setCfg).catch(function () { setCfg({ brand_name: "灵泽万川智造云", enterprise: "灵泽万川智造云", background_data_url: "" }); });
       logoRequest("/zhiyun-logo/config").then(function (body) { if (body && body.logo) setLogo(body.logo); }).catch(function () {});
     }
     React.useEffect(function () {
@@ -289,8 +289,8 @@
       setUser(null); setPassword(""); setStatus("locked");
     }
 
-    var brand = (cfg && cfg.brand_name) || "智造云 AI-OS";
-    var enterprise = (cfg && cfg.enterprise) || "智造云";
+    var brand = (cfg && cfg.brand_name) || "灵泽万川智造云";
+    var enterprise = (cfg && cfg.enterprise) || "灵泽万川智造云";
     var bg = (cfg && cfg.background_data_url) || "";
 
     if (status === "loading") return null;
@@ -378,7 +378,7 @@
               "账号由企业管理员分配；忘记密码请联系系统管理员重置")
           ),
           h("div", { style: { marginTop: 34, fontSize: 11.5, color: "#b3bdcc", textAlign: "center" } },
-            "© 2026 " + enterprise + " · 智造云 AI-OS")
+            "© 2026 " + enterprise + " · 灵泽万川智造云")
         )
       )
     );

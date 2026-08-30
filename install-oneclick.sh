@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# 制造云 AI-OS 一键安装（Linux，在线模式）
+# 灵泽万川智造云 一键安装（Linux，在线模式）
 set -e
 cd "$(dirname "$0")"
 
 echo "============================================"
-echo "  制造云 AI-OS 一键安装（在线模式）"
+echo "  灵泽万川智造云 一键安装（在线模式）"
 echo "============================================"
 
 command -v node >/dev/null 2>&1 || { echo "[错误] 未检测到 Node.js（需要 20 或以上）：https://nodejs.org"; exit 1; }

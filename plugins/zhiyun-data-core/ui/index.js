@@ -362,7 +362,7 @@
             h(antd.Upload, { accept: ".xlsx,.csv", showUploadList: false, beforeUpload: upload }, h(antd.Button, { type: selected === "orders" ? "default" : "primary" }, "导入 Excel/CSV")),
             selected === "orders" || selected === "production" ? h(antd.Button, { type: "primary", onClick: function () { simulate(selected); }, loading: loading }, selected === "orders" ? "生成 20 条演示订单" : "生成 20 条演示生产数据") : null)
         ),
-        h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：集中管理所有智造云应用共享的数据、字段、导入批次、演示数据、健康检查和安全备份。"), h("ol", null, h("li", null, "用“导入 Excel/CSV”导入正式业务数据并核对字段。"), h("li", null, "可在“数据环境”中切换演示/正式；生成的演示数据可按批次撤销。"), h("li", null, "新增或调整字段请在字段管理中完成，核心字段受保护。"), h("li", null, "恢复备份前必须确认，系统会先创建安全备份。"))) }] }),
+        h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：集中管理所有灵泽万川智造云应用共享的数据、字段、导入批次、演示数据、健康检查和安全备份。"), h("ol", null, h("li", null, "用“导入 Excel/CSV”导入正式业务数据并核对字段。"), h("li", null, "可在“数据环境”中切换演示/正式；生成的演示数据可按批次撤销。"), h("li", null, "新增或调整字段请在字段管理中完成，核心字段受保护。"), h("li", null, "恢复备份前必须确认，系统会先创建安全备份。"))) }] }),
         error ? h(antd.Alert, { type: "error", showIcon: true, message: error, style: { marginBottom: 16 } }) : null,
         h(antd.Row, { gutter: [12, 12], style: { marginBottom: 16 } },
           [["数据表", entities.length], ["当前记录", current.record_count || 0], ["演示数据", current.demo_count || 0], ["正式数据", current.production_count || 0]].map(function (item) {

@@ -65,7 +65,7 @@ CONFIG_FILE = WORKING_DIR / "config.json"
 # knows it is running inside the App Center and that it may call ``find_paw_apps``
 # before answering.  Kept in sync with the registered tool below.
 APP_CONTEXT = (
-    "你是「智造云 AI OS」应用与项目中心的智能体助手。"
+    "你是「灵泽万川智造云 AI OS」应用与项目中心的智能体助手。"
     "你可以调用 `find_paw_apps` 工具检索真实已登记的本机 PawApp，"
     "当用户询问“用什么应用/谁来完成某业务/某能力在哪”时，请先调用该工具，"
     "再基于返回的真实应用给出明确推荐；不要凭空编造应用名称。"
@@ -93,7 +93,7 @@ def _app_context(app_id: str) -> str:
     if not app:
         return APP_CONTEXT
     name = app.get("name") or app_id
-    lines = ["你是「智造云 AI OS」中「{name}」应用的智能体助手。".format(name=name)]
+    lines = ["你是「灵泽万川智造云 AI OS」中「{name}」应用的智能体助手。".format(name=name)]
     caps = app.get("capabilities") or []
     if caps:
         names = [c.get("name") for c in caps if c.get("name")]

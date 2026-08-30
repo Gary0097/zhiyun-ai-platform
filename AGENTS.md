@@ -1,4 +1,4 @@
-# 制造云 AI-OS Development Rules
+# 灵泽万川智造云 Development Rules
 
 These rules apply to the entire repository. Read the PRD in
 `docs/product/AI-OS-PRD-V6.4-QwenPaw-PawApps.md`, the architecture documents,
