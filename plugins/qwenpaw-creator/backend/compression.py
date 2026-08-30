@@ -120,14 +120,36 @@ def _run_capture(cmd: list[str]) -> str:
         return ""
 
 
+_GPU_PROBE_CACHE: dict[str, bool] = {}
+
+
+def _gpu_encoder_works(ffmpeg: str, encoder: str) -> bool:
+    """用 1 帧空源试编码验证硬件编码器真实可用（含驱动/设备）。"""
+    if encoder in _GPU_PROBE_CACHE:
+        return _GPU_PROBE_CACHE[encoder]
+    try:
+        result = subprocess.run(
+            [ffmpeg, "-hide_banner", "-loglevel", "error",
+             "-f", "lavfi", "-i", "nullsrc=s=64x64:d=0.1",
+             "-frames:v", "1", "-c:v", encoder, "-f", "null", "-"],
+            capture_output=True, text=True, timeout=15)
+        ok = result.returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        ok = False
+    _GPU_PROBE_CACHE[encoder] = ok
+    return ok
+
+
 def detect_environment() -> dict:
     ffmpeg = find_tool("ffmpeg")
     ffprobe = find_tool("ffprobe")
     encoders_text = _run_capture([ffmpeg, "-hide_banner", "-encoders"]).lower() if ffmpeg else ""
+    # GPU 家族不能只看“编译进 ffmpeg”，还要硬件/驱动真实可用：
+    # 用 1 帧空源试编码验证（结果进程内缓存，capabilities 只探测一次）。
     gpu_families = {
-        "nvenc": "nvenc" in encoders_text,
-        "amf": "_amf" in encoders_text,
-        "qsv": "_qsv" in encoders_text,
+        "nvenc": "nvenc" in encoders_text and _gpu_encoder_works(ffmpeg, "hevc_nvenc"),
+        "amf": "_amf" in encoders_text and _gpu_encoder_works(ffmpeg, "hevc_amf"),
+        "qsv": "_qsv" in encoders_text and _gpu_encoder_works(ffmpeg, "hevc_qsv"),
     }
 
     def available(label: str, key: str) -> bool:

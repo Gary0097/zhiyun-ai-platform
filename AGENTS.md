@@ -15,6 +15,9 @@ and the applicable progress ledger before changing product behavior.
   entries here only after the corresponding external commit is available.
 - QwenPaw Creator ships as a controlled product app (video-compression edition,
   `plugins/qwenpaw-creator`); other upstream Creator capabilities stay out of scope.
+- Agent Kanban is vendored the same way (`plugins/agent-kanban`): the offline-USB
+  channel must ship both official apps from this tree, so they share the system
+  plugin install path instead of an external PawApp commit lock.
 - Do not edit generated installations under
   `apps/qwenpaw-embedded/runtime/pawapps`; change the owning repository instead.
 

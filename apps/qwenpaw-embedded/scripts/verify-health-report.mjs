@@ -49,7 +49,7 @@ async function scenario (overrides = {}) {
       '/api/zhiyun-finance-studio/health': { status: 'available', version: '0.1.0' },
       '/api/zhiyun-people-studio/health': { status: 'available', version: '0.1.0' },
       '/api/zhiyun-chanjet-hub/health': { status: 'available', version: '0.1.0' },
-      '/api/qwenpaw-creator/capabilities': { name: 'QwenPaw Creator · 视频压缩', environment: { ready: true } },
+      '/api/qwenpaw-creator/capabilities': { name: 'QwenPaw Creator · 视频压缩', presets: ['极速', '高速', '均衡', '高画质'], environment: { ready: true, encoders: [{ key: 'CPU H.264 / AVC (libx264)', label: 'CPU H.264 / AVC (libx264)', available: true }] } },
       '/api/agent-kanban/issues': { issues: [] },
       ...overrides,
     }

@@ -28,7 +28,7 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict
 
-from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, Header, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
@@ -38,6 +38,7 @@ BACKEND_DIR = Path(__file__).resolve().parent
 if str(BACKEND_DIR) not in sys.path:  # 官方 Creator 同款布局：绝对导入
     sys.path.insert(0, str(BACKEND_DIR))
 
+from creator_auth_guard import verify_token_user  # 唯一模块名，避免与 Studio 的 auth_guard 在共享 sys.path 上冲突
 from compression import (
     AUDIO_MODES,
     ENCODERS,
@@ -68,7 +69,23 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 router = APIRouter()
 
-# file_id -> 登记信息；job_id -> 任务状态（内存 + 启动时落盘的注册表）
+
+def require_user(authorization: str = Header(default="")) -> dict:
+    """全部变更类路由要求有效 Bearer Token（与 Studio 鉴权同源）。"""
+    user = verify_token_user(authorization)
+    if user is None:
+        raise HTTPException(status_code=401, detail="未登录或凭证已过期")
+    return user
+
+
+def require_admin(user: dict = Depends(require_user)) -> dict:
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="仅系统管理员可登记本地路径")
+    return user
+
+JOBS_FILE = DATA_DIR / "jobs.json"
+
+# file_id -> 登记信息；job_id -> 任务状态（均持久化到 data/ 注册表）
 _FILES: Dict[str, Dict[str, Any]] = {}
 _JOBS: Dict[str, Dict[str, Any]] = {}
 _RUNNING: Dict[str, "asyncio.Task"] = {}
@@ -89,7 +106,29 @@ def _save_registry() -> None:
         json.dumps(_FILES, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _public_job(job: Dict[str, Any]) -> Dict[str, Any]:
+    """剥离下划线私有键（如 _proc 进程对象），供 API 响应与持久化使用。"""
+    return {k: v for k, v in job.items() if not k.startswith("_")}
+
+
+def _save_jobs() -> None:
+    JOBS_FILE.write_text(
+        json.dumps({jid: _public_job(j) for jid, j in _JOBS.items()},
+                   ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 _load_registry()
+try:
+    _saved_jobs = json.loads(JOBS_FILE.read_text(encoding="utf-8"))
+    for job_id, job in _saved_jobs.items():
+        if job.get("status") == "running":
+            job["status"] = "interrupted"  # 服务重启时进程已不存在
+            job["error"] = "服务重启导致任务中断，请重新发起"
+        if Path(job.get("output_path", "")).is_file() and job.get("status") == "done":
+            job["output_size"] = Path(job["output_path"]).stat().st_size
+        _JOBS[job_id] = job
+except (OSError, json.JSONDecodeError, TypeError):
+    pass
 
 
 @router.get("/capabilities")
@@ -108,7 +147,7 @@ async def capabilities() -> Dict[str, Any]:
 
 async def _register_input(path: Path, display_name: str, source: str) -> Dict[str, Any]:
     file_id = f"f-{uuid.uuid4().hex[:10]}"
-    info = probe_media_info(path)
+    info = await asyncio.to_thread(probe_media_info, path)  # 避免阻塞事件循环
     entry = {
         "file_id": file_id,
         "name": display_name,
@@ -124,7 +163,7 @@ async def _register_input(path: Path, display_name: str, source: str) -> Dict[st
 
 
 @router.post("/files")
-async def upload_file(file: UploadFile) -> Dict[str, Any]:
+async def upload_file(file: UploadFile, user: dict = Depends(require_user)) -> Dict[str, Any]:
     suffix = Path(file.filename or "video.mp4").suffix.lower()
     if suffix not in VIDEO_EXTENSIONS:
         raise HTTPException(status_code=422, detail=f"不支持的视频格式：{suffix}")
@@ -145,7 +184,7 @@ class LocalFileRequest(BaseModel):
 
 
 @router.post("/files/local")
-async def register_local(body: LocalFileRequest) -> Dict[str, Any]:
+async def register_local(body: LocalFileRequest, user: dict = Depends(require_admin)) -> Dict[str, Any]:
     path = Path(body.path).expanduser().resolve()
     if not path.is_file():
         raise HTTPException(status_code=404, detail=f"文件不存在：{path}")
@@ -155,12 +194,12 @@ async def register_local(body: LocalFileRequest) -> Dict[str, Any]:
 
 
 @router.get("/files")
-async def list_files() -> Dict[str, Any]:
+async def list_files(user: dict = Depends(require_user)) -> Dict[str, Any]:
     return {"files": sorted(_FILES.values(), key=lambda e: e["registered_at"], reverse=True)}
 
 
 @router.delete("/files/{file_id}")
-async def delete_file(file_id: str) -> Dict[str, Any]:
+async def delete_file(file_id: str, user: dict = Depends(require_user)) -> Dict[str, Any]:
     entry = _FILES.pop(file_id, None)
     if entry is None:
         raise HTTPException(status_code=404, detail="文件不存在")
@@ -188,7 +227,7 @@ class CompressRequest(BaseModel):
 
 
 @router.post("/compress")
-async def compress(body: CompressRequest) -> Dict[str, Any]:
+async def compress(body: CompressRequest, user: dict = Depends(require_user)) -> Dict[str, Any]:
     entry = _FILES.get(body.file_id)
     if entry is None:
         raise HTTPException(status_code=404, detail="输入文件不存在")
@@ -232,6 +271,7 @@ async def compress(body: CompressRequest) -> Dict[str, Any]:
         "command": [],
     }
     _JOBS[job_id] = job
+    _save_jobs()
     _RUNNING[job_id] = asyncio.create_task(_run_job(job_id, source, target, settings))
     return {"job_id": job_id}
 
@@ -251,6 +291,7 @@ async def _run_job(job_id: str, source: Path, target: Path,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
+        job["_proc"] = proc  # 供 /cancel 直接终止子进程
         job["pid"] = proc.pid
         duration_us = max(job.get("duration") or 0, 0) * 1_000_000
         assert proc.stdout is not None
@@ -265,14 +306,20 @@ async def _run_job(job_id: str, source: Path, target: Path,
             job["status"] = "done"
             job["progress"] = 1.0
             job["output_size"] = target.stat().st_size
+            _save_jobs()
             logger.info("[creator] 压缩任务 %s 完成：%s（%.1f%% 体积）",
                         job_id, target.name,
                         100 * job["output_size"] / max(1, job["source_size"]))
         else:
             job["status"] = "failed"
             job["error"] = stderr.strip()[-800:] or f"ffmpeg 退出码 {returncode}"
+            _save_jobs()
             logger.warning("[creator] 压缩任务 %s 失败：%s", job_id, job["error"][:200])
     except asyncio.CancelledError:
+        # 双保险：cancel 端点没来得及杀进程时，这里兜底终止
+        proc = job.get("_proc")
+        if proc is not None and proc.returncode is None:
+            proc.kill()
         job["status"] = "cancelled"
         raise
     except Exception as exc:  # noqa: BLE001
@@ -280,12 +327,14 @@ async def _run_job(job_id: str, source: Path, target: Path,
         job["error"] = str(exc)
         logger.exception("[creator] 压缩任务 %s 异常", job_id)
     finally:
+        job.pop("_proc", None)
         _RUNNING.pop(job_id, None)
+        _save_jobs()
 
 
 @router.get("/jobs")
-async def list_jobs() -> Dict[str, Any]:
-    return {"jobs": sorted(_JOBS.values(),
+async def list_jobs(user: dict = Depends(require_user)) -> Dict[str, Any]:
+    return {"jobs": sorted((_public_job(j) for j in _JOBS.values()),
                            key=lambda j: j["created_at"], reverse=True)}
 
 
@@ -294,20 +343,29 @@ async def job_status(job_id: str) -> Dict[str, Any]:
     job = _JOBS.get(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="任务不存在")
-    return job
+    return _public_job(job)
 
 
 @router.post("/jobs/{job_id}/cancel")
-async def cancel_job(job_id: str) -> Dict[str, Any]:
+async def cancel_job(job_id: str, user: dict = Depends(require_user)) -> Dict[str, Any]:
     task = _RUNNING.get(job_id)
     if task is None:
         raise HTTPException(status_code=409, detail="任务不在运行中")
+    # 先杀 ffmpeg 子进程再取消 Python 任务，避免转码继续占用 CPU/GPU 写盘
+    job = _JOBS.get(job_id) or {}
+    proc = job.get("_proc")
+    if proc is not None and proc.returncode is None:
+        proc.terminate()
+        try:
+            await asyncio.wait_for(proc.wait(), timeout=5)
+        except asyncio.TimeoutError:
+            proc.kill()
     task.cancel()
     return {"cancelling": job_id}
 
 
 @router.get("/jobs/{job_id}/download")
-async def download_output(job_id: str) -> FileResponse:
+async def download_output(job_id: str, user: dict = Depends(require_user)) -> FileResponse:
     job = _JOBS.get(job_id)
     if job is None or job.get("status") != "done":
         raise HTTPException(status_code=404, detail="产物不存在或任务未完成")

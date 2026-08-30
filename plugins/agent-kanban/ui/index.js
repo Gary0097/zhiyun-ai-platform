@@ -182,15 +182,24 @@
 
     // Restore inline code
     for (var i = 0; i < inlineCodes.length; i++) {
-      html = html.replace("\x00INLINECODE" + i + "\x00", '<code style="background:#f1f5f9;padding:2px 4px;border-radius:3px;font-family:monospace;font-size:11px">' + inlineCodes[i] + '</code>');
+      html = html.replace("\x00INLINECODE" + i + "\x00", '<code style="background:#f1f5f9;padding:2px 4px;border-radius:3px;font-family:monospace;font-size:11px">' + escapeHtml(inlineCodes[i]) + '</code>');
     }
 
     // Restore code blocks
     for (var i = 0; i < codeBlocks.length; i++) {
-      html = html.replace("\x00CODEBLOCK" + i + "\x00", '<pre style="background:#f1f5f9;padding:8px;border-radius:4px;margin:4px 0;overflow-x:auto"><code>' + codeBlocks[i].trim() + '</code></pre>');
+      html = html.replace("\x00CODEBLOCK" + i + "\x00", '<pre style="background:#f1f5f9;padding:8px;border-radius:4px;margin:4px 0;overflow-x:auto"><code>' + escapeHtml(codeBlocks[i].trim()) + '</code></pre>');
     }
 
     return html;
+  }
+
+  function escapeHtml(text) {
+    return String(text == null ? "" : text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   // ── Issue card ──────────────────────────────────────────────────────────

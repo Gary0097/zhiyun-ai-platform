@@ -64,6 +64,17 @@ function validatePayload (id, payload) {
     if (new Set(prdCapabilityIds).size !== 31 || prdCapabilityIds.length !== 31) return `PRD能力台账应为31项，实际${prdCapabilityIds.length}项`
     return ''
   }
+  if (id === 'qwenpaw-creator') {
+    if (payload?.name !== 'QwenPaw Creator · 视频压缩') return 'Creator能力端点名称不符'
+    if (payload?.environment?.ready !== true) return 'Creator未就绪（ffmpeg缺失）'
+    if (!Array.isArray(payload?.environment?.encoders) || payload.environment.encoders.length === 0) return 'Creator未提供编码器列表'
+    if (!Array.isArray(payload?.presets) || payload.presets.length === 0) return 'Creator缺少压缩预设'
+    return ''
+  }
+  if (id === 'agent-kanban') {
+    if (!Array.isArray(payload?.issues)) return 'Kanban看板缺少issues数组'
+    return ''
+  }
   if (id === 'zhiyun-data-core') {
     return payload?.status === 'available' && Number.isInteger(payload?.schema_version) && payload?.schema_version >= 2 && payload?.integrity === 'ok'
       ? '' : 'Data Core状态或schema_version异常'

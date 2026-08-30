@@ -124,7 +124,26 @@
       }).then(refresh).catch(function (e) { setErr(e.message); });
     }
 
-    function cancel(jobId) {
+    function downloadJob(jobId, name) {
+    fetch(getApiUrl(BASE + "/jobs/" + jobId + "/download"), { headers: authHeaders() })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = name || "output.mp4";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      })
+      .catch(function (e) { setErr("下载失败：" + e.message); });
+  }
+
+  function cancel(jobId) {
       api("/jobs/" + jobId + "/cancel", { method: "POST" }).then(refresh).catch(function (e) { setErr(e.message); });
     }
 
@@ -195,7 +214,7 @@
                 h("span", { style: { color: j.status === "failed" ? "#b42318" : "#5b6472" } },
                   j.status === "running" ? "压缩中 " + pct + "%" : j.status === "done" ? "完成" : j.status === "failed" ? "失败：" + (j.error || "").slice(0, 120) : j.status),
                 j.status === "running" ? h("button", { onClick: function () { cancel(j.job_id); }, style: { padding: "2px 10px", fontSize: 12, borderRadius: 5, border: "1px solid #d0d5dd", background: "#fff", cursor: "pointer" } }, "取消") : null,
-                j.status === "done" ? h("a", { href: RAW_BASE + "/jobs/" + j.job_id + "/download", style: { padding: "2px 10px", fontSize: 12, borderRadius: 5, background: "#12b76a", color: "#fff", textDecoration: "none" } }, "⬇ 下载") : null));
+                j.status === "done" ? h("button", { onClick: function () { downloadJob(j.job_id, j.output_name); }, style: { padding: "2px 10px", fontSize: 12, borderRadius: 5, background: "#12b76a", color: "#fff", border: "none", cursor: "pointer" } }, "⬇ 下载") : null));
           }))));
   }
 

@@ -26,7 +26,7 @@ except ImportError:  # pragma: no cover - Windows fallback (single-process).
     fcntl = None
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
@@ -34,6 +34,59 @@ from qwenpaw.pawapp import PawApp, get_ctx
 from qwenpaw.pawapp.task import SSEChannel
 
 logger = logging.getLogger(__name__)
+
+
+# ── 统一登录鉴权（与 zhiyun-auth / Creator 同源的本地 HMAC 校验） ──────────
+def _auth_dir_file(*parts):
+    import os as _os
+    env = _os.environ.get("QWENPAW_WORKING_DIR", "")
+    if env:
+        base = Path(env)
+    else:
+        try:
+            from qwenpaw.constant import WORKING_DIR
+            base = Path(WORKING_DIR)
+        except Exception:  # noqa: BLE001
+            base = Path.cwd()
+    return base.joinpath(*parts)
+
+
+def _verify_token_user(authorization: str):
+    import base64 as _b64
+    import hashlib as _hl
+    import hmac as _hmac
+    import time as _time
+
+    token = authorization[7:].strip() if authorization.lower().startswith("bearer ") else ""
+    if not token:
+        return None
+    try:
+        secret = _auth_dir_file("auth", "token_secret.txt").read_text(encoding="utf-8").strip()
+        if not secret:
+            return None
+        b64, sig = token.split(".", 1)
+        expected = _hmac.new(secret.encode("utf-8"), b64.encode("ascii"), _hl.sha256).hexdigest()
+        if not _hmac.compare_digest(sig, expected):
+            return None
+        import json as _json
+        payload = _json.loads(_b64.urlsafe_b64decode(b64.encode("ascii")))
+        if int(payload.get("exp", 0)) < int(_time.time()):
+            return None
+        username = str(payload.get("sub") or "")
+        users = _json.loads(_auth_dir_file("auth", "users.json").read_text(encoding="utf-8"))
+        user = next((u for u in users if u.get("username") == username), None)
+        if not user or not user.get("active", True):
+            return None
+        return user
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def _require_user(authorization: str = Header(default="")) -> Dict[str, Any]:
+    user = _verify_token_user(authorization)
+    if user is None:
+        raise HTTPException(status_code=401, detail="未登录或凭证已过期")
+    return user
 
 # ── Storage (shared by HTTP routes and agent tools) ──────────────────
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -347,6 +400,10 @@ async def patch_issue(
             issue["title"] = body.title
         if body.description is not None:
             issue["description"] = body.description
+        # 用户编辑视为人工介入：清除失败计数与自动调度暂停
+        issue.pop("consecutive_failures", None)
+        issue.pop("dispatch_paused", None)
+        issue.pop("error", None)
 
         # Apply assignee first so the status check below sees it.
         old_assignee = issue.get("assignee") or ""
@@ -413,6 +470,15 @@ async def delete_issue(
     ctx=Depends(get_ctx),
 ) -> Dict[str, Any]:
     """Remove an issue from the board and its session data."""
+    # 运行中的任务先走受控停止：取消并等待 Agent 执行结束，避免删除后仍在后台
+    # 消耗 Token / 产生工具副作用。
+    running_task = _RUNNING.get(issue_id)
+    if running_task is not None and not running_task.done():
+        running_task.cancel()
+        try:
+            await asyncio.wait_for(asyncio.shield(running_task), timeout=10)
+        except (asyncio.TimeoutError, asyncio.CancelledError, Exception):  # noqa: BLE001
+            pass
     issue = None
     async with _txn():
         issues = _read_all()
@@ -615,13 +681,22 @@ async def _execute_run(
         # Clear in-memory trace (result is in session now)
         _LIVE_TRACE.pop(issue_id, None)
         if error:
+            failures = int(issue.get("consecutive_failures", 0) or 0) + 1
+            issue["consecutive_failures"] = failures
+            if failures >= 3:
+                # 连续失败达到上限：留在 todo 但标记停调，等用户编辑/重置后再试，
+                # 避免模型故障时无限重跑消耗 Token、重复外呼副作用。
+                issue["dispatch_paused"] = True
+                issue["error"] = f"{error}（连续失败 {failures} 次，已暂停自动调度；编辑该 issue 可重新排队）"
+                logger.warning("[kanban] issue %s 连续失败 %d 次，暂停自动调度", issue_id, failures)
+            else:
+                issue["error"] = error
             issue["status"] = "todo"
-            # Only store error in issue
-            issue["error"] = error
         else:
             issue["status"] = "review"
-            # Remove error if previous run had one
             issue.pop("error", None)
+            issue.pop("consecutive_failures", None)
+            issue.pop("dispatch_paused", None)
         issue["updated_at"] = _now()
         _write_all(issues)
 
@@ -990,8 +1065,8 @@ async def list_kanban_approvals() -> Dict[str, Any]:
 
 
 @router.post("/approvals/{request_id}/approve")
-async def approve_kanban(request_id: str) -> Dict[str, Any]:
-    """Approve a pending tool execution from the kanban UI.
+async def approve_kanban(request_id: str, user: Dict[str, Any] = Depends(_require_user)) -> Dict[str, Any]:
+    """Approve a pending tool execution from the kanban UI (需登录).
 
     Looks up the pending approval by *request_id* and resolves
     it using its own ``root_session_id``, so the frontend does
@@ -1023,8 +1098,8 @@ async def approve_kanban(request_id: str) -> Dict[str, Any]:
 
 
 @router.post("/approvals/{request_id}/deny")
-async def deny_kanban(request_id: str) -> Dict[str, Any]:
-    """Deny a pending tool execution from the kanban UI."""
+async def deny_kanban(request_id: str, user: Dict[str, Any] = Depends(_require_user)) -> Dict[str, Any]:
+    """Deny a pending tool execution from the kanban UI (需登录)."""
     try:
         from qwenpaw.app.approvals import get_approval_service
         from qwenpaw.security.tool_guard.approval import (
@@ -1149,6 +1224,8 @@ async def _dispatch_loop() -> None:
                 if not assignee:
                     continue
                 status = issue.get("status")
+                if issue.get("dispatch_paused"):
+                    continue  # 连续失败暂停中，等用户编辑后重置
                 # Collect in_progress (orphaned) and todo tasks
                 if status in ("in_progress", "todo"):
                     agent_tasks.setdefault(assignee, []).append(issue)
@@ -1257,6 +1334,16 @@ async def init_kanban():
         )
     except Exception:  # noqa: BLE001
         logger.exception("[kanban] Failed to load issues from disk")
+        # 先把不可读文件备份成 issues.corrupt-<时间戳>.json，再以空缓存启动：
+        # 否则下一次看板变更会把空缓存原子写回，彻底覆盖掉本可恢复的数据。
+        try:
+            stamp = time.strftime("%Y%m%d-%H%M%S")
+            backup = _DATA_DIR / f"issues.corrupt-{stamp}.json"
+            if _DATA_FILE.is_file():
+                _DATA_FILE.replace(backup)
+                logger.warning("[kanban] 原始看板数据已备份：%s", backup)
+        except OSError:
+            logger.exception("[kanban] 备份不可读看板数据失败")
         _ISSUES_CACHE = []
 
     # Start dispatcher
