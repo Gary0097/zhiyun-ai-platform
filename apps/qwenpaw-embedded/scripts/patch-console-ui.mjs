@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, writeFileSync, readdirSync, rmSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, readdirSync, renameSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -99,18 +99,13 @@ function hashOf (value) {
 
 // uv 以硬链接方式安装包文件，直接 writeFileSync 会连 uv 缓存里的原始副本一起改写，
 // 之后任何重装都会把“已定制”的旧内容带回来（曾导致 制造云 旧品牌在重装后复活）。
-// 写入前若发现硬链接（nlink>1），先断链再落盘。
+// Windows 上 Node 的 statSync().nlink 不可靠（硬链接也可能报 1），无法据此
+// 判断，因此一律走“临时文件 + rename 原子替换”：每次写入都落成新文件，
+// 从物理上保证绝不写穿 uv 缓存里的硬链接副本。
 function writeIndependent (file, data) {
-  try {
-    if (statSync(file).nlink > 1) {
-      const previous = readFileSync(file)
-      rmSync(file)
-      writeFileSync(file, previous)
-    }
-  } catch {
-    // 文件不存在或无法 stat 时按普通写入处理
-  }
-  writeFileSync(file, data)
+  const tmp = file + '.zy-tmp'
+  writeFileSync(tmp, data)
+  renameSync(tmp, file)
 }
 
 function workingDir () {
