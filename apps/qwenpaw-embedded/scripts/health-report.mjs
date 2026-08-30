@@ -30,6 +30,8 @@ export const endpoints = [
   { id: 'zhiyun-finance-studio', name: 'Finance Studio', path: '/api/zhiyun-finance-studio/health', contentType: 'application/json' },
   { id: 'zhiyun-chanjet-hub', name: 'Chanjet Hub', path: '/api/zhiyun-chanjet-hub/health', contentType: 'application/json' },
   { id: 'zhiyun-people-studio', name: 'People Studio', path: '/api/zhiyun-people-studio/health', contentType: 'application/json' },
+  { id: 'qwenpaw-creator', name: '视频压缩工坊（QwenPaw Creator）', path: '/api/qwenpaw-creator/capabilities', contentType: 'application/json' },
+  { id: 'agent-kanban', name: 'Agent 看板', path: '/api/agent-kanban/issues', contentType: 'application/json' },
 ]
 
 if (checkOnly) {
@@ -60,6 +62,17 @@ function validatePayload (id, payload) {
       .filter(item => !String(item.id || '').startsWith('ext_'))
       .map(item => item.id)
     if (new Set(prdCapabilityIds).size !== 31 || prdCapabilityIds.length !== 31) return `PRD能力台账应为31项，实际${prdCapabilityIds.length}项`
+    return ''
+  }
+  if (id === 'qwenpaw-creator') {
+    if (payload?.name !== 'QwenPaw Creator · 视频压缩') return 'Creator能力端点名称不符'
+    if (payload?.environment?.ready !== true) return 'Creator未就绪（ffmpeg缺失）'
+    if (!Array.isArray(payload?.environment?.encoders) || payload.environment.encoders.length === 0) return 'Creator未提供编码器列表'
+    if (!Array.isArray(payload?.presets) || payload.presets.length === 0) return 'Creator缺少压缩预设'
+    return ''
+  }
+  if (id === 'agent-kanban') {
+    if (!Array.isArray(payload?.issues)) return 'Kanban看板缺少issues数组'
     return ''
   }
   if (id === 'zhiyun-data-core') {

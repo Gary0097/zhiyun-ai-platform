@@ -2,10 +2,7 @@
 setlocal
 cd /d "%~dp0"
 rem U盘离线包内置的便携 Node 优先于系统 Node（不存在时无影响）
-if exist "extras
-ode
-ode.exe" set "PATH=%~dp0extras
-ode;%PATH%"
+if exist "extras\node\node.exe" set "PATH=%~dp0extras\node;%PATH%"
 if not exist "apps\qwenpaw-embedded\runtime\qwenpaw\venv\Scripts\qwenpaw.exe" if not exist "apps\qwenpaw-embedded\runtime\qwenpaw\Scripts\qwenpaw.exe" (
   where qwenpaw >nul 2>nul
   if errorlevel 1 (
