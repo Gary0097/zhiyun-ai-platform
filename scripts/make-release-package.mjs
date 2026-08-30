@@ -81,14 +81,17 @@ if (offline) {
     console.warn('警告：未找到 node.exe，离线包将要求目标机器自行安装 Node.js 20+。')
   }
   // 3) U盘一键安装入口（自动优先使用内嵌 node）
+  // cmd 在中文系统默认 GBK 代码页，UTF-8 中文 echo 会被误读成乱码命令
+  // （曾出现 '锟藉姩...' not recognized），因此批处理输出一律用 ASCII。
   writeFileSync(join(workDir, 'install-usb.cmd'), [
     '@echo off',
     'chcp 65001 >nul',
-    'title 灵泽万川智造云 AI-OS — U盘离线一键安装',
+    'title Lingze Wanchuan Zhizaoyun AI-OS - USB Offline Setup',
     'cd /d "%~dp0"',
     'echo ==============================================',
-    'echo   灵泽万川智造云 AI-OS — U盘离线安装',
-    'echo   安装完成后自动启动并打开浏览器',
+    'echo   Lingze Wanchuan Zhizaoyun AI-OS - USB offline install',
+    'echo   Auto-starts and opens the browser when finished.',
+    'echo   (Chinese guide: see USB-INSTALL.md)',
     'echo ==============================================',
     'echo.',
     'if exist "extras\\node\\node.exe" set "PATH=%~dp0extras\\node;%PATH%"',
