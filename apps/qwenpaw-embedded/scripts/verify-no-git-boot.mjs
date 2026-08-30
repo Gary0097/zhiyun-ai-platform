@@ -13,18 +13,26 @@ import { pawappsAllMaterialized } from './pawapp-materialized.mjs'
 
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
 
-// 受控 PATH：只保留系统目录，剔除一切 git（Windows 与 POSIX 皆适用）
+// 受控 PATH：剔除一切含 git 的目录；若 git 仍藏在保留目录里
+// （如 ubuntu runner 的 /usr/bin），降级为空目录 PATH——子进程只需要
+// 绝对路径 node 与（不存在的）git，无需其他系统命令。
 function gitlessPath () {
+  const sep = process.platform === 'win32' ? ';' : ':'
   const keep = (process.env.PATH || '')
-    .split(process.platform === 'win32' ? ';' : ':')
+    .split(sep)
     .filter(entry => entry && !/git/i.test(entry))
+  let candidate
   if (process.platform === 'win32') {
-    return [join(process.env.SystemRoot || 'C:\\Windows', 'System32'), ...keep.filter(e => !/nodejs/i.test(e)), dirname(process.execPath)].join(';')
+    candidate = [join(process.env.SystemRoot || 'C:\Windows', 'System32'), ...keep.filter(e => !/nodejs/i.test(e)), dirname(process.execPath)].join(';')
+  } else {
+    candidate = keep.join(':')
   }
-  return ['/usr/bin:/bin', ...keep].join(':')
+  if (spawnSync('git', ['--version'], { env: { ...process.env, PATH: candidate } }).status === 0) {
+    return mkdtempSync(join(tmpdir(), 'gitless-path-'))
+  }
+  return candidate
 }
 const NO_GIT_ENV = { ...process.env, PATH: gitlessPath() }
-assert.ok(!spawnSync('git', ['--version'], { env: NO_GIT_ENV }).status === true || true, '环境构造')
 assert.notEqual(spawnSync('git', ['--version'], { env: NO_GIT_ENV }).status, 0, '受控 PATH 中不应存在 git')
 
 function fixture (materialized) {
