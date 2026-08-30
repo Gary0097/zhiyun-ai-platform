@@ -97,6 +97,7 @@ const commands = [
   [process.execPath, [join(scripts, 'set-logo.mjs'), '--check']],
   [process.execPath, [join(scripts, 'sync-pawapps.mjs'), '--check']],
   [process.execPath, [join(scripts, 'verify-deployment.mjs')]],
+  [process.execPath, [join(scripts, 'verify-no-git-boot.mjs')]],
   [process.execPath, [join(scripts, 'verify-runtime.mjs')]],
   [process.execPath, [join(scripts, 'verify-pawapp-offline.mjs')]],
   [process.execPath, [join(scripts, 'verify-maintenance.mjs')]],

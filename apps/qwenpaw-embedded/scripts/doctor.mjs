@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process'
 import { accessSync, constants, existsSync, mkdirSync, readFileSync } from 'node:fs'
 import net from 'node:net'
 import { dirname, join } from 'node:path'
+import { pawappsAllMaterialized } from './pawapp-materialized.mjs'
 import { fileURLToPath } from 'node:url'
 import { resolveRuntime, runtimeEnvironment } from './runtime-env.mjs'
 
@@ -43,21 +44,8 @@ record('node', nodeMajor >= 18 ? 'pass' : 'fail', `Node.js ${process.versions.no
 
 // Git 只在需要在线拉取 PawApp 时才是必需的（QwenPaw 官方安装本体是 pip 包，
 // 不依赖 git）。U 盘离线包随身携带全部锁定 PawApp，此时缺 git 只降级为提醒。
-function pawappsAllMaterialized () {
-  try {
-    const lock = JSON.parse(readFileSync(join(appRoot, 'pawapps.lock.json'), 'utf8'))
-    return (lock.apps || []).every(app => {
-      const target = join(appRoot, 'runtime', 'pawapps', app.install_dir)
-      const marker = join(target, '.pawapp-commit')
-      try {
-        return existsSync(marker) && readFileSync(marker, 'utf8').trim() === app.commit
-          && existsSync(join(target, 'plugin.json')) && !existsSync(join(target, '.git'))
-      } catch { return false }
-    })
-  } catch { return false }
-}
 const git = command('git', ['--version'])
-const gitOptional = pawappsAllMaterialized()
+const gitOptional = pawappsAllMaterialized(appRoot)
 record(
   'git',
   git.ok ? 'pass' : (gitOptional ? 'warn' : 'fail'),
