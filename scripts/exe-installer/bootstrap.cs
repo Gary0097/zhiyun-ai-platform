@@ -39,21 +39,29 @@ class Installer
             return;
         }
 
-        // 支持 --dir <目录> 静默安装（无界面，便于企业批量部署与自动化测试）
-        string[] args = Environment.GetCommandLineArgs();
-        int dirIdx = Array.IndexOf(args, "--dir");
-        if (dirIdx >= 0 && dirIdx + 1 < args.Length)
+        try
         {
-            Install(payload, args[dirIdx + 1]);
-            return;
-        }
+            // 支持 --dir <目录> 静默安装（无界面，便于企业批量部署与自动化测试）
+            string[] args = Environment.GetCommandLineArgs();
+            int dirIdx = Array.IndexOf(args, "--dir");
+            if (dirIdx >= 0 && dirIdx + 1 < args.Length)
+            {
+                Install(payload, args[dirIdx + 1]);
+                return;
+            }
 
-        using (var dialog = new FolderBrowserDialog())
+            using (var dialog = new FolderBrowserDialog())
+            {
+                dialog.Description = "选择安装目录（需要约 2.5 GB 可用空间，路径建议不含空格）";
+                dialog.ShowNewFolderButton = true;
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+                Install(payload, dialog.SelectedPath);
+            }
+        }
+        finally
         {
-            dialog.Description = "选择安装目录（需要约 2.5 GB 可用空间，路径建议不含空格）";
-            dialog.ShowNewFolderButton = true;
-            if (dialog.ShowDialog() != DialogResult.OK) return;
-            Install(payload, dialog.SelectedPath);
+            // 无论成功、失败还是用户取消，都清掉临时载荷，避免多 GB 副本滞留 %TEMP%
+            try { if (payload != null) File.Delete(payload); } catch { }
         }
     }
 
@@ -116,29 +124,48 @@ class Installer
         if (thread.IsAlive) thread.Join(2000);
     }
 
-    // 在自身文件中查找标记：返回提取出的临时 zip 路径
+    // 在自身文件中流式定位标记并把载荷复制到临时 zip：
+    // 不整包读入内存（数百 MB 的 EXE 全量加载会造成严重内存峰值/分配失败）。
     static string FindPayload()
     {
         string self = Assembly.GetExecutingAssembly().Location;
-        byte[] selfBytes = File.ReadAllBytes(self);
         int markerLen = PayloadMarker.Length;
-        int idx = -1;
-        // 从文件中段之后开始找（前段是 .NET 头，正常不含该标记）
-        for (int i = 64; i <= selfBytes.Length - markerLen; i++)
-        {
-            bool match = true;
-            for (int j = 0; j < markerLen; j++)
-            {
-                if (selfBytes[i + j] != PayloadMarker[j]) { match = false; break; }
-            }
-            if (match) { idx = i; break; }
-        }
-        if (idx < 0) return null;
         string tempZip = Path.Combine(Path.GetTempPath(), "zhizaoyun-aos-payload-" +
             DateTime.Now.ToString("yyyyMMddHHmmss") + ".zip");
-        using (var output = new FileStream(tempZip, FileMode.Create, FileAccess.Write))
+
+        const int chunk = 1 << 20; // 1 MB
+        byte[] buffer = new byte[chunk + markerLen];
+        long searchPos = 64; // 跳过 .NET 头
+        long payloadOffset = -1;
+        using (var input = new FileStream(self, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
-            output.Write(selfBytes, idx + markerLen, selfBytes.Length - idx - markerLen);
+            while (payloadOffset < 0)
+            {
+                input.Position = searchPos;
+                int read = input.Read(buffer, 0, buffer.Length);
+                if (read < markerLen) break;
+                int limit = read - markerLen;
+                for (int i = 0; i <= limit; i++)
+                {
+                    bool match = true;
+                    for (int j = 0; j < markerLen; j++)
+                    {
+                        if (buffer[i + j] != PayloadMarker[j]) { match = false; break; }
+                    }
+                    if (match) { payloadOffset = searchPos + i + markerLen; break; }
+                }
+                if (payloadOffset < 0) searchPos += Math.Max(1, read - markerLen + 1);
+            }
+            if (payloadOffset < 0) return null;
+
+            input.Position = payloadOffset;
+            using (var output = new FileStream(tempZip, FileMode.Create, FileAccess.Write))
+            {
+                byte[] copy = new byte[chunk];
+                int n;
+                while ((n = input.Read(copy, 0, copy.Length)) > 0)
+                    output.Write(copy, 0, n);
+            }
         }
         return tempZip;
     }

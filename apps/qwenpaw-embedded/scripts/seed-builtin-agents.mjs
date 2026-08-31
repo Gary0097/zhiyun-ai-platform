@@ -8,7 +8,9 @@ import { fileURLToPath } from 'node:url'
 const appRoot = process.env.AI_OS_EMBEDDED_ROOT
   ? resolve(process.env.AI_OS_EMBEDDED_ROOT)
   : join(dirname(fileURLToPath(import.meta.url)), '..')
-const seedsRoot = join(appRoot, 'agent-seeds')
+// 业务数字员工种子由 zhiyun-enterprise-seeder 系统插件持有（版本随 plugin.json），
+// 本脚本只负责把它装进工作区，不拥有业务内容本身。
+const seedsRoot = join(appRoot, '..', '..', 'plugins', 'zhiyun-enterprise-seeder', 'agent_seeds')
 const workspacesRoot = join(appRoot, 'workspace', 'workspaces')
 const configFile = join(appRoot, 'workspace', 'config.json')
 
