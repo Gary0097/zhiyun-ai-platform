@@ -87,7 +87,13 @@ try {
   }
 }
 rmSync(buildDir, { recursive: true, force: true })
-const sha256 = createHash('sha256').update(readFileSync(exePath)).digest('hex')
+const sha256 = await new Promise((resolve, reject) => {
+  const hash = createHash('sha256')
+  const input = createReadStream(exePath)
+  input.on('data', chunk => hash.update(chunk))
+  input.on('end', () => resolve(hash.digest('hex')))
+  input.on('error', reject)
+})
 writeFileSync(`${exePath}.sha256`, `${sha256}  ${exeName}\n`, 'utf8')
 const sizeMb = (statSync(exePath).size / 1024 / 1024).toFixed(2)
 console.log(`EXE 安装程序构建完成：dist/${exeName}（${sizeMb} MB）`)

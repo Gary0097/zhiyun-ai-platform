@@ -41,12 +41,13 @@ class Installer
 
         try
         {
-            // 支持 --dir <目录> 静默安装（无界面，便于企业批量部署与自动化测试）
+            // 支持 --dir <目录> 静默安装：无任何 UI，不创建窗口或消息循环，
+            // 进度写入 <目标目录>\install-log.txt，退出码 0=成功 2=失败。
             string[] args = Environment.GetCommandLineArgs();
             int dirIdx = Array.IndexOf(args, "--dir");
             if (dirIdx >= 0 && dirIdx + 1 < args.Length)
             {
-                Install(payload, args[dirIdx + 1]);
+                SilentInstall(payload, args[dirIdx + 1]);
                 return;
             }
 
@@ -65,6 +66,49 @@ class Installer
         }
     }
 
+    // 目标根目录前缀（兼容盘符根：GetFullPath("H:\") 已以分隔符结尾，不重复追加）
+    static string TargetRoot(string targetDir)
+    {
+        string root = Path.GetFullPath(targetDir);
+        if (!root.EndsWith(Path.DirectorySeparatorChar.ToString()) &&
+            !root.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
+            root += Path.DirectorySeparatorChar;
+        return root;
+    }
+
+    static void SilentInstall(string payloadPath, string targetDir)
+    {
+        string logPath = Path.Combine(targetDir, "install-log.txt");
+        Directory.CreateDirectory(targetDir);
+        using (var log = new StreamWriter(
+            new FileStream(Path.Combine(targetDir, "install-log.txt"), FileMode.Create, FileAccess.Write, FileShare.Read)))
+        {
+            try
+            {
+                int files = ExtractTo(payloadPath, targetDir, null, null);
+                log.WriteLine("done: " + files + " files");
+                log.Flush();
+                var installer = Path.Combine(targetDir, "install-usb.cmd");
+                if (File.Exists(installer))
+                {
+                    log.WriteLine("launching install-usb.cmd");
+                    log.Flush();
+                    Process.Start(new ProcessStartInfo("cmd.exe", "/c \"" + installer + "\"")
+                    {
+                        WorkingDirectory = targetDir,
+                        UseShellExecute = false
+                    });
+                }
+                Environment.ExitCode = 0;
+            }
+            catch (Exception ex)
+            {
+                log.WriteLine("failed: " + ex.Message);
+                Environment.ExitCode = 2;
+            }
+        }
+    }
+
     static void Install(string payloadPath, string targetDir)
     {
         Directory.CreateDirectory(targetDir);
@@ -73,31 +117,7 @@ class Installer
         {
             try
             {
-                using (var archive = ZipFile.OpenRead(payloadPath))
-                {
-                    int total = archive.Entries.Count, done = 0;
-                    foreach (var entry in archive.Entries)
-                    {
-                        string rel = entry.FullName;
-                        if (rel.StartsWith("./")) rel = rel.Substring(2);
-                        if (string.IsNullOrEmpty(rel)) continue;
-                        string dest = Path.Combine(targetDir, rel.Replace('/', Path.DirectorySeparatorChar));
-                        // 防路径穿越
-                        string fullDest = Path.GetFullPath(dest);
-                        if (!fullDest.StartsWith(Path.GetFullPath(targetDir) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
-                            continue;
-                        if (string.IsNullOrEmpty(entry.Name)) // 目录项
-                        {
-                            Directory.CreateDirectory(fullDest);
-                            continue;
-                        }
-                        Directory.CreateDirectory(Path.GetDirectoryName(fullDest));
-                        entry.ExtractToFile(fullDest, true);
-                        done++;
-                        if (done % 200 == 0)
-                            progress.SetProgress(done, total, entry.Name);
-                    }
-                }
+                ExtractTo(payloadPath, targetDir, progress, null);
                 progress.Done();
                 var installer = Path.Combine(targetDir, "install-usb.cmd");
                 if (File.Exists(installer))
@@ -122,6 +142,38 @@ class Installer
         thread.Start();
         Application.Run(progress);
         if (thread.IsAlive) thread.Join(2000);
+    }
+
+    // 公共解压：防路径穿越（兼容盘符根），progress 可为 null（静默模式）
+    static int ExtractTo(string payloadPath, string targetDir, ProgressForm progress, object unused)
+    {
+        string root = TargetRoot(targetDir);
+        int files = 0;
+        using (var archive = ZipFile.OpenRead(payloadPath))
+        {
+            int total = archive.Entries.Count, done = 0;
+            foreach (var entry in archive.Entries)
+            {
+                string rel = entry.FullName;
+                if (rel.StartsWith("./")) rel = rel.Substring(2);
+                if (string.IsNullOrEmpty(rel)) continue;
+                string dest = Path.Combine(targetDir, rel.Replace('/', Path.DirectorySeparatorChar));
+                string fullDest = Path.GetFullPath(dest);
+                if (!fullDest.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+                    continue;
+                if (string.IsNullOrEmpty(entry.Name)) // 目录项
+                {
+                    Directory.CreateDirectory(fullDest);
+                    continue;
+                }
+                Directory.CreateDirectory(Path.GetDirectoryName(fullDest));
+                entry.ExtractToFile(fullDest, true);
+                done++; files++;
+                if (progress != null && done % 200 == 0)
+                    progress.SetProgress(done, total, entry.Name);
+            }
+        }
+        return files;
     }
 
     // 在自身文件中流式定位标记并把载荷复制到临时 zip：

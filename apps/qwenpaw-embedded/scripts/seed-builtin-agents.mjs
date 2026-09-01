@@ -45,12 +45,12 @@ for (const entry of readdirSync(seedsRoot, { withFileTypes: true })) {
   }
 
   mkdirSync(target, { recursive: true })
+  // agent.json 是“种子完成”标记（上方的就绪检查以它为准），必须最后写入：
+  // 中途中断时目录不完整，下次启动会重新安装而不是带着残缺跳过。
   for (const f of ['AGENTS.md', 'PROFILE.md', 'SOUL.md', 'skill.json']) {
     const src = join(seedDir, f)
     if (existsSync(src)) cpSync(src, join(target, f))
   }
-  agent.workspace_dir = target
-  writeFileSync(join(target, 'agent.json'), JSON.stringify(agent, null, 2), 'utf8')
   for (const part of ['skills', 'files', 'memory']) {
     const src = join(seedDir, part)
     if (existsSync(src)) cpSync(src, join(target, part), { recursive: true })
@@ -60,6 +60,8 @@ for (const entry of readdirSync(seedsRoot, { withFileTypes: true })) {
   const jobs = join(target, 'jobs.json')
   if (!existsSync(jobs)) writeFileSync(jobs, JSON.stringify({ version: 1, jobs: [] }, null, 2), 'utf8')
 
+  agent.workspace_dir = target
+  writeFileSync(join(target, 'agent.json'), JSON.stringify(agent, null, 2), 'utf8') // 完成标记
   if (!config.agents.profiles[id]) {
     config.agents.profiles[id] = {
       id,
