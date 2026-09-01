@@ -24,7 +24,7 @@ from uuid import uuid4
 
 import httpx
 from agentscope.middleware import MiddlewareBase
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, Header, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from qwenpaw.plugins.api import PluginApi
@@ -46,6 +46,21 @@ try:
 except ImportError:
     from audit_store import list_events, persist, redact, verify_integrity
     from risk_policy import assess
+
+
+def _working_dir() -> Path:
+    try:
+        from qwenpaw.constant import WORKING_DIR
+
+        return Path(WORKING_DIR)
+    except ImportError:
+        return Path(os.environ.get("QWENPAW_WORKING_DIR", Path.home() / ".qwenpaw"))
+
+
+WORKING_DIR = _working_dir()
+AUTH_DIR = WORKING_DIR / "auth"
+USERS_FILE = AUTH_DIR / "users.json"
+SECRET_FILE = AUTH_DIR / "token_secret.txt"
 
 
 class HighRiskOperationBlocked(RuntimeError):
@@ -95,6 +110,82 @@ class AgentChatRequest(BaseModel):
     )
 
 
+# ---------------------------------------------------------------------------
+# 登录鉴权（与 zhiyun-auth 共用同一 token secret 与用户文件）
+# ---------------------------------------------------------------------------
+
+
+def _read_json(path: Path, default: Any) -> Any:
+    try:
+        if path.is_file():
+            return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        pass
+    return default
+
+
+def _find_user(username: str) -> dict[str, Any] | None:
+    data = _read_json(USERS_FILE, [])
+    if isinstance(data, list):
+        users = data
+    elif isinstance(data, dict):
+        users = data.get("users") or []
+    else:
+        users = []
+    for user in users:
+        if user.get("username") == username:
+            return user
+    return None
+
+
+def _token_secret() -> str:
+    try:
+        if SECRET_FILE.is_file():
+            val = SECRET_FILE.read_text(encoding="utf-8").strip()
+            if val:
+                return val
+    except OSError:
+        pass
+    secret = secrets.token_hex(32)
+    SECRET_FILE.parent.mkdir(parents=True, exist_ok=True)
+    SECRET_FILE.write_text(secret, encoding="utf-8")
+    return secret
+
+
+def _bearer_token(authorization: str) -> str:
+    if authorization.startswith("Bearer "):
+        return authorization[7:]
+    return ""
+
+
+def _verify_token(token: str) -> str | None:
+    try:
+        b64, sig = token.split(".", 1)
+        secret = _token_secret()
+        if not secret:
+            return None
+        expected = hmac.new(secret.encode("utf-8"), b64.encode("ascii"), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected):
+            return None
+        payload = json.loads(base64.urlsafe_b64decode(b64.encode("ascii")))
+        if int(payload.get("exp", 0)) < int(time.time()):
+            return None
+        username = str(payload.get("sub") or "")
+        user = _find_user(username)
+        if not user or not user.get("active", True):
+            return None
+        return username
+    except (ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def _require_auth(authorization: str) -> str:
+    username = _verify_token(_bearer_token(authorization))
+    if not username:
+        raise HTTPException(status_code=401, detail="登录已失效，请重新登录")
+    return username
+
+
 @router.get("/integrity")
 async def integrity() -> dict[str, Any]:
     return verify_integrity(_workspace())
@@ -105,8 +196,10 @@ async def events(
     status: str | None = Query(default=None),
     tool_name: str | None = Query(default=None, max_length=200),
     limit: int = Query(default=100, ge=1, le=500),
+    authorization: str = Header(default=""),
 ) -> dict[str, Any]:
     """Return redacted audit metadata without Tool inputs or model reasoning."""
+    _require_auth(authorization)
     try:
         records = list_events(_workspace(), status=status, tool_name=tool_name, limit=limit)
     except ValueError as exc:

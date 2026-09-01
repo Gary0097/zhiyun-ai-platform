@@ -64,9 +64,17 @@
     );
   }
 
-  function getJson(path) {
-    return Q.host.fetch(path).then(function (response) {
-      if (!response.ok) throw new Error("HTTP " + response.status);
+  function readToken() {
+    try { return window.localStorage.getItem("zhiyun_token") || ""; } catch (e) { return ""; }
+  }
+  function request(path, options) {
+    var opts = Object.assign({}, options || {});
+    var token = readToken();
+    opts.headers = Object.assign({}, (options && options.headers) || {}, token ? { Authorization: "Bearer " + token } : {});
+    return Q.host.fetch(path, opts).then(function (response) {
+      if (!response.ok) return response.json().catch(function () { return {}; }).then(function (body) {
+        throw new Error(body.detail || ("HTTP " + response.status));
+      });
       return response.json();
     });
   }
@@ -177,7 +185,7 @@
       var text = String(value || "").trim();
       if (!text) { setResults([]); return; }
       setLoading(true); setError("");
-      getJson("/zhiyun-app-discovery/search?q=" + encodeURIComponent(text) + "&limit=12")
+      request("/zhiyun-app-discovery/search?q=" + encodeURIComponent(text) + "&limit=12")
         .then(function (data) { setResults(data.results || []); })
         .catch(function () { setError("应用索引暂时不可用，请检查插件状态。"); })
         .finally(function () { setLoading(false); });

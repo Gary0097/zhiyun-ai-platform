@@ -426,6 +426,13 @@ class DataCoreRouteGuardTests(unittest.TestCase):
 class DepartmentScopingTests(unittest.TestCase):
     """记录级部门数据范围（PRD 21.2/§15）：v4 迁移、导入盖章、读取过滤。"""
 
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory()
+        self.core = DataCore(Path(self.temp.name) / "data-core.sqlite")
+
+    def tearDown(self) -> None:
+        self.temp.cleanup()
+
     def test_v4_migration_and_department_filter(self):
         import tempfile
         from data_core import DataCore
@@ -475,6 +482,74 @@ class DepartmentScopingTests(unittest.TestCase):
             self.assertEqual(len(core.list_records("ag_t")), 2)
             self.assertEqual(len(core.list_batches("ag_t", owner_agent="business_analyst")), 1)
 
+
+
+    def test_preview_import_reports_duplicate_rows(self) -> None:
+        rows = [
+            {"order_no": "DUP-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50},
+            {"order_no": "DUP-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50},
+        ]
+        preview = self.core.preview_import("orders", rows)
+        self.assertEqual(preview["duplicate_count"], 2)
+        self.assertEqual(len(preview["duplicate_rows"]), 2)
+
+    def test_cross_batch_duplicate_key_is_detected_against_existing_records(self) -> None:
+        row = {"order_no": "PROD-2", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
+        self.core.import_rows("orders", [row], data_mode="production")
+        duplicate = {"order_no": "PROD-2", "customer_name": "星联科技", "product_name": "伺服电机", "quantity": 5, "order_date": "2026-08-05", "promised_date": "2026-08-25", "status": "待排产", "progress": 0}
+        preview = self.core.preview_import("orders", [duplicate], data_mode="production")
+        self.assertEqual(preview["duplicate_count"], 1)
+        self.assertEqual(preview["duplicate_rows"][0]["fields"]["order_no"], "PROD-2")
+        self.assertTrue(preview["duplicate_rows"][0]["existing"])
+        with self.assertRaisesRegex(DataCoreError, "duplicate"):
+            self.core.import_rows("orders", [duplicate], data_mode="production")
+
+    def test_duplicate_rows_block_commit(self) -> None:
+        rows = [
+            {"order_no": "DUP-2", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50},
+            {"order_no": "DUP-2", "customer_name": "星联科技", "product_name": "伺服电机", "quantity": 5, "order_date": "2026-08-05", "promised_date": "2026-08-25", "status": "待排产", "progress": 0},
+        ]
+        preview = self.core.preview_import("orders", rows, data_mode="production")
+        self.assertEqual(preview["duplicate_count"], 2)
+        with self.assertRaisesRegex(DataCoreError, "duplicate"):
+            self.core.import_rows("orders", rows, data_mode="production")
+
+    def test_duplicate_key_across_environments_is_isolated(self) -> None:
+        prod = {"order_no": "SHARED-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
+        self.core.import_rows("orders", [prod], data_mode="production")
+        demo = {"order_no": "SHARED-1", "customer_name": "星联科技", "product_name": "伺服电机", "quantity": 5, "order_date": "2026-08-05", "promised_date": "2026-08-25", "status": "待排产", "progress": 0}
+        preview = self.core.preview_import("orders", [demo], data_mode="demo")
+        self.assertEqual(preview["duplicate_count"], 0)
+        batch = self.core.import_rows("orders", [demo], data_mode="demo")
+        self.assertEqual(batch["data_mode"], "demo")
+
+    def test_export_respects_data_mode_isolation(self) -> None:
+        real = {"order_no": "PROD-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
+        self.core.import_rows("orders", [real])  # real import lands in production by default
+        self.core.generate_orders(3, seed=9)     # simulation lands in demo by default
+        data, media_type, suggested = self.core.export_records("orders", format="csv", data_mode="production")
+        self.assertEqual(media_type, "text/csv; charset=utf-8")
+        self.assertEqual(suggested, "orders.csv")
+        text = data.decode("utf-8-sig")
+        self.assertIn("PROD-1", text)
+        self.assertNotIn("SIM-", text)
+        demo_data, _, _ = self.core.export_records("orders", format="csv", data_mode="demo")
+        demo_text = demo_data.decode("utf-8-sig")
+        self.assertNotIn("PROD-1", demo_text)
+        self.assertIn("SIM-", demo_text)
+
+    def test_export_respects_source_type_filter(self) -> None:
+        real = {"order_no": "REAL-1", "customer_name": "海川制造", "product_name": "电机", "quantity": 10, "order_date": "2026-08-01", "promised_date": "2026-08-20", "status": "生产中", "progress": 50}
+        self.core.import_rows("orders", [real])
+        self.core.generate_orders(3, seed=11)
+        data, _, _ = self.core.export_records("orders", format="csv", data_mode="production", source_type="real")
+        text = data.decode("utf-8-sig")
+        self.assertIn("REAL-1", text)
+        self.assertNotIn("SIM-", text)
+
+    def test_export_rejects_invalid_format(self) -> None:
+        with self.assertRaisesRegex(DataCoreError, "xlsx"):
+            self.core.export_records("orders", format="json")
 
 if __name__ == "__main__":
     unittest.main()

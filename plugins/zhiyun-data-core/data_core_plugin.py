@@ -17,7 +17,7 @@ from typing import Any, AsyncGenerator
 from uuid import uuid4
 
 import httpx
-from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, Request, UploadFile
+from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, Request, Response, UploadFile
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from qwenpaw.plugins.api import PluginApi
@@ -149,6 +149,7 @@ class ImportPreview(BaseModel):
     rows: list[dict[str, Any]] = Field(min_length=1, max_length=10000)
     mapping: dict[str, str] | None = None
     source_name: str = "manual-import"
+    data_mode: str | None = None
 
 
 class SimulationCreate(BaseModel):
@@ -303,7 +304,7 @@ async def update_field(entity: str, field_name: str, request: FieldPatch) -> dic
 
 @router.post("/imports/{entity}/preview", dependencies=[Depends(require_auth)])
 async def preview_import(entity: str, request: ImportPreview) -> dict[str, Any]:
-    return _handle(lambda: core.preview_import(entity, request.rows, request.mapping))
+    return _handle(lambda: core.preview_import(entity, request.rows, request.mapping, data_mode=_mode_required(request.data_mode)))
 
 
 @router.post("/imports/{entity}/commit", dependencies=[Depends(require_auth)])
@@ -317,7 +318,7 @@ async def commit_import(
             request.rows,
             mapping=request.mapping,
             source_name=request.source_name,
-            data_mode=_mode_required(data_mode),
+            data_mode=_mode_required(request.data_mode or data_mode),
             owner_department=str(user.get("department") or ""), owner_agent=str(user.get("agent_id") or "default"),
         )
     )
@@ -361,6 +362,37 @@ async def records(
             ),
         }
     )
+
+@router.get("/export/{entity}", dependencies=[Depends(require_auth)])
+async def export_records(
+    entity: str,
+    format: str = Query(default="xlsx", pattern="^(xlsx|csv)$"),
+    data_mode: str | None = Query(default=None, max_length=20),
+    source_type: str | None = None,
+    start_date: str | None = Query(default=None, max_length=16),
+    end_date: str | None = Query(default=None, max_length=16),
+    limit: int = Query(default=1000, ge=1, le=1000),
+    user: dict[str, Any] = Depends(require_auth_user),
+) -> Response:
+    def run() -> Response:
+        content, media_type, suggested = core.export_records(
+            entity,
+            format=format,
+            data_mode=_mode_q(data_mode),
+            source_type=source_type,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+            owner_department=_scope_filters(user)["owner_department"],
+            owner_agent=_scope_filters(user)["owner_agent"],
+        )
+        return Response(
+            content=content,
+            media_type=media_type,
+            headers={"Content-Disposition": f'attachment; filename="{suggested}"'},
+        )
+    return _handle(run)
+
 
 @router.get("/orders", dependencies=[Depends(require_auth)])
 async def orders(

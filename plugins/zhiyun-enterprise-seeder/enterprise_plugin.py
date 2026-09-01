@@ -427,10 +427,43 @@ def _startup_bootstrap() -> None:
     _spawn_daily_integrity_report()
 
 
+PBKDF2_ITERATIONS = 200_000
+PBKDF2_PREFIX = "pbkdf2$"
+
+
 def _hash_password(password: str, salt: str | None = None) -> tuple[str, str]:
+    """Return an iterated PBKDF2 hash and the salt used to derive it.
+
+    The returned hash embeds the algorithm, iteration count, salt and digest as
+    ``pbkdf2$<iterations>$<salt_hex>$<digest_hex>`` so ``_verify_password`` can
+    always re-derive it without relying on the separate stored salt.
+    """
     salt = salt or secrets.token_hex(16)
+    digest = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), bytes.fromhex(salt), PBKDF2_ITERATIONS
+    ).hex()
+    return f"{PBKDF2_PREFIX}{PBKDF2_ITERATIONS}${salt}${digest}", salt
+
+
+def _verify_pbkdf2(password: str, stored_hash: str) -> bool:
+    try:
+        _, iterations_text, salt_hex, digest_hex = stored_hash.split("$", 3)
+        iterations = int(iterations_text)
+        expected = bytes.fromhex(digest_hex)
+        actual = hashlib.pbkdf2_hmac(
+            "sha256", password.encode("utf-8"), bytes.fromhex(salt_hex), iterations
+        )
+        return hmac.compare_digest(actual, expected)
+    except (ValueError, TypeError):
+        return False
+
+
+def _verify_password(password: str, stored_hash: str, salt: str) -> bool:
+    if stored_hash.startswith(PBKDF2_PREFIX):
+        return _verify_pbkdf2(password, stored_hash)
+    # Legacy single-round SHA256: verify and allow the login path to upgrade it.
     digest = hashlib.sha256((salt + password).encode("utf-8")).hexdigest()
-    return digest, salt
+    return hmac.compare_digest(digest, stored_hash)
 
 def _verify_password(password: str, stored_hash: str, salt: str) -> bool:
     digest, _ = _hash_password(password, salt)
