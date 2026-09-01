@@ -65,7 +65,38 @@
         h("b", null, "⚠ 异常日（|z|≥2）"),
         data.anomalies.slice(0, 5).map(function (a, i) { return h("div", { key: i }, a.date + " " + a.kind + "（" + a.sessions + " 次会话, z=" + a.z + "）" + a.context); })) : null,
       h("div", { style: { border: "1px solid #e3e8ef", borderRadius: 8, padding: 10, fontSize: 12.5, background: "#fafbfc" } },
-        h("b", null, "🔄 数据流转"), h("div", { style: { marginTop: 4 } }, data.data_flow.summary))
+        h("b", null, "🔄 数据流转"), h("div", { style: { marginTop: 4 } }, data.data_flow.summary)),
+      h(FulfillmentPanel, null)
+    );
+  }
+
+  function FulfillmentPanel() {
+    var st = React.useState(null); var ord = st[0]; var setOrd = st[1];
+    React.useEffect(function () {
+      fetch("/api/zhiyun-data-core/orders/insights", { headers: authHeaders() })
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(setOrd)
+        .catch(function () { setOrd(null); });
+    }, []);
+    if (!ord || !ord.total) return null;
+    var colors = { "正常": "#12b76a", "轻微延误": "#f79009", "高风险": "#f04438", "已逾期": "#912018" };
+    return h("div", { style: cardStyle },
+      h("div", { style: { fontWeight: 700, fontSize: 14, marginBottom: 6 } }, "📦 订单履约洞察"),
+      h("div", { style: { background: "#f0f7ff", border: "1px solid #cfe3ff", borderRadius: 8, padding: 10, fontSize: 13, lineHeight: 1.7, marginBottom: 10 } }, ord.summary),
+      h("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 } },
+        Object.keys(ord.risk_distribution || {}).map(function (k) {
+          return h("div", { key: k, style: { flex: "1 1 130px", border: "1px solid #e3e8ef", borderRadius: 8, padding: 10, fontSize: 12.5 } },
+            h("div", { style: { color: "#5b6472" } }, k),
+            h("div", { style: { fontSize: 20, fontWeight: 700, color: colors[k] } }, String(ord.risk_distribution[k])));
+        })),
+      (ord.top_risky || []).length ? h("div", { style: { fontSize: 12.5 } },
+        h("b", null, "⚠ 延误榜（前 10）"),
+        h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 6, marginTop: 6 } },
+          ord.top_risky.map(function (o, i) {
+            return h("div", { key: i, style: { border: "1px solid #fecdca", borderRadius: 6, padding: "6px 8px", background: "#fff6f5" } },
+              h("b", null, o.order_no), " · " + o.customer + " · " + o.status +
+              " · 进度 " + Math.round(o.progress) + "%" + (o.delay_days ? " · 延误 " + o.delay_days + " 天" : "") + " · 承诺 " + o.promised);
+          }))) : null
     );
   }
 
