@@ -40,8 +40,9 @@ def build_insights(conn, *, env_id: str, data_mode: str,
     end = date.fromisoformat(end_date[:10])
     start = date.fromisoformat(start_date[:10])
     # 环比窗口固定看最近 14 天：后 7 天 vs 前 7 天
+    # 等长 7 天窗口（含端点）：当前 = end-6..end，对照 = end-13..end-7
     win_end = end
-    win_mid = end - timedelta(days=7)
+    win_mid = end - timedelta(days=6)
     win_start = end - timedelta(days=13)
     scope = max(start, win_start)
 
@@ -58,9 +59,7 @@ def build_insights(conn, *, env_id: str, data_mode: str,
     tokens_by_day = day_series(
         f"SELECT day, SUM(tokens) n FROM token_usage {base} "
         "AND day >= ? GROUP BY day", args + (scope.isoformat(),))
-    users_by_day = day_series(
-        f"SELECT substr(started_at,1,10) d, COUNT(DISTINCT agent_id) n FROM sessions {base} "
-        "AND started_at >= ? GROUP BY d", args + (scope.isoformat(),))
+
     tasks_done = day_series(
         f"SELECT substr(finished_at,1,10) d, COUNT(*) n FROM tasks {base} "
         "AND status='success' AND finished_at >= ? GROUP BY d", args + (scope.isoformat(),))
@@ -69,13 +68,21 @@ def build_insights(conn, *, env_id: str, data_mode: str,
         a_s, b_s = a.isoformat(), b.isoformat()
         return sum(v for k, v in series.items() if a_s <= k <= b_s)
 
+    # 活跃智能体按“窗口整体一次 DISTINCT”统计：按日 DISTINCT 求和会重复计
+    # 跨天出现的同一智能体，环比口径系统性偏高。
+    def active_agents(a, b):
+        row = conn.execute(
+            f"SELECT COUNT(DISTINCT agent_id) n FROM sessions {base} "
+            "AND started_at >= ? AND started_at < ?", args + (a.isoformat(), b.isoformat())).fetchone()
+        return row["n"]
+
     cur = {"sessions": window(sessions_by_day, win_mid, win_end),
            "tokens": window(tokens_by_day, win_mid, win_end),
-           "users": window(users_by_day, win_mid, win_end),
+           "users": active_agents(win_mid, win_end + timedelta(days=1)),
            "tasks": window(tasks_done, win_mid, win_end)}
     prev = {"sessions": window(sessions_by_day, win_start, win_mid - timedelta(days=1)),
             "tokens": window(tokens_by_day, win_start, win_mid - timedelta(days=1)),
-            "users": window(users_by_day, win_start, win_mid - timedelta(days=1)),
+            "users": active_agents(win_start, win_mid),
             "tasks": window(tasks_done, win_start, win_mid - timedelta(days=1))}
 
     label = {"sessions": "会话量", "tokens": "Token 消耗", "users": "活跃智能体", "tasks": "完成任务"}

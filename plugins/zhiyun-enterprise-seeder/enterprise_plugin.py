@@ -71,6 +71,7 @@ try:
     from .insights import build_insights
 except ImportError:  # pragma: no cover - 兼容非包式加载
     from analytics import build_trends as _build_trends
+    from insights import build_insights
 
 PLUGIN_VERSION = "0.1.0"
 ENTERPRISE_DIR = Path(os.environ.get("ZHIYUN_ENTERPRISE_DIR", WORKING_DIR / "enterprise"))
