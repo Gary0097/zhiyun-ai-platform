@@ -834,6 +834,30 @@
       ],
       "health": "available",
       "capabilities": []
+    },
+    {
+      "app_id": "zhiyun-data-insights",
+      "name": "智能分析驾驶舱",
+      "aliases": [
+        "智能分析",
+        "驾驶舱",
+        "经营分析",
+        "环比",
+        "异常检测",
+        "insights",
+        "cockpit"
+      ],
+      "version": "1.0.0",
+      "category": "data",
+      "install_status": "installed",
+      "route": "/apps/zhiyun-data-insights",
+      "repository_url": "",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "health": "available",
+      "capabilities": []
     }
   ]
 }

@@ -68,8 +68,10 @@ except ImportError:  # pragma: no cover - 兼容非包式加载
 
 try:
     from .analytics import build_trends as _build_trends
+    from .insights import build_insights
 except ImportError:  # pragma: no cover - 兼容非包式加载
     from analytics import build_trends as _build_trends
+    from insights import build_insights
 
 PLUGIN_VERSION = "0.1.0"
 ENTERPRISE_DIR = Path(os.environ.get("ZHIYUN_ENTERPRISE_DIR", WORKING_DIR / "enterprise"))
@@ -1518,6 +1520,43 @@ async def analytics_trends(
         return _build_trends(
             conn, env_id=env_id, data_mode=mode, start_date=s, end_date=e, granularity=granularity
         )
+    finally:
+        conn.close()
+
+
+@router.get("/analytics/insights")
+async def analytics_insights(
+    authorization: str = Header(default=""),
+    env_id: str = Query(default="", max_length=64),
+    data_mode: str = Query(default="", max_length=20),
+    start_date: str = Query(default="", max_length=10),
+    end_date: str = Query(default="", max_length=10),
+) -> dict[str, Any]:
+    """智能分析驾驶舱：环比结论 + 异常检测 + TopN + 数据流转（智能/分析/可视化数据源）。"""
+    _require_auth(authorization)
+    data_mode = _normalize_mode(data_mode)
+    if start_date:
+        _parse_date(start_date)
+    if end_date:
+        _parse_date(end_date)
+    conn = _connect()
+    try:
+        if env_id:
+            meta = conn.execute(
+                "SELECT * FROM enterprise_meta WHERE env_id = ? ORDER BY id DESC LIMIT 1",
+                (env_id,)).fetchone()
+        else:
+            mode_where = "WHERE data_mode = ?" if data_mode else ""
+            mode_args: list[Any] = (data_mode,) if data_mode else ()
+            meta = conn.execute(
+                f"SELECT * FROM enterprise_meta {mode_where} ORDER BY id DESC LIMIT 1", mode_args
+            ).fetchone()
+        if not meta:
+            raise HTTPException(status_code=404, detail="尚未初始化企业环境")
+        s = start_date or meta["start_date"] or DEFAULT_START
+        e = end_date or meta["end_date"] or _today()
+        return build_insights(conn, env_id=meta["env_id"], data_mode=meta["data_mode"],
+                              start_date=s, end_date=e)
     finally:
         conn.close()
 @router.post("/seed")

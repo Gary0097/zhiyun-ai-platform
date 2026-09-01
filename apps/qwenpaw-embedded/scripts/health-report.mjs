@@ -34,6 +34,7 @@ export const endpoints = [
   { id: 'agent-kanban', name: 'Agent 看板', path: '/api/agent-kanban/issues', contentType: 'application/json' },
   { id: 'qwenpaw-creator-studio', name: 'QwenPaw Creator 原版', path: '/api/qwenpaw-creator-studio/health', contentType: 'application/json' },
   { id: 'qwenpaw-creator-mixcut', name: '智能混剪工坊', path: '/api/qwenpaw-creator-mixcut/capabilities', contentType: 'application/json' },
+  { id: 'zhiyun-data-insights', name: '智能分析驾驶舱', path: '/api/zhiyun-data-insights/health', contentType: 'application/json' },
 ]
 
 if (checkOnly) {
@@ -71,6 +72,10 @@ function validatePayload (id, payload) {
     if (payload?.environment?.ready !== true) return 'Creator未就绪（ffmpeg缺失）'
     if (!Array.isArray(payload?.environment?.encoders) || payload.environment.encoders.length === 0) return 'Creator未提供编码器列表'
     if (!Array.isArray(payload?.presets) || payload.presets.length === 0) return 'Creator缺少压缩预设'
+    return ''
+  }
+  if (id === 'zhiyun-data-insights') {
+    if (payload?.status !== 'available') return '驾驶舱健康状态异常'
     return ''
   }
   if (id === 'qwenpaw-creator-studio') {
