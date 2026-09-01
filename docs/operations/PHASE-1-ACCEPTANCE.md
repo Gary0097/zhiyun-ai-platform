@@ -16,6 +16,13 @@ status: Data Studio PR #15 merged as
 merged as `612b2a2b48ee8321da208b4aa7ebdbce22e6f939` (v0.7.1). These releases add
 Chinese titles and in-app guidance while preserving the accepted data paths.
 
+The lock and catalog have since advanced to the guided-workflow releases without
+changing the accepted data paths or delivery status: Data Studio locked at
+`d5734d1be6b288a170b6a2916dcd63d2bdebe9be` (v0.9.2) and Order Studio locked at
+`9edd776ab9c7038fc00f34b61509cd3466bddd76` (v0.7.2). These releases replace
+a JSON-paste authoring flow with structured forms and an in-app “问 Agent” panel,
+preserving every accepted Phase 1 capability.
+
 Both external PRs passed `verify (ubuntu-24.04)` and
 `verify (windows-2022)` before manual merge.
 

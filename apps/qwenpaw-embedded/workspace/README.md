@@ -1,4 +1,4 @@
-# 智造云 AI-OS Workspace 约定
+# 制造云 AI-OS Workspace 约定
 
 该目录是版本化模板，不存放真实运行数据。当前启用日志审计、Data Core，并按锁定版本加载独立 PawApp（首个应用为 Data Studio）。
 

@@ -1,0 +1,71 @@
+name: Clean-environment E2E matrix
+
+# PRD §17.13/§17.14：同一发行版本分别在 Windows 与 Linux 干净环境完成
+# 真实安装 → 启动 → 相同核心 E2E，且用例输出与数据结构一致。
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clean-env-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clean-env:
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install AI-OS into a clean working directory
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then bash ./setup-ai-os.sh; else pwsh -NoProfile -Command "& ./setup-ai-os.ps1"; fi
+        shell: bash
+      - name: Start the service in the background
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            nohup bash ./start-ai-os.sh > clean-env-run.log 2>&1 &
+          else
+            powershell -NoProfile -Command "Start-Process -FilePath 'cmd.exe' -ArgumentList '/c','start-ai-os.cmd' -WindowStyle Hidden"
+          fi
+          for i in $(seq 1 60); do
+            if curl -sf --max-time 3 http://127.0.0.1:8088/api/version >/dev/null 2>&1; then
+              echo "service ready"; exit 0
+            fi
+            sleep 5
+          done
+          echo "service did not become ready"; tail -n 80 clean-env-run.log 2>/dev/null || true
+          exit 1
+      - name: Run the identical core E2E suite
+        shell: bash
+        run: |
+          for i in $(seq 1 20); do
+            curl -sf --max-time 3 http://127.0.0.1:8088/api/plugins >/dev/null 2>&1 && break
+            sleep 5
+          done
+          python scripts/qa/verify_clean_env_e2e.py --json > clean-env-result.json
+          cat clean-env-result.json
+          python - <<'EOF'
+          import json, sys
+          data = json.load(open("clean-env-result.json", encoding="utf-8"))
+          sys.exit(0 if data["passed"] == data["total"] else 1)
+          EOF
+      - name: Upload result artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clean-env-${{ matrix.os }}
+          path: clean-env-result.json

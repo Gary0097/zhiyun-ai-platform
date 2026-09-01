@@ -88,25 +88,86 @@
   }
 
   function MyApps(props) {
+    var openAppAgent = props.openAppAgent || function () {};
+    var user = props.user || {};
     var apps = (props.apps || []).filter(function (item) { return item.install_status === "installed"; });
+    var catMap = {
+      data: "数据分析", order: "订单管理", service: "售后服务", supply: "供应链",
+      sales: "销售客户", finance: "财务", people: "组织协同", integration: "系统集成",
+      knowledge: "知识库", system: "系统组件"
+    };
+    var catStyle = {
+      data: ["📊", "#1f5ed6"], order: ["📦", "#4338ca"], service: ["🎧", "#0e7490"], supply: ["🚚", "#c2570a"],
+      sales: ["📈", "#0e9f6e"], finance: ["💰", "#b45309"], people: ["👥", "#6d28d9"], integration: ["🔌", "#0891b2"],
+      knowledge: ["📚", "#475569"], system: ["⚙️", "#64748b"]
+    };
+    var grouped = {};
+    var order = [];
+    apps.forEach(function (item) {
+      var cat = catMap[item.category] || item.category || "其他";
+      if (!grouped[cat]) { grouped[cat] = []; order.push({ key: cat, raw: item.category }); }
+      grouped[cat].push(item);
+    });
+    var bizCount = apps.filter(function (a) { return a.category !== "system"; }).length;
+    var capCount = apps.reduce(function (n, a) { return n + ((a.capabilities || []).length); }, 0);
+    var healthy = apps.filter(function (a) { return a.health === "available"; }).length;
+    var now = new Date();
+    var dateText = (now.getMonth() + 1) + "月" + now.getDate() + "日 " + "星期" + "日一二三四五六"[now.getDay()];
+    var hello = user.display_name || user.username || "";
+    var stat = function (label, value, color) {
+      return h("div", { style: { background: "#fff", border: "1px solid #e8edf4", borderRadius: 10, padding: "14px 18px", minWidth: 128 } },
+        h("div", { style: { fontSize: 12, color: "#667085" } }, label),
+        h("div", { style: { fontSize: 24, fontWeight: 750, color: color || "#182640", marginTop: 2 } }, value));
+    };
     return h("div", null,
-      h(antd.Alert, { type: "info", showIcon: true, message: "这里只展示当前真实安装的应用与系统组件。", style: { marginBottom: 18 } }),
-      h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 14 } },
-        apps.map(function (item) {
-          return h(antd.Card, { key: item.app_id, title: item.name, extra: h(antd.Tag, { color: "green" }, "已安装") },
-            h("p", { style: { color: "#667085", minHeight: 42 } }, item.category === "system" ? "AI-OS 系统组件" : "可运行的业务应用"),
-            h("div", { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
-              h(antd.Tag, null, "v" + (item.version || "-")),
-              h(antd.Tag, { color: item.health === "available" ? "green" : "orange" }, item.health === "available" ? "运行可用" : item.health),
-              item.route ? h(antd.Button, { type: "primary", size: "small", href: item.route }, "打开") : h(antd.Button, { size: "small", disabled: true }, "后台服务")
-            )
-          );
-        })
-      )
+      h("div", { style: { borderRadius: 12, padding: "22px 26px", marginBottom: 18, color: "#fff", background: "linear-gradient(120deg, #1749a8 0%, #1f5ed6 55%, #3d7ce4 100%)", boxShadow: "0 8px 24px rgba(23,73,168,0.25)" } },
+        h("div", { style: { fontSize: 21, fontWeight: 750 } }, (hello ? hello + "，" : "") + "欢迎回来"),
+        h("div", { style: { fontSize: 12.5, opacity: 0.85, marginTop: 6 } }, (user.enterprise || "灵泽万川智造云") + " · " + dateText + " · 今天要从哪个应用开始？")
+      ),
+      h("div", { style: { display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 } },
+        stat("业务应用", bizCount, "#1f5ed6"), stat("系统组件", apps.length - bizCount, "#64748b"),
+        stat("可交付能力", capCount, "#0e9f6e"), stat("运行可用", healthy + "/" + apps.length, healthy === apps.length ? "#0e9f6e" : "#c2570a")
+      ),
+      order.map(function (grp) {
+        var style = catStyle[grp.raw] || ["🧩", "#475569"];
+        return h("div", { key: grp.key, style: { marginBottom: 20 } },
+          h("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 10 } },
+            h("span", { style: { width: 4, height: 16, borderRadius: 2, background: style[1] } }),
+            h("span", { style: { fontWeight: 700, fontSize: 14.5, color: "#182640" } }, grp.key),
+            h("span", { style: { fontSize: 12, color: "#98a2b3" } }, grouped[grp.key].length + " 个应用")
+          ),
+          h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 12 } },
+            grouped[grp.key].map(function (item) {
+              return h("div", { key: item.app_id, style: { background: "#fff", border: "1px solid #e8edf4", borderRadius: 10, padding: "14px 16px", display: "flex", gap: 12, transition: "box-shadow .15s ease", cursor: item.route ? "pointer" : "default" },
+                  onClick: function () { if (item.route) window.location.href = item.route; } },
+                h("div", { style: { width: 42, height: 42, borderRadius: 9, background: style[1] + "14", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21, flex: "0 0 auto" } }, style[0]),
+                h("div", { style: { flex: "1 1 auto", minWidth: 0 } },
+                  h("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+                    h("span", { style: { fontWeight: 700, fontSize: 13.5, color: "#182640" } }, item.name),
+                    h(antd.Tag, { style: { margin: 0, fontSize: 11 } }, "v" + (item.version || "-")),
+                    item.health === "available" ? h(antd.Tag, { color: "green", style: { margin: 0, fontSize: 11 } }, "可用") : h(antd.Tag, { color: "orange", style: { margin: 0, fontSize: 11 } }, item.health)
+                  ),
+                  (item.capabilities || []).length ? h("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 } },
+                    (item.capabilities || []).slice(0, 4).map(function (cap) {
+                      return h("span", { key: cap.id, style: { fontSize: 11.5, color: "#35405a", background: "#f1f5fb", borderRadius: 5, padding: "3px 8px", cursor: "pointer" },
+                          onClick: function (e) { e.stopPropagation(); if (item.route) window.location.href = item.route; } }, cap.name);
+                    })
+                  ) : h("div", { style: { color: "#98a2b3", fontSize: 12, marginTop: 6 } }, item.category === "system" ? "AI-OS 系统组件" : "业务应用"),
+                  h("div", { style: { display: "flex", gap: 6, marginTop: 10 } },
+                    item.route ? h(antd.Button, { size: "small", type: "primary", onClick: function (e) { e.stopPropagation(); window.location.href = item.route; } }, "打开") : h(antd.Button, { size: "small", disabled: true }, "后台服务"),
+                    h(antd.Button, { size: "small", onClick: function (e) { e.stopPropagation(); openAppAgent(item.app_id, item.name, item.capabilities); } }, "问数")
+                  )
+                )
+              );
+            })
+          )
+        );
+      })
     );
   }
 
-  function AppSearch() {
+  function AppSearch(props) {
+    var openAppAgent = props.openAppAgent || function () {};
     var queryState = React.useState("");
     var query = queryState[0];
     var setQuery = queryState[1];
@@ -149,6 +210,7 @@
             h("div", { style: { color: "#667085", minHeight: 42 } }, match.reason || "能力索引匹配"),
             h("div", { style: { display: "flex", gap: 8, marginTop: 14 } },
               installed && item.route ? h(antd.Button, { type: "primary", href: item.route }, "打开") : h(antd.Button, { disabled: true }, "尚未开发"),
+              installed && item.route ? h(antd.Button, { size: "small", type: "default", onClick: function () { openAppAgent(item.app_id, item.name, item.capabilities); } }, "问数") : null,
               h(antd.Tag, null, (item.platforms || []).join(" / "))
             )
           );
@@ -196,41 +258,138 @@
     var agentDraftState = React.useState(""), agentDraft = agentDraftState[0], setAgentDraft = agentDraftState[1];
     var agentMsgState = React.useState([]), agentMessages = agentMsgState[0], setAgentMessages = agentMsgState[1];
     var agentBusyState = React.useState(false), agentBusy = agentBusyState[0], setAgentBusy = agentBusyState[1];
+    var agentSessionRef = React.useRef("app-dock-" + Date.now().toString(36));
+    var agentAppState = React.useState("zhiyun-app-discovery"), agentApp = agentAppState[0], setAgentApp = agentAppState[1];
+    var agentModuleState = React.useState("应用与项目中心"), agentModule = agentModuleState[0], setAgentModule = agentModuleState[1];
+    var DEFAULT_CHIPS = [{ key: "mine", label: "我的应用" }, { key: "search", label: "能力检索" }, { key: "progress", label: "查看进度" }];
+    var agentChipsState = React.useState(DEFAULT_CHIPS), agentChips = agentChipsState[0], setAgentChips = agentChipsState[1];
     function agentAdd(role, text, card) { setAgentMessages(function (prev) { return prev.concat([{ role: role, text: text, card: card }]); }); }
     function agentCommand(key, label) {
-      agentAdd("user", label || key);
+      var prompt;
+      if (agentApp === "zhiyun-app-discovery") {
+        prompt = key === "mine" ? "我有哪些已安装、可用的应用？"
+          : key === "search" ? "帮我检索能完成某业务的真实应用，应该用哪个？"
+          : key === "progress" ? "当前应用中心 31 项 PRD 交付进度是怎样的？"
+          : (label || key);
+      } else {
+        prompt = label || key;
+      }
+      startAgentChat(prompt);
+    }
+    function openAppAgent(app_id, name, capabilities) {
+      var id = app_id || "zhiyun-app-discovery";
+      var label = name || "应用与项目中心";
+      var caps = capabilities || [];
+      setAgentApp(id);
+      setAgentModule(label);
+      var chips = caps.length ? caps.map(function (c) { return { key: c.id || c.name, label: c.name }; }) : DEFAULT_CHIPS;
+      setAgentChips(chips);
+      setAgentMessages([]);
+      agentSessionRef.current = "app-dock-" + id + "-" + Date.now().toString(36);
+      setAgentOpen(true);
+    }
+    function startAgentChat(text) {
+      text = String(text == null ? "" : text).trim();
+      if (!text || agentBusy) return;
+      var history = (agentMessages || [])
+        .filter(function (m) { return m && m.role !== "system"; })
+        .map(function (m) { return { role: m.role === "bot" ? "assistant" : "user", text: m.text || "" }; })
+        .slice(-12);
+      agentAdd("user", text, null);
+      agentAdd("bot", "", null);
       setAgentBusy(true);
-      setTimeout(function () {
-        zyPushAgent({ app_id: "zhiyun-app-discovery", kind: key, label: label || key, summary: { apps: apps, progress: progress }, source_type: "real" });
+      zyPushAgent({ app_id: agentApp, kind: "chat", label: text, summary: { apps: apps, progress: progress }, source_type: "real" });
+      function setLastBot(value) {
+        setAgentMessages(function (prev) {
+          var next = prev.slice();
+          next[next.length - 1] = { role: "bot", text: value, card: null };
+          return next;
+        });
+      }
+      var token = "";
+      try { token = window.localStorage.getItem("zhiyun_token") || ""; } catch (e) {}
+      var agentHeaders = { "Content-Type": "application/json" };
+      if (token) agentHeaders["Authorization"] = "Bearer " + token;
+      Q.host.fetch("/zhiyun-app-discovery/agent/chat", {
+        method: "POST",
+        headers: agentHeaders,
+        body: JSON.stringify({ text: text, session_id: agentSessionRef.current, user_id: "default", app_id: agentApp, history: history })
+      })
+      .then(function (response) {
+        if (!response.ok || !response.body) {
+          return response.text().then(function (t) { throw new Error("HTTP " + response.status + (t && t.trim() ? ": " + t.trim() : "")); });
+        }
+        var reader = response.body.getReader();
+        var decoder = new TextDecoder();
+        var buffer = "";
+        var full = "";
+        function read() {
+          return reader.read().then(function (chunk) {
+            if (chunk.done) return;
+            buffer += decoder.decode(chunk.value, { stream: true });
+            var lines = buffer.split("\n");
+            buffer = lines.pop();
+            lines.forEach(function (line) {
+              line = line.trim();
+              if (line.indexOf("data: ") !== 0) return;
+              var raw = line.slice(6).trim();
+              if (!raw || raw === "[DONE]") return;
+              var event;
+              try { event = JSON.parse(raw); } catch (e) { return; }
+              if (event.error) {
+                if (!full) { full = "智能体返回失败：" + event.error; setLastBot(full); }
+                return;
+              }
+              if (event.type === "text" && event.delta && typeof event.text === "string" && event.text) {
+                full += event.text;
+                setLastBot(full);
+              }
+              if (event.type === "message" && event.status === "completed" && Array.isArray(event.content)) {
+                for (var i = 0; i < event.content.length; i++) {
+                  var part = event.content[i];
+                  if (part && part.type === "text" && !part.delta && typeof part.text === "string" && part.text) {
+                    full = part.text;
+                    setLastBot(full);
+                  }
+                }
+              }
+              if (event.status === "failed" && !full) {
+                full = event.error || "智能体返回失败";
+                setLastBot(full);
+              }
+            });
+            return read();
+          });
+        }
+        return read();
+      })
+      .then(function () {
         setAgentBusy(false);
-        var text = key === "search" ? "已打开能力检索，可在应用搜索页输入业务问题查找对应应用。" : key === "progress" ? "已汇总 31 项 PRD 交付进度，可在项目进度页查看完成与验证中功能。" : "已定位至我的应用，当前已安装应用可一键打开使用。";
-        agentAdd("bot", text, null);
-      }, 240);
+        if (!full) setLastBot("（智能体未返回可显示内容）");
+      })
+      .catch(function (err) {
+        setAgentBusy(false);
+        setLastBot("调用智能体失败：" + (err && err.message ? err.message : String(err)));
+      });
     }
     function agentSend(text) {
-      agentAdd("user", text);
-      setAgentBusy(true);
-      var key = /进度|完成|开发/.test(text) ? "progress" : (/我的|安装|打开/.test(text) ? "mine" : "search");
-      setTimeout(function () {
-        zyPushAgent({ app_id: "zhiyun-app-discovery", kind: key, label: text, summary: { apps: apps, progress: progress }, source_type: "real" });
-        setAgentBusy(false);
-        agentAdd("bot", "已将「" + text + "」交给应用中心智能体，可到对应 Tab 查看结果。", null);
-      }, 240);
+      startAgentChat(text);
     }
-    function loadAll() {
-      Promise.all([request("/zhiyun-app-discovery/catalog"), request("/zhiyun-app-discovery/progress")])
+    var userState = React.useState({}); var user = userState[0]; var setUser = userState[1];
+    React.useEffect(function () {
+      Promise.all([getJson("/zhiyun-app-discovery/catalog"), getJson("/zhiyun-app-discovery/progress")])
         .then(function (values) { setApps(values[0].apps || []); setProgress(values[1]); })
         .catch(function () { setError("应用与进度数据加载失败，请检查插件状态。"); });
-    }
-    React.useEffect(function () {
-      if (readToken()) { loadAll(); return; }
-      function onAuth() { loadAll(); }
-      window.addEventListener("zhiyun:auth", onAuth);
-      return function () { window.removeEventListener("zhiyun:auth", onAuth); };
+      try {
+        var token = window.localStorage.getItem("zhiyun_token") || "";
+        Q.host.fetch("/zhiyun-auth/me", { headers: token ? { Authorization: "Bearer " + token } : {} })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (body) { if (body && body.user) setUser(body.user); });
+      } catch (e) {}
     }, []);
     var items = [
-      { key: "mine", label: "我的应用", children: h(MyApps, { apps: apps }) },
-      { key: "search", label: "应用搜索", children: h(AppSearch) },
+      { key: "mine", label: "我的应用", children: h(MyApps, { apps: apps, user: user, openAppAgent: openAppAgent }) },
+      { key: "search", label: "应用搜索", children: h(AppSearch, { openAppAgent: openAppAgent }) },
       { key: "progress", label: "项目进度", children: h(ProjectProgress, { apps: apps, progress: progress }) }
     ];
     return h("div", { style: { padding: 28, height: "100%", overflow: "auto", background: "#f7f8fa" } },
@@ -239,11 +398,11 @@
           h("div", null,
             h("h2", { style: { marginBottom: 4 } }, "应用与项目中心"),
             h("p", { style: { color: "#667085", marginTop: 0 } }, "真实应用入口、能力检索和 31 项 PRD 交付进度。")),
-          h(antd.Button, { type: "primary", onClick: function () { setAgentOpen(true); } }, zySpark(), " 问 Agent")),
+          h(antd.Button, { type: "primary", onClick: function () { openAppAgent("zhiyun-app-discovery", "应用与项目中心"); } }, zySpark(), " 问 Agent")),
         h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：按中文名称、业务功能或自然语言需求查找真实已登记应用，并区分已安装与功能已交付。"), h("ol", null, h("li", null, "在“我的应用”输入要解决的业务问题。"), h("li", null, "查看匹配功能、原因、健康和安装状态。"), h("li", null, "只有已验收能力才会显示可用；计划中功能不会被虚构为可用。"))) }] }),
         error ? h(antd.Alert, { type: "error", message: error, showIcon: true, style: { marginBottom: 16 } }) : null,
         h(antd.Tabs, { defaultActiveKey: "mine", items: items }),
-        h(AgentDock, { open: agentOpen, onClose: function () { setAgentOpen(false); }, moduleLabel: "应用与项目中心", chips: [{ key: "mine", label: "我的应用" }, { key: "search", label: "能力检索" }, { key: "progress", label: "查看进度" }], messages: agentMessages, draft: agentDraft, setDraft: setAgentDraft, busy: agentBusy, onSend: agentSend, onCommand: agentCommand })
+        h(AgentDock, { open: agentOpen, onClose: function () { setAgentOpen(false); }, moduleLabel: agentModule, chips: agentChips, placeholder: agentApp === "zhiyun-app-discovery" ? "例如：帮我找交付风险应用" : "直接输入业务问题，例如：统计本月订单情况", messages: agentMessages, draft: agentDraft, setDraft: setAgentDraft, busy: agentBusy, onSend: agentSend, onCommand: agentCommand })
       )
     );
   }

@@ -1,0 +1,67 @@
+{
+ "timestamp": "2026-08-28T13:44:46",
+ "pages": [
+  {
+   "app": "zhiyun-sales-studio",
+   "interactive_s": 0.37,
+   "ok": true
+  },
+  {
+   "app": "zhiyun-finance-studio",
+   "interactive_s": 0.22,
+   "ok": true
+  },
+  {
+   "app": "zhiyun-people-studio",
+   "interactive_s": 0.22,
+   "ok": true
+  },
+  {
+   "app": "zhiyun-supply-studio",
+   "interactive_s": 0.22,
+   "ok": true
+  },
+  {
+   "app": "zhiyun-service-studio",
+   "interactive_s": 0.29,
+   "ok": true
+  },
+  {
+   "app": "zhiyun-order-studio",
+   "interactive_s": 0.36,
+   "ok": true
+  },
+  {
+   "app": "zhiyun-data-studio",
+   "interactive_s": 0.37,
+   "ok": true
+  },
+  {
+   "app": "zhiyun-data-core",
+   "interactive_s": 0.36,
+   "ok": true
+  },
+  {
+   "app": "zhiyun-audit",
+   "interactive_s": 0.42,
+   "ok": true
+  },
+  {
+   "app": "zhiyun-app-discovery",
+   "interactive_s": 0.36,
+   "ok": true
+  },
+  {
+   "app": "zhiyun-integration-hub",
+   "interactive_s": 0.33,
+   "ok": true
+  }
+ ],
+ "page_interactive_max_s": 0.42,
+ "page_all_under_2s": true,
+ "search_samples": 36,
+ "search_p50_ms": 6,
+ "search_p95_ms": 14,
+ "search_p95_under_500ms": true,
+ "prd16_pass": true
+}

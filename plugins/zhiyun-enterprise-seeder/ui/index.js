@@ -876,7 +876,7 @@ h("div", { style: sub }, "一键生成企业组织、部门、员工、角色权
           h("div", { style: { fontSize: 15, fontWeight: 700, color: "#1f2933", marginBottom: 16 } }, "生成参数"),
           h("div", { style: field },
             h("div", { style: label }, "企业名称"),
-            h(antd.Input, { value: cfg.enterprise, placeholder: "例如：智云智造", onChange: upd("enterprise") })
+            h(antd.Input, { value: cfg.enterprise, placeholder: "例如：灵泽万川智造云科技", onChange: upd("enterprise") })
           ),
           h("div", { style: field },
             h("div", { style: label }, "行业模板"),

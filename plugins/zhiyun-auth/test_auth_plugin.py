@@ -1,26 +1,106 @@
 # -*- coding: utf-8 -*-
-"""zhiyun-auth 插件登录与权限单元测试。
-
-该文件不在 verify-release.mjs 门禁内，需手动运行：
-    python -m unittest test_auth_plugin -v
-"""
-
-from __future__ import annotations
-
-import asyncio
-import base64
-import hashlib
-import hmac
+"""zhiyun-auth 回归：品牌保存语义与最后管理员保护。"""
 import json
 import os
+import sys
 import tempfile
-import time
 import unittest
+from pathlib import Path
 
-# 必须在导入 auth_plugin 之前设置工作目录，因为模块级常量在导入时计算。
-os.environ["QWENPAW_WORKING_DIR"] = tempfile.mkdtemp(prefix="zhiyun-auth-test-")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import auth_plugin as ap  # noqa: E402
+try:
+    import auth_plugin as ap
+    _HAS_DEPS = True
+except Exception:  # CI 环境可能缺 fastapi/pydantic，此时优雅跳过（宿主环境全量执行）
+    _HAS_DEPS = False
+
+unittest_skip = unittest.skipUnless(_HAS_DEPS, "auth_plugin 依赖（fastapi/pydantic）不可用")
+
+
+def _repoint(ap, tmp):
+    """把模块的派生路径常量指到临时目录。"""
+    ap.AUTH_DIR = Path(tmp) / "auth"
+    ap.USERS_FILE = ap.AUTH_DIR / "users.json"
+    ap.SECRET_FILE = ap.AUTH_DIR / "token_secret.txt"
+    ap.BRANDING_DIR = Path(tmp) / "branding"
+    ap.LOGIN_CONFIG_FILE = ap.BRANDING_DIR / "login-config.json"
+    ap.CONFIG_FILE = Path(tmp) / "config.json"
+
+
+@unittest_skip
+class BrandingSemanticsTests(unittest.TestCase):
+    def test_empty_background_keeps_existing_cover(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self._repoint(tmp)
+            (Path(tmp) / "branding").mkdir()
+            (Path(tmp) / "branding" / "login-config.json").write_text(
+                json.dumps({"brand_name": "B", "enterprise": "E", "background_data_url": "data:image/png;base64,OLD"}),
+                encoding="utf-8",
+            )
+            req = ap.BrandingRequest(brand_name="B2", enterprise="E2", background_data_url="")
+            import asyncio
+
+            asyncio.run(ap.update_branding(req, authorization=self._admin_auth(tmp)))
+            cfg = json.loads((Path(tmp) / "branding" / "login-config.json").read_text(encoding="utf-8"))
+            self.assertEqual(cfg["background_data_url"], "data:image/png;base64,OLD")
+            self.assertEqual(cfg["brand_name"], "B2")
+
+    def _repoint(self, tmp):
+        _repoint(ap, tmp)
+
+    def _admin_auth(self, tmp):
+        (Path(tmp) / "auth").mkdir(exist_ok=True)
+        users = [{"username": "admin", "role": "admin", "active": True,
+                  "password_hash": "", "password_salt": "", "display_name": "a",
+                  "agent_id": "default", "data_scope": "enterprise", "kb_scope": "", "created_at": ""}]
+        (Path(tmp) / "auth" / "users.json").write_text(json.dumps(users), encoding="utf-8")
+        return "Bearer " + ap._create_token("admin")
+
+
+@unittest_skip
+class LastAdminGuardTests(unittest.TestCase):
+    def test_cannot_demote_last_active_admin(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self._repoint(tmp)
+            (Path(tmp) / "auth").mkdir()
+            users = [
+                {"username": "admin", "role": "admin", "active": True, "display_name": "a",
+                 "password_hash": "", "password_salt": "", "agent_id": "default",
+                 "data_scope": "enterprise", "kb_scope": "", "created_at": ""},
+                {"username": "m1", "role": "member", "active": True, "display_name": "m",
+                 "password_hash": "", "password_salt": "", "agent_id": "default",
+                 "data_scope": "enterprise", "kb_scope": "", "created_at": ""},
+            ]
+            (Path(tmp) / "auth" / "users.json").write_text(json.dumps(users), encoding="utf-8")
+            req = ap.UserUpsertRequest(username="admin", password="", display_name="a", role="member",
+                                       agent_id="default", data_scope="enterprise", kb_scope="", active=True)
+            import asyncio
+
+            with self.assertRaises(Exception) as ctx:
+                asyncio.run(ap.upsert_user(req, authorization=self._admin_auth(tmp)))
+            self.assertIn("最后一个", str(ctx.exception.detail) if hasattr(ctx.exception, "detail") else str(ctx.exception))
+
+    def _repoint(self, tmp):
+        _repoint(ap, tmp)
+
+    def _admin_auth(self, tmp):
+        return "Bearer " + ap._create_token("admin")
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+# ---------------------------------------------------------------------------
+# server-side RBAC hardening (issue-77): PBKDF2 / token / admin-guard / routes
+# ---------------------------------------------------------------------------
+
+import asyncio  # noqa: E402
+import base64  # noqa: E402
+import hashlib  # noqa: E402
+import hmac  # noqa: E402
+import time  # noqa: E402
 
 
 def _make_legacy_hash(password: str, salt: str) -> str:
@@ -40,6 +120,7 @@ def _make_expired_token(username: str) -> str:
     return f"{b64}.{sig}"
 
 
+@unittest_skip
 class AuthPasswordTests(unittest.TestCase):
     """PBKDF2 与旧版 SHA256 密码校验。"""
 
@@ -82,6 +163,7 @@ class AuthPasswordTests(unittest.TestCase):
         self.assertTrue(ap._verify_password("OldPass1", user["password_hash"], user["password_salt"]))
 
 
+@unittest_skip
 class AuthTokenTests(unittest.TestCase):
     """Token 生成、校验与 _bearer_token 解析。"""
 
@@ -133,6 +215,7 @@ class AuthTokenTests(unittest.TestCase):
         self.assertIsNone(ap._verify_token(_make_expired_token("carol")))
 
 
+@unittest_skip
 class AuthAdminGuardTests(unittest.TestCase):
     """_require_admin 路由保护。"""
 
@@ -170,6 +253,7 @@ class AuthAdminGuardTests(unittest.TestCase):
         self.assertEqual(ap._require_admin("Bearer " + token), "admin")
 
 
+@unittest_skip
 class AuthRoutesTests(unittest.TestCase):
     """login / me / list_users 异步路由。"""
 
@@ -181,7 +265,7 @@ class AuthRoutesTests(unittest.TestCase):
         return asyncio.run(coro)
 
     def test_login_success(self) -> None:
-        resp = self._run(ap.login(ap.LoginRequest(username="admin", password="Zhiyun@2026")))
+        resp = self._run(ap.login(ap.LoginRequest(username="admin", password=ap.DEFAULT_ADMIN_PASSWORD)))
         self.assertTrue(resp["token"])
         self.assertEqual(resp["user"]["role"], "admin")
 
@@ -202,7 +286,7 @@ class AuthRoutesTests(unittest.TestCase):
 
     def test_me_with_valid_token(self) -> None:
         token = self._run(ap.login(ap.LoginRequest(
-            username="admin", password="Zhiyun@2026")))["token"]
+            username="admin", password=ap.DEFAULT_ADMIN_PASSWORD)))["token"]
         resp = self._run(ap.me(authorization="Bearer " + token))
         self.assertEqual(resp["user"]["role"], "admin")
 
@@ -230,7 +314,7 @@ class AuthRoutesTests(unittest.TestCase):
 
     def test_list_users_admin_ok(self) -> None:
         token = self._run(ap.login(ap.LoginRequest(
-            username="admin", password="Zhiyun@2026")))["token"]
+            username="admin", password=ap.DEFAULT_ADMIN_PASSWORD)))["token"]
         resp = self._run(ap.list_users(authorization="Bearer " + token))
         self.assertEqual(resp["current"], "admin")
         self.assertGreaterEqual(len(resp["users"]), 1)

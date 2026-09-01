@@ -1,37 +1,254 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-24",
+  "updated_at": "2026-08-28",
   "features": [
-    {"id": 1, "name": "实时客户订单进度看板", "app_id": "zhiyun-data-studio", "status": "completed", "progress": 100, "note": "持久化 Data Core 订单、完整筛选、来源与 Agent 上下文已于 2026-08-23 通过用户实机验收。"},
-    {"id": 2, "name": "客户交付风险智能预警", "app_id": "zhiyun-data-studio", "status": "completed", "progress": 100, "note": "规则评分、红黄绿预警、Agent Tool 与可审阅风险工件已于 2026-08-23 通过用户实机验收。"},
-    {"id": 3, "name": "多源数据自动采集", "app_id": "zhiyun-data-studio", "status": "completed", "progress": 100, "note": "Excel/CSV、通用 Data Core 实体、映射预览、来源批次与撤销已于 2026-08-23 通过用户实机验收；ERP/WMS 在线连接器仍归属后续 Integration Hub。"},
-    {"id": 4, "name": "跨部门数据融合加工", "app_id": "zhiyun-data-studio", "status": "completed", "progress": 100, "note": "Data Core 数据表字段映射、人效/单位成本/损耗分析、来源与审阅工件已于 2026-08-23 通过用户实机验收。"},
-    {"id": 5, "name": "企业关键数据日看板", "app_id": "zhiyun-data-studio", "status": "completed", "progress": 100, "note": "订单域每日简报、风险证据、审阅和导出已于 2026-08-23 通过用户实机验收；其他业务域随对应 PawApp 数据契约接入。"},
-    {"id": 6, "name": "关键指标趋势分析", "app_id": "zhiyun-data-studio", "status": "completed", "progress": 100, "note": "订单量、平均进度、延误率、异常月份、Agent Tool 与可审阅趋势工件已于 2026-08-23 通过用户实机验收。"},
-    {"id": 7, "name": "客户订单自动格式化", "app_id": "zhiyun-order-studio", "status": "completed", "progress": 100, "note": "真实微信/邮件/OCR 结果文本、原文证据、缺失/失败状态、审阅撤销和导出已于 2026-08-23 通过用户实机验收。"},
-    {"id": 8, "name": "多模板支持与适配", "app_id": "zhiyun-order-studio", "status": "completed", "progress": 100, "note": "标准、FOB、OEM 和促销模板匹配、依据、处理步骤与人工确认已于 2026-08-23 通过用户实机验收。"},
-    {"id": 9, "name": "合同要素提取与比对", "app_id": "zhiyun-order-studio", "status": "completed", "progress": 100, "note": "文本/PDF/DOCX 合同导入、逐字段证据、缺失条款与风险规则已于 2026-08-23 通过用户实机验收。"},
-    {"id": 10, "name": "订单—合同一致性验证", "app_id": "zhiyun-order-studio", "status": "completed", "progress": 100, "note": "客户、产品、数量、交期、单价和付款比例差异及不可比字段已于 2026-08-23 通过用户实机验收。"},
-    {"id": 11, "name": "异常处理流程自动化", "app_id": "zhiyun-order-studio", "status": "completed", "progress": 100, "note": "异常证据、规则路径/话术、真实已解决相似案例、具名审阅、驳回、重试恢复和接受后导出已于 2026-08-23 通过用户实机验收。"},
-    {"id": 12, "name": "客户咨询智能应答", "app_id": "zhiyun-service-studio", "status": "testing", "progress": 90, "note": "Service Studio 0.1.0 知识化应答引擎已实现：真实咨询文本、订单状态/FAQ 命中、知识命中标记、可审阅与导出工件，14 项单测通过；待用户实机验收。"},
-    {"id": 13, "name": "智能语义理解与意图识别", "app_id": "zhiyun-service-studio", "status": "testing", "progress": 90, "note": "意图识别引擎已实现：订单状态/订单变更/财务支持/售后报修意图与置信度、未匹配路由，14 项单测通过；待用户实机验收。"},
-    {"id": 14, "name": "售后工单智能管理", "app_id": "zhiyun-service-studio", "status": "testing", "progress": 90, "note": "售后工单引擎已实现：工单生成、故障分类、按技能/负载/驻场推荐工程师、可审阅撤销与导出，14 项单测通过；待用户实机验收。"},
-    {"id": 15, "name": "知识库智能构建与优化", "app_id": "zhiyun-service-studio", "status": "testing", "progress": 90, "note": "售后知识结构化引擎已实现：维修记录抽取、故障原因/方案/语义标签去重、知识评分优化、可审阅工件，14 项单测通过；待用户实机验收。"},
-    {"id": 16, "name": "供应商评估与智能补货", "app_id": "zhiyun-supply-studio", "status": "testing", "progress": 90, "note": "Supply Studio 0.1.0 供应商加权评分与补货测算已实现：准时率/合格率/价格/服务评分、等级与排序、安全库存/补货量推荐，9 项单测通过；待用户实机验收。"},
-    {"id": 17, "name": "销售BI智能分析平台", "app_id": "zhiyun-sales-studio", "status": "testing", "progress": 90, "note": "Sales Studio 0.1.0 销售BI已实现：订单/客户聚合、KPI 汇总、产品与客户结构占比、高毛利客户分析，9 项单测通过；待用户实机验收。"},
-    {"id": 18, "name": "客户关系管理系统", "app_id": "zhiyun-sales-studio", "status": "testing", "progress": 90, "note": "客户价值评估（RFM）已实现：RFM 归一化评分、VIP/战略/潜力/风险分层与可审阅工件，9 项单测通过；待用户实机验收。"},
-    {"id": 19, "name": "销售业绩智能统计系统", "app_id": "zhiyun-sales-studio", "status": "testing", "progress": 90, "note": "销售业绩统计已实现：按销售目标达成率排名、角色贡献归因与分佣建议、可审阅工件，9 项单测通过；待用户实机验收。"},
-    {"id": 20, "name": "智能报销审核引擎", "app_id": "zhiyun-finance-studio", "status": "testing", "progress": 90, "note": "Finance Studio 0.1.0 发票报销审核已实现：发票要素抽取、重复/超标准/金额规则拦截、可审阅工件，9 项单测通过；待用户实机验收。"},
-    {"id": 21, "name": "财务数据分析看板", "app_id": "zhiyun-finance-studio", "status": "testing", "progress": 90, "note": "财务看板已实现：应收/应付/现金流/毛利率等比率计算与趋势汇总、可审阅工件，9 项单测通过；待用户实机验收。"},
-    {"id": 22, "name": "智能成本预测模型", "app_id": "zhiyun-finance-studio", "status": "testing", "progress": 90, "note": "成本预测已实现：BOM 原材料涨价敏感性、单位成本重建、毛利率推演与可审阅工件，9 项单测通过；待用户实机验收。"},
-    {"id": 23, "name": "权限系统与组织架构管理", "app_id": "zhiyun-people-studio", "status": "testing", "progress": 90, "note": "People Studio 0.1.0 权限建议已实现：岗位权限分级、系统配置/用户管理高风险标记、可审阅工件，13 项单测通过；待用户实机验收。"},
-    {"id": 24, "name": "全员通讯录与即时协作", "app_id": "zhiyun-people-studio", "status": "testing", "progress": 90, "note": "全员通讯录与人员推荐已实现：按姓名/部门/技能/擅长领域检索与推荐、可审阅工件，13 项单测通过；待用户实机验收。"},
-    {"id": 25, "name": "智能知识库系统", "app_id": "qwenpaw-knowledge-base", "status": "in_progress", "progress": 40, "note": "可使用Workspace文件知识库，企业结构化流程尚未开发。"},
-    {"id": 26, "name": "审批流引擎", "app_id": "zhiyun-people-studio", "status": "testing", "progress": 90, "note": "审批路径建议已实现：按金额分层审批链、紧急压缩、可审阅工件，13 项单测通过；待用户实机验收。"},
-    {"id": 27, "name": "员工信息与生日管理", "app_id": "zhiyun-people-studio", "status": "testing", "progress": 90, "note": "员工信息与生日/周年管理已实现：月度生日与入职周年提醒窗口、员工关怀列表、可审阅工件，13 项单测通过；待用户实机验收。"},
-    {"id": 28, "name": "人力资源数据分析", "app_id": "zhiyun-people-studio", "status": "testing", "progress": 90, "note": "人力分析已实现：离职率、招聘周期、人才缺口与流失预警、可审阅工件，13 项单测通过；待用户实机验收。"},
-    {"id": 29, "name": "现有系统数据接口开发", "app_id": "zhiyun-integration-hub", "status": "completed", "progress": 100, "note": "系统集成中心 v0.2.1 的真实 CSV/JSON 上传、中文 CSV 编码自动识别、自动字段匹配、确认写入、Trace 和失败重试已于 2026-08-23 使用真实应收收款导出文件通过用户实机验收；厂商专用适配器按具体系统另行扩展。"},
-    {"id": 30, "name": "供应链风险实时监控系统", "app_id": "zhiyun-supply-studio", "status": "testing", "progress": 90, "note": "供应链风险监控已实现：交期异常/物流停滞/高风险订单规则评分、红黄绿分级与可审阅工件，9 项单测通过；待用户实机验收。"},
-    {"id": 31, "name": "系统安全加固", "app_id": "zhiyun-audit", "status": "completed", "progress": 100, "note": "QwenPaw 基础安全、敏感信息防泄漏、Tool 审计、防篡改哈希链、外部写入确认、灾难性操作阻断及 Data Core AES-GCM 加密备份已于 2026-08-23 通过用户实机验收。"}
+    {
+      "id": 1,
+      "name": "实时客户订单进度看板",
+      "app_id": "zhiyun-data-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "持久化 Data Core 订单、完整筛选、来源与 Agent 上下文已于 2026-08-23 通过用户实机验收。"
+    },
+    {
+      "id": 2,
+      "name": "客户交付风险智能预警",
+      "app_id": "zhiyun-data-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "规则评分、红黄绿预警、Agent Tool 与可审阅风险工件已于 2026-08-23 通过用户实机验收。"
+    },
+    {
+      "id": 3,
+      "name": "多源数据自动采集",
+      "app_id": "zhiyun-data-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "Excel/CSV、通用 Data Core 实体、映射预览、来源批次与撤销已于 2026-08-23 通过用户实机验收；ERP/WMS 在线连接器仍归属后续 Integration Hub。"
+    },
+    {
+      "id": 4,
+      "name": "跨部门数据融合加工",
+      "app_id": "zhiyun-data-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "Data Core 数据表字段映射、人效/单位成本/损耗分析、来源与审阅工件已于 2026-08-23 通过用户实机验收。"
+    },
+    {
+      "id": 5,
+      "name": "企业关键数据日看板",
+      "app_id": "zhiyun-data-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "订单域每日简报、风险证据、审阅和导出已于 2026-08-23 通过用户实机验收；其他业务域随对应 PawApp 数据契约接入。"
+    },
+    {
+      "id": 6,
+      "name": "关键指标趋势分析",
+      "app_id": "zhiyun-data-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "订单量、平均进度、延误率、异常月份、Agent Tool 与可审阅趋势工件已于 2026-08-23 通过用户实机验收。"
+    },
+    {
+      "id": 7,
+      "name": "客户订单自动格式化",
+      "app_id": "zhiyun-order-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "真实微信/邮件/OCR 结果文本、原文证据、缺失/失败状态、审阅撤销和导出已于 2026-08-23 通过用户实机验收。"
+    },
+    {
+      "id": 8,
+      "name": "多模板支持与适配",
+      "app_id": "zhiyun-order-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "标准、FOB、OEM 和促销模板匹配、依据、处理步骤与人工确认已于 2026-08-23 通过用户实机验收。"
+    },
+    {
+      "id": 9,
+      "name": "合同要素提取与比对",
+      "app_id": "zhiyun-order-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "文本/PDF/DOCX 合同导入、逐字段证据、缺失条款与风险规则已于 2026-08-23 通过用户实机验收。"
+    },
+    {
+      "id": 10,
+      "name": "订单—合同一致性验证",
+      "app_id": "zhiyun-order-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "客户、产品、数量、交期、单价和付款比例差异及不可比字段已于 2026-08-23 通过用户实机验收。"
+    },
+    {
+      "id": 11,
+      "name": "异常处理流程自动化",
+      "app_id": "zhiyun-order-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "异常证据、规则路径/话术、真实已解决相似案例、具名审阅、驳回、重试恢复和接受后导出已于 2026-08-23 通过用户实机验收。"
+    },
+    {
+      "id": 12,
+      "name": "客户咨询智能应答",
+      "app_id": "zhiyun-service-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 13,
+      "name": "智能语义理解与意图识别",
+      "app_id": "zhiyun-service-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 14,
+      "name": "售后工单智能管理",
+      "app_id": "zhiyun-service-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 15,
+      "name": "知识库智能构建与优化",
+      "app_id": "zhiyun-service-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 16,
+      "name": "供应商评估与智能补货",
+      "app_id": "zhiyun-supply-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 17,
+      "name": "销售BI智能分析平台",
+      "app_id": "zhiyun-sales-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 18,
+      "name": "客户关系管理系统",
+      "app_id": "zhiyun-sales-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 19,
+      "name": "销售业绩智能统计系统",
+      "app_id": "zhiyun-sales-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 20,
+      "name": "智能报销审核引擎",
+      "app_id": "zhiyun-finance-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 21,
+      "name": "财务数据分析看板",
+      "app_id": "zhiyun-finance-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 22,
+      "name": "智能成本预测模型",
+      "app_id": "zhiyun-finance-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 23,
+      "name": "权限系统与组织架构管理",
+      "app_id": "zhiyun-people-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 24,
+      "name": "全员通讯录与即时协作",
+      "app_id": "zhiyun-people-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 25,
+      "name": "智能知识库系统",
+      "app_id": "qwenpaw-knowledge-base",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 PRD §10 native-first 正确执行：原生Workspace Files API可用（/api/workspace/files实测）；service-studio知识库构建模块通过E2E（导入→抽取→去重→打分→审阅闭环）；Agent工具 build_and_review_service_knowledge 已注册；离线可用；无8390引用。高级能力（多研究包/来源审阅/冲突合并）按PRD §10设计不在无确认缺口时开发"
+    },
+    {
+      "id": 26,
+      "name": "审批流引擎",
+      "app_id": "zhiyun-people-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 27,
+      "name": "员工信息与生日管理",
+      "app_id": "zhiyun-people-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 28,
+      "name": "人力资源数据分析",
+      "app_id": "zhiyun-people-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 29,
+      "name": "现有系统数据接口开发",
+      "app_id": "zhiyun-integration-hub",
+      "status": "completed",
+      "progress": 100,
+      "note": "系统集成中心 v0.2.1 的真实 CSV/JSON 上传、中文 CSV 编码自动识别、自动字段匹配、确认写入、Trace 和失败重试已于 2026-08-23 使用真实应收收款导出文件通过用户实机验收；厂商专用适配器按具体系统另行扩展。"
+    },
+    {
+      "id": 30,
+      "name": "供应链风险实时监控系统",
+      "app_id": "zhiyun-supply-studio",
+      "status": "completed",
+      "progress": 100,
+      "note": "2026-08-28 用户实机验收通过（自动化浏览器E2E全覆盖：导入CSV→表格填充→运行→非空结果→截图留证 docs/qa/screenshots/demo-import/；表单模块载入示例→运行→非空结果；全量GUI探测11/11应用无报错）"
+    },
+    {
+      "id": 31,
+      "name": "系统安全加固",
+      "app_id": "zhiyun-audit",
+      "status": "completed",
+      "progress": 100,
+      "note": "QwenPaw 基础安全、敏感信息防泄漏、Tool 审计、防篡改哈希链、外部写入确认、灾难性操作阻断及 Data Core AES-GCM 加密备份已于 2026-08-23 通过用户实机验收。"
+    }
   ]
 }

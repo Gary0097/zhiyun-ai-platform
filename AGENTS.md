@@ -1,4 +1,4 @@
-# Zhiyun AI-OS Development Rules
+# 灵泽万川智造云 Development Rules
 
 These rules apply to the entire repository. Read the PRD in
 `docs/product/AI-OS-PRD-V6.4-QwenPaw-PawApps.md`, the architecture documents,
@@ -13,7 +13,11 @@ and the applicable progress ledger before changing product behavior.
   system plugins, launchers, the shared Workspace contract, and version locks.
 - Data Studio and Order Studio are independent repositories. Update their lock
   entries here only after the corresponding external commit is available.
-- Creator is reference-only and must not be loaded as a product application.
+- QwenPaw Creator ships as a controlled product app (video-compression edition,
+  `plugins/qwenpaw-creator`); other upstream Creator capabilities stay out of scope.
+- Agent Kanban is vendored the same way (`plugins/agent-kanban`): the offline-USB
+  channel must ship both official apps from this tree, so they share the system
+  plugin install path instead of an external PawApp commit lock.
 - Do not edit generated installations under
   `apps/qwenpaw-embedded/runtime/pawapps`; change the owning repository instead.
 

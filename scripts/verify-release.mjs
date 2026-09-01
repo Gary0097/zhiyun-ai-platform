@@ -25,7 +25,7 @@ const qwenpawLock = JSON.parse(readFileSync(join(embedded, 'qwenpaw.lock.json'),
 assert.equal(qwenpawLock.schema_version, 1)
 assert.equal(qwenpawLock.package, 'qwenpaw')
 assert.equal(qwenpawLock.version, '2.1.0')
-assert.equal(qwenpawLock.ref, 'release/v2.1.0', 'QwenPaw must stay pinned to release/v2.1.0')
+assert.equal(qwenpawLock.ref, 'release/v2.1.0')
 assert.match(qwenpawLock.commit, /^[0-9a-f]{40}$/, 'QwenPaw must use a full commit SHA')
 const pawapps = JSON.parse(readFileSync(join(embedded, 'pawapps.lock.json'), 'utf8'))
 assert.equal(pawapps.schema_version, 1)
@@ -60,9 +60,11 @@ assert.ok(sync.includes("rmSync(join(staging, '.git')"), 'sync must remove Git m
 assert.ok(sync.includes('AI_OS_OFFLINE') && sync.includes("'bundle', 'create'"), 'sync must support verified PawApp offline bundles')
 const cleanup = readFileSync(join(scripts, 'cleanup-legacy.mjs'), 'utf8')
 assert.ok(cleanup.includes('QWENPAW_WORKING_DIR') && cleanup.includes('COPAW_WORKING_DIR'), 'cleanup must follow the QwenPaw working directory contract')
-for (const pluginId of ['cospaw', 'ai_decision', 'team_chat', 'qwenpaw-creator']) {
+for (const pluginId of ['cospaw', 'ai_decision', 'team_chat']) {
   assert.ok(cleanup.includes(pluginId), `cleanup must quarantine incompatible plugin: ${pluginId}`)
 }
+assert.ok(cleanup.includes('转为受控产品应用'), 'cleanup must document that qwenpaw-creator is now a controlled product app')
+assert.ok(existsSync(join(root, 'plugins', 'qwenpaw-creator', 'backend', 'main.py')), 'controlled creator app is missing')
 assert.ok(existsSync(join(root, 'plugins', 'zhiyun-logo', 'assets', 'default-logo.png')), 'packaged default logo is missing')
 
 const allowedToolTypes = new Set(['file', 'internal', 'network', 'shell'])
@@ -87,6 +89,7 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'sync-pawapps.mjs')]],
   [process.execPath, ['--check', join(scripts, 'doctor.mjs')]],
   [process.execPath, ['--check', join(scripts, 'cleanup-legacy.mjs')]],
+  [process.execPath, [join(scripts, 'patch-console-ui.mjs'), '--check']],
   [process.execPath, ['--check', join(scripts, 'set-logo.mjs')]],
   [process.execPath, ['--check', join(scripts, 'health-report.mjs')]],
   [process.execPath, [join(scripts, 'health-report.mjs'), '--check']],
@@ -94,6 +97,7 @@ const commands = [
   [process.execPath, [join(scripts, 'set-logo.mjs'), '--check']],
   [process.execPath, [join(scripts, 'sync-pawapps.mjs'), '--check']],
   [process.execPath, [join(scripts, 'verify-deployment.mjs')]],
+  [process.execPath, [join(scripts, 'verify-no-git-boot.mjs')]],
   [process.execPath, [join(scripts, 'verify-runtime.mjs')]],
   [process.execPath, [join(scripts, 'verify-pawapp-offline.mjs')]],
   [process.execPath, [join(scripts, 'verify-maintenance.mjs')]],
@@ -137,7 +141,7 @@ for (const app of pawapps.apps) {
 }
 
 const python = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3')
-for (const plugin of ['zhiyun-app-discovery', 'zhiyun-audit', 'zhiyun-data-core']) {
+for (const plugin of ['zhiyun-app-discovery', 'zhiyun-audit', 'zhiyun-data-core', 'zhiyun-auth', 'qwenpaw-creator']) {
   const result = spawnSync(python, ['-m', 'unittest', 'discover', '-s', join(root, 'plugins', plugin), '-p', 'test*.py', '-v'], { cwd: join(root, 'plugins', plugin), stdio: 'inherit' })
   assert.equal(result.status, 0, `Python tests failed: ${plugin}`)
 }
@@ -149,3 +153,4 @@ for (const app of pawapps.apps) {
 }
 
 console.log('AI-OS 发布门禁通过：纯QwenPaw架构、跨平台启动、版本锁、系统插件和全部锁定PawApp测试均正常。')
+

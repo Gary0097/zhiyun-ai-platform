@@ -1,4 +1,4 @@
-# 智造云 AI-OS 产品需求文档 PRD V6.4（产品确认版）
+# 制造云 AI-OS 产品需求文档 PRD V6.4（产品确认版）
 
 > 文档状态：产品方向已确认；进入开发前基线。确认日期：2026-08-22。
 >
@@ -16,7 +16,7 @@
 
 # 1. 文档目的
 
-本 PRD 用于替代以 DeepSeek Harness、独立企业管理平台和固定 8390 服务为中心的旧架构描述，确定智造云 AI-OS 下一阶段的产品边界、应用标准、加载方式、数据组织、Agent 协作、日志审计和验收方法。
+本 PRD 用于替代以 DeepSeek Harness、独立企业管理平台和固定 8390 服务为中心的旧架构描述，确定制造云 AI-OS 下一阶段的产品边界、应用标准、加载方式、数据组织、Agent 协作、日志审计和验收方法。
 
 本文只定义目标产品，不承诺保留旧技术实现。旧系统中有业务价值的数据、规则和流程可以迁移；旧页面、旧端口、旧模拟器和旧运行链路不作为兼容目标。
 
@@ -29,8 +29,8 @@
 | AgentScope Platform 上的 QwenPaw Creator | https://platform.agentscope.io/plugins/qwenpaw-creator | 应用发布、安装和分发形态 |
 | QwenPaw Creator 1.1.0 | https://github.com/agentscope-ai/QwenPaw/tree/release/v2.1.0/plugins/apps/qwenpaw-creator | 仅作为开发参考：原生 PawApp、项目工作台、应用内 Agent、资产/工件、审阅、运行依赖、健康检查；不作为 AI-OS 预装应用 |
 | QwenPaw | https://github.com/agentscope-ai/QwenPaw/tree/release/v2.1.0 | Apps、PawApp SDK、Workspace、模型、插件生命周期和宿主能力 |
-| QwenPaw-Data / DataPaw | https://github.com/agentscope-ai/QwenPaw-Data | 仅参考企业数据接地、托管依赖、语义层和可追溯分析；不直接加载，智造云自研 Data Studio |
-| 智造云 AI-OS | https://github.com/Gary0097/zhiyun-ai-platform | 产品主仓库、系统插件、应用清单、打包索引和集成验证 |
+| QwenPaw-Data / DataPaw | https://github.com/agentscope-ai/QwenPaw-Data | 仅参考企业数据接地、托管依赖、语义层和可追溯分析；不直接加载，制造云自研 Data Studio |
+| 制造云 AI-OS | https://github.com/Gary0097/zhiyun-ai-platform | 产品主仓库、系统插件、应用清单、打包索引和集成验证 |
 
 ## 2.2 “参照 Creator”具体指什么
 
@@ -75,7 +75,7 @@
 
 # 4. 产品定位
 
-智造云 AI-OS 是运行在 QwenPaw 上的企业 AI 应用工作台：QwenPaw 提供宿主、模型、Workspace、Apps、插件生命周期和基础对话；智造云提供一组面向真实岗位任务的 PawApp。
+制造云 AI-OS 是运行在 QwenPaw 上的企业 AI 应用工作台：QwenPaw 提供宿主、模型、Workspace、Apps、插件生命周期和基础对话；制造云提供一组面向真实岗位任务的 PawApp。
 
 AI-OS 不再等于“大而全的后台”。用户看到的是一个统一桌面和多个可工作的应用。每个应用解决一个完整岗位场景，并能把结果沉淀为可继续编辑、查询和审计的项目与工件。
 
@@ -695,7 +695,7 @@ Data Studio 参考 DataPaw 的接地模式，但第一版控制复杂度。
 # 19. 总体验收场景
 
 1. 新电脑安装 QwenPaw 和 AI-OS 后，只运行一个启动入口即可打开 8088。
-2. Apps 中可以看到已登记的智造云应用；选择安装后能正常打开。
+2. Apps 中可以看到已登记的制造云应用；选择安装后能正常打开。
 3. Workspace Files / Knowledge Base 接收真实混合文档并完成可检索知识整理；若 Knowledge Studio 已立项，则额外验收高级研究闭环。
 4. 自研 Data Studio 接入真实测试数据，回答业务问题并输出可追溯图表/报告。
 5. 用户在应用页面选择某个对象并要求 Agent 修改，修改准确落到该对象。
@@ -716,7 +716,7 @@ Data Studio 参考 DataPaw 的接地模式，但第一版控制复杂度。
 2. 所有业务功能以 PawApp 交付；31 项功能按真实需求聚合进入业务应用、原生知识能力和系统层。
 3. 知识能力优先使用 Workspace Files / Knowledge Base，独立 Knowledge Studio 按缺口立项。
 4. Creator 只作为开发参考，不直接加载为 AI-OS 应用。
-5. DataPaw 只作为架构参考，不直接加载；智造云自研 Data Studio。
+5. DataPaw 只作为架构参考，不直接加载；制造云自研 Data Studio。
 6. 每个业务 PawApp 从第一天起使用独立 GitHub 仓库。
 7. 首版只保留必要的应用内操作确认，不建设通用 Capability 权限和 Approval 审批中心。
 8. AI-OS 和所有 PawApp 必须支持 Windows、Linux 快速部署；双平台兼容性是进入应用索引的前置条件。
@@ -753,7 +753,7 @@ Data Studio 参考 DataPaw 的接地模式，但第一版控制复杂度。
 ## 22.1 企业环境初始化器（zhiyun-enterprise-seeder）
 
 1. 新增 `zhiyun-enterprise-seeder` 插件：一次初始化生成企业、部门、用户、角色、权限、Agent、Skill、应用、数据源、会话、任务、Token、日志；落库 `enterprise.db`，按 `env_id + data_mode` 区分多环境。
-2. `/seed` 一次生成并同步账号到 `auth/users.json`；默认密码统一 `Zhiyun@2026`（与 admin 一致，仅演示用）。
+2. `/seed` 一次生成并同步账号到 `auth/users.json`；默认密码统一 `ZhizaoYun@2026`（与 admin 一致，仅演示用）。
 3. 修复 `/records/{entity}` 的环境隔离：强制 `env_id` + `data_mode` 过滤，避免多环境数据串扰。
 
 ## 22.2 服务端 Bearer 鉴权（落地 21.2.6 的第一步）

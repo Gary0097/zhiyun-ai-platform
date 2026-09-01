@@ -22,7 +22,7 @@
 | --- | --- |
 | 目标 | 一键从零生成完整企业组织与数字员工 |
 | 范围 | 企业 → 部门 → 用户 → 角色 → 权限 → Agent → Skill → 应用 → 数据源 → 会话 → 任务执行 → Token → 操作日志 |
-| 复用现状 | `zhiyun-auth` 已有登录门、用户文件、默认账号 `admin/Zhiyun@2026`；`zhiyun-enterprise-seeder` 已上线（seed/config/summary/records，含多环境隔离与 Bearer 鉴权）；`zhiyun-data-core` 已有 `data_core_meta / data_batches / data_records` 与 `source_type=real\|simulated` |
+| 复用现状 | `zhiyun-auth` 已有登录门、用户文件、默认账号 `admin/ZhizaoYun@2026`；`zhiyun-enterprise-seeder` 已上线（seed/config/summary/records，含多环境隔离与 Bearer 鉴权）；`zhiyun-data-core` 已有 `data_core_meta / data_batches / data_records` 与 `source_type=real\|simulated` |
 | 缺口 | 已实现一键初始化与账号同步；仍需 Agent 与执行记录/Token/日志的跨模块引用闭环与一致性校验（见 Epic 3/6） |
 | 关键产物 | 企业模板（制造企业）、部门/岗位/权限矩阵、初始化命令、运行时实体 |
 | 验收 | 全新 DB 一次初始化后，企业、部门、用户、角色、权限、Agent、Skill、应用、会话、任务、Token、日志全部存在且可跨模块引用 |

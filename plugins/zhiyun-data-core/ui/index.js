@@ -5,13 +5,12 @@
   var antd = Q.host.antd;
   var h = React.createElement;
 
-  function readToken() {
-    try { return window.localStorage.getItem("zhiyun_token") || ""; } catch (e) { return ""; }
-  }
   function request(path, options) {
     var opts = Object.assign({}, options || {});
-    var token = readToken();
-    opts.headers = Object.assign({}, (options && options.headers) || {}, token ? { Authorization: "Bearer " + token } : {});
+    try {
+      var t = window.localStorage.getItem("zhiyun_token");
+      if (t) opts.headers = Object.assign({}, (options && options.headers) || {}, { Authorization: "Bearer " + t });
+    } catch (e) {}
     return Q.host.fetch(path, opts).then(function (response) {
       if (!response.ok) return response.json().catch(function () { return {}; }).then(function (body) {
         throw new Error(body.detail || ("HTTP " + response.status));
@@ -92,6 +91,9 @@
     var recordsState = React.useState([]);
     var records = recordsState[0];
     var setRecords = recordsState[1];
+    var addFieldOpenState = React.useState(false); var addFieldOpen = addFieldOpenState[0]; var setAddFieldOpen = addFieldOpenState[1];
+    var newFieldState = React.useState({ field_name: "", field_label: "", field_type: "text", field_required: false });
+    var newField = newFieldState[0]; var setNewField = newFieldState[1];
     var sourceState = React.useState("");
     var source = sourceState[0];
     var setSource = sourceState[1];
@@ -128,25 +130,100 @@
     var agentDraftState = React.useState(""), agentDraft = agentDraftState[0], setAgentDraft = agentDraftState[1];
     var agentMsgState = React.useState([]), agentMessages = agentMsgState[0], setAgentMessages = agentMsgState[1];
     var agentBusyState = React.useState(false), agentBusy = agentBusyState[0], setAgentBusy = agentBusyState[1];
+    var agentSessionRef = React.useRef("data-core-" + Date.now().toString(36));
     function agentAdd(role, text, card) { setAgentMessages(function (prev) { return prev.concat([{ role: role, text: text, card: card }]); }); }
     function agentCommand(key, label) {
-      agentAdd("user", label || key);
+      var prompt = key === "preview" ? "帮我汇总当前数据概览，哪些实体可用？"
+        : key === "health" ? "当前数据中心健康状态和备份情况如何？"
+        : (label || key);
+      startAgentChat(prompt);
+    }
+    function startAgentChat(text) {
+      text = String(text == null ? "" : text).trim();
+      if (!text || agentBusy) return;
+      var history = (agentMessages || [])
+        .filter(function (m) { return m && m.role !== "system"; })
+        .map(function (m) { return { role: m.role === "bot" ? "assistant" : "user", text: m.text || "" }; })
+        .slice(-12);
+      agentAdd("user", text, null);
+      agentAdd("bot", "", null);
       setAgentBusy(true);
-      setTimeout(function () {
-        zyPushAgent({ app_id: "zhiyun-data-core", kind: key, label: label || key, summary: { entities: entities, records: records, health: health }, source_type: "real" });
+      zyPushAgent({ app_id: "zhiyun-data-core", kind: "chat", label: text, summary: { entities: entities, records: records, health: health }, source_type: "real" });
+      function setLastBot(value) {
+        setAgentMessages(function (prev) {
+          var next = prev.slice();
+          next[next.length - 1] = { role: "bot", text: value, card: null };
+          return next;
+        });
+      }
+      var token = "";
+      try { token = window.localStorage.getItem("zhiyun_token") || ""; } catch (e) {}
+      var agentHeaders = { "Content-Type": "application/json" };
+      if (token) agentHeaders["Authorization"] = "Bearer " + token;
+      var full = "";
+      Q.host.fetch("/zhiyun-data-core/agent/chat", {
+        method: "POST",
+        headers: agentHeaders,
+        body: JSON.stringify({ text: text, session_id: agentSessionRef.current, user_id: "default", app_id: "zhiyun-data-core", history: history })
+      })
+      .then(function (response) {
+        if (!response.ok || !response.body) {
+          return response.text().then(function (t) { throw new Error("HTTP " + response.status + (t && t.trim() ? ": " + t.trim() : "")); });
+        }
+        var reader = response.body.getReader();
+        var decoder = new TextDecoder();
+        var buffer = "";
+        function read() {
+          return reader.read().then(function (chunk) {
+            if (chunk.done) return;
+            buffer += decoder.decode(chunk.value, { stream: true });
+            var lines = buffer.split("\n");
+            buffer = lines.pop();
+            lines.forEach(function (line) {
+              line = line.trim();
+              if (line.indexOf("data: ") !== 0) return;
+              var raw = line.slice(6).trim();
+              if (!raw || raw === "[DONE]") return;
+              var event;
+              try { event = JSON.parse(raw); } catch (e) { return; }
+              if (event.error) {
+                if (!full) { full = "智能体返回失败：" + event.error; setLastBot(full); }
+                return;
+              }
+              if (event.type === "text" && event.delta && typeof event.text === "string" && event.text) {
+                full += event.text;
+                setLastBot(full);
+              }
+              if (event.type === "message" && event.status === "completed" && Array.isArray(event.content)) {
+                for (var i = 0; i < event.content.length; i++) {
+                  var part = event.content[i];
+                  if (part && part.type === "text" && !part.delta && typeof part.text === "string" && part.text) {
+                    full = part.text;
+                    setLastBot(full);
+                  }
+                }
+              }
+              if (event.status === "failed" && !full) {
+                full = event.error || "智能体返回失败";
+                setLastBot(full);
+              }
+            });
+            return read();
+          });
+        }
+        return read();
+      })
+      .then(function () {
         setAgentBusy(false);
-        agentAdd("bot", key === "preview" ? "已汇总数据预览上下文，可直接在界面操作数据表、导入或生成演示数据。" : "已定位至数据管理操作，请在界面完成具体动作。", null);
-      }, 240);
+        if (!full) setLastBot("（智能体未返回可显示内容）");
+      })
+      .catch(function (err) {
+        setAgentBusy(false);
+        setLastBot("调用智能体失败：" + (err && err.message ? err.message : String(err)));
+      });
     }
     function agentSend(text) {
-      agentAdd("user", text);
-      setAgentBusy(true);
-      var key = /预览|数据|表|记录/.test(text) ? "preview" : "health";
-      setTimeout(function () {
-        zyPushAgent({ app_id: "zhiyun-data-core", kind: key, label: text, summary: { entities: entities, records: records, health: health }, source_type: "real" });
-        setAgentBusy(false);
-        agentAdd("bot", "已将「" + text + "」交给数据智能体，可返回界面查看数据表与字段结构。", null);
-      }, 240);
+      startAgentChat(text);
     }
 
     function loadEntities() {
@@ -155,7 +232,7 @@
     }
 
     function loadOperations() {
-      return Promise.all([request("/zhiyun-data-core/health"), request("/zhiyun-data-core/backups")]).then(function (values) {
+      return Promise.all([request("/zhiyun-data-core/health"), request("/zhiyun-data-core/backups").catch(function () { return { backups: [] }; })]).then(function (values) {
         setHealth(values[0]); setBackups(values[1].backups || []);
       });
     }
@@ -173,10 +250,27 @@
         setSchema(values[0]); setRecords(values[1].records || []);
       }).catch(function (reason) { setError(reason.message || "数据加载失败"); })
         .finally(function () { setLoading(false); });
-    }
+      }
+
+      function submitAddField(values) {
+        if (!selected) return Promise.reject(new Error("请先选择数据表"));
+        return request("/zhiyun-data-core/schemas/" + encodeURIComponent(selected) + "/fields", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: values.field_name, label: values.field_label || values.field_name, field_type: values.field_type || "text", required: !!values.field_required })
+        }).then(function () {
+          message.success("字段已添加：" + values.field_name);
+          loadDataset(selected, source);
+        }).catch(function (e) { message.error(e.message || "添加字段失败"); throw e; });
+      }
+      function patchField(fieldName, patch) {
+        return request("/zhiyun-data-core/schemas/" + encodeURIComponent(selected) + "/fields/" + encodeURIComponent(fieldName), {
+          method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch)
+        }).then(function () { loadDataset(selected, source); }).catch(function (e) { message.error(e.message || "字段更新失败"); });
+      }
 
     React.useEffect(function () { loadDataset(selected, source); loadOperations(); }, [selected, source, dataMode]);
     React.useEffect(function () {
+      // 未登录时首次加载会 401；登录成功事件后自动重载（配合端点强制鉴权）
       function onAuth() { loadDataset(selected, source); loadOperations(); }
       window.addEventListener("zhiyun:auth", onAuth);
       return function () { window.removeEventListener("zhiyun:auth", onAuth); };
@@ -268,7 +362,7 @@
             h(antd.Upload, { accept: ".xlsx,.csv", showUploadList: false, beforeUpload: upload }, h(antd.Button, { type: selected === "orders" ? "default" : "primary" }, "导入 Excel/CSV")),
             selected === "orders" || selected === "production" ? h(antd.Button, { type: "primary", onClick: function () { simulate(selected); }, loading: loading }, selected === "orders" ? "生成 20 条演示订单" : "生成 20 条演示生产数据") : null)
         ),
-        h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：集中管理所有智造云应用共享的数据、字段、导入批次、演示数据、健康检查和安全备份。"), h("ol", null, h("li", null, "用“导入 Excel/CSV”导入正式业务数据并核对字段。"), h("li", null, "可在“数据环境”中切换演示/正式；生成的演示数据可按批次撤销。"), h("li", null, "新增或调整字段请在字段管理中完成，核心字段受保护。"), h("li", null, "恢复备份前必须确认，系统会先创建安全备份。"))) }] }),
+        h(antd.Collapse, { style: { marginBottom: 16 }, items: [{ key: "guide", label: "功能引导与使用说明", children: h("div", null, h("p", null, "功能介绍：集中管理所有灵泽万川智造云应用共享的数据、字段、导入批次、演示数据、健康检查和安全备份。"), h("ol", null, h("li", null, "用“导入 Excel/CSV”导入正式业务数据并核对字段。"), h("li", null, "可在“数据环境”中切换演示/正式；生成的演示数据可按批次撤销。"), h("li", null, "新增或调整字段请在字段管理中完成，核心字段受保护。"), h("li", null, "恢复备份前必须确认，系统会先创建安全备份。"))) }] }),
         error ? h(antd.Alert, { type: "error", showIcon: true, message: error, style: { marginBottom: 16 } }) : null,
         h(antd.Row, { gutter: [12, 12], style: { marginBottom: 16 } },
           [["数据表", entities.length], ["当前记录", current.record_count || 0], ["演示数据", current.demo_count || 0], ["正式数据", current.production_count || 0]].map(function (item) {
@@ -290,12 +384,29 @@
         ),
         h(antd.Tabs, { items: [
           { key: "records", label: "数据预览（最多 100 条）", children: h(antd.Table, { rowKey: "record_id", size: "small", loading: loading, columns: columns, dataSource: records, scroll: { x: Math.max(900, columns.length * 150) }, pagination: { pageSize: 20 } }) },
-          { key: "schema", label: "字段结构", children: h(antd.Table, { rowKey: "name", size: "small", loading: loading, pagination: false, dataSource: schema ? schema.fields : [], columns: [
+          { key: "schema", label: "字段结构", children: h("div", null,
+            h("div", { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 12 } },
+              h(antd.Input, { size: "small", style: { width: 170 }, placeholder: "字段名（小写字母/数字/_）", value: newField.field_name, onChange: function (e) { setNewField(Object.assign({}, newField, { field_name: e.target.value })); } }),
+              h(antd.Input, { size: "small", style: { width: 150 }, placeholder: "显示名称", value: newField.field_label, onChange: function (e) { setNewField(Object.assign({}, newField, { field_label: e.target.value })); } }),
+              h(antd.Select, { size: "small", style: { width: 110 }, value: newField.field_type, options: ["text", "number", "date"].map(function (v) { return { value: v, label: v }; }), onChange: function (v) { setNewField(Object.assign({}, newField, { field_type: v })); } }),
+              h(antd.Checkbox, { checked: newField.field_required, onChange: function (e) { setNewField(Object.assign({}, newField, { field_required: e.target.checked })); } }, "必填"),
+              h(antd.Button, { size: "small", type: "primary", onClick: function () {
+                  if (!/^[a-z][a-z0-9_]{0,63}$/.test(newField.field_name)) { message.warning("字段名需为小写字母/数字/下划线"); return; }
+                  submitAddField(newField).then(function () { setNewField({ field_name: "", field_label: "", field_type: "text", field_required: false }); });
+                } }, "新增字段"),
+              h("span", { style: { fontSize: 11, color: "#98a2b3" } }, "新增字段即时生效，导入映射与数据预览自动包含；改显示名/停用需管理员")
+            ),
+            h(antd.Table, { rowKey: "name", size: "small", loading: loading, pagination: false, dataSource: schema ? schema.fields : [], columns: [
             { title: "字段名", dataIndex: "name" }, { title: "显示名称", dataIndex: "label" }, { title: "类型", dataIndex: "type" },
             { title: "必填", dataIndex: "required", render: function (value) { return value ? "是" : "否"; } },
             { title: "状态", dataIndex: "active", render: function (value) { return h(antd.Tag, { color: value ? "green" : "default" }, value ? "启用" : "停用"); } },
-            { title: "内置字段", dataIndex: "built_in", render: function (value) { return value ? "是" : "否"; } }
-          ] }) },
+            { title: "内置字段", dataIndex: "built_in", render: function (value) { return value ? "是" : "否"; } },
+            { title: "操作", key: "_op", width: 130, render: function (_, field) { return field.built_in ? null : h("div", { style: { display: "flex", gap: 6 } },
+              h(antd.Button, { size: "small", onClick: function () { var label = window.prompt("新的显示名称", field.label); if (label && label.trim()) patchField(field.name, { label: label.trim() }); } }, "改名"),
+              h(antd.Button, { size: "small", danger: true, onClick: function () { patchField(field.name, { active: !field.active }); } }, field.active ? "停用" : "启用")
+            ); } }
+          ] })
+          ) },
           { key: "operations", label: "健康与备份", children: h(React.Fragment, null,
             h(antd.Alert, { type: health && health.status === "available" ? "success" : "error", showIcon: true,
               message: health ? ("数据库完整性：" + health.integrity + "；Schema v" + health.schema_version + "；备份 " + health.backup_count + " 个") : "正在读取健康状态",
