@@ -4,7 +4,7 @@
   "version": "0.8.0",
   "type": "app",
   "description": "面向全部 PawApp 的 Workspace 统一数据库、Schema Registry、导入批次和演示/正式数据环境服务。",
-  "author": "Zhiyun AI",
+  "author": "灵泽万川智造云 AI",
   "entry": {
     "backend": "data_core_plugin.py",
     "frontend": "ui/index.js"

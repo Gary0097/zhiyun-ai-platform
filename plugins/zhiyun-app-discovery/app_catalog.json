@@ -4,198 +4,648 @@
     {
       "app_id": "zhiyun-data-studio",
       "name": "企业数据分析中心",
-      "aliases": ["数据分析", "数据中枢", "销售BI", "经营看板", "sjfx", "data paw"],
-      "version": "0.9.1",
+      "aliases": [
+        "数据分析",
+        "数据中枢",
+        "销售BI",
+        "经营看板",
+        "sjfx",
+        "data paw"
+      ],
+      "version": "0.9.3",
       "category": "data",
       "install_status": "installed",
       "route": "/apps/zhiyun-data-studio",
       "repository_url": "https://github.com/Gary0097/zhiyun-data-studio",
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": [
-        {"id": 1, "name": "实时客户订单进度看板", "keywords": ["订单进度", "实时看板", "工单状态"], "questions": ["查看全部订单进度", "订单做到哪一步了"]},
-        {"id": 2, "name": "客户交付风险智能预警", "keywords": ["交付风险", "延期概率", "红黄绿预警"], "questions": ["哪些订单有交付风险", "预测订单是否延期"]},
-        {"id": 3, "name": "多源数据自动采集", "keywords": ["Excel导入", "ERP数据", "表单采集", "数据清洗"], "questions": ["导入Excel并清洗数据"]},
-        {"id": 4, "name": "跨部门数据融合加工", "keywords": ["人效", "产值", "损耗", "部门仪表盘"], "questions": ["分析人效产值损耗"]},
-        {"id": 5, "name": "企业关键数据日看板", "keywords": ["日报", "经营简报", "管理看板"], "questions": ["生成今天的经营日报"]},
-        {"id": 6, "name": "关键指标趋势分析", "keywords": ["趋势", "拐点", "移动平均", "异常指标"], "questions": ["分析废品率趋势"]}
+        {
+          "id": 1,
+          "name": "实时客户订单进度看板",
+          "keywords": [
+            "订单进度",
+            "实时看板",
+            "工单状态"
+          ],
+          "questions": [
+            "查看全部订单进度",
+            "订单做到哪一步了"
+          ]
+        },
+        {
+          "id": 2,
+          "name": "客户交付风险智能预警",
+          "keywords": [
+            "交付风险",
+            "延期概率",
+            "红黄绿预警"
+          ],
+          "questions": [
+            "哪些订单有交付风险",
+            "预测订单是否延期"
+          ]
+        },
+        {
+          "id": 3,
+          "name": "多源数据自动采集",
+          "keywords": [
+            "Excel导入",
+            "ERP数据",
+            "表单采集",
+            "数据清洗"
+          ],
+          "questions": [
+            "导入Excel并清洗数据"
+          ]
+        },
+        {
+          "id": 4,
+          "name": "跨部门数据融合加工",
+          "keywords": [
+            "人效",
+            "产值",
+            "损耗",
+            "部门仪表盘"
+          ],
+          "questions": [
+            "分析人效产值损耗"
+          ]
+        },
+        {
+          "id": 5,
+          "name": "企业关键数据日看板",
+          "keywords": [
+            "日报",
+            "经营简报",
+            "管理看板"
+          ],
+          "questions": [
+            "生成今天的经营日报"
+          ]
+        },
+        {
+          "id": 6,
+          "name": "关键指标趋势分析",
+          "keywords": [
+            "趋势",
+            "拐点",
+            "移动平均",
+            "异常指标"
+          ],
+          "questions": [
+            "分析废品率趋势"
+          ]
+        }
       ]
     },
     {
       "app_id": "zhiyun-order-studio",
       "name": "智能订单中心",
-      "aliases": ["订单中心", "合同订单", "ddzx", "订单处理"],
-      "version": "0.7.1",
+      "aliases": [
+        "订单中心",
+        "合同订单",
+        "ddzx",
+        "订单处理"
+      ],
+      "version": "0.7.3",
       "category": "order",
       "install_status": "installed",
       "route": "/apps/zhiyun-order-studio",
       "repository_url": "https://github.com/Gary0097/zhiyun-order-studio",
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": [
-        {"id": 7, "name": "客户订单自动格式化", "keywords": ["OCR订单", "扫描订单", "标准工单"], "questions": ["识别图片订单并生成工单"]},
-        {"id": 8, "name": "多模板支持与适配", "keywords": ["FOB", "代工", "促销", "订单模板"], "questions": ["为订单匹配处理模板"]},
-        {"id": 9, "name": "合同要素提取与比对", "keywords": ["合同条款", "付款周期", "违约责任"], "questions": ["提取合同风险条款"]},
-        {"id": 10, "name": "订单—合同一致性验证", "keywords": ["合同不一致", "单价差异", "交期差异", "付款比例"], "questions": ["检查订单和合同是否一致"]},
-        {"id": 11, "name": "异常处理流程自动化", "keywords": ["订单延期", "客户投诉", "异常流程"], "questions": ["处理延期和投诉复合异常"]}
+        {
+          "id": 7,
+          "name": "客户订单自动格式化",
+          "keywords": [
+            "OCR订单",
+            "扫描订单",
+            "标准工单"
+          ],
+          "questions": [
+            "识别图片订单并生成工单"
+          ]
+        },
+        {
+          "id": 8,
+          "name": "多模板支持与适配",
+          "keywords": [
+            "FOB",
+            "代工",
+            "促销",
+            "订单模板"
+          ],
+          "questions": [
+            "为订单匹配处理模板"
+          ]
+        },
+        {
+          "id": 9,
+          "name": "合同要素提取与比对",
+          "keywords": [
+            "合同条款",
+            "付款周期",
+            "违约责任"
+          ],
+          "questions": [
+            "提取合同风险条款"
+          ]
+        },
+        {
+          "id": 10,
+          "name": "订单—合同一致性验证",
+          "keywords": [
+            "合同不一致",
+            "单价差异",
+            "交期差异",
+            "付款比例"
+          ],
+          "questions": [
+            "检查订单和合同是否一致"
+          ]
+        },
+        {
+          "id": 11,
+          "name": "异常处理流程自动化",
+          "keywords": [
+            "订单延期",
+            "客户投诉",
+            "异常流程"
+          ],
+          "questions": [
+            "处理延期和投诉复合异常"
+          ]
+        }
       ]
     },
     {
       "app_id": "zhiyun-service-studio",
       "name": "智能售后服务中心",
-      "aliases": ["智能客服", "售后中心", "客服运营", "shkf"],
-      "version": "0.1.0",
+      "aliases": [
+        "智能客服",
+        "售后中心",
+        "客服运营",
+        "shkf"
+      ],
+      "version": "0.5.0",
       "category": "service",
       "install_status": "installed",
       "route": "/apps/zhiyun-service-studio",
       "repository_url": "https://github.com/Gary0097/zhiyun-service-studio",
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": [
-        {"id": 12, "name": "客户咨询智能应答", "keywords": ["客户咨询", "订单在哪", "客服回复"], "questions": ["回答客户订单在哪里"]},
-        {"id": 13, "name": "智能语义理解与意图识别", "keywords": ["意图识别", "订单变更", "财务支持", "售后报修"], "questions": ["识别客户咨询意图"]},
-        {"id": 14, "name": "售后工单智能管理", "keywords": ["售后工单", "电机异响", "工程师推荐"], "questions": ["给售后工单推荐工程师"]},
-        {"id": 15, "name": "售后知识结构化", "keywords": ["维修记录", "故障原因", "维修方案", "语义标签"], "questions": ["从维修记录提取故障知识"]}
+        {
+          "id": 12,
+          "name": "客户咨询智能应答",
+          "keywords": [
+            "客户咨询",
+            "订单在哪",
+            "客服回复"
+          ],
+          "questions": [
+            "回答客户订单在哪里"
+          ]
+        },
+        {
+          "id": 13,
+          "name": "智能语义理解与意图识别",
+          "keywords": [
+            "意图识别",
+            "订单变更",
+            "财务支持",
+            "售后报修"
+          ],
+          "questions": [
+            "识别客户咨询意图"
+          ]
+        },
+        {
+          "id": 14,
+          "name": "售后工单智能管理",
+          "keywords": [
+            "售后工单",
+            "电机异响",
+            "工程师推荐"
+          ],
+          "questions": [
+            "给售后工单推荐工程师"
+          ]
+        },
+        {
+          "id": 15,
+          "name": "售后知识结构化",
+          "keywords": [
+            "维修记录",
+            "故障原因",
+            "维修方案",
+            "语义标签"
+          ],
+          "questions": [
+            "从维修记录提取故障知识"
+          ]
+        }
       ]
     },
     {
       "app_id": "zhiyun-supply-studio",
       "name": "采购与供应链中心",
-      "aliases": ["采购管理", "供应链", "智能补货", "gyl"],
-      "version": "0.1.0",
+      "aliases": [
+        "采购管理",
+        "供应链",
+        "智能补货",
+        "gyl"
+      ],
+      "version": "0.5.0",
       "category": "supply",
       "install_status": "installed",
       "route": "/apps/zhiyun-supply-studio",
       "repository_url": "https://github.com/Gary0097/zhiyun-supply-studio",
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": [
-        {"id": 16, "name": "供应商评估与智能补货", "keywords": ["安全库存", "补货", "供应商准时率", "合格率"], "questions": ["推荐补货量和供应商"]},
-        {"id": 30, "name": "供应链风险实时监控", "keywords": ["交期异常", "物流停滞", "高风险订单", "供应链风险"], "questions": ["检查供应链风险"]}
+        {
+          "id": 16,
+          "name": "供应商评估与智能补货",
+          "keywords": [
+            "安全库存",
+            "补货",
+            "供应商准时率",
+            "合格率"
+          ],
+          "questions": [
+            "推荐补货量和供应商"
+          ]
+        },
+        {
+          "id": 30,
+          "name": "供应链风险实时监控",
+          "keywords": [
+            "交期异常",
+            "物流停滞",
+            "高风险订单",
+            "供应链风险"
+          ],
+          "questions": [
+            "检查供应链风险"
+          ]
+        }
       ]
     },
     {
       "app_id": "zhiyun-sales-studio",
       "name": "销售客户中心",
-      "aliases": ["销售平台", "CRM", "客户关系", "xsfx"],
-      "version": "0.1.0",
+      "aliases": [
+        "销售平台",
+        "CRM",
+        "客户关系",
+        "xsfx"
+      ],
+      "version": "0.5.0",
       "category": "sales",
       "install_status": "installed",
       "route": "/apps/zhiyun-sales-studio",
       "repository_url": "https://github.com/Gary0097/zhiyun-sales-studio",
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": [
-        {"id": 17, "name": "销售BI智能分析", "keywords": ["销售分析", "高毛利客户", "复购率"], "questions": ["找出高毛利客户TOP10"]},
-        {"id": 18, "name": "客户价值评估", "keywords": ["客户分层", "战略客户", "潜力客户", "风险客户"], "questions": ["给客户做价值分层"]},
-        {"id": 19, "name": "销售业绩智能统计", "keywords": ["销售人员业绩", "销售业绩", "贡献归因", "分佣", "业绩归属"], "questions": ["分析销售人员业绩", "计算销售角色贡献比例"]}
+        {
+          "id": 17,
+          "name": "销售BI智能分析",
+          "keywords": [
+            "销售分析",
+            "高毛利客户",
+            "复购率"
+          ],
+          "questions": [
+            "找出高毛利客户TOP10"
+          ]
+        },
+        {
+          "id": 18,
+          "name": "客户价值评估",
+          "keywords": [
+            "客户分层",
+            "战略客户",
+            "潜力客户",
+            "风险客户"
+          ],
+          "questions": [
+            "给客户做价值分层"
+          ]
+        },
+        {
+          "id": 19,
+          "name": "销售业绩智能统计",
+          "keywords": [
+            "销售人员业绩",
+            "销售业绩",
+            "贡献归因",
+            "分佣",
+            "业绩归属"
+          ],
+          "questions": [
+            "分析销售人员业绩",
+            "计算销售角色贡献比例"
+          ]
+        }
       ]
     },
     {
       "app_id": "zhiyun-finance-studio",
       "name": "财务智能中心",
-      "aliases": ["财务中枢", "报销审核", "财务票据", "cw"],
-      "version": "0.1.0",
+      "aliases": [
+        "财务中枢",
+        "报销审核",
+        "财务票据",
+        "cw"
+      ],
+      "version": "0.5.0",
       "category": "finance",
       "install_status": "installed",
       "route": "/apps/zhiyun-finance-studio",
       "repository_url": "https://github.com/Gary0097/zhiyun-finance-studio",
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": [
-        {"id": 20, "name": "智能报销审核", "keywords": ["发票识别", "报销审核", "差旅标准", "财务合规"], "questions": ["识别发票并审核报销"]},
-        {"id": 21, "name": "财务数据分析看板", "keywords": ["应收", "应付", "现金流", "毛利率"], "questions": ["生成财务趋势看板"]},
-        {"id": 22, "name": "智能成本预测", "keywords": ["原材料价格", "BOM", "毛利率推演", "替代材料"], "questions": ["预测原材料涨价对毛利的影响"]}
+        {
+          "id": 20,
+          "name": "智能报销审核",
+          "keywords": [
+            "发票识别",
+            "报销审核",
+            "差旅标准",
+            "财务合规"
+          ],
+          "questions": [
+            "识别发票并审核报销"
+          ]
+        },
+        {
+          "id": 21,
+          "name": "财务数据分析看板",
+          "keywords": [
+            "应收",
+            "应付",
+            "现金流",
+            "毛利率"
+          ],
+          "questions": [
+            "生成财务趋势看板"
+          ]
+        },
+        {
+          "id": 22,
+          "name": "智能成本预测",
+          "keywords": [
+            "原材料价格",
+            "BOM",
+            "毛利率推演",
+            "替代材料"
+          ],
+          "questions": [
+            "预测原材料涨价对毛利的影响"
+          ]
+        }
       ]
     },
     {
       "app_id": "zhiyun-people-studio",
       "name": "组织协同中心",
-      "aliases": ["管理协同", "组织人事", "通讯录", "审批", "hr"],
-      "version": "0.1.0",
+      "aliases": [
+        "管理协同",
+        "组织人事",
+        "通讯录",
+        "审批",
+        "hr"
+      ],
+      "version": "0.5.0",
       "category": "people",
       "install_status": "installed",
       "route": "/apps/zhiyun-people-studio",
       "repository_url": "https://github.com/Gary0097/zhiyun-people-studio",
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": [
-        {"id": 23, "name": "组织与权限配置建议", "keywords": ["组织架构", "岗位权限", "权限建议"], "questions": ["给新岗位推荐权限"]},
-        {"id": 24, "name": "全员通讯录与人员推荐", "keywords": ["通讯录", "找专家", "人员推荐", "擅长领域"], "questions": ["找谁处理压铸焊接问题"]},
-        {"id": 26, "name": "审批路径推荐", "keywords": ["审批流", "审批人", "采购审批"], "questions": ["推荐采购申请审批路径"]},
-        {"id": 27, "name": "员工信息与生日管理", "keywords": ["生日", "入职周年", "员工关怀"], "questions": ["查看本月员工生日"]},
-        {"id": 28, "name": "人力资源数据分析", "keywords": ["离职率", "招聘周期", "人才缺口"], "questions": ["预警人才缺口"]}
+        {
+          "id": 23,
+          "name": "组织与权限配置建议",
+          "keywords": [
+            "组织架构",
+            "岗位权限",
+            "权限建议"
+          ],
+          "questions": [
+            "给新岗位推荐权限"
+          ]
+        },
+        {
+          "id": 24,
+          "name": "全员通讯录与人员推荐",
+          "keywords": [
+            "通讯录",
+            "找专家",
+            "人员推荐",
+            "擅长领域"
+          ],
+          "questions": [
+            "找谁处理压铸焊接问题"
+          ]
+        },
+        {
+          "id": 26,
+          "name": "审批路径推荐",
+          "keywords": [
+            "审批流",
+            "审批人",
+            "采购审批"
+          ],
+          "questions": [
+            "推荐采购申请审批路径"
+          ]
+        },
+        {
+          "id": 27,
+          "name": "员工信息与生日管理",
+          "keywords": [
+            "生日",
+            "入职周年",
+            "员工关怀"
+          ],
+          "questions": [
+            "查看本月员工生日"
+          ]
+        },
+        {
+          "id": 28,
+          "name": "人力资源数据分析",
+          "keywords": [
+            "离职率",
+            "招聘周期",
+            "人才缺口"
+          ],
+          "questions": [
+            "预警人才缺口"
+          ]
+        }
       ]
     },
     {
       "app_id": "zhiyun-integration-hub",
       "name": "系统集成中心",
-      "aliases": ["系统集成", "接口中心", "ERP对接", "WMS对接", "jkzx"],
-      "version": "0.2.1",
+      "aliases": [
+        "系统集成",
+        "接口中心",
+        "ERP对接",
+        "WMS对接",
+        "jkzx"
+      ],
+      "version": "0.2.2",
       "category": "integration",
       "install_status": "installed",
       "route": "/apps/zhiyun-integration-hub",
       "repository_url": "https://github.com/Gary0097/zhiyun-integration-hub",
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": [
-        {"id": 29, "name": "现有系统数据接口开发", "keywords": ["ERP接口", "WMS接口", "系统对接", "开放API"], "questions": ["把智能体结果对接ERP"]}
+        {
+          "id": 29,
+          "name": "现有系统数据接口开发",
+          "keywords": [
+            "ERP接口",
+            "WMS接口",
+            "系统对接",
+            "开放API"
+          ],
+          "questions": [
+            "把智能体结果对接ERP"
+          ]
+        }
       ]
     },
     {
       "app_id": "qwenpaw-knowledge-base",
       "name": "工作区知识库",
-      "aliases": ["知识库", "知识工厂", "文件知识库", "workspace files", "knowledge base", "zsk"],
+      "aliases": [
+        "知识库",
+        "知识工厂",
+        "文件知识库",
+        "workspace files",
+        "knowledge base",
+        "zsk"
+      ],
       "version": "2.1.0",
       "category": "knowledge",
       "install_status": "installed",
       "route": "/files",
       "repository_url": "https://github.com/agentscope-ai/QwenPaw",
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": [
-        {"id": 25, "name": "智能知识库系统", "keywords": ["文档解析", "知识检索", "维修知识", "企业知识库"], "questions": ["整理资料并形成企业知识库", "设备异响怎么修"]}
+        {
+          "id": 25,
+          "name": "智能知识库系统",
+          "keywords": [
+            "文档解析",
+            "知识检索",
+            "维修知识",
+            "企业知识库"
+          ],
+          "questions": [
+            "整理资料并形成企业知识库",
+            "设备异响怎么修"
+          ]
+        }
       ]
     },
     {
       "app_id": "zhiyun-app-discovery",
       "name": "应用与项目中心",
-      "aliases": ["应用中心", "项目进度", "功能清单"],
-      "version": "0.3.0",
+      "aliases": [
+        "应用中心",
+        "项目进度",
+        "功能清单"
+      ],
+      "version": "0.4.0",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",
       "route": "/apps/zhiyun-app-discovery",
       "repository_url": null,
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": []
     },
     {
       "app_id": "zhiyun-data-core",
       "name": "统一数据中心",
-      "aliases": ["统一数据库", "数据核心"],
+      "aliases": [
+        "统一数据库",
+        "数据核心"
+      ],
       "version": "0.8.0",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",
       "route": "/apps/zhiyun-data-core",
       "repository_url": null,
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": []
     },
     {
       "app_id": "zhiyun-audit",
       "name": "安全审计中心",
-      "aliases": ["审计", "操作日志", "高风险操作"],
+      "aliases": [
+        "审计",
+        "操作日志",
+        "高风险操作"
+      ],
       "version": "1.3.0",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",
       "route": "/apps/zhiyun-audit",
       "repository_url": null,
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": [
         {
@@ -203,26 +653,139 @@
           "name": "Tool 调用审计",
           "delivery_status": "completed",
           "description": "查看成功、失败和已阻断 Tool 调用的脱敏执行元数据。",
-          "questions": ["查看操作审计", "哪些高风险操作被阻断", "Agent Tool 是否执行失败"],
-          "objects": ["Tool 调用", "Trace", "审计事件"],
-          "inputs": ["状态筛选"],
-          "outputs": ["脱敏审计列表"],
-          "roles": ["管理员", "安全审计员"],
-          "scenarios": ["安全审计", "故障追踪", "高风险操作检查"]
+          "questions": [
+            "查看操作审计",
+            "哪些高风险操作被阻断",
+            "Agent Tool 是否执行失败"
+          ],
+          "objects": [
+            "Tool 调用",
+            "Trace",
+            "审计事件"
+          ],
+          "inputs": [
+            "状态筛选"
+          ],
+          "outputs": [
+            "脱敏审计列表"
+          ],
+          "roles": [
+            "管理员",
+            "安全审计员"
+          ],
+          "scenarios": [
+            "安全审计",
+            "故障追踪",
+            "高风险操作检查"
+          ]
         }
       ]
     },
     {
       "app_id": "zhiyun-logo",
       "name": "品牌 Logo 配置",
-      "aliases": ["Logo", "品牌设置"],
+      "aliases": [
+        "Logo",
+        "品牌设置"
+      ],
       "version": "1.0.0",
       "category": "system",
       "visibility": "system",
       "install_status": "installed",
-      "route": null,
+      "route": "/apps/zhiyun-logo",
       "repository_url": null,
-      "platforms": ["windows", "linux"],
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "health": "available",
+      "capabilities": []
+    },
+    {
+      "app_id": "zhiyun-chanjet-hub",
+      "name": "畅捷通连接中心",
+      "aliases": [
+        "用友",
+        "畅捷通",
+        "T+",
+        "取数",
+        "问数",
+        "ERP"
+      ],
+      "version": "0.1.0",
+      "category": "integration",
+      "install_status": "installed",
+      "route": "/apps/zhiyun-chanjet-hub",
+      "repository_url": "https://github.com/Gary0097/zhiyun-chanjet-hub",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "health": "available",
+      "capabilities": [
+        {
+          "id": "ext_chanjet_fetch",
+          "name": "畅捷通取数",
+          "keywords": [
+            "畅捷通",
+            "用友",
+            "T+",
+            "取数",
+            "订单"
+          ],
+          "questions": [
+            "从畅捷通取销售发货单",
+            "用友T+订单导入"
+          ],
+          "delivery_status": "completed"
+        }
+      ]
+    },
+    {
+      "app_id": "qwenpaw-creator",
+      "name": "视频压缩工坊（QwenPaw Creator）",
+      "aliases": [
+        "视频压缩",
+        "压缩视频",
+        "视频转码",
+        "减小视频体积",
+        "H.265",
+        "HEVC",
+        "spjyys",
+        "creator"
+      ],
+      "version": "1.2.0",
+      "category": "productivity",
+      "install_status": "installed",
+      "route": "/apps/qwenpaw-creator",
+      "repository_url": "",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "health": "available",
+      "capabilities": []
+    },
+    {
+      "app_id": "agent-kanban",
+      "name": "Agent 看板",
+      "aliases": [
+        "看板",
+        "任务板",
+        "问题跟踪",
+        "智能体任务",
+        "kanban",
+        "agent 看板"
+      ],
+      "version": "0.1.0",
+      "category": "productivity",
+      "install_status": "installed",
+      "route": "/apps/agent-kanban",
+      "repository_url": "",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
       "health": "available",
       "capabilities": []
     }

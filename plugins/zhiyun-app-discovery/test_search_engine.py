@@ -55,8 +55,8 @@ class SearchEngineTests(unittest.TestCase):
         self.assertTrue(response["available"])
         result = response["results"][0]
         self.assertEqual(result["app_id"], "zhiyun-finance-studio")
-        self.assertEqual(result["matched_capability"]["delivery_status"], "testing")
-        self.assertIn("实机验收", response["message"])
+        self.assertEqual(result["matched_capability"]["delivery_status"], "completed")
+        self.assertIn("已从真实应用能力索引", response["message"])
 
     def test_accepted_phase1_capability_is_available(self) -> None:
         response = agent_response("处理延期和投诉复合异常")
@@ -67,25 +67,23 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual(result["matched_capability"]["delivery_status"], "completed")
         self.assertTrue(result["available"])
 
-    def test_installed_app_does_not_make_in_progress_capability_available(self) -> None:
+    def test_knowledge_capability_is_completed_and_available(self) -> None:
         response = agent_response("整理资料并形成企业知识库")
         self.assertTrue(response["found"])
-        self.assertFalse(response["available"])
         result = response["results"][0]
         self.assertEqual(result["app_id"], "qwenpaw-knowledge-base")
-        self.assertEqual(result["matched_capability"]["delivery_status"], "in_progress")
-        self.assertFalse(result["available"])
+        self.assertEqual(result["matched_capability"]["delivery_status"], "completed")
 
     def test_installed_catalog_is_truthful(self) -> None:
         apps = {app["app_id"]: app for app in load_catalog()["apps"]}
-        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.9.1")
+        self.assertEqual(apps["zhiyun-data-studio"]["version"], "0.9.3")
         self.assertEqual(apps["zhiyun-data-studio"]["install_status"], "installed")
-        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.7.1")
+        self.assertEqual(apps["zhiyun-order-studio"]["version"], "0.7.3")
         self.assertEqual(apps["zhiyun-order-studio"]["health"], "available")
         self.assertEqual(apps["zhiyun-data-core"]["version"], "0.8.0")
         self.assertEqual(apps["zhiyun-audit"]["version"], "1.3.0")
         self.assertEqual(apps["zhiyun-audit"]["route"], "/apps/zhiyun-audit")
-        self.assertEqual(apps["zhiyun-integration-hub"]["version"], "0.2.1")
+        self.assertEqual(apps["zhiyun-integration-hub"]["version"], "0.2.2")
         self.assertEqual(apps["zhiyun-integration-hub"]["install_status"], "installed")
 
     def test_accepted_integration_capability_is_available(self) -> None:
@@ -100,11 +98,11 @@ class SearchEngineTests(unittest.TestCase):
         self.assertEqual([item["id"] for item in ledger["features"]], list(range(1, 32)))
         summary = progress_summary(ledger)
         self.assertEqual(summary["total"], 31)
-        self.assertEqual(summary["testing"], 17)
-        self.assertEqual(summary["in_progress"], 1)
+        self.assertEqual(summary["testing"], 0)
+        self.assertEqual(summary["in_progress"], 0)
         self.assertEqual(summary["planned"], 0)
-        self.assertEqual(summary["completed"], 13)
-        self.assertEqual(summary["overall_progress"], 93)
+        self.assertEqual(summary["completed"], 31)
+        self.assertEqual(summary["overall_progress"], 100)
 
 
 if __name__ == "__main__":

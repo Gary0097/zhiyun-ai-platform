@@ -41,9 +41,11 @@ BRANDING_DIR = WORKING_DIR / "branding"
 LOGIN_CONFIG_FILE = BRANDING_DIR / "login-config.json"
 CONFIG_FILE = WORKING_DIR / "config.json"
 
-DEFAULT_ENTERPRISE = "智云AI"
+DEFAULT_ENTERPRISE = "灵泽万川智造云"
 DEFAULT_ADMIN_USER = "admin"
-DEFAULT_ADMIN_PASSWORD = "Zhiyun@2026"
+DEFAULT_ADMIN_PASSWORD = "ZhizaoYun@2026"
+# rebrand 前系统默认管理员口令，仅用于升级后向后兼容轮换。
+LEGACY_DEFAULT_ADMIN_PASSWORD = "Zhiyun@2026"
 TOKEN_EXPIRY_SECONDS = 7 * 24 * 3600
 
 router = APIRouter()
@@ -91,7 +93,7 @@ def _login_config() -> dict[str, Any]:
 
 def _brand_name() -> str:
     cfg = _login_config()
-    return str(cfg.get("brand_name") or "智云 AI-Agent OS").strip() or "智云 AI-Agent OS"
+    return str(cfg.get("brand_name") or "灵泽万川智造云 AI-OS").strip() or "灵泽万川智造云 AI-OS"
 
 
 def _enterprise_name() -> str:
@@ -187,27 +189,42 @@ def _find_user(username: str) -> dict[str, Any] | None:
 
 
 def _ensure_admin() -> None:
-    """启动时保证存在一个默认管理员账号。"""
+    """启动时保证存在一个默认管理员账号。
+
+    旧版本（rebrand 前）默认口令为 Zhiyun@2026；升级后若管理员账号仍使用该旧
+    默认口令，则自动轮换为新默认口令 ZhizaoYun@2026，确保文档 / 登录页展示
+    的凭据仍然可用。若管理员已手动改过口令，则不触碰。
+    """
     # 先让全局 secret 落盘，保证后续创建用户时签名秘钥稳定。
     _token_secret()
     users = _load_users()
-    if any(u.get("username") == DEFAULT_ADMIN_USER for u in users):
+    admin = next((u for u in users if u.get("username") == DEFAULT_ADMIN_USER), None)
+    if admin is None:
+        pw_hash, salt = _hash_password(DEFAULT_ADMIN_PASSWORD)
+        users.append({
+            "username": DEFAULT_ADMIN_USER,
+            "display_name": "系统管理员",
+            "role": "admin",
+            "password_hash": pw_hash,
+            "password_salt": salt,
+            "enterprise": _enterprise_name(),
+            "agent_id": "default",
+            "data_scope": "enterprise",
+            "kb_scope": "enterprise",
+            "active": True,
+            "created_at": _now(),
+        })
+        _save_users(users)
         return
-    pw_hash, salt = _hash_password(DEFAULT_ADMIN_PASSWORD)
-    users.append({
-        "username": DEFAULT_ADMIN_USER,
-        "display_name": "系统管理员",
-        "role": "admin",
-        "password_hash": pw_hash,
-        "password_salt": salt,
-        "enterprise": _enterprise_name(),
-        "agent_id": "default",
-        "data_scope": "enterprise",
-        "kb_scope": "enterprise",
-        "active": True,
-        "created_at": _now(),
-    })
-    _save_users(users)
+    # 向后兼容轮换：仅当管理员仍使用 rebrand 前的默认口令时才更新为新口令，
+    # 避免覆盖管理员已自行修改的密码。
+    stored = admin.get("password_hash", "")
+    salt = admin.get("password_salt", "")
+    if stored and salt and _verify_password(LEGACY_DEFAULT_ADMIN_PASSWORD, stored, salt):
+        pw_hash, new_salt = _hash_password(DEFAULT_ADMIN_PASSWORD)
+        admin["password_hash"] = pw_hash
+        admin["password_salt"] = new_salt
+        _save_users(users)
 
 
 def _available_agents() -> list[dict[str, Any]]:
@@ -373,6 +390,17 @@ async def upsert_user(request: UserUpsertRequest, authorization: str = Header(de
     existing = next((u for u in users if u.get("username") == request.username), None)
     if existing:
         # 仅管理员可改角色；保留原密码，除非显式传入新密码。
+        if (
+            existing.get("role") == "admin"
+            and request.role != "admin"
+            and not any(
+                u.get("username") != request.username
+                and u.get("role") == "admin"
+                and u.get("active", True)
+                for u in users
+            )
+        ):
+            raise HTTPException(status_code=400, detail="不能降级最后一个启用中的管理员，请先创建其他管理员")
         if request.password:
             pw_hash, salt = _hash_password(request.password)
             existing["password_hash"] = pw_hash
@@ -414,10 +442,13 @@ async def update_branding(request: BrandingRequest, authorization: str = Header(
         cfg["brand_name"] = request.brand_name.strip()
     if request.enterprise is not None:
         cfg["enterprise"] = request.enterprise.strip()
-    if request.background_image is not None:
+    # 空字符串视为“不修改”，避免仅保存名称/Logo 时误清空已有封面；
+    # 但上传了新封面数据时必须清掉旧的 background_image 路径，否则旧路径优先级更高
+    if request.background_image:
         cfg["background_image"] = request.background_image.strip()
-    if request.background_data_url is not None:
+    if request.background_data_url:
         cfg["background_data_url"] = request.background_data_url.strip()
+        cfg["background_image"] = ""
     _write_json(LOGIN_CONFIG_FILE, cfg)
     return {"ok": True, "config": {
         "brand_name": _brand_name(),

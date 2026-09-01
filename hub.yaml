@@ -1,0 +1,13 @@
+version: 1
+
+control_plane:
+  public_base_url: http://127.0.0.1:8000
+  registration:
+    enabled: true          # 首个注册账户自动成为管理员；建好后建议改为 false
+    default_role: user
+
+runtime:
+  provisioner: local       # Windows 本地进程隔离（需管理员权限运行）
+
+capacity:
+  max_running_runtimes: 20

@@ -19,7 +19,7 @@ try:
 except ImportError:  # pragma: no cover
     from table_parser import build_export_bytes
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 5
 FIELD_NAME = re.compile(r"^[a-z][a-z0-9_]{0,62}$")
 FIELD_TYPES = {"text", "integer", "number", "boolean", "date", "datetime"}
 SOURCE_TYPES = {"real", "simulated"}
@@ -126,6 +126,8 @@ class DataCore:
                     entity TEXT NOT NULL,
                     source_type TEXT NOT NULL,
                     data_mode TEXT NOT NULL DEFAULT 'demo',
+                    owner_department TEXT NOT NULL DEFAULT '',
+                    owner_agent TEXT NOT NULL DEFAULT '',
                     source_name TEXT NOT NULL,
                     row_count INTEGER NOT NULL,
                     status TEXT NOT NULL DEFAULT 'active',
@@ -138,6 +140,8 @@ class DataCore:
                     batch_id TEXT NOT NULL,
                     source_type TEXT NOT NULL,
                     data_mode TEXT NOT NULL DEFAULT 'demo',
+                    owner_department TEXT NOT NULL DEFAULT '',
+                    owner_agent TEXT NOT NULL DEFAULT '',
                     payload TEXT NOT NULL,
                     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (batch_id) REFERENCES data_batches(batch_id)
@@ -152,7 +156,15 @@ class DataCore:
                 "SELECT value FROM data_core_meta WHERE key = 'schema_version'"
             ).fetchone()
             if current and int(current["value"]) > SCHEMA_VERSION:
-                raise RuntimeError("Data Core database is newer than this plugin")
+                # 回滚恢复路径：旧版本插件遇到更高 schema 版时降级登记并继续，
+                # 多出的 owner_* 列对旧代码无影响（SELECT * 按名取列）。
+                connection.execute(
+                    "INSERT OR REPLACE INTO data_core_meta(key, value) VALUES('schema_version', ?)",
+                    (str(SCHEMA_VERSION),),
+                )
+                current = connection.execute(
+                    "SELECT value FROM data_core_meta WHERE key = 'schema_version'"
+                ).fetchone()
             current_version = int(current["value"]) if current else 0
             if current_version < 1:
                 connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(1, 'initial schema registry and reversible batches')")
@@ -168,6 +180,22 @@ class DataCore:
                 connection.execute("CREATE INDEX IF NOT EXISTS idx_records_mode ON data_records(entity, data_mode, created_at)")
                 connection.execute("CREATE INDEX IF NOT EXISTS idx_batches_mode ON data_batches(entity, data_mode, created_at)")
                 connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(3, 'add demo/production data environment isolation')")
+            if current_version < 4:
+                try:
+                    connection.execute("ALTER TABLE data_batches ADD COLUMN owner_department TEXT NOT NULL DEFAULT ''")
+                    connection.execute("ALTER TABLE data_records ADD COLUMN owner_department TEXT NOT NULL DEFAULT ''")
+                except sqlite3.OperationalError:
+                    pass
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_records_dept ON data_records(entity, owner_department, data_mode)")
+                connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(4, 'record-level owner department for scoped access')")
+            if current_version < 5:
+                for table in ("data_batches", "data_records"):
+                    try:
+                        connection.execute(f"ALTER TABLE {table} ADD COLUMN owner_agent TEXT NOT NULL DEFAULT ''")
+                    except sqlite3.OperationalError:
+                        pass
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_records_agent ON data_records(entity, owner_agent, data_mode)")
+                connection.execute("INSERT OR IGNORE INTO data_core_migrations(version, description) VALUES(5, 'record-level owner agent for agent-scoped access')")
             connection.execute(
                 "INSERT OR REPLACE INTO data_core_meta(key, value) VALUES('schema_version', ?)",
                 (str(SCHEMA_VERSION),),
@@ -581,6 +609,8 @@ class DataCore:
         mapping: dict[str, str] | None = None,
         source_name: str = "manual-import",
         data_mode: str = "production",
+        owner_department: str = "",
+        owner_agent: str = "",
     ) -> dict[str, Any]:
         data_mode = _normalize_data_mode(data_mode)
         preview = self.preview_import(entity, rows, mapping, data_mode=data_mode)
@@ -597,6 +627,8 @@ class DataCore:
             source_type="real",
             source_name=source_name,
             data_mode=data_mode,
+            owner_department=owner_department,
+            owner_agent=owner_agent,
         )
         return {"batch_id": batch_id, "entity": entity, "row_count": len(rows), "source_type": "real", "data_mode": data_mode}
 
@@ -666,6 +698,8 @@ class DataCore:
         source_type: str,
         source_name: str,
         data_mode: str = "demo",
+        owner_department: str = "",
+        owner_agent: str = "",
     ) -> str:
         if source_type not in SOURCE_TYPES:
             raise DataCoreError(f"unsupported source type: {source_type}")
@@ -674,18 +708,18 @@ class DataCore:
         with self.connect() as connection:
             connection.execute(
                 """
-                INSERT INTO data_batches(batch_id, entity, source_type, data_mode, source_name, row_count)
-                VALUES(?, ?, ?, ?, ?, ?)
+                INSERT INTO data_batches(batch_id, entity, source_type, data_mode, source_name, row_count, owner_department, owner_agent)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (batch_id, entity, source_type, data_mode, source_name, len(rows)),
+                (batch_id, entity, source_type, data_mode, source_name, len(rows), owner_department, owner_agent),
             )
             connection.executemany(
                 """
-                INSERT INTO data_records(record_id, entity, batch_id, source_type, data_mode, payload)
-                VALUES(?, ?, ?, ?, ?, ?)
+                INSERT INTO data_records(record_id, entity, batch_id, source_type, data_mode, payload, owner_department, owner_agent)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 [
-                    (f"record-{uuid.uuid4()}", entity, batch_id, source_type, data_mode, json.dumps(row, ensure_ascii=False))
+                    (f"record-{uuid.uuid4()}", entity, batch_id, source_type, data_mode, json.dumps(row, ensure_ascii=False), owner_department, owner_agent)
                     for row in rows
                 ],
             )
@@ -724,6 +758,8 @@ class DataCore:
         data_mode: str | None = None,
         start_date: str | None = None,
         end_date: str | None = None,
+        owner_department: str | None = None,
+        owner_agent: str | None = None,
     ) -> list[dict[str, Any]]:
         context = None
         if data_mode is None or start_date is None or end_date is None:
@@ -736,6 +772,12 @@ class DataCore:
             end_date = context["end_date"] or None
         clauses = ["entity = ?"]
         params: list[Any] = [entity]
+        if owner_department is not None:
+            clauses.append("owner_department = ?")
+            params.append(owner_department)
+        if owner_agent is not None:
+            clauses.append("owner_agent = ?")
+            params.append(owner_agent)
         if source_type:
             if source_type not in SOURCE_TYPES:
                 raise DataCoreError(f"unsupported source type: {source_type}")
@@ -802,6 +844,8 @@ class DataCore:
         start_date: str | None = None,
         end_date: str | None = None,
         limit: int = 50,
+        owner_department: str | None = None,
+        owner_agent: str | None = None,
     ) -> list[dict[str, Any]]:
         """Search active records without exposing raw SQL to callers."""
         schema = self.list_schema(entity)
@@ -818,6 +862,8 @@ class DataCore:
             data_mode=data_mode,
             start_date=start_date,
             end_date=end_date,
+            owner_department=owner_department,
+            owner_agent=owner_agent,
         )
         needle = keyword.strip().casefold()
         matched: list[dict[str, Any]] = []
@@ -841,6 +887,8 @@ class DataCore:
         start_date: str | None = None,
         end_date: str | None = None,
         limit: int = 1000,
+        owner_department: str | None = None,
+        owner_agent: str | None = None,
     ) -> tuple[bytes, str, str]:
         """Export active fields as CSV or XLSX bytes, respecting data-mode isolation."""
         if format not in {"xlsx", "csv"}:
@@ -854,15 +902,45 @@ class DataCore:
             data_mode=data_mode,
             start_date=start_date,
             end_date=end_date,
+            owner_department=owner_department,
+            owner_agent=owner_agent,
         )
         rows = [record["data"] for record in records]
         return build_export_bytes(f"{entity}.{format}", headers, rows)
 
-    def list_batches(self, entity: str | None = None, data_mode: str | None = None) -> list[dict[str, Any]]:
+    def backfill_department(self, entity: str, department: str, batch_id: str | None = None) -> int:
+        """为历史无部门戳的记录/批次补盖部门（仅影响 owner_department 为空的行）。"""
+        department = str(department or "").strip()
+        if not department:
+            raise DataCoreError("department is required")
+        with self.connect() as connection:
+            if batch_id:
+                cur = connection.execute(
+                    "UPDATE data_records SET owner_department = ? WHERE entity = ? AND batch_id = ? AND owner_department = ''",
+                    (department, entity, batch_id))
+                connection.execute(
+                    "UPDATE data_batches SET owner_department = ? WHERE entity = ? AND batch_id = ? AND owner_department = ''",
+                    (department, entity, batch_id))
+            else:
+                cur = connection.execute(
+                    "UPDATE data_records SET owner_department = ? WHERE entity = ? AND owner_department = ''",
+                    (department, entity))
+                connection.execute(
+                    "UPDATE data_batches SET owner_department = ? WHERE entity = ? AND owner_department = ''",
+                    (department, entity))
+            return cur.rowcount
+
+    def list_batches(self, entity: str | None = None, data_mode: str | None = None, owner_department: str | None = None, owner_agent: str | None = None) -> list[dict[str, Any]]:
         query = "SELECT * FROM data_batches"
         params: tuple[Any, ...] = ()
         clauses: list[str] = []
         args: list[Any] = []
+        if owner_department is not None:
+            clauses.append("owner_department = ?")
+            args.append(owner_department)
+        if owner_agent is not None:
+            clauses.append("owner_agent = ?")
+            args.append(owner_agent)
         if entity:
             clauses.append("entity = ?")
             args.append(entity)

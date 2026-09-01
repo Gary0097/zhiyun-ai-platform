@@ -16,7 +16,7 @@ for (const file of ['setup-ai-os.ps1', 'setup-ai-os.sh']) assert.ok(existsSync(j
 
 assert.equal(matchesVersion('QwenPaw, version 2.1.0', '2.1.0'), true)
 assert.equal(matchesVersion('QwenPaw, version 12.1.0', '2.1.0'), false)
-assert.equal(matchesVersion('QwenPaw, version 2.1.1', '2.1.0'), false)
+assert.equal(matchesVersion('QwenPaw, version 3.2.0', '2.2.0b3'), false)
 
 const fakeRoot = join(repoRoot, 'path with spaces', 'runtime')
 const windowsCandidate = runtimeCandidates(fakeRoot, 'win32')[0]
@@ -39,7 +39,7 @@ const wrongVersion = resolveRuntime({
   allowGlobal: false,
   root: fakeRoot,
   exists: () => true,
-  probe: () => ({ ok: true, output: 'QwenPaw, version 2.2.0', error: '' }),
+  probe: () => ({ ok: true, output: 'QwenPaw, version 3.2.0', error: '' }),
 })
 assert.equal(wrongVersion.source, 'missing')
 assert.equal(wrongVersion.remedy, '.\\setup-ai-os.ps1')

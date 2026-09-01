@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process'
 import { accessSync, constants, existsSync, mkdirSync, readFileSync } from 'node:fs'
 import net from 'node:net'
 import { dirname, join } from 'node:path'
+import { pawappsAllMaterialized } from './pawapp-materialized.mjs'
 import { fileURLToPath } from 'node:url'
 import { resolveRuntime, runtimeEnvironment } from './runtime-env.mjs'
 
@@ -41,8 +42,18 @@ function checkPort (port) {
 const nodeMajor = Number(process.versions.node.split('.')[0])
 record('node', nodeMajor >= 18 ? 'pass' : 'fail', `Node.js ${process.versions.node}`, '请安装 Node.js 18 或更高版本。')
 
+// Git 只在需要在线拉取 PawApp 时才是必需的（QwenPaw 官方安装本体是 pip 包，
+// 不依赖 git）。U 盘离线包随身携带全部锁定 PawApp，此时缺 git 只降级为提醒。
 const git = command('git', ['--version'])
-record('git', git.ok ? 'pass' : 'fail', git.output || git.error || '未找到 Git', '请安装 Git 并确保 git 在 PATH 中。')
+const gitOptional = pawappsAllMaterialized(appRoot)
+record(
+  'git',
+  git.ok ? 'pass' : (gitOptional ? 'warn' : 'fail'),
+  git.output || git.error || '未找到 Git',
+  gitOptional
+    ? '锁定 PawApp 已全部就绪，无需 Git；仅在线拉取应用更新时才需要。'
+    : '请安装 Git 并确保 git 在 PATH 中。',
+)
 
 const qwenpaw = runtime.command ? command(runtime.command, ['--version']) : { ok: false, output: runtime.output, error: '' }
 record(

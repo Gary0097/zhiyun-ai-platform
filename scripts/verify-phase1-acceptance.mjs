@@ -12,12 +12,12 @@ const catalog = JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-app-discov
 
 const expected = {
   'zhiyun-data-studio': {
-    commit: 'de291fed581e5c8d684379682351011a4be4c73a', version: '0.9.1',
+    commit: 'e6f32fcde92f9cc8b2f8395089e9a39cc7d1bed4', version: '0.9.3',
     files: ['backend/insight_workflow.py', 'tests/test_insight_workflow.py'],
     source: ['@router.post("/artifacts")', 'tool_name="analyze_order_delivery_risk"'],
   },
   'zhiyun-order-studio': {
-    commit: '612b2a2b48ee8321da208b4aa7ebdbce22e6f939', version: '0.7.1',
+    commit: '9fb76305829810242e1d65e00d0f38fc914ab3d6', version: '0.7.3',
     files: ['backend/exception_engine.py', 'tests/test_exception_workflow.py'],
     source: ['@router.post("/exceptions")', 'tool_name="run_order_exception_workflow"'],
   },

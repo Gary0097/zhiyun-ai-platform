@@ -1,4 +1,4 @@
-# Zhiyun AI-OS Project Plan
+# 制造云 AI-OS Project Plan
 
 ## Purpose
 
@@ -193,7 +193,7 @@ apps / Studio. Evidence:
 `docs/qa/functional-interaction-probe.json`,
 `docs/qa/screenshots/{post-login,functional}/*.png`.
 
-- Real login (`admin` / `Zhiyun@2026`) via `/api/zhiyun-auth/login`; JWT lands in
+- Real login (`admin` / `ZhizaoYun@2026`) via `/api/zhiyun-auth/login`; JWT lands in
   `localStorage.zhiyun_token` and the login layer disappears.
 - 11/11 apps render structured GUI (no bare JSON, no `<pre>` leak); 11/11 run
   their core flow (load sample -> run -> non-empty result, no execution error);

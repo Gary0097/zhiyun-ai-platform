@@ -1,6 +1,6 @@
 # 需求变更记录（2026-08-24）
 
-> 状态：已纳入当前迭代。本文件是「智造云 AI-OS · 五大业务 Studio」在 2026-08-24 迭代的需求变更说明，后续所有 PRD、测试与交付参考本文件。
+> 状态：已纳入当前迭代。本文件是「制造云 AI-OS · 五大业务 Studio」在 2026-08-24 迭代的需求变更说明，后续所有 PRD、测试与交付参考本文件。
 >
 > 变更范围：服务 / 供应 / 销售 / 财务 / 人力 五个 Studio，共 18 个功能模块。Data Studio 与 Order Studio 作为基础数据与订单底座一并纳入部署与数据可写修复，不在 18 模块矩阵内。
 
@@ -110,7 +110,7 @@
 # 第二迭代码段（2026-08-24 追加）
 
 > 本段记录「登录与权限 + 系统应用直达路由 + 真实 GUI 全量复核」第二次迭代的最终事实。
-> 对应的交付以「员工账号登录」（默认账号 `admin` / `Zhiyun@2026`）与「六个系统应用（数据核心 / 应用中心 / 审计中心 / Logo / 登录）共用完整路由 `/apps/<plugin-id>`」为基准。
+> 对应的交付以「员工账号登录」（默认账号 `admin` / `ZhizaoYun@2026`）与「六个系统应用（数据核心 / 应用中心 / 审计中心 / Logo / 登录）共用完整路由 `/apps/<plugin-id>`」为基准。
 
 ## 1. 本次新增与修复
 
@@ -129,7 +129,7 @@
 
 ### 1.2 默认账号（交付测试用）
 - 账号：`admin`
-- 密码：`Zhiyun@2026`
+- 密码：`ZhizaoYun@2026`
 - token 有效期：7 天；密码采用 salted SHA-256。
 
 ### 1.3 系统应用直达路由（已修复，P0）
@@ -198,7 +198,7 @@
 
 | 对象 | 现状 | 双态体系下的处理 |
 | --- | --- | --- |
-| `zhiyun-auth` | 已有登录门、默认账号 `admin/Zhiyun@2026`、前端 RBAC 展示 | 作为企业 IAM 底座；服务端强制鉴权与路由待接入 |
+| `zhiyun-auth` | 已有登录门、默认账号 `admin/ZhizaoYun@2026`、前端 RBAC 展示 | 作为企业 IAM 底座；服务端强制鉴权与路由待接入 |
 | `zhiyun-data-core` | 已有 `data_core_meta / batches / records`、`source_type=real\|simulated`、`preview_import / import_rows / list_records / list_batches / rollback_batch`、`generate_orders / generate_production` | 作为 Simulation/Data Platform/Time Machine 的底座；**改造点**：UI 的「模拟订单/生产数据」按钮与「模拟」徽标按命名规范改为「数据环境 Demo/Live 措辞」，本轮只记录不改码 |
 | `zhiyun-audit` | 已有审计链完整性、Tool 表、防篡改哈希链 | 作为 Data Integrity 的校验与审计底座 |
 | `feature_progress.json` | 当前 1-31 项能力台账 | 保持不动；Epic 产出的可交付能力若需入账，先评估与校验器兼容性 |
@@ -224,7 +224,7 @@
 - 插件：`plugins/zhiyun-enterprise-seeder`（后端 `enterprise_plugin.py`，前端 `ui/index.js`）。
 - 一次初始化：`POST /api/zhiyun-enterprise-seeder/seed` 生成企业/部门/用户/角色/权限/Agent/Skill/应用/数据源/会话/任务/Token/日志。
 - 多环境：记录带 `env_id + data_mode`，`/records` 强制按 `env_id + data_mode` 过滤。
-- 账号同步：生成后同步到 `auth/users.json`，默认密码 `Zhiyun@2026`。
+- 账号同步：生成后同步到 `auth/users.json`，默认密码 `ZhizaoYun@2026`。
 - 交互：前端为真实 GUI（参数表单 + 概览 + 明细表 + 实体切换 + Agent 抽屉），非裸 JSON。
 
 ## 2. 服务端鉴权（RBAC 落地）
@@ -357,5 +357,63 @@
 ## 4. 待办（下一迭代）
 
 - 真实模型驱动执行替换规则引擎（当前本地 `kilo/kilo-auto/free` 不可达，不影响规则驱动）。
+- 各 Studio 业务接口统一接入 RBAC 强制路由。
+- 不同企业独立实例的部署脚本配置化。
+
+
+---
+
+# 第八迭代：应用接入默认智能体 + SKILLs 问数（2026-08-25）
+
+> 本段为 2026-08-25 对「应用接入智能体」通用能力的定义与首例落地。服务运行于 `http://127.0.0.1:8088`，QwenPaw 2.1.0，健康 `13/13`。
+
+## 1. 需求变更背景
+
+此前各业务 Studio 虽然都有「问 Agent」入口，但多数为**前端模拟**：输入自然语言后由前端 `pushAgent` 并返回固定文案，并未真正调用模型。同时缺少「每个应用对应一个默认智能体」的绑定关系，应用无法把自身能力以 SKILLs/工具形式暴露给智能体进行「问数」。
+
+本迭代确立统一模式：
+
+1. 每个业务应用对应一个默认智能体。
+2. 应用把「问数 / 业务操作」能力以 SKILLs（工具/技能）形式暴露给其默认智能体。
+3. 应用 UI 内提供「智能体对话」板块（复用 AgentDock），可真实发起 SSE 流式对话。
+4. 首例落地于系统插件 `zhiyun-app-discovery`（应用与项目中心），作为可复用的参考实现。
+
+## 2. 变更内容
+
+### 2.1 后端：真实 Agent 对话代理端点
+
+- 新增 `POST /api/zhiyun-app-discovery/agent/chat`（`app_discovery_plugin.py`）。
+- 请求结构 `AgentChatRequest`：`text`、`session_id`、`user_id`、`app_id`、`context`、`history`（多轮上下文）。
+- `_build_input` 构建 `input` 消息列表：system 上下文 + 历史多轮 + 当前用户消息（`bot`→`assistant` 映射，system 不重复注入）。
+- 使用 `httpx.AsyncClient.stream` 代理到「`http://127.0.0.1:8088/api/console/chat`」，返回 `text/event-stream` SSE，逐 token 转发。
+- 透传 `metadata`：`app_id`、`source_kind: agent_dock`、`data_mode: real`，供审计与数据一致性追溯。
+- `session_id` 持久化（`zhiyun-app-discovery-<uuid>`），跨轮继续同一会话。
+
+### 2.2 后端：SKILLs/工具暴露给默认智能体
+
+- 注册工具 `find_paw_apps(query, limit=3) → agent_response`，描述「搜索真实本地 PawApp 能力索引」，`tool_type: internal`。
+- 默认上下文 `APP_CONTEXT` 注入系统提示：当前处于应用中心智能体，用户询问「用什么应用/谁完成某业务/某能力在哪」时先调用 `find_paw_apps`，再基于真实应用推荐，**不凭空编造应用名**。
+
+### 2.3 前端：智能体对话板块（AgentDock 复用）
+
+- `ui/index.js` 内置可复用 `AgentDock` 右侧滑出抽屉（遮罩 + 对话列表 + 快捷指令 + 输入框）。
+- 会话 `agentSessionRef`：`app-dock-<timestamp>`，跨轮保持同一会话。
+- `startAgentChat` 构建 `history`（过滤 system、`bot`→`assistant`、截取最近 12 条），追加 user + 空 bot 占位，`fetch("/zhiyun-app-discovery/agent/chat", {method:"POST", ...})` 后 SSE 流式读取：
+  - `delta:true` 的 `text` 累加到 `full`，实时替换最后一条 bot 消息，实现 token 级渲染。
+  - 处理 `message completed` 的 `content` 数组（最终完整文本）、`status:failed` 与 `error` 为 fallback。
+  - 完成/失败均复位 `busy`。
+- 快捷指令映射为真实 prompt：`我的应用`、`能力检索`、`交付进度`；聊天 `source_type: real`。
+
+## 3. 验证证据
+
+- 直接调 console chat：`POST /api/console/chat` 返回 `status 200, text/event-stream`，delta 文本正常输出。
+- 插件代理端点：`POST /api/zhiyun-app-discovery/agent/chat` 返回 `status 200, text/event-stream`，`delta_events=1806`, `elapsed=48.2s`（真实模型流式输出）。
+- `node --check plugins/zhiyun-app-discovery/ui/index.js` → exit 0。
+- `py_compile plugins/zhiyun-app-discovery/app_discovery_plugin.py` 通过。
+- 源码与运行副本（`apps/qwenpaw-embedded/workspace/plugins/zhiyun-app-discovery/`）三文件 `md5` 一致（`ui/index.js`、`app_discovery_plugin.py`、`plugin.json`）。
+
+## 4. 待办（下一迭代）
+
+- 将「每个应用一个默认智能体 + AgentDock 板块 + SKILLs 问数」模式推广到其他系统插件与外部业务应用。
 - 各 Studio 业务接口统一接入 RBAC 强制路由。
 - 不同企业独立实例的部署脚本配置化。

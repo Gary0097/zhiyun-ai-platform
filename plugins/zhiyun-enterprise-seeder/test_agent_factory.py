@@ -67,7 +67,7 @@ class TestAgentFactory(unittest.TestCase):
         self.assertEqual(cfg["model_id"], "local-qwen2.5-72b")
         self.assertIn("business_analyst_attribution", [s["skill_id"] for s in cfg["skills"]])
         self.assertTrue(all(t["tool_id"] in TOOL_CATALOG for t in cfg["tools"]))
-        self.assertIn("sales_center", cfg["apps"])
+        self.assertIn("zhiyun-sales-studio", cfg["apps"])
 
     def test_validate_ok(self) -> None:
         cfg = build_agent_config(SPEC)
@@ -86,8 +86,8 @@ class TestAgentFactory(unittest.TestCase):
         self.assertEqual(res["agent_id"], "business_analyst")
         self.assertEqual(self.conn.execute("SELECT COUNT(*) AS c FROM models").fetchone()["c"], 1)
         self.assertEqual(self.conn.execute("SELECT COUNT(*) AS c FROM agent_tools").fetchone()["c"], 1)
-        # 管理层可访问 4 个应用（finance/sales/data/project）
-        self.assertEqual(self.conn.execute("SELECT COUNT(*) AS c FROM agent_app_access").fetchone()["c"], 4)
+        # 管理层可访问 5 个应用（finance/sales/data/project/knowledge-base）
+        self.assertEqual(self.conn.execute("SELECT COUNT(*) AS c FROM agent_app_access").fetchone()["c"], 5)
         # 幂等：同环境再写一次不新增模型
         persist_bindings(self.conn, "env_x", "t_x", "demo", SPEC, "2026-01-01 00:00:00")
         self.assertEqual(self.conn.execute("SELECT COUNT(*) AS c FROM models").fetchone()["c"], 1)

@@ -57,9 +57,19 @@ function bundlePath (app) {
   return join(cacheRoot, `${app.id}-${app.commit}.bundle`)
 }
 
+function gitAvailable () {
+  // 无 git 的目标机器（U 盘离线安装）允许跳过离线 bundle 缓存：应用本体已就绪。
+  return spawnSync('git', ['--version'], { stdio: 'ignore' }).status === 0
+}
+const hasGit = gitAvailable()
+
 function cacheBundle (app) {
   const bundle = bundlePath(app)
   if (existsSync(bundle) || offline) return
+  if (!hasGit) {
+    console.log(`提示：系统无 Git，跳过 ${app.id} 的离线 bundle 缓存（已安装版本不受影响）。`)
+    return
+  }
   const cacheStage = join(appsRoot, `.${app.id}.cache-${process.pid}`)
   rmSync(cacheStage, { recursive: true, force: true })
   const clone = git(['clone', '--filter=blob:none', '--no-checkout', app.repository, cacheStage], appRoot)

@@ -110,7 +110,7 @@ def main():
         page.goto(BASE + "/", wait_until="domcontentloaded", timeout=60000); page.wait_for_timeout(2500)
         a = page.query_selector("input[placeholder='请输入员工账号']"); pwd = page.query_selector("input[placeholder='请输入登录密码']")
         if a and pwd:
-            a.fill("admin"); pwd.fill("Zhiyun@2026"); page.click("button:has-text('登录')"); page.wait_for_timeout(3000)
+            a.fill("admin"); pwd.fill("ZhizaoYun@2026"); page.click("button:has-text('登录')"); page.wait_for_timeout(3000)
         results.append({"login_token": bool(page.evaluate("() => window.localStorage.getItem('zhiyun_token')"))})
         for cfg in APPS:
             results.append(probe(page, cfg))
