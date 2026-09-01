@@ -93,13 +93,31 @@ class Installer
                 {
                     log.WriteLine("launching install-usb.cmd");
                     log.Flush();
-                    Process.Start(new ProcessStartInfo("cmd.exe", "/c \"" + installer + "\"")
+                    var child = Process.Start(new ProcessStartInfo("cmd.exe", "/c \"" + installer + "\"")
                     {
                         WorkingDirectory = targetDir,
                         UseShellExecute = false
                     });
+                    // install-usb 正常路径是“装运行时→起服务（前台常驻）”，子进程
+                    // 不会退出。这里只收割早期失败：若在窗口期内以非零码退出则视为
+                    // 安装失败；超时仍在运行说明服务已起，按成功处理。
+                    if (child.WaitForExit(180000))
+                    {
+                        log.WriteLine("install-usb.cmd exited: " + child.ExitCode);
+                        log.Flush();
+                        Environment.ExitCode = child.ExitCode == 0 ? 0 : 2;
+                    }
+                    else
+                    {
+                        log.WriteLine("install-usb.cmd still running (service online)");
+                        Environment.ExitCode = 0;
+                    }
                 }
-                Environment.ExitCode = 0;
+                else
+                {
+                    log.WriteLine("warning: install-usb.cmd not found");
+                    Environment.ExitCode = 0;
+                }
             }
             catch (Exception ex)
             {

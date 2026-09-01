@@ -21,7 +21,15 @@ if (!existsSync(seedsRoot)) {
 
 let config = existsSync(configFile)
   ? JSON.parse(readFileSync(configFile, 'utf8'))
-  : { agents: { active_agent: 'default', agent_order: ['default'], profiles: {} } }
+  : { agents: { active_agent: 'default', agent_order: ['default'], profiles: {
+      // 全新安装兜底：default 智能体必须出现在 profiles 中，运行时按
+      // enabled profiles 解析；其工作区目录由 QwenPaw 首次启动初始化。
+      default: {
+        id: 'default', name: '默认智能体', description: 'Default agent',
+        workspace_dir: join(appRoot, 'workspace', 'workspaces', 'default'),
+        enabled: true, pinned: true,
+      },
+    } } }
 config.agents ??= {}
 config.agents.profiles ??= {}
 config.agents.agent_order ??= []
@@ -61,7 +69,6 @@ for (const entry of readdirSync(seedsRoot, { withFileTypes: true })) {
   if (!existsSync(jobs)) writeFileSync(jobs, JSON.stringify({ version: 1, jobs: [] }, null, 2), 'utf8')
 
   agent.workspace_dir = target
-  writeFileSync(join(target, 'agent.json'), JSON.stringify(agent, null, 2), 'utf8') // 完成标记
   if (!config.agents.profiles[id]) {
     config.agents.profiles[id] = {
       id,
@@ -74,6 +81,13 @@ for (const entry of readdirSync(seedsRoot, { withFileTypes: true })) {
     if (!config.agents.agent_order.includes(id)) config.agents.agent_order.push(id)
     changed = true
   }
+  // 完成标记最后写：先落 config.json（profiles 注册），成功后再写 agent.json。
+  // 任一步中断，下次启动都会因缺少标记而重装，不会把半成品当成就绪。
+  if (changed) {
+    writeFileSync(configFile, JSON.stringify(config, null, 2), 'utf8')
+    changed = false
+  }
+  writeFileSync(join(target, 'agent.json'), JSON.stringify(agent, null, 2), 'utf8')
   console.log(`内置智能体已安装：${agent.name}（${id}）`)
 }
 
