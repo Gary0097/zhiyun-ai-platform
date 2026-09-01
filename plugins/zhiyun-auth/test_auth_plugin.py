@@ -281,7 +281,7 @@ class AuthRoutesTests(unittest.TestCase):
 
     def test_me_requires_token(self) -> None:
         with self.assertRaises(ap.HTTPException) as ctx:
-            self._run(ap.me())
+            self._run(ap.me(""))
         self.assertEqual(ctx.exception.status_code, 401)
 
     def test_me_with_valid_token(self) -> None:
@@ -292,7 +292,7 @@ class AuthRoutesTests(unittest.TestCase):
 
     def test_list_users_requires_admin(self) -> None:
         with self.assertRaises(ap.HTTPException) as ctx:
-            self._run(ap.list_users())
+            self._run(ap.list_users(""))
         self.assertEqual(ctx.exception.status_code, 401)
 
     def test_list_users_member_forbidden(self) -> None:
