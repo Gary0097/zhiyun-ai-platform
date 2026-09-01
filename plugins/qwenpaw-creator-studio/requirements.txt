@@ -1,0 +1,8 @@
+# 离线安装包友好：仅保留可预装进主 venv 的核心依赖。
+# geopandas/trimesh/playwright（GIS/3D/动效渲染）与 oss2 按上游设计优雅降级，未包含。
+imageio-ffmpeg
+pypdfium2
+pandas
+openpyxl
+matplotlib
+tabulate

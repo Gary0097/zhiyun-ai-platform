@@ -51,6 +51,8 @@ async function scenario (overrides = {}) {
       '/api/zhiyun-chanjet-hub/health': { status: 'available', version: '0.1.0' },
       '/api/qwenpaw-creator/capabilities': { name: 'QwenPaw Creator · 视频压缩', presets: ['极速', '高速', '均衡', '高画质'], environment: { ready: true, encoders: [{ key: 'CPU H.264 / AVC (libx264)', label: 'CPU H.264 / AVC (libx264)', available: true }] } },
       '/api/agent-kanban/issues': { issues: [] },
+      '/api/qwenpaw-creator-studio/health': { status: 'ok', runtime: 'creator-filesystem', dependencies: { status: 'ok' } },
+      '/api/qwenpaw-creator-mixcut/capabilities': { name: 'QwenPaw Creator · 智能混剪', transitions: ['交叉溶解'], resolutions: ['1080p 横屏'], environment: { ready: true } },
       ...overrides,
     }
     response.end(JSON.stringify(bodies[request.url] || {}))

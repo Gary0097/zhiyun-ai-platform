@@ -27,7 +27,7 @@ fi
 export UV_CACHE_DIR="$CACHE_DIR/uv" UV_PYTHON_INSTALL_DIR="$CACHE_DIR/python" UV_PYTHON_PREFERENCE=only-managed
 if [ "$OFFLINE" = "1" ]; then export UV_OFFLINE=1; fi
 "$UV" venv "$VENV_ROOT" --python 3.12 --clear
-"$UV" pip install --python "$PYTHON" "qwenpaw==$VERSION"
+"$UV" pip install --python "$PYTHON" "qwenpaw==$VERSION" pypdfium2 pandas openpyxl matplotlib tabulate
 if [ ! -x "$QWENPAW" ] || ! "$QWENPAW" --version 2>&1 | grep -E "version[[:space:]]+$VERSION[[:space:]]*$" >/dev/null; then
   printf '项目运行环境安装后版本校验失败。\n' >&2; exit 1
 fi

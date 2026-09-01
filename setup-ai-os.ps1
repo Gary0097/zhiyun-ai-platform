@@ -47,7 +47,7 @@ try {
   if ($Offline) { $env:UV_OFFLINE = "1" }
   & $UvCommand venv $VenvRoot --python 3.12 --clear
   if ($LASTEXITCODE -ne 0) { throw "uv venv 退出码：$LASTEXITCODE" }
-  & $UvCommand pip install --python $PythonCommand "qwenpaw==$($Lock.version)"
+  & $UvCommand pip install --python $PythonCommand "qwenpaw==$($Lock.version)" pypdfium2 pandas openpyxl matplotlib tabulate
   if ($LASTEXITCODE -ne 0) { throw "uv pip install 退出码：$LASTEXITCODE" }
 } finally {
   foreach ($name in $previous.Keys) { Set-Item -Path "env:$name" -Value $previous[$name] }
