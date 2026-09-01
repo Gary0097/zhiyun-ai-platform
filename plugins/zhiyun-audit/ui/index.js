@@ -4,6 +4,20 @@
   var React = Q.host.React;
   var antd = Q.host.antd;
   var h = React.createElement;
+  function readToken() {
+    try { return window.localStorage.getItem("zhiyun_token") || ""; } catch (e) { return ""; }
+  }
+  function request(path, options) {
+    var opts = Object.assign({}, options || {});
+    var token = readToken();
+    opts.headers = Object.assign({}, (options && options.headers) || {}, token ? { Authorization: "Bearer " + token } : {});
+    return Q.host.fetch(path, opts).then(function (response) {
+      if (!response.ok) return response.json().catch(function () { return {}; }).then(function (body) {
+        throw new Error(body.detail || ("HTTP " + response.status));
+      });
+      return response.json();
+    });
+  }
 
   function zySpark() { return h("span", { style: { fontSize: 13 } }, "✦"); }
   function zyPushAgent(ctx) {
@@ -184,15 +198,19 @@
     function load() {
       setLoading(true); setError("");
       var query = status ? "?status=" + encodeURIComponent(status) : "";
-      Promise.all([Q.host.fetch("/zhiyun-audit/events" + query), Q.host.fetch("/zhiyun-audit/integrity")]).then(function (responses) {
-        if (!responses[0].ok || !responses[1].ok) throw new Error("审计接口不可用");
-        return Promise.all([responses[0].json(), responses[1].json()]);
-      }).then(function (bodies) { setRecords(bodies[0].events || []); setIntegrity(bodies[1]); })
+      Promise.all([request("/zhiyun-audit/events" + query), request("/zhiyun-audit/integrity")]).then(function (bodies) {
+        setRecords(bodies[0].events || []); setIntegrity(bodies[1]);
+      })
         .catch(function (reason) { setError(reason.message || "审计记录加载失败"); })
         .finally(function () { setLoading(false); });
     }
 
     React.useEffect(load, [status]);
+    React.useEffect(function () {
+      function onAuth() { load(); }
+      window.addEventListener("zhiyun:auth", onAuth);
+      return function () { window.removeEventListener("zhiyun:auth", onAuth); };
+    }, [status]);
     var statusColors = { success: "green", failed: "red", blocked: "orange" };
     var columns = [
       { title: "时间", dataIndex: "created_at", width: 210 },
