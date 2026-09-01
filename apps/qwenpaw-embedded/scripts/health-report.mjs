@@ -32,6 +32,8 @@ export const endpoints = [
   { id: 'zhiyun-people-studio', name: 'People Studio', path: '/api/zhiyun-people-studio/health', contentType: 'application/json' },
   { id: 'qwenpaw-creator', name: '视频压缩工坊（QwenPaw Creator）', path: '/api/qwenpaw-creator/capabilities', contentType: 'application/json' },
   { id: 'agent-kanban', name: 'Agent 看板', path: '/api/agent-kanban/issues', contentType: 'application/json' },
+  { id: 'qwenpaw-creator-studio', name: 'QwenPaw Creator 原版', path: '/api/qwenpaw-creator-studio/health', contentType: 'application/json' },
+  { id: 'qwenpaw-creator-mixcut', name: '智能混剪工坊', path: '/api/qwenpaw-creator-mixcut/capabilities', contentType: 'application/json' },
 ]
 
 if (checkOnly) {
@@ -69,6 +71,16 @@ function validatePayload (id, payload) {
     if (payload?.environment?.ready !== true) return 'Creator未就绪（ffmpeg缺失）'
     if (!Array.isArray(payload?.environment?.encoders) || payload.environment.encoders.length === 0) return 'Creator未提供编码器列表'
     if (!Array.isArray(payload?.presets) || payload.presets.length === 0) return 'Creator缺少压缩预设'
+    return ''
+  }
+  if (id === 'qwenpaw-creator-studio') {
+    if (!['ok', 'degraded'].includes(payload?.status)) return 'Creator原版健康状态异常'
+    return ''
+  }
+  if (id === 'qwenpaw-creator-mixcut') {
+    if (payload?.name !== 'QwenPaw Creator · 智能混剪') return '混剪端点名称不符'
+    if (!Array.isArray(payload?.transitions) || payload.transitions.length === 0) return '混剪缺少转场列表'
+    if (!Array.isArray(payload?.resolutions) || payload.resolutions.length === 0) return '混剪缺少分辨率预设'
     return ''
   }
   if (id === 'agent-kanban') {

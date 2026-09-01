@@ -13,6 +13,10 @@ PYTHON="$VENV_ROOT/bin/python"
 CACHED_UV="$CACHE_DIR/bin/uv"
 OFFLINE=${AI_OS_OFFLINE:-0}
 if [ -x "$PYTHON" ] && "$PYTHON" --version >/dev/null 2>&1 && [ -x "$QWENPAW" ] && "$QWENPAW" --version 2>&1 | grep -E "version[[:space:]]+$VERSION[[:space:]]*$" >/dev/null; then
+  # 升级路径：运行时就绪但可能缺少后续新增的 Creator 依赖，补装后再退出
+  if command -v uv >/dev/null 2>&1; then
+    uv pip install --python "$PYTHON" pypdfium2 pandas openpyxl matplotlib tabulate >/dev/null 2>&1 || true
+  fi
   printf 'QwenPaw %s 项目运行环境已就绪：%s\n' "$VERSION" "$RUNTIME_ROOT"; exit 0
 fi
 mkdir -p "$CACHE_DIR/bin" "$CACHE_DIR/uv" "$CACHE_DIR/python"
@@ -27,7 +31,7 @@ fi
 export UV_CACHE_DIR="$CACHE_DIR/uv" UV_PYTHON_INSTALL_DIR="$CACHE_DIR/python" UV_PYTHON_PREFERENCE=only-managed
 if [ "$OFFLINE" = "1" ]; then export UV_OFFLINE=1; fi
 "$UV" venv "$VENV_ROOT" --python 3.12 --clear
-"$UV" pip install --python "$PYTHON" "qwenpaw==$VERSION"
+"$UV" pip install --python "$PYTHON" "qwenpaw==$VERSION" pypdfium2 pandas openpyxl matplotlib tabulate
 if [ ! -x "$QWENPAW" ] || ! "$QWENPAW" --version 2>&1 | grep -E "version[[:space:]]+$VERSION[[:space:]]*$" >/dev/null; then
   printf '项目运行环境安装后版本校验失败。\n' >&2; exit 1
 fi

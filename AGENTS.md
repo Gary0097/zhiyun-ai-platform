@@ -13,8 +13,11 @@ and the applicable progress ledger before changing product behavior.
   system plugins, launchers, the shared Workspace contract, and version locks.
 - Data Studio and Order Studio are independent repositories. Update their lock
   entries here only after the corresponding external commit is available.
-- QwenPaw Creator ships as a controlled product app (video-compression edition,
-  `plugins/qwenpaw-creator`); other upstream Creator capabilities stay out of scope.
+- QwenPaw Creator ships as three controlled product apps installed with every
+  release (user-mandated lineup): the official studio edition
+  (`plugins/qwenpaw-creator-studio`, re-id'd from upstream), the
+  video-compression edition (`plugins/qwenpaw-creator`), and the smart
+  mixcut edition (`plugins/qwenpaw-creator-mixcut`).
 - Agent Kanban is vendored the same way (`plugins/agent-kanban`): the offline-USB
   channel must ship both official apps from this tree, so they share the system
   plugin install path instead of an external PawApp commit lock.

@@ -788,6 +788,52 @@
       ],
       "health": "available",
       "capabilities": []
+    },
+    {
+      "app_id": "qwenpaw-creator-studio",
+      "name": "QwenPaw Creator 原版（智能视频创作）",
+      "aliases": [
+        "视频创作",
+        "智能创作",
+        "短剧生成",
+        "视频剪辑平台",
+        "creator studio"
+      ],
+      "version": "1.1.1",
+      "category": "productivity",
+      "install_status": "installed",
+      "route": "/apps/qwenpaw-creator-studio",
+      "repository_url": "",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "health": "available",
+      "capabilities": []
+    },
+    {
+      "app_id": "qwenpaw-creator-mixcut",
+      "name": "智能混剪工坊（QwenPaw Creator）",
+      "aliases": [
+        "混剪",
+        "视频拼接",
+        "视频合集",
+        "转场",
+        "加字幕",
+        "加背景音乐",
+        "mixcut"
+      ],
+      "version": "1.0.0",
+      "category": "productivity",
+      "install_status": "installed",
+      "route": "/apps/qwenpaw-creator-mixcut",
+      "repository_url": "",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "health": "available",
+      "capabilities": []
     }
   ]
 }

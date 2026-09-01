@@ -22,7 +22,14 @@ function Test-QwenPawRuntime {
   $versionOutput = & $QwenPawCommand --version 2>&1 | Out-String
   return $LASTEXITCODE -eq 0 -and $versionOutput -match ("version\s+" + [regex]::Escape($Lock.version) + "\s*$")
 }
-if (Test-QwenPawRuntime) { Write-Host "QwenPaw $($Lock.version) 项目运行环境已就绪：$RuntimeRoot"; exit 0 }
+if (Test-QwenPawRuntime) {
+  # 升级路径：运行时就绪但可能缺少后续新增的 Creator 依赖，补装后再退出
+  $UvFallback = if (Test-Path -LiteralPath $CachedUv) { $CachedUv } else { (Get-Command uv -ErrorAction SilentlyContinue).Source }
+  if ($UvFallback) {
+    & $UvFallback pip install --python $PythonCommand pypdfium2 pandas openpyxl matplotlib tabulate | Out-Null
+  }
+  Write-Host "QwenPaw $($Lock.version) 项目运行环境已就绪：$RuntimeRoot"; exit 0
+}
 
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $CachedUv), (Join-Path $RuntimeCache "uv"), (Join-Path $RuntimeCache "python") | Out-Null
 $UvCommand = if (Test-Path -LiteralPath $CachedUv) { $CachedUv } else { (Get-Command uv -ErrorAction SilentlyContinue).Source }
@@ -47,7 +54,7 @@ try {
   if ($Offline) { $env:UV_OFFLINE = "1" }
   & $UvCommand venv $VenvRoot --python 3.12 --clear
   if ($LASTEXITCODE -ne 0) { throw "uv venv 退出码：$LASTEXITCODE" }
-  & $UvCommand pip install --python $PythonCommand "qwenpaw==$($Lock.version)"
+  & $UvCommand pip install --python $PythonCommand "qwenpaw==$($Lock.version)" pypdfium2 pandas openpyxl matplotlib tabulate
   if ($LASTEXITCODE -ne 0) { throw "uv pip install 退出码：$LASTEXITCODE" }
 } finally {
   foreach ($name in $previous.Keys) { Set-Item -Path "env:$name" -Value $previous[$name] }
