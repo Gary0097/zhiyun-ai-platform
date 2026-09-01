@@ -17,6 +17,7 @@ from typing import Any, AsyncGenerator
 from uuid import uuid4
 
 import httpx
+import asyncio
 from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, Request, Response, UploadFile
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
@@ -392,6 +393,71 @@ async def export_records(
             headers={"Content-Disposition": f'attachment; filename="{suggested}"'},
         )
     return _handle(run)
+
+
+@router.get("/orders/insights", dependencies=[Depends(require_auth)])
+async def orders_insights(
+    data_mode: str | None = Query(default=None, max_length=20),
+    limit: int = Query(default=500, ge=1, le=2000),
+    user: dict[str, Any] = Depends(require_auth_user),
+) -> dict[str, Any]:
+    """订单履约洞察：状态/风险分布、逾期识别、延误榜与数据流转结论。"""
+    from datetime import date as _date
+
+    def query() -> dict[str, Any]:
+        records = core.search_records(
+            "orders", keyword="", filters={}, source_type=None,
+            data_mode=_mode_q(data_mode),
+            owner_department=_scope_filters(user)["owner_department"],
+            owner_agent=_scope_filters(user)["owner_agent"],
+            start_date=None, end_date=None, limit=limit,
+        )
+        today = _date.today()
+        status_dist: dict[str, int] = {}
+        risk_dist = {"正常": 0, "轻微延误": 0, "高风险": 0, "已逾期": 0}
+        overdue, risky = [], []
+        for r in records:
+            d = r.get("data", {})
+            st = str(d.get("status") or "未知")
+            status_dist[st] = status_dist.get(st, 0) + 1
+            promised = str(d.get("promised_date") or "")
+            progress = float(d.get("progress") or 0)
+            delay_days = d.get("production_delay_days")
+            delay_days = float(delay_days) if delay_days is not None else 0
+            entry = {"order_no": d.get("order_no"), "customer": d.get("customer_name"),
+                     "status": st, "progress": progress, "promised": promised,
+                     "delay_days": delay_days}
+            is_overdue = False
+            if promised:
+                try:
+                    is_overdue = _date.fromisoformat(promised[:10]) < today and "交付" not in st and "完成" not in st
+                except ValueError:
+                    pass
+            if is_overdue:
+                risk_dist["已逾期"] += 1
+                overdue.append(entry)
+            elif delay_days >= 7 or (progress < 50 and delay_days >= 3):
+                risk_dist["高风险"] += 1
+                risky.append(entry)
+            elif delay_days > 0:
+                risk_dist["轻微延误"] += 1
+            else:
+                risk_dist["正常"] += 1
+        top_risky = sorted(overdue + risky, key=lambda x: -x["delay_days"])[:10]
+        n = max(1, len(records))
+        at_risk = risk_dist["高风险"] + risk_dist["已逾期"]
+        summary = (f"共 {len(records)} 张订单：正常 {risk_dist['正常']}（{risk_dist['正常']*100//n}%）、"
+                   f"轻微延误 {risk_dist['轻微延误']}、高风险 {risk_dist['高风险']}、已逾期 {risk_dist['已逾期']}。")
+        if overdue:
+            summary += f"逾期订单需立即跟催，最严重：{overdue[0]['order_no']}（{overdue[0]['customer']}，承诺 {overdue[0]['promised']}）。"
+        elif at_risk == 0:
+            summary += "履约整体健康。"
+        return {"total": len(records), "status_distribution": status_dist,
+                "risk_distribution": risk_dist, "overdue_count": len(overdue),
+                "top_risky": top_risky, "summary": summary,
+                "generated_at": today.isoformat()}
+
+    return await asyncio.to_thread(query)
 
 
 @router.get("/orders", dependencies=[Depends(require_auth)])
