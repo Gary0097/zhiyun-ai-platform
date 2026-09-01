@@ -8,6 +8,15 @@ from unittest import mock
 
 from table_parser import build_export_bytes, parse_table
 
+try:
+    import openpyxl  # noqa: F401
+    _HAS_OPENPYXL = True
+except ModuleNotFoundError:
+    _HAS_OPENPYXL = False
+
+_requires_openpyxl = unittest.skipUnless(
+    _HAS_OPENPYXL, "openpyxl 未安装时跳过 xlsx 用例（CSV 路径不受影响）")
+
 
 class TableParserTests(unittest.TestCase):
     def test_csv_is_parsed_for_any_dataset(self) -> None:
@@ -23,6 +32,7 @@ class TableParserTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "仅支持.*\.xls"):
             parse_table("data.txt", b"a,b")
 
+    @_requires_openpyxl
     def test_xlsx_parse_reads_first_sheet(self) -> None:
         from openpyxl import Workbook
 
@@ -72,6 +82,7 @@ class TableParserTests(unittest.TestCase):
         self.assertEqual(suggested, "orders.csv")
         self.assertIn("海川制造".encode("utf-8"), data)
 
+    @_requires_openpyxl
     def test_export_xlsx_bytes_round_trip(self) -> None:
         from openpyxl import load_workbook
 
