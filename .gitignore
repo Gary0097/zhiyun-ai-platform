@@ -26,5 +26,7 @@ apps/qwenpaw-embedded/workspace.secret/
 Thumbs.db
 .idea/
 .vscode/
+dist/*.exe
+dist/*.exe.sha256
 dist/*.zip
 dist/*.sha256

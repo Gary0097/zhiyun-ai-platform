@@ -52,6 +52,7 @@ function run (command, args, hint, capture = false) {
 run(process.execPath, [join(scriptsRoot, 'doctor.mjs')], '启动诊断未通过；请按上方提示处理后重试。')
 if (process.argv.includes('--check')) process.exit(0)
 
+run(process.execPath, [join(scriptsRoot, 'seed-builtin-agents.mjs')], '内置智能体种子安装失败。')
 run(process.execPath, [join(scriptsRoot, 'cleanup-legacy.mjs')], '清理旧品牌、应用和企业 Tool 配置失败。')
 run(process.execPath, [join(scriptsRoot, 'ensure-workspace.mjs')], 'Workspace 初始化失败。')
 run(process.execPath, [join(scriptsRoot, 'patch-console-ui.mjs')], 'Console UI 定制脚本执行失败。')
