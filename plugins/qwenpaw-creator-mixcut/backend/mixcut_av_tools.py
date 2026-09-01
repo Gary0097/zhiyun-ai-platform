@@ -182,6 +182,8 @@ def probe_media_info(source: Path) -> dict:
             fmt = data.get("format", {})
             video = next((s for s in data.get("streams", [])
                           if s.get("codec_type") == "video"), {})
+            has_audio = any(st.get("codec_type") == "audio"
+                            for st in data.get("streams", []))
             return {
                 "duration": float(fmt.get("duration") or 0),
                 "size": int(fmt.get("size") or 0),
@@ -189,6 +191,7 @@ def probe_media_info(source: Path) -> dict:
                 "width": int(video.get("width") or 0),
                 "height": int(video.get("height") or 0),
                 "codec": video.get("codec_name") or "",
+                "has_audio": has_audio,
                 "fps": _parse_fps(video.get("avg_frame_rate") or video.get("r_frame_rate")),
             }
         except (ValueError, json.JSONDecodeError):

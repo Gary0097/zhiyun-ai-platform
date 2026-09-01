@@ -18,7 +18,7 @@ from typing import Any, Callable
 from urllib.parse import urlparse
 
 import httpx
-from fastapi import APIRouter, Body, Header, Query, Request, Response, status
+from fastapi import APIRouter, Body, Depends, Header, Query, Request, Response, status
 from pydantic import ValidationError as PydanticValidationError
 
 from domain.errors import ConflictError, StorageIntegrityError, ValidationError
@@ -2022,9 +2022,15 @@ async def test_oss_connection(
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# 平台统一鉴权（灵泽万川智造云）：密钥类端点必须携带有效 Bearer Token
+# ---------------------------------------------------------------------------
+from studio_auth_guard import require_studio_admin  # noqa: E402
+
+
 @router.get("/real-api-key/{section}")
-async def get_real_api_key(section: str) -> dict[str, str]:
-    """Return the real API key of the given config section (for testing).
+async def get_real_api_key(section: str, user: dict = Depends(require_studio_admin)) -> dict[str, str]:
+    """Return the real API key of the given config section (login + admin required).
 
     When VLM/Grounding/ASR reuse the LLM config, the frontend needs the real
     API key to run connection tests, because it only stores the mask
@@ -2056,8 +2062,8 @@ async def get_real_api_key(section: str) -> dict[str, str]:
 
 
 @router.get("/host-provider/{provider_id}/api-key")
-async def get_host_provider_key(provider_id: str) -> dict[str, str | None]:
-    """Fetch the API key of the given provider from the QwenPaw host.
+async def get_host_provider_key(provider_id: str, user: dict = Depends(require_studio_admin)) -> dict[str, str | None]:
+    """Fetch the API key of the given provider from the QwenPaw host (login + admin required).
 
     Used to auto-sync the API key when picking an LLM/VLM provider in Creator.
     """

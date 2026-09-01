@@ -179,6 +179,8 @@ async def upload_bgm(file: UploadFile, user: dict = Depends(require_user)) -> Di
     suffix = Path(file.filename or "bgm.mp3").suffix.lower()
     if suffix not in {".mp3", ".wav", ".flac", ".aac", ".m4a", ".ogg"}:
         raise HTTPException(status_code=422, detail=f"不支持的音频格式：{suffix}")
+    for old in BGM_DIR.glob("bgm.*"):
+        old.unlink(missing_ok=True)  # 替换式上传：清理旧 BGM，避免多扩展名残留被误选
     target = BGM_DIR / f"bgm{suffix}"
     with target.open("wb") as out:
         while chunk := await file.read(1024 * 1024):
@@ -362,7 +364,7 @@ async def render(project_id: str, body: RenderRequest | None = None,
         if clip is None:
             raise HTTPException(status_code=422, detail=f"片段 {item['clip_id']} 已不存在，请先补传")
         timeline.append({**item, "clip_path": clip["path"], "duration": clip.get("duration") or 0,
-                         "has_audio": bool(clip.get("codec") or True)})
+                         "has_audio": bool(clip.get("has_audio", False))})
 
     bgm_file = None
     bgms = sorted(BGM_DIR.glob("bgm.*"))
