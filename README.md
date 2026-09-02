@@ -163,6 +163,7 @@ QwenPaw 2.1.0（唯一宿主，端口 8088）
 
 ## 文档
 
+- 使用说明书：[docs/user-manual/README.md](docs/user-manual/README.md)（图文版，含独立 HTML 分发文件）
 - 产品需求：[AI-OS PRD V6.4](docs/product/AI-OS-PRD-V6.4-QwenPaw-PawApps.md)
 - 架构：[QwenPaw-only 目标架构](docs/architecture/QWENPAW-ONLY-ARCHITECTURE.md)
 - 部署运维：[快速部署](docs/operations/QUICKSTART.md) · [PawApp 升级策略](docs/operations/PAWAPP-UPGRADE-POLICY.md)
