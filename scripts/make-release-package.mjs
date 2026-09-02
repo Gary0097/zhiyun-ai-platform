@@ -181,7 +181,13 @@ if (!existsSync(zipPath) || statSync(zipPath).size < 50 * 1024) {
   process.exit(1)
 }
 
-// 打包成功后再清理历史产物，失败路径绝不删除任何旧版本
+// 打包成功后再清理历史产物，失败路径绝不删除任何旧版本；
+// protect 保证 --ref 重建旧版本时本次刚构建的产物不会被当作历史清理掉
 if (!argv.includes('--no-prune')) {
-  for (const name of pruneDist(distDir, { keep: 2 })) console.log(`清理历史产物：${name}`)
+  for (const name of pruneDist(distDir, { keep: 2, protect: version })) console.log(`清理历史产物：${name}`)
+}
+// 后置保险：清理后本次产物必须仍在，否则视为清理故障
+if (!existsSync(zipPath)) {
+  console.error('清理步骤误删了本次构建产物，请检查 release-prune 的 protect 参数。')
+  process.exit(1)
 }
