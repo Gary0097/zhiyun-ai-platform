@@ -1,5 +1,5 @@
 product: zhiyun-ai-os
-version: 1.3.2
+version: 1.3.3
 qwenpaw: 2.1.0
 locked_pawapps: 9
   - zhiyun-data-studio @ e6f32fcde92f9cc8b2f8395089e9a39cc7d1bed4
