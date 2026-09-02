@@ -65,7 +65,7 @@ class Installer
 
     // ── 系统集成：对齐官方 QwenPaw Desktop 的安装体验 ──────────────
     // 桌面/开始菜单快捷方式 + 控制面板卸载项 + 启动器与卸载脚本。
-    internal static void RegisterIntegration(string targetDir)
+    internal static bool RegisterIntegration(string targetDir)
     {
         try
         {
@@ -139,7 +139,30 @@ class Installer
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine("integration failed: " + ex.Message);
+            return false;
         }
+        return true;
+    }
+
+    // Node 可用性：离线包可能未内嵌 node.exe（打包仅告警），此时要求系统 PATH
+    // 存在 node（与 install-usb.cmd 的检查一致），否则服务无法启动
+    internal static bool HasNodeAvailable(string targetDir)
+    {
+        if (File.Exists(Path.Combine(targetDir, "extras", "node", "node.exe"))) return true;
+        try
+        {
+            var psi = new ProcessStartInfo("cmd.exe", "/c where node >nul 2>&1")
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+            using (var p = Process.Start(psi))
+            {
+                p.WaitForExit(15000);
+                return p.ExitCode == 0;
+            }
+        }
+        catch { return false; }
     }
 
     internal static string AppVersion { get { return VersionInfo.AppVersion; } }
@@ -205,7 +228,7 @@ class Installer
             {
                 StopLiveService();
                 int files = ExtractTo(payloadPath, targetDir, null);
-                RegisterIntegration(targetDir);
+                log.WriteLine("integration: " + (RegisterIntegration(targetDir) ? "ok" : "failed"));
                 log.WriteLine("done: " + files + " files");
                 log.Flush();
                 var installer = Path.Combine(targetDir, "install-usb.cmd");
@@ -605,16 +628,25 @@ class WizardForm : Form, IExtractProgress
                 throw new Exception("运行时安装失败（退出码 " + code + "），详见日志：\n" + _setupLog);
 
             SetStage("第 3 步 / 共 3 步：创建快捷方式");
-            Installer.RegisterIntegration(_targetDir);
+            bool integrationOk = Installer.RegisterIntegration(_targetDir);
+
+            // Node 可用性校验（extras 内嵌或系统 PATH），缺 Node 则服务无法启动，
+            // 不得向用户报告安装成功
+            if (!Installer.HasNodeAvailable(_targetDir))
+                throw new Exception("未检测到 Node.js 运行环境（包内未内嵌且系统 PATH 中无 node）。" +
+                    "本安装包需要 Node.js 20+，请安装后重新运行安装程序。\nhttps://nodejs.org/zh-cn");
 
             _finished = true;
             RunOnUi(delegate
             {
                 _errorLabel.Text = "安装完成！\n\n" +
-                    "· 桌面与开始菜单已创建“智造云 AI-OS”快捷方式\n" +
+                    (integrationOk
+                        ? "· 桌面与开始菜单已创建“智造云 AI-OS”快捷方式\n"
+                        : "· 注意：快捷方式创建失败，请使用安装目录中的启动脚本\n") +
                     "· 双击即以独立应用窗口启动（自动拉起本地服务）\n" +
                     "· 默认管理员账号见安装目录 USB-INSTALL.md";
-                _launchBtn.Visible = File.Exists(Path.Combine(_targetDir, "智造云AI-OS.exe"));
+                _launchBtn.Visible = File.Exists(Path.Combine(_targetDir, "智造云AI-OS.exe")) ||
+                                     File.Exists(Path.Combine(_targetDir, "智造云AI-OS启动.cmd"));
                 Swap(_done);
             });
         }
