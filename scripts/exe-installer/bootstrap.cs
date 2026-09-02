@@ -73,6 +73,10 @@ class Installer
     {
         try
         {
+            // 桌面启动器 exe（离线包内嵌；缺失时快捷方式回退到 .cmd 入口）
+            string launcherExe = Path.Combine(targetDir, "智造云AI-OS.exe");
+            bool hasLauncher = File.Exists(launcherExe);
+
             // 批处理内容用“行数组运行时拼接”，避免源码转义拼写出错
             string[] launcherLines = {
                 "@echo off", "chcp 65001 >nul",
@@ -110,7 +114,7 @@ class Installer
                     new object[] { Path.Combine(dir, "智造云 AI-OS.lnk") });
                 // IDispatch 后期绑定：属性用属性名 + SetProperty 直接设置
                 shellType.InvokeMember("TargetPath", System.Reflection.BindingFlags.SetProperty, null, sc,
-                    new object[] { launcher });
+                    new object[] { hasLauncher ? launcherExe : launcher });
                 shellType.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty, null, sc,
                     new object[] { targetDir });
                 shellType.InvokeMember("Description", System.Reflection.BindingFlags.SetProperty, null, sc,
@@ -124,7 +128,7 @@ class Installer
                 key.SetValue("DisplayName", "灵泽万川智造云 AI-OS");
                 key.SetValue("DisplayVersion", AppVersion);
                 key.SetValue("InstallLocation", targetDir);
-                key.SetValue("DisplayIcon", launcher);
+                key.SetValue("DisplayIcon", hasLauncher ? launcherExe : launcher);
                 key.SetValue("UninstallString", "\"" + uninstaller + "\"");
                 key.SetValue("NoModify", 1, Microsoft.Win32.RegistryValueKind.DWord);
                 key.SetValue("NoRepair", 1, Microsoft.Win32.RegistryValueKind.DWord);
