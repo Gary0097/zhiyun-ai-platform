@@ -106,6 +106,8 @@ if (offline) {
     'chcp 65001 >nul',
     'title Lingze Wanchuan Zhizaoyun AI-OS - USB Offline Setup',
     'cd /d "%~dp0"',
+    // 覆盖升级：先强制停止在跑的 8088 实例（解锁文件，避免升级后仍运行旧代码）
+    'for /f "tokens=5" %%p in (\'netstat -ano ^| findstr :8088 ^| findstr LISTENING\') do taskkill /PID %%p /F >nul 2>&1',
     'echo ==============================================',
     'echo   Lingze Wanchuan Zhizaoyun AI-OS - USB offline install',
     'echo   Auto-starts and opens the browser when finished.',

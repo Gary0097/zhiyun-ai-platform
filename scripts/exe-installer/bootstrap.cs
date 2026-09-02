@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
+using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -152,6 +153,46 @@ class Installer
         return root;
     }
 
+    // 覆盖升级：旧实例不停止会锁住 venv 文件导致解压失败，且 launcher 会
+    // 因 8088 已就绪而直接打开旧实例（新插件永不加载）。安装前强制停止。
+    static void StopLiveService()
+    {
+        try
+        {
+            var psi = new ProcessStartInfo("cmd.exe",
+                "/c for /f \"tokens=5\" %p in ('netstat -ano ^| findstr :8088 ^| findstr LISTENING') do taskkill /PID %p /F >nul 2>&1")
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+            using (var p = Process.Start(psi)) p.WaitForExit(15000);
+        }
+        catch { /* 无运行实例或权限不足时继续安装 */ }
+    }
+
+    // 静默安装就绪探活：/api/version 200 即服务可用
+    static bool ServiceReady()
+    {
+        try
+        {
+            var req = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:8088/api/version");
+            req.Timeout = 2000;
+            req.ReadWriteTimeout = 2000;
+            using (var resp = req.GetResponse()) { return true; }
+        }
+        catch { return false; }
+    }
+
+    static bool WaitReady(int timeoutSeconds)
+    {
+        for (int i = 0; i < timeoutSeconds; i++)
+        {
+            if (ServiceReady()) return true;
+            Thread.Sleep(1000);
+        }
+        return false;
+    }
+
     static void SilentInstall(string payloadPath, string targetDir)
     {
         string logPath = Path.Combine(targetDir, "install-log.txt");
@@ -161,6 +202,7 @@ class Installer
         {
             try
             {
+                StopLiveService();
                 int files = ExtractTo(payloadPath, targetDir, null, null);
                 RegisterIntegration(targetDir);
                 log.WriteLine("done: " + files + " files");
@@ -178,17 +220,29 @@ class Installer
                     // install-usb 正常路径是“装运行时→起服务（前台常驻）”，子进程
                     // 不会退出。这里只收割早期失败：若在窗口期内以非零码退出则视为
                     // 安装失败；超时仍在运行说明服务已起，按成功处理。
+                    // 无论哪条路径，静默安装的成功契约都是“服务就绪”，
+                    // 统一以 /api/version 探活结果为准。
+                    bool success;
                     if (child.WaitForExit(180000))
                     {
                         log.WriteLine("install-usb.cmd exited: " + child.ExitCode);
                         log.Flush();
-                        Environment.ExitCode = child.ExitCode == 0 ? 0 : 2;
+                        if (child.ExitCode != 0)
+                        {
+                            log.WriteLine("failed: install-usb.cmd exit code " + child.ExitCode);
+                            Environment.ExitCode = 2;
+                            return;
+                        }
+                        success = WaitReady(240);
                     }
                     else
                     {
-                        log.WriteLine("install-usb.cmd still running (service online)");
-                        Environment.ExitCode = 0;
+                        log.WriteLine("install-usb.cmd still running");
+                        success = WaitReady(240);
                     }
+                    log.WriteLine(success ? "service ready" : "service not ready within timeout");
+                    log.Flush();
+                    Environment.ExitCode = success ? 0 : 2;
                 }
                 else
                 {
@@ -212,6 +266,7 @@ class Installer
         {
             try
             {
+                StopLiveService();
                 ExtractTo(payloadPath, targetDir, progress, null);
                 RegisterIntegration(targetDir);
                 progress.Done();
