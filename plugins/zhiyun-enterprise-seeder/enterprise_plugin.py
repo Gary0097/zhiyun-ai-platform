@@ -401,17 +401,16 @@ def _ensure_schema() -> None:
     try:
         conn.executescript(SCHEMA)
         ensure_sim_schema(conn)
+        for _t in ("sessions", "tasks", "token_usage", "files", "file_downloads",
+                   "login_activity", "operation_logs", "business_events"):
+            _cols = {r[1] for r in conn.execute(f"PRAGMA table_info({_t})").fetchall()}
+            if "run_tag" not in _cols:
+                conn.execute(f"ALTER TABLE {_t} ADD COLUMN run_tag TEXT NOT NULL DEFAULT ''")
+            conn.execute(f"CREATE INDEX IF NOT EXISTS idx_{_t}_run_tag ON {_t}(run_tag)")
         conn.commit()
         _schema_lock = True
     finally:
         conn.close()
-
-    for _t in ("sessions", "tasks", "token_usage", "files", "file_downloads",
-               "login_activity", "operation_logs", "business_events"):
-        _cols = {r[1] for r in conn.execute(f"PRAGMA table_info({_t})").fetchall()}
-        if "run_tag" not in _cols:
-            conn.execute(f"ALTER TABLE {_t} ADD COLUMN run_tag TEXT NOT NULL DEFAULT ''")
-        conn.execute(f"CREATE INDEX IF NOT EXISTS idx_{_t}_run_tag ON {_t}(run_tag)")
 
 def _startup_bootstrap() -> None:
     """启动入口：先确保 schema（同步、轻量），再后台生成当日一致性快照。
