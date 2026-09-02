@@ -101,7 +101,7 @@ const commands = [
   [process.execPath, [join(scripts, 'verify-runtime.mjs')]],
   [process.execPath, [join(scripts, 'verify-pawapp-offline.mjs')]],
   [process.execPath, [join(scripts, 'verify-maintenance.mjs')]],
-  [process.execPath, [join(scripts, 'release-prune.mjs'), '--check']],
+  [process.execPath, [join(root, 'scripts', 'release-prune.mjs'), '--check']],
 ]
 for (const [command, args] of commands) {
   const result = spawnSync(command, args, { cwd: root, stdio: 'inherit' })
