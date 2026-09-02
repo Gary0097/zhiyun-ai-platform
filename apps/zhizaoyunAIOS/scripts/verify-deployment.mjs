@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-const scripts = join(root, 'apps', 'qwenpaw-embedded', 'scripts')
+const scripts = join(root, 'apps', 'zhizaoyunAIOS', 'scripts')
 
 for (const file of ['setup-ai-os.ps1', 'setup-ai-os.sh', 'start-ai-os.cmd', 'start-ai-os.sh', 'diagnose-ai-os.cmd', 'diagnose-ai-os.sh', 'check-ai-os.cmd', 'check-ai-os.sh', 'docs/operations/QUICKSTART.md']) {
   assert.ok(existsSync(join(root, file)), `missing deployment file: ${file}`)
@@ -14,7 +14,7 @@ for (const file of ['setup-ai-os.ps1', 'setup-ai-os.sh', 'start-ai-os.cmd', 'sta
 const windowsStart = readFileSync(join(root, 'start-ai-os.cmd'), 'utf8')
 const linuxStart = readFileSync(join(root, 'start-ai-os.sh'), 'utf8')
 assert.ok(windowsStart.includes('runtime\\qwenpaw\\venv\\Scripts\\qwenpaw.exe'), 'Windows wrapper must recognize the managed venv layout')
-assert.ok(linuxStart.includes('runtime/qwenpaw/venv/bin/qwenpaw'), 'Linux wrapper must recognize the managed venv layout')
+assert.ok(linuxStart.includes('runtime/zhizaoyunAIOS/venv/bin/qwenpaw'), 'Linux wrapper must recognize the managed venv layout')
 
 const start = readFileSync(join(scripts, 'start.mjs'), 'utf8')
 assert.ok(start.includes("from './runtime-env.mjs'"), 'start must resolve the project-managed QwenPaw runtime')

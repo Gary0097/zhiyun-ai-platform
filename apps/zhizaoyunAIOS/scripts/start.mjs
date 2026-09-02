@@ -1,6 +1,7 @@
 import { spawn, spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { createHash } from 'node:crypto'
+import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs'
+import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveRuntime, runtimeEnvironment } from './runtime-env.mjs'
 
@@ -37,6 +38,44 @@ Object.assign(launchEnv, {
   ORDER_STUDIO_DB: join(runtimeData, 'zhiyun-order-studio', 'orders.db')
 })
 
+// 插件源指纹：目录清单（相对路径+大小+mtime）哈希。未变更时跳过 qwenpaw
+// plugin install（每个插件一次 ~3-5 秒的冷启动，19 个插件是启动耗时大头）。
+const _ch = createHash
+const _rd = readdirSync
+const _st = statSync
+function pluginFingerprint (dir) {
+  try {
+    const h = _ch('sha1')
+    const walk = (d, prefix) => {
+      for (const e of _rd(d, { withFileTypes: true })) {
+        if (e.name === '__pycache__' || e.name === 'data') continue // 运行期产物不入指纹
+        const p = join(d, e.name)
+        const rel = prefix + e.name
+        if (e.isDirectory()) { h.update('d:' + rel + '\n'); walk(p, rel + '/') }
+        else {
+          const st = _st(p)
+          h.update(`f:${rel}:${st.size}:${Math.floor(st.mtimeMs)}\n`)
+        }
+      }
+    }
+    walk(dir, '')
+    return h.digest('hex')
+  } catch { return null }
+}
+
+function installPluginIfNeeded (pluginDir, label) {
+  const id = basename(pluginDir)
+  const marker = join(appRoot, 'workspace', 'plugins', id, '.zy-source-fingerprint')
+  const fp = pluginFingerprint(pluginDir)
+  if (fp && existsSync(marker) && readFileSync(marker, 'utf8') === fp &&
+      existsSync(join(appRoot, 'workspace', 'plugins', id, 'plugin.json'))) {
+    console.log(`${label}：源未变更，跳过安装`)
+    return
+  }
+  run(qwenpawCommand, ['plugin', 'install', pluginDir, '--force'], label + '安装失败。')
+  try { writeFileSync(marker, fp || '', 'utf8') } catch { /* 忽略 */ }
+}
+
 function run (command, args, hint, capture = false) {
   const result = spawnSync(command, args, {
     cwd: repoRoot,
@@ -60,17 +99,17 @@ run(process.execPath, [join(scriptsRoot, 'cleanup-legacy.mjs')], '清理旧品�
 run(process.execPath, [join(scriptsRoot, 'ensure-workspace.mjs')], 'Workspace 初始化失败。')
 run(process.execPath, [join(scriptsRoot, 'patch-console-ui.mjs')], 'Console UI 定制脚本执行失败。')
 console.log(`QwenPaw 运行环境：${runtime.source === 'project' ? runtime.root : '全局安装'} (${runtime.version})`)
-run(qwenpawCommand, ['plugin', 'install', auditPlugin, '--force'], '日志审计插件安装失败。')
-run(qwenpawCommand, ['plugin', 'install', logoPlugin, '--force'], 'Logo 配置插件安装失败。')
-run(qwenpawCommand, ['plugin', 'install', appDiscoveryPlugin, '--force'], '应用发现插件安装失败。')
-run(qwenpawCommand, ['plugin', 'install', dataCorePlugin, '--force'], 'Data Core 插件安装失败。')
-run(qwenpawCommand, ['plugin', 'install', authPlugin, '--force'], '员工登录与权限插件安装失败。')
-run(qwenpawCommand, ['plugin', 'install', creatorPlugin, '--force'], 'QwenPaw Creator（视频压缩）安装失败。')
-run(qwenpawCommand, ['plugin', 'install', creatorStudioPlugin, '--force'], 'QwenPaw Creator 原版安装失败。')
-run(qwenpawCommand, ['plugin', 'install', creatorMixcutPlugin, '--force'], 'QwenPaw Creator 智能混剪安装失败。')
-run(qwenpawCommand, ['plugin', 'install', dataInsightsPlugin, '--force'], '智能分析驾驶舱安装失败。')
-run(qwenpawCommand, ['plugin', 'install', agentKanbanPlugin, '--force'], 'Agent Kanban 看板安装失败。')
-run(qwenpawCommand, ['plugin', 'install', enterpriseSeederPlugin, '--force'], '企业环境初始化器插件安装失败。')
+installPluginIfNeeded(auditPlugin, '日志审计插件')
+installPluginIfNeeded(logoPlugin, 'Logo 配置插件')
+installPluginIfNeeded(appDiscoveryPlugin, '应用发现插件')
+installPluginIfNeeded(dataCorePlugin, 'Data Core 插件')
+installPluginIfNeeded(authPlugin, '员工登录与权限插件')
+installPluginIfNeeded(creatorPlugin, 'QwenPaw Creator（视频压缩）')
+installPluginIfNeeded(creatorStudioPlugin, 'QwenPaw Creator 原版')
+installPluginIfNeeded(creatorMixcutPlugin, 'QwenPaw Creator 智能混剪')
+installPluginIfNeeded(dataInsightsPlugin, '智能分析驾驶舱')
+installPluginIfNeeded(agentKanbanPlugin, 'Agent Kanban 看板')
+installPluginIfNeeded(enterpriseSeederPlugin, '企业环境初始化器插件')
 run(process.execPath, [join(scriptsRoot, 'sync-pawapps.mjs')], '外部 PawApp 同步失败。')
 const externalApps = JSON.parse(readFileSync(pawappsLock, 'utf8')).apps
 for (const app of externalApps) {

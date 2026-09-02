@@ -6,5 +6,5 @@ if "%~1"=="" (
   pause
   exit /b 1
 )
-node apps\qwenpaw-embedded\scripts\set-logo.mjs "%~1"
+node apps\zhizaoyunAIOS\scripts\set-logo.mjs "%~1"
 if errorlevel 1 pause

@@ -6,7 +6,7 @@
   "repository": "https://github.com/agentscope-ai/QwenPaw.git",
   "ref": "release/v2.1.0",
   "commit": "e4995dcf516d27400fbc33891aa3dcbcf79acc7a",
-  "runtime_dir": "runtime/qwenpaw",
+  "runtime_dir": "runtime/zhizaoyunAIOS",
   "license": "Apache-2.0",
   "integration": "embedded-downstream"
 }

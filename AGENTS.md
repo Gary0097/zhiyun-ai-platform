@@ -22,7 +22,7 @@ and the applicable progress ledger before changing product behavior.
   channel must ship both official apps from this tree, so they share the system
   plugin install path instead of an external PawApp commit lock.
 - Do not edit generated installations under
-  `apps/qwenpaw-embedded/runtime/pawapps`; change the owning repository instead.
+  `apps/zhizaoyunAIOS/runtime/pawapps`; change the owning repository instead.
 
 ## Branch and Scope Policy
 

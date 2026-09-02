@@ -79,12 +79,12 @@ try {
 
 try {
   const lockCheck = command(process.execPath, [join(appRoot, 'scripts', 'sync-pawapps.mjs'), '--check'])
-  record('pawapps-lock', lockCheck.ok ? 'pass' : 'fail', lockCheck.output || 'PawApp 锁文件检查失败', '修复 apps/qwenpaw-embedded/pawapps.lock.json。')
+  record('pawapps-lock', lockCheck.ok ? 'pass' : 'fail', lockCheck.output || 'PawApp 锁文件检查失败', '修复 apps/zhizaoyunAIOS/pawapps.lock.json。')
   const lock = JSON.parse(readFileSync(lockPath, 'utf8'))
   const missing = lock.apps.filter(app => !existsSync(join(runtimeRoot, 'pawapps', app.install_dir, 'plugin.json')))
   record('pawapps', missing.length ? 'warn' : 'pass', missing.length ? `${missing.length} 个外部 PawApp 尚未同步：${missing.map(app => app.id).join('、')}` : `${lock.apps.length} 个外部 PawApp 已落盘`, '首次启动会自动同步；若失败，请检查 GitHub 网络访问。')
 } catch (error) {
-  if (!checks.some(item => item.id === 'pawapps-lock')) record('pawapps-lock', 'fail', `无法读取 PawApp 锁文件：${error.message}`, '修复 apps/qwenpaw-embedded/pawapps.lock.json。')
+  if (!checks.some(item => item.id === 'pawapps-lock')) record('pawapps-lock', 'fail', `无法读取 PawApp 锁文件：${error.message}`, '修复 apps/zhizaoyunAIOS/pawapps.lock.json。')
 }
 
 const portInUse = await checkPort(8088)
