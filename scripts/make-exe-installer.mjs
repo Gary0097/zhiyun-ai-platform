@@ -40,6 +40,11 @@ rmSync(buildDir, { recursive: true, force: true })
 mkdirSync(buildDir, { recursive: true })
 const stubPath = join(buildDir, 'stub.exe')
 const srcPath = join(root, 'scripts', 'exe-installer', 'bootstrap.cs')
+// 版本在编译期打进引导器（卸载项/关于信息使用）
+const versionSrc = join(buildDir, 'VersionInfo.cs')
+writeFileSync(versionSrc, `// 自动生成：make-exe-installer.mjs
+static class VersionInfo { public const string AppVersion = "${version}"; }
+`, 'utf8')
 execFileSync(csc, [
   '/nologo', '/target:winexe', '/optimize+',
   '/out:' + stubPath,
@@ -48,6 +53,7 @@ execFileSync(csc, [
   '/r:System.Windows.Forms.dll',
   '/r:System.Drawing.dll',
   srcPath,
+  versionSrc,
 ], { stdio: 'inherit' })
 if (!existsSync(stubPath)) {
   console.error('引导器编译失败。')
@@ -98,4 +104,4 @@ writeFileSync(`${exePath}.sha256`, `${sha256}  ${exeName}\n`, 'utf8')
 const sizeMb = (statSync(exePath).size / 1024 / 1024).toFixed(2)
 console.log(`EXE 安装程序构建完成：dist/${exeName}（${sizeMb} MB）`)
 console.log(`SHA256：${sha256}`)
-console.log('使用方式：双击 → 选择安装目录 → 自动解压并运行 install-usb.cmd')
+console.log('使用方式：双击 → 选择安装目录 → 自动解压并运行 install-usb.cmd（桌面/开始菜单快捷方式 + 控制面板可卸载）')
