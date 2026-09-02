@@ -66,6 +66,78 @@ class Installer
         }
     }
 
+
+    // ── 系统集成：对齐官方 QwenPaw Desktop 的安装体验 ──────────────
+    // 桌面/开始菜单快捷方式 + 控制面板卸载项 + 启动器与卸载脚本。
+    static void RegisterIntegration(string targetDir)
+    {
+        try
+        {
+            // 批处理内容用“行数组运行时拼接”，避免源码转义拼写出错
+            string[] launcherLines = {
+                "@echo off", "chcp 65001 >nul",
+                "title Lingze Wanchuan Zhizaoyun AI-OS",
+                "cd /d \"%~dp0\"",
+                "start \"\" http://127.0.0.1:8088",
+                "call start-ai-os.cmd" };
+            string launcher = Path.Combine(targetDir, "智造云AI-OS启动.cmd");
+            File.WriteAllText(launcher, string.Join("\r\n", launcherLines) + "\r\n",
+                new System.Text.UTF8Encoding(false));
+
+            string[] uninstallerLines = {
+                "@echo off", "chcp 65001 >nul",
+                "cd /d \"%~dp0\"",
+                "for /f \"tokens=5\" %%p in ('netstat -ano ^| findstr :8088 ^| findstr LISTENING') do taskkill /PID %%p /F >nul 2>&1",
+                "reg delete HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ZhizaoyunAIOS /f >nul 2>&1",
+                "del \"%USERPROFILE%\\Desktop\\智造云 AI-OS.lnk\" >nul 2>&1",
+                "del \"%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\智造云 AI-OS.lnk\" >nul 2>&1",
+                "echo 已移除快捷方式与卸载项；如需彻底删除请手动删除整个安装目录。",
+                "pause" };
+            string uninstaller = Path.Combine(targetDir, "卸载智造云AI-OS.cmd");
+            File.WriteAllText(uninstaller, string.Join("\r\n", uninstallerLines) + "\r\n",
+                new System.Text.UTF8Encoding(false));
+
+            Type shellType = Type.GetTypeFromProgID("WScript.Shell");
+            object shellObj = Activator.CreateInstance(shellType);
+            string desktopDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            string startMenuDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "Microsoft", "Windows", "Start Menu", "Programs");
+            foreach (string dir in new[] { desktopDir, startMenuDir })
+            {
+                object sc = shellType.InvokeMember("CreateShortcut",
+                    System.Reflection.BindingFlags.InvokeMethod, null, shellObj,
+                    new object[] { Path.Combine(dir, "智造云 AI-OS.lnk") });
+                // IDispatch 后期绑定：属性用属性名 + SetProperty 直接设置
+                shellType.InvokeMember("TargetPath", System.Reflection.BindingFlags.SetProperty, null, sc,
+                    new object[] { launcher });
+                shellType.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty, null, sc,
+                    new object[] { targetDir });
+                shellType.InvokeMember("Description", System.Reflection.BindingFlags.SetProperty, null, sc,
+                    new object[] { "灵泽万川智造云 AI-OS" });
+                shellType.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod, null, sc, null);
+            }
+
+            using (var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\Uninstall\ZhizaoyunAIOS"))
+            {
+                key.SetValue("DisplayName", "灵泽万川智造云 AI-OS");
+                key.SetValue("DisplayVersion", AppVersion);
+                key.SetValue("InstallLocation", targetDir);
+                key.SetValue("DisplayIcon", launcher);
+                key.SetValue("UninstallString", "\"" + uninstaller + "\"");
+                key.SetValue("NoModify", 1, Microsoft.Win32.RegistryValueKind.DWord);
+                key.SetValue("NoRepair", 1, Microsoft.Win32.RegistryValueKind.DWord);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("integration failed: " + ex.Message);
+        }
+    }
+
+    static string AppVersion { get { return VersionInfo.AppVersion; } }
+
     // 目标根目录前缀（兼容盘符根：GetFullPath("H:\") 已以分隔符结尾，不重复追加）
     static string TargetRoot(string targetDir)
     {
@@ -86,6 +158,7 @@ class Installer
             try
             {
                 int files = ExtractTo(payloadPath, targetDir, null, null);
+                RegisterIntegration(targetDir);
                 log.WriteLine("done: " + files + " files");
                 log.Flush();
                 var installer = Path.Combine(targetDir, "install-usb.cmd");
@@ -136,6 +209,7 @@ class Installer
             try
             {
                 ExtractTo(payloadPath, targetDir, progress, null);
+                RegisterIntegration(targetDir);
                 progress.Done();
                 var installer = Path.Combine(targetDir, "install-usb.cmd");
                 if (File.Exists(installer))
