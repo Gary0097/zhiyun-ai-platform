@@ -26,7 +26,10 @@ if (Test-QwenPawRuntime) {
   # 升级路径：运行时就绪但可能缺少后续新增的 Creator 依赖，补装后再退出
   $UvFallback = if (Test-Path -LiteralPath $CachedUv) { $CachedUv } else { (Get-Command uv -ErrorAction SilentlyContinue).Source }
   if ($UvFallback) {
-    & $UvFallback pip install --python $PythonCommand pypdfium2 pandas openpyxl matplotlib tabulate 2>$null | Out-Null
+    $prevEap2 = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  try { & $UvFallback pip install --python $PythonCommand pypdfium2 pandas openpyxl matplotlib tabulate 2>$null | Out-Null } catch {}
+  finally { $ErrorActionPreference = $prevEap2 }
   }
   Write-Host "QwenPaw $($Lock.version) 项目运行环境已就绪：$RuntimeRoot"; exit 0
 }
@@ -56,9 +59,18 @@ try {
   if ($LASTEXITCODE -ne 0) { throw "uv venv 退出码：$LASTEXITCODE" }
   & $UvCommand pip install --python $PythonCommand "qwenpaw==$($Lock.version)"
   if ($LASTEXITCODE -ne 0) { throw "uv pip install 退出码：$LASTEXITCODE" }
-  # Creator 可选依赖：离线缓存缺失时允许跳过（官方设计为优雅降级），绝不阻断安装
-  & $UvCommand pip install --python $PythonCommand pypdfium2 pandas openpyxl matplotlib tabulate 2>$null
-  if ($LASTEXITCODE -ne 0) { Write-Host "提示：Creator 可选依赖未安装（离线缓存缺失），原版 Creator 文档渲染将降级，不影响核心功能。" }
+  # Creator 可选依赖：离线缓存缺失时允许跳过（官方设计为优雅降级），绝不阻断安装。
+  # EAP=Stop 下对原生命令做 2>$null 重定向会把 uv 的常规 stderr 输出升级为终止性
+  # NativeCommandError（即使安装成功也会炸）——临时降为 Continue 再恢复。
+  $prevEap = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  $optionalOk = $true
+  try {
+    & $UvCommand pip install --python $PythonCommand pypdfium2 pandas openpyxl matplotlib tabulate 2>$null | Out-Null
+    if ($LASTEXITCODE -ne 0) { $optionalOk = $false }
+  } catch { $optionalOk = $false }
+  finally { $ErrorActionPreference = $prevEap }
+  if (-not $optionalOk) { Write-Host "提示：Creator 可选依赖未安装（离线缓存缺失），原版 Creator 文档渲染将降级，不影响核心功能。" }
   if ($LASTEXITCODE -ne 0) { throw "uv pip install 退出码：$LASTEXITCODE" }
 } finally {
   foreach ($name in $previous.Keys) { Set-Item -Path "env:$name" -Value $previous[$name] }

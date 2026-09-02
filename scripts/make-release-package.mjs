@@ -68,6 +68,16 @@ if (offline) {
       console.error(`离线包缺少 ${src}；请先在本机完成一次在线安装。`)
       process.exit(1)
     }
+    // 离线硬依赖防呆：uv 引导器与 Python 运行时缺失会让目标机器在 setup
+    // 早期就失败（v1.3.3 事故：cache/bin 被清后照常打包）。
+    if (part === 'cache') {
+      for (const required of ['bin/uv.exe', 'python']) {
+        if (!existsSync(join(src, required))) {
+          console.error(`离线缓存缺少硬依赖 ${required}（${join(src, required)}）；中止打包。`)
+          process.exit(1)
+        }
+      }
+    }
     console.log(`内嵌 runtime/${part}（${dirSizeMb(src)} MB）...`)
     cpSync(src, join(pkgRuntime, part), { recursive: true })
   }
