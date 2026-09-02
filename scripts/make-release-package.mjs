@@ -1,14 +1,16 @@
 // 构建一键安装发布包：从干净的 worktree 导出受控文件 + 版本清单，输出 zip 与 SHA256。
 // 前置：发布内容已合并到目标分支。用法：
-//   node scripts/make-release-package.mjs <版本号> [--offline] [--ref <ref>]
+//   node scripts/make-release-package.mjs <版本号> [--offline] [--ref <ref>] [--no-prune]
 // --offline：U盘离线安装包 —— 额外内嵌 Python 运行时缓存（runtime/cache）、
 //   锁定 PawApp（runtime/pawapps）与便携 node.exe（extras/node），
 //   目标机器解压后运行 install-usb.cmd 即可，全程无需联网。
+// --no-prune：跳过 dist 历史产物清理（默认打包成功后只保留最近 2 个版本）。
 import { createHash } from 'node:crypto'
 import { execSync, execFileSync } from 'node:child_process'
 import { mkdirSync, copyFileSync, readFileSync, writeFileSync, existsSync, statSync, rmSync, cpSync, readdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { pruneDist } from './release-prune.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const argv = process.argv.slice(2)
@@ -104,6 +106,8 @@ if (offline) {
     'chcp 65001 >nul',
     'title Lingze Wanchuan Zhizaoyun AI-OS - USB Offline Setup',
     'cd /d "%~dp0"',
+    // 覆盖升级：先强制停止在跑的 8088 实例（解锁文件，避免升级后仍运行旧代码）
+    'for /f "tokens=5" %%p in (\'netstat -ano ^| findstr :8088 ^| findstr LISTENING\') do taskkill /PID %%p /F >nul 2>&1',
     'echo ==============================================',
     'echo   Lingze Wanchuan Zhizaoyun AI-OS - USB offline install',
     'echo   Auto-starts and opens the browser when finished.',
@@ -204,5 +208,16 @@ console.log(`打包完成：dist/${zipName}（${sizeMb} MB）`)
 console.log(`SHA256：${sha256}`)
 if (!existsSync(zipPath) || statSync(zipPath).size < 50 * 1024) {
   console.error('打包产物异常（过小），请检查压缩步骤。')
+  process.exit(1)
+}
+
+// 打包成功后再清理历史产物，失败路径绝不删除任何旧版本；
+// protect 保证 --ref 重建旧版本时本次刚构建的产物不会被当作历史清理掉
+if (!argv.includes('--no-prune')) {
+  for (const name of pruneDist(distDir, { keep: 2, protect: version })) console.log(`清理历史产物：${name}`)
+}
+// 后置保险：清理后本次产物必须仍在，否则视为清理故障
+if (!existsSync(zipPath)) {
+  console.error('清理步骤误删了本次构建产物，请检查 release-prune 的 protect 参数。')
   process.exit(1)
 }
