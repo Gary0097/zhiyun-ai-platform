@@ -103,6 +103,10 @@ class Installer
             string startMenuDir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "Microsoft", "Windows", "Start Menu", "Programs");
+            // 品牌图标随包分发（branding/app.ico）；快捷方式与卸载面板均显式指向它，
+            // 避免目标 .cmd 显示成默认命令行图标
+            string iconSource = Path.Combine(targetDir, "branding", "app.ico");
+            string iconRef = File.Exists(iconSource) ? iconSource + ",0" : launcher;
             foreach (string dir in new[] { desktopDir, startMenuDir })
             {
                 object sc = shellType.InvokeMember("CreateShortcut",
@@ -115,6 +119,8 @@ class Installer
                     new object[] { targetDir });
                 shellType.InvokeMember("Description", System.Reflection.BindingFlags.SetProperty, null, sc,
                     new object[] { "灵泽万川智造云 AI-OS" });
+                shellType.InvokeMember("IconLocation", System.Reflection.BindingFlags.SetProperty, null, sc,
+                    new object[] { iconRef });
                 shellType.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod, null, sc, null);
             }
 
@@ -124,7 +130,7 @@ class Installer
                 key.SetValue("DisplayName", "灵泽万川智造云 AI-OS");
                 key.SetValue("DisplayVersion", AppVersion);
                 key.SetValue("InstallLocation", targetDir);
-                key.SetValue("DisplayIcon", launcher);
+                key.SetValue("DisplayIcon", iconRef);
                 key.SetValue("UninstallString", "\"" + uninstaller + "\"");
                 key.SetValue("NoModify", 1, Microsoft.Win32.RegistryValueKind.DWord);
                 key.SetValue("NoRepair", 1, Microsoft.Win32.RegistryValueKind.DWord);
