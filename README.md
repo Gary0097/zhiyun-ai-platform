@@ -111,7 +111,7 @@ QwenPaw 2.1.0（唯一宿主，端口 8088）
 - 所有业务应用使用统一 Workspace 数据核心，通过稳定数据契约共享数据
 - 每个应用独立 GitHub 仓库交付，本仓库以 `pawapps.lock.json` 锁定正式合并提交
 - 数据库、日志、知识文件全部落在 Workspace，升级与回滚不触碰用户数据
-- 不要直接修改 `apps/qwenpaw-embedded/runtime/pawapps` 或 `~/.qwenpaw/plugins` 中的安装副本；变更请在对应应用仓库进行后更新锁文件
+- 不要直接修改 `apps/zhizaoyunAIOS/runtime/pawapps` 或 `~/.qwenpaw/plugins` 中的安装副本；变更请在对应应用仓库进行后更新锁文件
 
 ## 国内镜像（Gitee）
 
@@ -130,7 +130,7 @@ QwenPaw 2.1.0（唯一宿主，端口 8088）
 
 ### 备份与恢复
 
-- 数据全部落在 `apps/qwenpaw-embedded/workspace/`（SQLite + 文件），升级/回滚不触碰
+- 数据全部落在 `apps/zhizaoyunAIOS/workspace/`（SQLite + 文件），升级/回滚不触碰
 - 统一数据中心内建备份：打开数据中心 → 健康与备份 → 创建备份；恢复前自动创建安全备份
 - 整机备份：停服后打包 `workspace/` 目录即可
 

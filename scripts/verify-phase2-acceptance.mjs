@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const embedded = join(root, 'apps', 'qwenpaw-embedded')
+const embedded = join(root, 'apps', 'zhizaoyunAIOS')
 const lock = JSON.parse(readFileSync(join(embedded, 'pawapps.lock.json'), 'utf8'))
 const catalog = JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-app-discovery', 'app_catalog.json'), 'utf8'))
 const progress = JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-app-discovery', 'feature_progress.json'), 'utf8'))
@@ -18,7 +18,7 @@ assert.equal(JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-audit', 'plug
 for (const file of [
   'plugins/zhiyun-data-core/operations.py',
   'plugins/zhiyun-data-core/test_operations.py',
-  'apps/qwenpaw-embedded/scripts/verify-pawapp-offline.mjs',
+  'apps/zhizaoyunAIOS/scripts/verify-pawapp-offline.mjs',
   'docs/operations/PHASE-2-ACCEPTANCE.md',
 ]) assert.ok(existsSync(join(root, file)), `Phase 2 evidence missing: ${file}`)
 

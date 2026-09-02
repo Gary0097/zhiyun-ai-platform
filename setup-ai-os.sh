@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 PROJECT_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-EMBEDDED_ROOT="$PROJECT_ROOT/apps/qwenpaw-embedded"
+EMBEDDED_ROOT="$PROJECT_ROOT/apps/zhizaoyunAIOS"
 LOCK="$EMBEDDED_ROOT/qwenpaw.lock.json"
 VERSION=$(node -e "const x=require(process.argv[1]); process.stdout.write(x.version)" "$LOCK")
 RUNTIME_REL=$(node -e "const x=require(process.argv[1]); process.stdout.write(x.runtime_dir)" "$LOCK")

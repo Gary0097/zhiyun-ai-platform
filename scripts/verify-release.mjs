@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const embedded = join(root, 'apps', 'qwenpaw-embedded')
+const embedded = join(root, 'apps', 'zhizaoyunAIOS')
 const scripts = join(embedded, 'scripts')
 
 for (const removed of [
@@ -13,10 +13,10 @@ for (const removed of [
   'apps/enterprise/server/index.js',
   'pawapps/zhiyun-orders/plugin.json',
   'pawapps/_shared/zhiyun_workspace.py',
-  'apps/qwenpaw-embedded/scripts/cleanup-legacy.py',
-  'apps/qwenpaw-embedded/scripts/set-logo.py',
-  'apps/qwenpaw-embedded/scripts/verify-r0.mjs',
-  'apps/qwenpaw-embedded/scripts/verify-s0.mjs',
+  'apps/zhizaoyunAIOS/scripts/cleanup-legacy.py',
+  'apps/zhizaoyunAIOS/scripts/set-logo.py',
+  'apps/zhizaoyunAIOS/scripts/verify-r0.mjs',
+  'apps/zhizaoyunAIOS/scripts/verify-s0.mjs',
 ]) {
   assert.equal(existsSync(join(root, removed)), false, `legacy source must be removed: ${removed}`)
 }

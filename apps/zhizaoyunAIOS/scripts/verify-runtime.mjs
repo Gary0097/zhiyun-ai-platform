@@ -11,7 +11,7 @@ const lock = runtimeLock()
 assert.equal(lock.version, '2.1.0')
 assert.equal(lock.ref, 'release/v2.1.0')
 assert.match(lock.commit, /^[0-9a-f]{40}$/)
-assert.equal(lock.runtime_dir, 'runtime/qwenpaw')
+assert.equal(lock.runtime_dir, 'runtime/zhizaoyunAIOS')
 for (const file of ['setup-ai-os.ps1', 'setup-ai-os.sh']) assert.ok(existsSync(join(repoRoot, file)), `missing ${file}`)
 
 assert.equal(matchesVersion('QwenPaw, version 2.1.0', '2.1.0'), true)

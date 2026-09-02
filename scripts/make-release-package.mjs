@@ -44,7 +44,7 @@ mkdirSync(distDir, { recursive: true })
 run(`git worktree add --detach "${workDir}" ${ref}`)
 
 // 版本清单：锁定的 PawApp 与运行时版本随包分发，供校验与诊断
-const lock = JSON.parse(readFileSync(join(workDir, 'apps', 'qwenpaw-embedded', 'pawapps.lock.json'), 'utf8'))
+const lock = JSON.parse(readFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'pawapps.lock.json'), 'utf8'))
 const manifest = [
   'product: zhiyun-ai-os',
   `version: ${version}`,
@@ -60,8 +60,8 @@ writeFileSync(join(workDir, 'INSTALLER-VERSION.txt'), manifest.join('\n') + '\n'
 
 if (offline) {
   // 1) 内嵌运行时缓存（Python 3.12 + uv + wheel 缓存）与锁定 PawApp
-  const liveRuntime = join(root, 'apps', 'qwenpaw-embedded', 'runtime')
-  const pkgRuntime = join(workDir, 'apps', 'qwenpaw-embedded', 'runtime')
+  const liveRuntime = join(root, 'apps', 'zhizaoyunAIOS', 'runtime')
+  const pkgRuntime = join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime')
   for (const part of ['cache', 'pawapps']) {
     const src = join(liveRuntime, part)
     if (!existsSync(src)) {
@@ -112,7 +112,7 @@ if (offline) {
     '  pause',
     '  exit /b 1',
     ')',
-    'powershell -NoProfile -ExecutionPolicy Bypass -File setup-ai-os.ps1 -Offline -CacheDir "apps\\qwenpaw-embedded\\runtime\\cache"',
+    'powershell -NoProfile -ExecutionPolicy Bypass -File setup-ai-os.ps1 -Offline -CacheDir "apps\\zhizaoyunAIOS\\runtime\\cache"',
     'if errorlevel 1 ( echo [错误] 运行环境安装失败，请检查上方输出。 & pause & exit /b 1 )',
     'call start-ai-os.cmd',
     '',

@@ -35,3 +35,10 @@ dist/*.exe
 dist/*.exe.sha256
 dist/*.zip
 dist/*.sha256
+
+# zhizaoyunAIOS 安装树（运行时数据与密钥绝不入库）
+apps/zhizaoyunAIOS/workspace/*
+!apps/zhizaoyunAIOS/workspace/.gitignore
+apps/zhizaoyunAIOS/workspace.secret/
+apps/zhizaoyunAIOS/runtime/*
+!apps/zhizaoyunAIOS/runtime/.gitignore

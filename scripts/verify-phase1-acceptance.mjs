@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const embedded = join(root, 'apps', 'qwenpaw-embedded')
+const embedded = join(root, 'apps', 'zhizaoyunAIOS')
 const installed = join(embedded, 'runtime', 'pawapps')
 const lock = JSON.parse(readFileSync(join(embedded, 'pawapps.lock.json'), 'utf8'))
 const progress = JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-app-discovery', 'feature_progress.json'), 'utf8'))

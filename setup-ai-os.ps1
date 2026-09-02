@@ -2,7 +2,7 @@
 param([switch]$Offline, [string]$CacheDir = "")
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$EmbeddedRoot = Join-Path $ProjectRoot "apps\qwenpaw-embedded"
+$EmbeddedRoot = Join-Path $ProjectRoot "apps\zhizaoyunAIOS"
 $Lock = Get-Content -LiteralPath (Join-Path $EmbeddedRoot "qwenpaw.lock.json") -Raw | ConvertFrom-Json
 $RuntimeRoot = Join-Path $EmbeddedRoot ($Lock.runtime_dir -replace '/', '\')
 $RuntimeCache = if ($CacheDir) { $CacheDir } else { Join-Path $EmbeddedRoot "runtime\cache" }

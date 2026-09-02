@@ -2,7 +2,7 @@
 // 场景 A（PawApp 全部物化 + PATH 无 git）→ sync-pawapps 必须成功并提示跳过 bundle 缓存；
 //      doctor 的 git 检查必须可降级（pawappsAllMaterialized 为 true）。
 // 场景 B（PawApp 缺失 + PATH 无 git）→ git 属必需，pawappsAllMaterialized 必须为 false。
-// 运行：node apps/qwenpaw-embedded/scripts/verify-no-git-boot.mjs
+// 运行：node apps/zhizaoyunAIOS/scripts/verify-no-git-boot.mjs
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'

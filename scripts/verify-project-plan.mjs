@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const progressPath = join(root, 'plugins', 'zhiyun-app-discovery', 'feature_progress.json')
-const lockPath = join(root, 'apps', 'qwenpaw-embedded', 'pawapps.lock.json')
+const lockPath = join(root, 'apps', 'zhizaoyunAIOS', 'pawapps.lock.json')
 const catalogPath = join(root, 'plugins', 'zhiyun-app-discovery', 'app_catalog.json')
 
 const progress = JSON.parse(readFileSync(progressPath, 'utf8'))
