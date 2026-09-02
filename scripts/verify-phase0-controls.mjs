@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const installed = join(root, 'apps', 'qwenpaw-embedded', 'runtime', 'pawapps')
+const installed = join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'pawapps')
 const repositories = [
   { id: 'zhiyun-ai-platform', root },
   { id: 'zhiyun-data-studio', root: join(installed, 'zhiyun-data-studio') },

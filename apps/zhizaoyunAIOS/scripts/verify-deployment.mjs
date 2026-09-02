@@ -13,7 +13,7 @@ for (const file of ['setup-ai-os.ps1', 'setup-ai-os.sh', 'start-ai-os.cmd', 'sta
 
 const windowsStart = readFileSync(join(root, 'start-ai-os.cmd'), 'utf8')
 const linuxStart = readFileSync(join(root, 'start-ai-os.sh'), 'utf8')
-assert.ok(windowsStart.includes('runtime\\qwenpaw\\venv\\Scripts\\qwenpaw.exe'), 'Windows wrapper must recognize the managed venv layout')
+assert.ok(windowsStart.includes('runtime\\zhizaoyunAIOS\\venv\\Scripts\\qwenpaw.exe'), 'Windows wrapper must recognize the managed venv layout')
 assert.ok(linuxStart.includes('runtime/zhizaoyunAIOS/venv/bin/qwenpaw'), 'Linux wrapper must recognize the managed venv layout')
 
 const start = readFileSync(join(scripts, 'start.mjs'), 'utf8')

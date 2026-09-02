@@ -5,7 +5,7 @@ const path = require('path');
 const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const RUNTIME = path.join(ROOT, 'apps', 'qwenpaw-embedded', 'runtime', 'pawapps');
+const RUNTIME = path.join(ROOT, 'apps', 'zhizaoyunAIOS', 'runtime', 'pawapps');
 const OUT = path.join(ROOT, 'docs', 'qa', 'demo-data');
 
 const STUDIOS = [
