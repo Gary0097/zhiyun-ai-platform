@@ -88,7 +88,7 @@ try {
 }
 
 const portInUse = await checkPort(8088)
-record('port-8088', portInUse ? 'fail' : 'pass', portInUse ? '127.0.0.1:8088 已有服务监听；为避免重复实例和插件文件冲突，本次启动已停止' : '127.0.0.1:8088 可用于启动', '先访问页面确认是否为旧 AI-OS；需要升级或重启时，请先停止旧进程再运行启动脚本。')
+record('port-8088', portInUse ? 'fail' : 'pass', portInUse ? '127.0.0.1:8088 已有外来服务监听（本平台旧实例已在启动前被自动接管）' : '127.0.0.1:8088 可用于启动', '8088 被 non-AI-OS 进程占用：请确认该端口用途后释放，或修改占用服务的端口。')
 
 const failed = checks.filter(item => item.status === 'fail')
 const warned = checks.filter(item => item.status === 'warn')
