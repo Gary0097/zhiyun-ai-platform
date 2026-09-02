@@ -31,8 +31,10 @@ function dirSizeMb (p) {
   const walk = d => {
     for (const e of readdirSync(d, { withFileTypes: true })) {
       const f = join(d, e.name)
-      if (e.isDirectory()) walk(f)
-      else total += statSync(f).size
+      try {
+        if (e.isDirectory() && !e.isSymbolicLink()) walk(f)
+        else total += statSync(f).size
+      } catch { /* 断链/权限抖动跳过 */ }
     }
   }
   if (existsSync(p)) walk(p)
@@ -41,6 +43,10 @@ function dirSizeMb (p) {
 
 rmSync(workDir, { recursive: true, force: true })
 mkdirSync(distDir, { recursive: true })
+// 残留注册清理：rmSync 只删目录不清注册表，会导致下一次 add 报
+// "missing but already registered"（曾连续卡死打包）。
+try { run(`git worktree remove --force "${workDir}"`) } catch { /* 未注册时忽略 */ }
+run(`git worktree prune`)
 run(`git worktree add --detach "${workDir}" ${ref}`)
 
 // 版本清单：锁定的 PawApp 与运行时版本随包分发，供校验与诊断
