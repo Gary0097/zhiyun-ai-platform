@@ -45,9 +45,14 @@ const versionSrc = join(buildDir, 'VersionInfo.cs')
 writeFileSync(versionSrc, `// 自动生成：make-exe-installer.mjs
 static class VersionInfo { public const string AppVersion = "${version}"; }
 `, 'utf8')
+// 品牌 exe 图标（branding/app.ico，多尺寸）；缺失时降级为默认 .NET 图标并告警
+const iconPath = join(root, 'branding', 'app.ico')
+const iconArgs = existsSync(iconPath) ? ['/win32icon:' + iconPath] : []
+if (!iconArgs.length) console.warn('警告：branding/app.ico 不存在，安装程序将使用默认图标。')
 execFileSync(csc, [
   '/nologo', '/target:winexe', '/optimize+',
   '/out:' + stubPath,
+  ...iconArgs,
   '/r:System.IO.Compression.dll',
   '/r:System.IO.Compression.FileSystem.dll',
   '/r:System.Windows.Forms.dll',
