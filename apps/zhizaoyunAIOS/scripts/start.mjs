@@ -91,6 +91,33 @@ function run (command, args, hint, capture = false) {
   return capture ? `${result.stdout || ''}${result.stderr || ''}`.trim() : ''
 }
 
+// 升级/重复启动接管：8088 若被“我们自己的实例”（可执行文件路径含
+// zhizaoyunAIOS / qwenpaw）占用，直接停掉旧进程再启动——安装包升级场景
+// 不应让用户手工找旧进程。外来进程不动，交给 doctor 的端口检查报错。
+function stopStaleInstance () {
+  const probe = spawnSync('powershell', ['-NoProfile', '-Command',
+    "(Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1).OwningProcess"], { encoding: 'utf8' })
+  const pid = parseInt((probe.stdout || '').trim(), 10)
+  if (!pid || Number.isNaN(pid)) return false
+  const pathProbe = spawnSync('powershell', ['-NoProfile', '-Command',
+    `(Get-Process -Id ${pid} -ErrorAction SilentlyContinue).Path`], { encoding: 'utf8' })
+  const ownerPath = (pathProbe.stdout || '').trim()
+  if (!ownerPath) return false
+  if (!/zhizaoyunAIOS|qwenpaw/i.test(ownerPath)) return false // 非本平台进程：不接管
+  console.log(`检测到本平台旧实例（PID ${pid}），自动停止以完成升级/重启…`)
+  spawnSync('powershell', ['-NoProfile', '-Command',
+    `try { Stop-Process -Id ${pid} -Force } catch {}`])
+  for (let i = 0; i < 10; i++) {
+    const check = spawnSync('powershell', ['-NoProfile', '-Command',
+      "(Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue) -ne $null"], { encoding: 'utf8' })
+    if ((check.stdout || '').trim() !== 'True') return true
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 500)
+  }
+  return true
+}
+
+try { stopStaleInstance() } catch (e) { console.warn('旧实例接管检查失败：', e.message) }
+
 run(process.execPath, [join(scriptsRoot, 'doctor.mjs')], '启动诊断未通过；请按上方提示处理后重试。')
 if (process.argv.includes('--check')) process.exit(0)
 
