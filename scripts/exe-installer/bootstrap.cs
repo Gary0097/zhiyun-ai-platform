@@ -179,21 +179,23 @@ class Installer
 
     // 覆盖升级：旧实例不停止会锁住 venv 文件导致解压失败，且 launcher 会
     // 因 8088 已就绪而直接打开旧实例（新插件永不加载）。安装前强制停止。
-    internal static void StopLiveService()
+    internal static void StopLiveService(string installRoot)
     {
         try
         {
-            // 8088 监听进程必须经命令行归属校验（zhizaoyunAIOS|qwenpaw，
-            // 与 start.mjs stopStaleInstance 同规则）后才终止，避免误杀
-            // 恰好占用该端口的无关应用
-            var ps = "Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | " +
+            // 8088 监听进程必须经命令行归属校验（命令行包含本安装目录）后才
+            // 终止——通用关键词会把其他 QwenPaw 安装也误认成“自己的”。
+            // 目录经 env 传入，避开 cmd/正则的双重转义
+            var ps = "$root=[regex]::Escape($env:Z_INSTALL_ROOT); " +
+                "Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | " +
                 "ForEach-Object { $p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $_.OwningProcess); " +
-                "if ($p -and $p.CommandLine -match 'zhizaoyunAIOS|qwenpaw') { Stop-Process -Id $p.ProcessId -Force } }";
+                "if ($p -and $p.CommandLine -match $root) { Stop-Process -Id $p.ProcessId -Force } }";
             var psi = new ProcessStartInfo("powershell.exe", "-NoProfile -Command \"" + ps + "\"")
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
+            psi.EnvironmentVariables["Z_INSTALL_ROOT"] = installRoot;
             using (var p = Process.Start(psi)) p.WaitForExit(30000);
             // 驻留托盘启动器按映像名精确结束，避免升级解压时 exe 被锁
             try { foreach (var proc in Process.GetProcessesByName("智造云AI-OS")) proc.Kill(); } catch { }
@@ -253,7 +255,7 @@ class Installer
         {
             try
             {
-                StopLiveService();
+                StopLiveService(targetDir);
                 if (PortOccupied())
                 {
                     log.WriteLine("failed: port 8088 occupied by another application");
@@ -651,7 +653,7 @@ class WizardForm : Form, IExtractProgress
         string fail = null;
         try
         {
-            Installer.StopLiveService();
+            Installer.StopLiveService(_targetDir);
             if (Installer.PortOccupied())
                 throw new Exception("端口 8088 被其他应用占用（非本安装的服务），无法启动服务。\n" +
                     "请释放该端口后重新运行安装程序。");
