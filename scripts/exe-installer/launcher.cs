@@ -55,9 +55,15 @@ class Launcher
         {
             if (!ServiceReady() || !ServiceIsOurs())
             {
-                // 托盘驻留但服务被停止（或 8088 被外部占用）：再次双击重新走
-                // 启动路径，由 start.mjs 拉起/接管/拒绝冲突，而不是干等超时
-                if (File.Exists(serviceEntry))
+                // 区分“主托盘正在启动”与“已停止”：前者只等就绪（两条
+                // start-ai-os.cmd 管线并发会竞争工作区变更与端口），后者才拉起
+                bool primaryStarting = false;
+                try
+                {
+                    using (EventWaitHandle.OpenExisting("Local\\ZhizaoyunAIOS.Starting")) { primaryStarting = true; }
+                }
+                catch { primaryStarting = false; }
+                if (!primaryStarting && File.Exists(serviceEntry))
                     StartService(serviceEntry, Path.Combine(here, "launcher-service.log"));
                 WaitReady(ReadyTimeoutSeconds);
             }
@@ -149,7 +155,7 @@ class Launcher
     }
 
     // 隐藏窗口运行 start-ai-os.cmd；cmd 自身重定向输出，进程不依赖启动器管道
-    internal static void StartService(string entry, string logPath)
+    internal static Process StartService(string entry, string logPath)
     {
         var psi = new ProcessStartInfo("cmd.exe",
             "/c \"\"" + entry + "\" > \"" + logPath + "\" 2>&1\"")
@@ -157,7 +163,13 @@ class Launcher
             UseShellExecute = false,
             CreateNoWindow = true,
         };
-        Process.Start(psi);
+        return Process.Start(psi);
+    }
+
+    // TickCount 约 49.7 天回绕，用无符号差值计算经过时间（回绕安全）
+    internal static int ElapsedMs(int startTicks)
+    {
+        return (int)((uint)Environment.TickCount - (uint)startTicks);
     }
 
     // 强制停止 8088 监听实例（与卸载脚本同一命令，已在安装/升级路径实测）
@@ -219,8 +231,11 @@ class TrayContext : ApplicationContext
     readonly MenuItem _startItem, _stopItem;
     ServiceState _state = ServiceState.Stopped; // 冷启动从 Stopped 起，Start() 的守卫才会真正拉起服务
     int _startingTicks;
+    bool _startingActive;
     bool _failShown;
     bool _openWhenReady; // 首次就绪后自动打开应用窗口（主启动路径）
+    Process _starter; // Starting 阶段的启动进程（cmd 包装），Stop/Exit 需一并终止
+    EventWaitHandle _startingSignal; // 跨进程告知“正在启动”，避免二次双击并发拉起
 
     public int ExitCode { get; private set; }
 
@@ -279,12 +294,14 @@ class TrayContext : ApplicationContext
 
     void Open()
     {
-        if (_state == ServiceState.Stopped)
+        if (_state != ServiceState.Running)
         {
-            Start();
+            // Stopped：先拉起；Starting：Start() 守卫会拒绝重复拉起。
+            // 两种情况都等就绪后再开窗，避免拿到连接错误页或双窗口
+            if (_state == ServiceState.Stopped) Start();
             var waiter = new Thread((ThreadStart)delegate
             {
-                if (Launcher.WaitReady(StartTimeoutSeconds))
+                if (Launcher.WaitReady(StartTimeoutSeconds + 20))
                     Launcher.OpenAppWindow();
                 else
                     MessageBox.Show("服务未能就绪，请查看安装目录 launcher-service.log。",
@@ -307,20 +324,55 @@ class TrayContext : ApplicationContext
             return;
         }
         _startingTicks = Environment.TickCount;
+        _startingActive = true;
         _failShown = false;
-        Launcher.StartService(_serviceEntry, Path.Combine(_here, "launcher-service.log"));
+        CloseStartingSignal();
+        try { _startingSignal = new EventWaitHandle(false, EventResetMode.ManualReset, "Local\\ZhizaoyunAIOS.Starting"); }
+        catch { _startingSignal = null; }
+        _starter = Launcher.StartService(_serviceEntry, Path.Combine(_here, "launcher-service.log"));
         SetState(ServiceState.Starting);
     }
 
     void Stop()
     {
         if (_state == ServiceState.Stopped) return;
+        KillStarter();
+        CloseStartingSignal();
+        _startingActive = false;
         Launcher.StopLiveService();
         SetState(ServiceState.Stopped);
     }
 
+    // Starting 阶段服务尚未绑定 8088，只清监听杀不到启动进程；
+    // 必须连同 start-ai-os.cmd 的进程树一起终止，否则托盘报告停止后
+    // 孤儿 starter 仍会把服务拉起来
+    void KillStarter()
+    {
+        if (_starter == null || _starter.HasExited) return;
+        try
+        {
+            var psi = new ProcessStartInfo("cmd.exe", "/c taskkill /T /F /PID " + _starter.Id + " >nul 2>&1")
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+            using (var k = Process.Start(psi)) k.WaitForExit(15000);
+        }
+        catch { }
+    }
+
+    void CloseStartingSignal()
+    {
+        if (_startingSignal == null) return;
+        try { _startingSignal.Dispose(); } catch { }
+        _startingSignal = null;
+    }
+
     void ExitApp()
     {
+        KillStarter();
+        CloseStartingSignal();
+        _startingActive = false;
         Launcher.StopLiveService();
         _poll.Stop();
         _tray.Visible = false;
@@ -337,7 +389,8 @@ class TrayContext : ApplicationContext
         if (_state == ServiceState.Starting)
         {
             if (up) { SetState(ServiceState.Running); return; }
-            if (_startingTicks > 0 && Environment.TickCount - _startingTicks > StartTimeoutSeconds * 1000)
+            int elapsed = _startingActive ? Launcher.ElapsedMs(_startingTicks) : int.MaxValue;
+            if (elapsed > StartTimeoutSeconds * 1000)
             {
                 _startingTicks = 0;
                 if (!_failShown)
@@ -361,6 +414,11 @@ class TrayContext : ApplicationContext
         {
             _openWhenReady = false;
             Launcher.OpenAppWindow();
+        }
+        if (state != ServiceState.Starting)
+        {
+            _startingActive = false;
+            CloseStartingSignal();
         }
         _startItem.Enabled = state == ServiceState.Stopped;
         _stopItem.Enabled = state != ServiceState.Stopped;
