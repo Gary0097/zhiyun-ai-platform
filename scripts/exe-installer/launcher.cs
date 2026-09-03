@@ -53,7 +53,7 @@ class Launcher
         _single = new Mutex(true, "Local\\ZhizaoyunAIOS.Launcher.Single", out created);
         if (!created)
         {
-            if (!ServiceReady() || !ServiceIsOurs(here))
+            if (!ServiceReady() || !ServiceIsOurs(_here))
             {
                 // 区分“主托盘正在启动”与“已停止”：前者只等就绪（两条
                 // start-ai-os.cmd 管线并发会竞争工作区变更与端口），后者才拉起
@@ -78,6 +78,7 @@ class Launcher
 
     static int Smoke(string serviceEntry)
     {
+        string here = Path.GetDirectoryName(serviceEntry);
         try
         {
             if (!ServiceReady() || !ServiceIsOurs(here))
