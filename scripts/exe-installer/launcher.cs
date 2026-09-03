@@ -53,7 +53,7 @@ class Launcher
         _single = new Mutex(true, "Local\\ZhizaoyunAIOS.Launcher.Single", out created);
         if (!created)
         {
-            if (!ServiceReady() || !ServiceIsOurs(_here))
+            if (!ServiceReady() || !ServiceIsOurs(here))
             {
                 // 区分“主托盘正在启动”与“已停止”：前者只等就绪（两条
                 // start-ai-os.cmd 管线并发会竞争工作区变更与端口），后者才拉起
@@ -391,7 +391,9 @@ class TrayContext : ApplicationContext
         bool up = ServiceUp();
         if (_state == ServiceState.Starting)
         {
-            if (up) { SetState(ServiceState.Running); return; }
+            // 就绪且归属本安装才算运行成功；被外部应用抢占 8088 时不转绿，
+            // 维持 Starting 直至超时，由失败弹窗提示（含端口占用可能）
+            if (up && Launcher.ServiceIsOurs(_here)) { SetState(ServiceState.Running); return; }
             int elapsed = _startingActive ? Launcher.ElapsedMs(_startingTicks) : int.MaxValue;
             if (elapsed > StartTimeoutSeconds * 1000)
             {
