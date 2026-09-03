@@ -31,7 +31,7 @@ class Launcher
             {
                 // 8088 已有监听但归属非本安装时，仍走正常启动路径：
                 // 由 start.mjs 接管自己的旧实例或拒绝外部冲突
-                if (!ServiceReady() || !ServiceIsOurs())
+                if (!ServiceReady() || !ServiceIsOurs(here))
                 {
                     if (!File.Exists(serviceEntry))
                         throw new FileNotFoundException("未找到 start-ai-os.cmd", serviceEntry);
@@ -41,7 +41,7 @@ class Launcher
                 SetStatus(splash, "等待服务就绪…");
                 if (!WaitReady(ReadyTimeoutSeconds))
                     throw new TimeoutException("服务在 " + ReadyTimeoutSeconds + " 秒内未就绪");
-                if (!ServiceIsOurs())
+                if (!ServiceIsOurs(here))
                     throw new Exception("端口 8088 被其他应用占用（非本安装的服务），请释放端口后重试。");
                 if (!smoke) OpenAppWindow();
                 if (splash != null) splash.DoneAndExit();
@@ -69,21 +69,23 @@ class Launcher
         if (splash != null) splash.SetStatus(text);
     }
 
-    // 8088 监听进程是否属于本安装（命令行含 zhizaoyunAIOS|qwenpaw，
-    // 与 start.mjs stopStaleInstance 同规则）。判定失败时按“是”处理以保持可用
-    internal static bool ServiceIsOurs ()
+    // 8088 监听进程是否属于本安装（命令行包含本安装目录；通用关键词会把
+    // 其他 QwenPaw 安装误认成“自己的”）。判定失败时按“是”处理以保持可用
+    internal static bool ServiceIsOurs(string installRoot)
     {
         try
         {
-            var ps = "$c = Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; " +
+            var ps = "$root=[regex]::Escape($env:Z_INSTALL_ROOT); " +
+                "$c = Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; " +
                 "if (-not $c) { exit 2 } " +
                 "$p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $c.OwningProcess); " +
-                "if ($p -and $p.CommandLine -match 'zhizaoyunAIOS|qwenpaw') { exit 0 } exit 1";
+                "if ($p -and $p.CommandLine -match $root) { exit 0 } exit 1";
             var psi = new ProcessStartInfo("powershell.exe", "-NoProfile -Command \"" + ps + "\"")
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
+            psi.EnvironmentVariables["Z_INSTALL_ROOT"] = installRoot;
             using (var p = Process.Start(psi))
             {
                 p.WaitForExit(30000);
