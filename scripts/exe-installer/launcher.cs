@@ -53,7 +53,13 @@ class Launcher
         _single = new Mutex(true, "Local\\ZhizaoyunAIOS.Launcher.Single", out created);
         if (!created)
         {
-            if (!ServiceReady()) WaitReady(ReadyTimeoutSeconds);
+            if (!ServiceReady())
+            {
+                // 托盘驻留但服务被停止：再次双击应能重新拉起，而不是干等超时
+                if (File.Exists(serviceEntry))
+                    StartService(serviceEntry, Path.Combine(here, "launcher-service.log"));
+                WaitReady(ReadyTimeoutSeconds);
+            }
             if (ServiceReady()) OpenAppWindow();
             return 0;
         }
@@ -102,7 +108,7 @@ class Launcher
         catch { return false; }
     }
 
-    static bool WaitReady(int timeoutSeconds)
+    internal static bool WaitReady(int timeoutSeconds)
     {
         for (int i = 0; i < timeoutSeconds; i++)
         {
@@ -129,13 +135,18 @@ class Launcher
     {
         try
         {
-            var psi = new ProcessStartInfo("cmd.exe",
-                "/c for /f \"tokens=5\" %p in ('netstat -ano ^| findstr :8088 ^| findstr LISTENING') do taskkill /PID %p /F >nul 2>&1")
+            // 归属校验后才终止：8088 监听进程命令行须含 zhizaoyunAIOS|qwenpaw
+            // （与 start.mjs stopStaleInstance 同规则），避免误杀无关应用；
+            // 注意这里绝不能按映像名杀 智造云AI-OS.exe——那是托盘自身
+            var ps = "Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | " +
+                "ForEach-Object { $p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $_.OwningProcess); " +
+                "if ($p -and $p.CommandLine -match 'zhizaoyunAIOS|qwenpaw') { Stop-Process -Id $p.ProcessId -Force } }";
+            var psi = new ProcessStartInfo("powershell.exe", "-NoProfile -Command \"" + ps + "\"")
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
-            using (var p = Process.Start(psi)) p.WaitForExit(15000);
+            using (var p = Process.Start(psi)) p.WaitForExit(30000);
         }
         catch { }
     }
@@ -176,9 +187,10 @@ class TrayContext : ApplicationContext
     readonly NotifyIcon _tray;
     readonly System.Windows.Forms.Timer _poll;
     readonly MenuItem _startItem, _stopItem;
-    ServiceState _state = ServiceState.Starting;
+    ServiceState _state = ServiceState.Stopped; // 冷启动从 Stopped 起，Start() 的守卫才会真正拉起服务
     int _startingTicks;
     bool _failShown;
+    bool _openWhenReady; // 首次就绪后自动打开应用窗口（主启动路径）
 
     public int ExitCode { get; private set; }
 
@@ -210,7 +222,8 @@ class TrayContext : ApplicationContext
         _poll.Tick += delegate { Poll(); };
         _poll.Start();
 
-        // 首次进入：服务没跑就自动拉起
+        // 首次进入：登记“就绪即开窗”，服务没跑就自动拉起
+        _openWhenReady = true;
         if (ServiceUp())
         {
             SetState(ServiceState.Running);
@@ -235,7 +248,21 @@ class TrayContext : ApplicationContext
 
     void Open()
     {
-        if (_state == ServiceState.Stopped) Start();
+        if (_state == ServiceState.Stopped)
+        {
+            Start();
+            var waiter = new Thread((ThreadStart)delegate
+            {
+                if (Launcher.WaitReady(StartTimeoutSeconds))
+                    Launcher.OpenAppWindow();
+                else
+                    MessageBox.Show("服务未能就绪，请查看安装目录 launcher-service.log。",
+                        "智造云 AI-OS", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            });
+            waiter.IsBackground = true;
+            waiter.Start();
+            return;
+        }
         Launcher.OpenAppWindow();
     }
 
@@ -299,6 +326,11 @@ class TrayContext : ApplicationContext
     void SetState(ServiceState state)
     {
         _state = state;
+        if (state == ServiceState.Running && _openWhenReady)
+        {
+            _openWhenReady = false;
+            Launcher.OpenAppWindow();
+        }
         _startItem.Enabled = state == ServiceState.Stopped;
         _stopItem.Enabled = state != ServiceState.Stopped;
         try { _tray.Icon.Dispose(); } catch { }
