@@ -47,6 +47,11 @@ powershell -NoProfile -Command "$ok=$false; for($i=0;$i -lt 40;$i++){ try { $r=I
 echo.
 echo [4/4] 创建桌面与开始菜单快捷方式（应用窗口打开，双击即用）...
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\make-desktop-shortcut.ps1"
+if errorlevel 1 (
+  echo [警告] 快捷方式创建失败（不影响服务，已保持运行）。
+  echo 可稍后手动运行：scripts\make-desktop-shortcut.ps1 重试，或直接访问 http://127.0.0.1:8088
+  pause
+)
 
 echo.
 echo 安装完成！默认管理员账号见 README（首次登录后请立即修改密码）。

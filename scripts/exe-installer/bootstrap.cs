@@ -183,13 +183,20 @@ class Installer
     {
         try
         {
-            var psi = new ProcessStartInfo("cmd.exe",
-                "/c for /f \"tokens=5\" %p in ('netstat -ano ^| findstr :8088 ^| findstr LISTENING') do taskkill /PID %p /F >nul 2>&1")
+            // 8088 监听进程必须经命令行归属校验（zhizaoyunAIOS|qwenpaw，
+            // 与 start.mjs stopStaleInstance 同规则）后才终止，避免误杀
+            // 恰好占用该端口的无关应用
+            var ps = "Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | " +
+                "ForEach-Object { $p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $_.OwningProcess); " +
+                "if ($p -and $p.CommandLine -match 'zhizaoyunAIOS|qwenpaw') { Stop-Process -Id $p.ProcessId -Force } }";
+            var psi = new ProcessStartInfo("powershell.exe", "-NoProfile -Command \"" + ps + "\"")
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
-            using (var p = Process.Start(psi)) p.WaitForExit(15000);
+            using (var p = Process.Start(psi)) p.WaitForExit(30000);
+            // 驻留托盘启动器按映像名精确结束，避免升级解压时 exe 被锁
+            try { foreach (var proc in Process.GetProcessesByName("智造云AI-OS")) proc.Kill(); } catch { }
         }
         catch { /* 无运行实例或权限不足时继续安装 */ }
     }
