@@ -53,14 +53,15 @@ class Launcher
         _single = new Mutex(true, "Local\\ZhizaoyunAIOS.Launcher.Single", out created);
         if (!created)
         {
-            if (!ServiceReady())
+            if (!ServiceReady() || !ServiceIsOurs())
             {
-                // 托盘驻留但服务被停止：再次双击应能重新拉起，而不是干等超时
+                // 托盘驻留但服务被停止（或 8088 被外部占用）：再次双击重新走
+                // 启动路径，由 start.mjs 拉起/接管/拒绝冲突，而不是干等超时
                 if (File.Exists(serviceEntry))
                     StartService(serviceEntry, Path.Combine(here, "launcher-service.log"));
                 WaitReady(ReadyTimeoutSeconds);
             }
-            if (ServiceReady()) OpenAppWindow();
+            if (ServiceReady() && ServiceIsOurs()) OpenAppWindow();
             return 0;
         }
 
@@ -73,7 +74,7 @@ class Launcher
     {
         try
         {
-            if (!ServiceReady())
+            if (!ServiceReady() || !ServiceIsOurs())
             {
                 if (!File.Exists(serviceEntry))
                 {
@@ -85,6 +86,11 @@ class Launcher
             if (!WaitReady(ReadyTimeoutSeconds))
             {
                 Console.Error.WriteLine("service not ready within " + ReadyTimeoutSeconds + "s");
+                return 3;
+            }
+            if (!ServiceIsOurs())
+            {
+                Console.Error.WriteLine("port 8088 occupied by another application");
                 return 3;
             }
             return 0;
@@ -106,6 +112,30 @@ class Launcher
             using (var resp = req.GetResponse()) { return true; }
         }
         catch { return false; }
+    }
+
+    // 8088 监听进程是否属于本安装（命令行含 zhizaoyunAIOS|qwenpaw，
+    // 与 start.mjs stopStaleInstance 同规则）。判定失败时按“是”处理以保持可用
+    internal static bool ServiceIsOurs()
+    {
+        try
+        {
+            var ps = "$c = Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; " +
+                "if (-not $c) { exit 2 } " +
+                "$p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $c.OwningProcess); " +
+                "if ($p -and $p.CommandLine -match 'zhizaoyunAIOS|qwenpaw') { exit 0 } exit 1";
+            var psi = new ProcessStartInfo("powershell.exe", "-NoProfile -Command \"" + ps + "\"")
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+            using (var p = Process.Start(psi))
+            {
+                p.WaitForExit(30000);
+                return p.ExitCode == 0;
+            }
+        }
+        catch { return true; }
     }
 
     internal static bool WaitReady(int timeoutSeconds)
@@ -222,9 +252,10 @@ class TrayContext : ApplicationContext
         _poll.Tick += delegate { Poll(); };
         _poll.Start();
 
-        // 首次进入：登记“就绪即开窗”，服务没跑就自动拉起
+        // 首次进入：登记“就绪即开窗”；服务须为本安装所有才视为运行中，
+        // 否则仍走 Start() 交给 start.mjs 拉起/接管/拒绝冲突
         _openWhenReady = true;
-        if (ServiceUp())
+        if (ServiceUp() && Launcher.ServiceIsOurs())
         {
             SetState(ServiceState.Running);
         }

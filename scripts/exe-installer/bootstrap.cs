@@ -201,6 +201,26 @@ class Installer
         catch { /* 无运行实例或权限不足时继续安装 */ }
     }
 
+    // 端口预检：8088 仍被监听（StopLiveService 后仍在，即非本产品进程）返回 true
+    internal static bool PortOccupied()
+    {
+        try
+        {
+            var psi = new ProcessStartInfo("powershell.exe",
+                "-NoProfile -Command \"if (Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue) { exit 1 }\"")
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+            using (var p = Process.Start(psi))
+            {
+                p.WaitForExit(30000);
+                return p.ExitCode == 1;
+            }
+        }
+        catch { return false; }
+    }
+
     // 静默安装就绪探活：/api/version 200 即服务可用
     static bool ServiceReady()
     {
@@ -234,6 +254,12 @@ class Installer
             try
             {
                 StopLiveService();
+                if (PortOccupied())
+                {
+                    log.WriteLine("failed: port 8088 occupied by another application");
+                    Environment.ExitCode = 2;
+                    return;
+                }
                 int files = ExtractTo(payloadPath, targetDir, null);
                 log.WriteLine("integration: " + (RegisterIntegration(targetDir) ? "ok" : "failed"));
                 log.WriteLine("done: " + files + " files");
@@ -248,30 +274,33 @@ class Installer
                         WorkingDirectory = targetDir,
                         UseShellExecute = false
                     });
-                    // install-usb 正常路径是“装运行时→起服务（前台常驻）”，子进程
-                    // 不会退出。这里只收割早期失败：若在窗口期内以非零码退出则视为
-                    // 安装失败；超时仍在运行说明服务已起，按成功处理。
-                    // 无论哪条路径，静默安装的成功契约都是“服务就绪”，
-                    // 统一以 /api/version 探活结果为准。
-                    bool success;
-                    if (child.WaitForExit(180000))
+                    // 静默安装成功契约 = “服务就绪”。子进程退出与就绪探活
+                    // 在完整支持窗口（10 分钟安装 + 240 秒启动）内一起轮询，
+                    // 避免安装超 3 分钟时误报失败或提前退出。
+                    bool success = false;
+                    bool childExited = false;
+                    int childCode = 0;
+                    long exitedAtTicks = 0;
+                    long startTicks = Environment.TickCount;
+                    while (Environment.TickCount - startTicks < (600 + 240) * 1000)
                     {
-                        log.WriteLine("install-usb.cmd exited: " + child.ExitCode);
-                        log.Flush();
-                        if (child.ExitCode != 0)
+                        if (!childExited && child.HasExited)
                         {
-                            log.WriteLine("failed: install-usb.cmd exit code " + child.ExitCode);
-                            Environment.ExitCode = 2;
-                            return;
+                            childExited = true;
+                            childCode = child.ExitCode;
+                            exitedAtTicks = Environment.TickCount;
+                            log.WriteLine("install-usb.cmd exited: " + childCode);
+                            log.Flush();
+                            if (childCode != 0) break;
                         }
-                        success = WaitReady(240);
+                        if (ServiceReady()) { success = true; break; }
+                        if (childExited && Environment.TickCount - exitedAtTicks > 240 * 1000) break;
+                        Thread.Sleep(2000);
                     }
-                    else
-                    {
-                        log.WriteLine("install-usb.cmd still running");
-                        success = WaitReady(240);
-                    }
-                    log.WriteLine(success ? "service ready" : "service not ready within timeout");
+                    if (!childExited) { try { child.Kill(); } catch { } }
+                    log.WriteLine(success ? "service ready" :
+                        childExited && childCode != 0 ? "failed: install-usb.cmd exit code " + childCode :
+                        "service not ready within timeout");
                     log.Flush();
                     Environment.ExitCode = success ? 0 : 2;
                 }
@@ -623,6 +652,9 @@ class WizardForm : Form, IExtractProgress
         try
         {
             Installer.StopLiveService();
+            if (Installer.PortOccupied())
+                throw new Exception("端口 8088 被其他应用占用（非本安装的服务），无法启动服务。\n" +
+                    "请释放该端口后重新运行安装程序。");
             Directory.CreateDirectory(_targetDir);
             int files = Installer.ExtractTo(_payload, _targetDir, this);
             SetStage("第 2 步 / 共 3 步：安装运行时与应用（离线，约 3-10 分钟）");
