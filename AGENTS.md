@@ -6,9 +6,14 @@ and the applicable progress ledger before changing product behavior.
 
 ## Architecture
 
-- QwenPaw 2.1.0 is the only runtime, desktop shell, and Agent container.
+- QwenPaw 2.2.0 is the only runtime, desktop shell, and Agent container (upgraded from 2.1.0; lock entries must move in lockstep).
 - Do not restore DeepSeek Harness, the enterprise service, or port 8390.
-- Port 8088 is the only service port.
+- Port 8088 is the only service port for the single-user desktop deployment.
+- QwenPaw Hub (product decision 2026-09-03) is the sanctioned multi-user mode:
+  admins run it with `start-hub.cmd` on port 8000, and model provider accounts
+  (API keys) are managed centrally on the Hub server via its credential vault,
+  projected into each user runtime as environment variables. Do not reintroduce
+  any second application service besides the single-user 8088 app and the Hub.
 - Business features must be delivered as PawApps. This repository contains only
   system plugins, launchers, the shared Workspace contract, and version locks.
 - Data Studio and Order Studio are independent repositories. Update their lock

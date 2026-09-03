@@ -56,7 +56,7 @@ const lock = JSON.parse(readFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'paw
 const manifest = [
   'product: zhiyun-ai-os',
   `version: ${version}`,
-  'qwenpaw: 2.1.0',
+  'qwenpaw: 2.2.0',
   `locked_pawapps: ${lock.apps.length}`,
   ...lock.apps.map(a => `  - ${a.id} @ ${a.commit}`),
   `channel: ${offline ? 'offline-usb' : 'online-installer'}`,
