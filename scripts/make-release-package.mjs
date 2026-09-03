@@ -106,8 +106,10 @@ if (offline) {
     'chcp 65001 >nul',
     'title Lingze Wanchuan Zhizaoyun AI-OS - USB Offline Setup',
     'cd /d "%~dp0"',
-    // 覆盖升级：先强制停止在跑的 8088 实例（解锁文件，避免升级后仍运行旧代码）
-    'for /f "tokens=5" %%p in (\'netstat -ano ^| findstr :8088 ^| findstr LISTENING\') do taskkill /PID %%p /F >nul 2>&1',
+    // 覆盖升级：停止本产品实例（8088 监听须命令行含 zhizaoyunAIOS|qwenpaw 才杀，
+    // 避免误伤占用该端口的无关应用；同时结束驻留托盘 exe 以解锁升级解压）
+    'powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { $p = Get-CimInstance Win32_Process -Filter (\'ProcessId=\' + $_.OwningProcess); if ($p -and $p.CommandLine -match \'zhizaoyunAIOS|qwenpaw\') { Stop-Process -Id $p.ProcessId -Force } }" >nul 2>&1',
+    'taskkill /IM "智造云AI-OS.exe" /F >nul 2>&1',
     'echo ==============================================',
     'echo   Lingze Wanchuan Zhizaoyun AI-OS - USB offline install',
     'echo   Auto-starts and opens the browser when finished.',
@@ -124,6 +126,8 @@ if (offline) {
     ')',
     'powershell -NoProfile -ExecutionPolicy Bypass -File setup-ai-os.ps1 -Offline -CacheDir "apps\\zhizaoyunAIOS\\runtime\\cache"',
     'if errorlevel 1 ( echo [错误] 运行环境安装失败，请检查上方输出。 & pause & exit /b 1 )',
+    'powershell -NoProfile -Command "if (Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue) { exit 1 }" >nul 2>&1',
+    'if errorlevel 1 ( echo [错误] 端口 8088 仍被其他应用占用，请先释放该端口再安装。 & pause & exit /b 1 )',
     'rem 优先用桌面启动器（闪屏→服务就绪→Edge 应用窗口）；无 exe 时回退控制台启动',
     'if exist "智造云AI-OS.exe" ( start "" "智造云AI-OS.exe" ) else ( call start-ai-os.cmd )',
     '',
