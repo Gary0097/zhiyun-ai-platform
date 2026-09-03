@@ -404,6 +404,9 @@ class TrayContext : ApplicationContext
                     MessageBox.Show("服务在约 " + StartTimeoutSeconds + " 秒内未能就绪，请查看安装目录 launcher-service.log。",
                         "智造云 AI-OS", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+                // starter 可能仍在运行（含失败后 pause 挂起）：先终止再转 Stopped，
+                // 避免重试时覆盖 _starter 造成孤儿进程
+                KillStarter();
                 SetState(ServiceState.Stopped);
             }
             return;

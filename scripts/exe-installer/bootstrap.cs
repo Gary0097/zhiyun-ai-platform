@@ -148,17 +148,22 @@ class Installer
     // 存在 node（与 install-usb.cmd 的检查一致），否则服务无法启动
     internal static bool HasNodeAvailable(string targetDir)
     {
-        if (File.Exists(Path.Combine(targetDir, "extras", "node", "node.exe"))) return true;
+        // 与 start-ai-os.cmd/install-usb.cmd 一致：要求 Node 20+，只查存在
+        // 会把 Node 16 误判为可用
+        string node = File.Exists(Path.Combine(targetDir, "extras", "node", "node.exe"))
+            ? Path.Combine(targetDir, "extras", "node", "node.exe")
+            : "node";
         try
         {
-            var psi = new ProcessStartInfo("cmd.exe", "/c where node >nul 2>&1")
+            var psi = new ProcessStartInfo("cmd.exe",
+                "/c \"\"" + node + "\" -p \"process.versions.node.split('.')[0] >= 20\"\" >nul 2>&1")
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
             using (var p = Process.Start(psi))
             {
-                p.WaitForExit(15000);
+                p.WaitForExit(30000);
                 return p.ExitCode == 0;
             }
         }
@@ -284,7 +289,7 @@ class Installer
                     int childCode = 0;
                     long exitedAtTicks = 0;
                     long startTicks = Environment.TickCount;
-                    while (Environment.TickCount - startTicks < (600 + 240) * 1000)
+                    while ((int)((uint)Environment.TickCount - (uint)startTicks) < (600 + 240) * 1000)
                     {
                         if (!childExited && child.HasExited)
                         {
@@ -296,7 +301,7 @@ class Installer
                             if (childCode != 0) break;
                         }
                         if (ServiceReady()) { success = true; break; }
-                        if (childExited && Environment.TickCount - exitedAtTicks > 240 * 1000) break;
+                        if (childExited && (int)((uint)Environment.TickCount - (uint)exitedAtTicks) > 240 * 1000) break;
                         Thread.Sleep(2000);
                     }
                     if (!childExited) { try { child.Kill(); } catch { } }
