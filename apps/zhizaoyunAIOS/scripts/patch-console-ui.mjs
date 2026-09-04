@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
+import { brotliCompressSync, gzipSync } from 'node:zlib'
 import { existsSync, readFileSync, writeFileSync, readdirSync, renameSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -9,6 +10,7 @@ import { resolveRuntime } from './runtime-env.mjs'
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
 const assetsRoot = join(scriptsRoot, '..', '..', '..', 'branding')
 const gearLogo = join(assetsRoot, 'gear-logo.png')
+const brandLogo = join(assetsRoot, 'default-logo.png')
 
 const REPLACEMENTS = [
   {
@@ -111,6 +113,20 @@ function writeIndependent (file, data) {
   renameSync(tmp, file)
 }
 
+// 写入静态资产并同步刷新同名的 .br / .gz 预压缩副本。console 静态服务支持
+// Content-Encoding 协商，若只改原文件，旧压缩副本仍会被优先返回，导致改动“看不见”。
+function writeAssetWithSiblings (file, data) {
+  writeIndependent(file, data)
+  for (const ext of ['.br', '.gz']) {
+    const sibling = file + ext
+    if (!existsSync(sibling)) continue
+    const compressed = ext === '.br'
+      ? brotliCompressSync(data)
+      : gzipSync(data)
+    writeIndependent(sibling, compressed)
+  }
+}
+
 function workingDir () {
   const explicit = process.env.QWENPAW_WORKING_DIR || process.env.COPAW_WORKING_DIR
   if (explicit) return resolve(explicit)
@@ -131,6 +147,10 @@ function selectedLogo () {
       return { path, mime, source: 'Workspace 自定义 Logo' }
     }
   } catch {}
+  // 默认使用灵泽万川品牌 Logo（横版字标）；缺失时回退内置齿轮 Logo。
+  if (existsSync(brandLogo) && statSync(brandLogo).size > 0) {
+    return { path: brandLogo, mime: 'image/png', source: '内置灵泽万川品牌 Logo' }
+  }
   return { path: gearLogo, mime: 'image/png', source: '内置智造云 AIOS 齿轮 Logo' }
 }
 
@@ -254,7 +274,7 @@ function ensureCacheBust (consoleDir, bundleContent) {
   if (!re.test(html)) return { changed: false }
   const newHtml = html.replace(re, '$1$2')
   if (newHtml === html) return { changed: false }
-  writeIndependent(htmlPath, newHtml)
+  writeAssetWithSiblings(htmlPath, newHtml)
   return { changed: true }
 }
 
@@ -268,13 +288,57 @@ function syncConsoleLogo (consoleDir) {
   const logo = selectedLogo()
   const svgTarget = join(consoleDir, 'qwenpaw.svg')
   writeIndependent(svgTarget, logoSvg(logo))
+  // 启动页（boot screen）Logo：index.html 中 .qwenpaw-boot__logo 直接引用根路径
+  // /qwenpaw.png，需要用当前平台 Logo 物理覆盖该文件（仅位图 Logo 可安全写入 .png）。
+  const rasterMime = new Set(['image/png', 'image/jpeg', 'image/webp'])
+  if (rasterMime.has(logo.mime)) {
+    writeAssetWithSiblings(join(consoleDir, 'qwenpaw.png'), readFileSync(logo.path))
+  }
+  // 其余上游默认 Logo 资产（登录页 logo-dark/light.svg、creator-logo.png 等）一并
+  // 覆盖为当前平台 Logo，避免任何残留的 QwenPaw 黡标识。
+  const svgLogo = logoSvg(logo)
+  for (const name of readdirSync(consoleDir)) {
+    if (/^logo-(dark|light)\.svg$/.test(name)) {
+      writeAssetWithSiblings(join(consoleDir, name), svgLogo)
+    } else if (name === 'creator-logo.png' && rasterMime.has(logo.mime)) {
+      writeAssetWithSiblings(join(consoleDir, name), readFileSync(logo.path))
+    }
+  }
   const htmlPath = join(consoleDir, 'index.html')
   const html = readFileSync(htmlPath, 'utf8')
   const nextHtml = html.replace(/<link rel="icon"[^>]*\/>/, '<link rel="icon" type="image/svg+xml" href="/qwenpaw.svg" />')
   if (nextHtml !== html) {
-    writeIndependent(htmlPath, nextHtml)
+    writeAssetWithSiblings(htmlPath, nextHtml)
   }
-  console.log(`Console favicon 与聊天智能体头像已同步为${logo.source}。`)
+  console.log(`Console favicon、启动页 Logo 与默认 Logo 资产已同步为${logo.source}。`)
+}
+
+// 注入金蝶风格主题（企业蓝）样式，覆盖 antd 默认主色，使登录页与整体控件
+// 恢复蓝系企业风格。仅做颜色层覆盖，不改变布局与交互。
+const KINGDEE_BLUE = '#0052D9'
+const KINGDEE_BLUE_HOVER = '#2B6FE3'
+function applyKingdeeTheme (consoleDir) {
+  const htmlPath = join(consoleDir, 'index.html')
+  const html = readFileSync(htmlPath, 'utf8')
+  const styleId = 'zy-kingdee-theme'
+  if (html.includes(`id="${styleId}"`)) return
+  const css = [
+    `:root{--zy-brand:${KINGDEE_BLUE};}`,
+    `.ant-btn-primary{background:${KINGDEE_BLUE} !important;border-color:${KINGDEE_BLUE} !important;}`,
+    `.ant-btn-primary:not(:disabled):hover{background:${KINGDEE_BLUE_HOVER} !important;border-color:${KINGDEE_BLUE_HOVER} !important;}`,
+    `a{color:${KINGDEE_BLUE};}`,
+    `.ant-switch-checked{background:${KINGDEE_BLUE} !important;}`,
+    `.ant-checkbox-checked .ant-checkbox-inner{background-color:${KINGDEE_BLUE} !important;border-color:${KINGDEE_BLUE} !important;}`,
+    `[class*="login"] [class*="title"],[class*="Login"] [class*="title"]{color:#1D2129;}`,
+  ].join('\n')
+  const style = `<style id="${styleId}">${css}</style>`
+  const nextHtml = html.replace(/<\/head>/, style + '</head>')
+  if (nextHtml === html) {
+    warn('未找到 </head>，无法注入金蝶风格主题。')
+    return
+  }
+  writeAssetWithSiblings(htmlPath, nextHtml)
+  console.log('Console 已注入金蝶风格（企业蓝）主题样式。')
 }
 // 抑制宿主“试试桌面模式”新手引导：该引导每次进入应用都会弹出并带全屏遮罩
 // 拦截点击，且不记忆已完成状态。桌面模式仍可从宿主快捷设置进入，这里只隐藏
@@ -290,7 +354,7 @@ function suppressConsoleTour (consoleDir) {
     warn('未找到 </head>，无法注入引导抑制样式。')
     return
   }
-  writeIndependent(htmlPath, nextHtml)
+  writeAssetWithSiblings(htmlPath, nextHtml)
   console.log('Console 新手引导弹层已抑制（style#zy-tour-suppress 注入）。')
 }
 
@@ -398,6 +462,7 @@ if (cacheBust.changed) {
   console.log('Console index.html 已移除主 bundle ?v= 查询参数（避免 console 双重执行）')
 }
 syncConsoleLogo(consoleDir)
+applyKingdeeTheme(consoleDir)
 suppressConsoleTour(consoleDir)
 
 
@@ -406,7 +471,7 @@ let extraBranded = 0
 for (const file of collectBrandableFiles(consoleDir)) {
   if (file === bundlePath) continue
   const cc = readFileSync(file, 'utf8')
-  if (!cc.includes('QwenPaw')) continue
+  if (!cc.includes('QwenPaw') && !cc.includes('灵泽万川智造云')) continue
   const out = applyBrand(cc)
   if (out !== cc) {
     writeIndependent(file, out)
