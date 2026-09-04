@@ -42,6 +42,42 @@ const REPLACEMENTS = [
     to: 'avatar:"/qwenpaw.svg"',
     patched: 'avatar:"/qwenpaw.svg"',
   },
+  // ---- QwenPaw 2.2.0 bundle（index-C6K6UUCj.js）----
+  {
+    name: '2.2.0 文档菜单 → 本地内嵌文档',
+    optional: true,
+    from: 'UM=e=>`https://qwenpaw.agentscope.io/docs/intro?lang=${Mo(e)}`',
+    to: 'UM=e=>"/aios-docs.html#tutorial"',
+    patched: 'UM=e=>"/aios-docs.html#tutorial"',
+  },
+  {
+    name: '2.2.0 功能演示 → 本地内嵌文档（视频教程待开发）',
+    optional: true,
+    from: 'GM=e=>`https://qwenpaw.agentscope.io/docs/functiondemo?lang=${Mo(e)}`',
+    to: 'GM=e=>"/aios-docs.html#demo"',
+    patched: 'GM=e=>"/aios-docs.html#demo"',
+  },
+  {
+    name: '2.2.0 更新日志 → 本地内嵌文档',
+    optional: true,
+    from: 'pd=e=>`https://qwenpaw.agentscope.io/release-notes?lang=${Mo(e)}`',
+    to: 'pd=e=>"/aios-docs.html#changelog"',
+    patched: 'pd=e=>"/aios-docs.html#changelog"',
+  },
+  {
+    name: '2.2.0 常见问题 → 本地内嵌文档',
+    optional: true,
+    from: 'jM=e=>`https://qwenpaw.agentscope.io/docs/faq?lang=${Mo(e)}`',
+    to: 'jM=e=>"/aios-docs.html#faq"',
+    patched: 'jM=e=>"/aios-docs.html#faq"',
+  },
+  {
+    name: '2.2.0 GitHub 按钮隐藏',
+    optional: true,
+    from: 'c.jsx(mt,{title:e("header.github"),children:c.jsx(ct,{type:"text",icon:c.jsx(Js,{}),onClick:()=>L(ud),className:F.hideOnMobile,children:e("header.github")})})',
+    to: 'false&&c.jsx(mt,{title:e("header.github"),children:c.jsx(ct,{type:"text",icon:c.jsx(Js,{}),onClick:()=>L(ud),className:F.hideOnMobile,children:e("header.github")})})',
+    patched: 'false&&c.jsx(mt,{title:e("header.github")',
+  },
   {
     name: '默认中文语言',
     from: 'lng:localStorage.getItem("language")||navigator.language||"en"',
@@ -361,6 +397,8 @@ function themeCss (theme) {
     `a{color:${p};}`,
     // 登录页 Logo 放大（上游内联 48px）
     `img[style*="height: 48px"]{height:${theme.loginLogoHeight}px !important;width:auto !important;}`,
+    // 顶栏 Logo 放大（上游 16px 的 CSS Module 类，按类名片段匹配以跨哈希稳定命中）
+    `img[class*="logoImg"]{height:40px !important;width:auto !important;max-width:none !important;}`,
   ]
   if (theme.loginBg) {
     const data = 'data:image/' + (theme.loginBg.endsWith('.png') ? 'png' : 'jpeg') + ';base64,' + readFileSync(theme.loginBg).toString('base64')
@@ -383,6 +421,101 @@ function applyBrandTheme (consoleDir) {
   }
   writeAssetWithSiblings(htmlPath, nextHtml)
   console.log('Console 已注入灵泽万川蓝绿主题样式。')
+}
+
+// 生成内嵌的“文档资料”本地页面（替代上游外链 qwenpaw.agentscope.io）。
+// 每次启动重写，内容随品牌主题着色；视频教程章节固定展示“待开发”。
+function writeLocalDocs (consoleDir) {
+  const t = brandTheme()
+  const logo = selectedLogo()
+  const logoData = 'data:' + logo.mime + ';base64,' + readFileSync(logo.path).toString('base64')
+  const html = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>智造云AIOS 帮助中心</title>
+<style>
+:root{--brand:${t.primary};--brand-hover:${t.primaryHover};--bg:#F0F8FA;--card:#fff;--text:#1D2129;--muted:#4E5969;}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,'Segoe UI','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#F0F8FA 0%,#C4E2EC 100%);color:var(--text);line-height:1.7}
+.wrap{max-width:880px;margin:0 auto;padding:32px 20px 64px}
+header{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+header img{height:56px;width:auto}
+h1{font-size:26px;margin:0}
+.sub{color:var(--muted);margin:0 0 28px}
+nav{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px}
+nav a{color:var(--brand);text-decoration:none;padding:6px 14px;border:1px solid var(--brand);border-radius:18px;font-size:14px}
+nav a:hover{background:var(--brand);color:#fff}
+section{background:var(--card);border-radius:12px;padding:24px 28px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,60,80,.06)}
+h2{font-size:20px;border-left:4px solid var(--brand);padding-left:10px;margin-top:0}
+h3{font-size:16px}
+code{background:#EDF3F5;padding:2px 6px;border-radius:4px;font-size:13px}
+.tag{display:inline-block;background:#FFF3E0;color:#D46B08;border-radius:4px;padding:2px 10px;font-size:13px;margin-left:8px}
+.todo{border:1px dashed var(--brand);border-radius:10px;padding:28px;text-align:center;color:var(--muted)}
+footer{color:var(--muted);font-size:13px;text-align:center;margin-top:32px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><img src="${logoData}" alt="智造云AIOS"></header>
+<h1>智造云AIOS 帮助中心</h1>
+<p class="sub">智造云AIOS 2.2.0（灵泽万川 · 企业级智能体操作系统）</p>
+<nav>
+<a href="#tutorial">教程</a>
+<a href="#demo">视频教程</a>
+<a href="#changelog">更新日志</a>
+<a href="#faq">常见问题</a>
+</nav>
+
+<section id="tutorial">
+<h2>教程 · 快速上手</h2>
+<h3>1. 启动与登录</h3>
+<p>运行桌面的「智造云AIOS」启动器，浏览器访问 <code>http://127.0.0.1:8088</code>。首次使用请在登录页注册账号，<b>第一个注册的账号即管理员</b>。忘记密码时删除服务端的 <code>auth.json</code> 后重启即可重置账户。</p>
+<h3>2. 对话与智能体</h3>
+<p>进入「聊天」即可与默认智能体对话；左侧「当前智能体」可切换或新建智能体，每个智能体可单独配置模型、技能与工具。输入框支持 <code>/</code> 快捷指令与 <code>↑↓</code> 浏览历史。</p>
+<h3>3. 工作区</h3>
+<p>左侧「工作区」提供文件、技能、工具、MCP、运行配置等入口。智能体默认在各自的工作目录中读写文件，所有文件操作均可在工作区中查看与回收。</p>
+<h3>4. 团队多用户（Hub 模式）</h3>
+<p>管理员运行 <code>start-hub.cmd</code> 启动 Hub（端口 8000），同事通过局域网地址访问；模型账号（API Key）由管理员在 Hub 服务器上统一配置与分发。</p>
+</section>
+
+<section id="demo">
+<h2>视频教程 <span class="tag">待开发</span></h2>
+<div class="todo">🎬 视频教程正在制作中，敬请期待。<br>当前可先阅读上方「教程」章节的文字版上手指南。</div>
+</section>
+
+<section id="changelog">
+<h2>更新日志</h2>
+<h3>智造云AIOS 2.2.0</h3>
+<ul>
+<li>内核升级：基于 QwenPaw 2.2.0 运行时（性能、稳定性与工具链全面升级）。</li>
+<li>应用解耦：业务应用从系统镜像中剥离，按需独立安装。</li>
+<li>原生登录：内置账户体系，支持单机与 Hub 多用户两种部署。</li>
+<li>品牌化：系统级灵泽万川蓝绿主题，Logo、启动页、登录页全面焕新。</li>
+<li>品牌自定义：支持通过品牌目录自定义 Logo、主题色与登录页封面。</li>
+</ul>
+</section>
+
+<section id="faq">
+<h2>常见问题</h2>
+<h3>Q：双击启动后浏览器没有打开？</h3>
+<p>等待约 10–30 秒让服务完成初始化，然后手动访问 <code>http://127.0.0.1:8088</code>。若端口被占用，启动器会先自动接管本系统的旧实例。</p>
+<h3>Q：忘记登录密码怎么办？</h3>
+<p>关闭服务，删除服务运行目录下的 <code>auth.json</code>，重新启动后即可重新注册（这是官方文档提供的账户重置方式，会清除全部本地账户）。</p>
+<h3>Q：Hub（8000 端口）启动失败？</h3>
+<p>首次启动需要 1–2 分钟装配运行环境，请保持窗口开启；Hub 为前台运行，关闭窗口即停止服务。</p>
+<h3>Q：如何更换系统 Logo 和主题色？</h3>
+<p>在 <code>~/.qwenpaw/branding/</code> 目录放置 <code>logo.json</code> 与 <code>theme.json</code>（详见产品 README「品牌与外观自定义」），重启服务生效。</p>
+</section>
+
+<footer>灵泽万川 · 智造云AIOS 2.2.0 — 本页面为内嵌离线文档</footer>
+</div>
+</body>
+</html>
+`
+  writeAssetWithSiblings(join(consoleDir, 'aios-docs.html'), html)
+  console.log('Console 内嵌帮助文档已生成：aios-docs.html')
 }
 // 抑制宿主“试试桌面模式”新手引导：该引导每次进入应用都会弹出并带全屏遮罩
 // 拦截点击，且不记忆已完成状态。桌面模式仍可从宿主快捷设置进入，这里只隐藏
@@ -507,6 +640,7 @@ if (cacheBust.changed) {
 }
 syncConsoleLogo(consoleDir)
 applyBrandTheme(consoleDir)
+writeLocalDocs(consoleDir)
 suppressConsoleTour(consoleDir)
 
 
