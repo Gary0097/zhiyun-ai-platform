@@ -58,6 +58,6 @@ for (const [command, args] of commands) {
 assert.ok(existsSync(join(root, 'branding', 'gear-logo.png')), 'branding/gear-logo.png missing')
 assert.ok(existsSync(join(root, 'branding', 'app.ico')), 'branding/app.ico missing')
 const patch = readFileSync(join(scripts, 'patch-console-ui.mjs'), 'utf8')
-assert.ok(patch.includes('智造云 AIOS'), 'patch-console-ui must brand as 智造云 AIOS')
+assert.ok(patch.includes('智造云AIOS'), 'patch-console-ui must brand as 智造云 AIOS')
 
 console.log('智造云 AIOS 2.2.0 发布门禁通过：QwenPaw 2.2.0 唯一运行时、原生登录、跨平台入口（单机 8088 + Hub 8000）、控制台品牌化均正常。')

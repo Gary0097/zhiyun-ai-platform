@@ -72,10 +72,10 @@ function applyBrand (content) {
     placeholders.push({ ph, t })
     out = out.split(t).join(ph)
   }
-  out = out.split('QwenPaw').join('智造云 AIOS')
+  out = out.split('QwenPaw').join('智造云AIOS')
   // 旧品牌名归一：bundle 可能已按历史品牌（灵泽万川智造云）打过补丁，
   // 重品牌化时一并替换，保证跨版本幂等
-  out = out.split('灵泽万川智造云').join('智造云 AIOS')
+  out = out.split('灵泽万川智造云').join('智造云AIOS')
   for (const { ph, t } of placeholders) out = out.split(ph).join(t)
   return out
 }
@@ -324,12 +324,11 @@ function applyKingdeeTheme (consoleDir) {
   if (html.includes(`id="${styleId}"`)) return
   const css = [
     `:root{--zy-brand:${KINGDEE_BLUE};}`,
-    `.ant-btn-primary{background:${KINGDEE_BLUE} !important;border-color:${KINGDEE_BLUE} !important;}`,
-    `.ant-btn-primary:not(:disabled):hover{background:${KINGDEE_BLUE_HOVER} !important;border-color:${KINGDEE_BLUE_HOVER} !important;}`,
+    `.ant-btn-primary,.qwenpaw-btn-primary{background:${KINGDEE_BLUE} !important;border-color:${KINGDEE_BLUE} !important;}`,
+    `.ant-btn-primary:not(:disabled):hover,.qwenpaw-btn-primary:not(:disabled):hover{background:${KINGDEE_BLUE_HOVER} !important;border-color:${KINGDEE_BLUE_HOVER} !important;}`,
     `a{color:${KINGDEE_BLUE};}`,
-    `.ant-switch-checked{background:${KINGDEE_BLUE} !important;}`,
-    `.ant-checkbox-checked .ant-checkbox-inner{background-color:${KINGDEE_BLUE} !important;border-color:${KINGDEE_BLUE} !important;}`,
-    `[class*="login"] [class*="title"],[class*="Login"] [class*="title"]{color:#1D2129;}`,
+    `.ant-switch-checked,.qwenpaw-switch-checked{background:${KINGDEE_BLUE} !important;}`,
+    `.ant-checkbox-checked .ant-checkbox-inner,.qwenpaw-checkbox-checked .qwenpaw-checkbox-inner{background-color:${KINGDEE_BLUE} !important;border-color:${KINGDEE_BLUE} !important;}`,
   ].join('\n')
   const style = `<style id="${styleId}">${css}</style>`
   const nextHtml = html.replace(/<\/head>/, style + '</head>')
@@ -400,7 +399,7 @@ if (checkMode) {
     process.exit(1)
   }
   if (branded !== content) {
-    console.error('[patch-console-ui] 检查失败：console bundle 中仍存在未替换的 QwenPaw 品牌文案（应替换为 智造云 AIOS）。')
+    console.error('[patch-console-ui] 检查失败：console bundle 中仍存在未替换的 QwenPaw 品牌文案（应替换为 智造云AIOS）。')
     process.exit(1)
   }
   // 校验所有可打补丁的 JS/HTML 资源文件均已替换 QwenPaw 品牌文案。
@@ -410,12 +409,12 @@ if (checkMode) {
     if (cc.includes('QwenPaw') && applyBrand(cc) !== cc) unpatchedFiles.push(file)
   }
   if (unpatchedFiles.length) {
-    console.error('[patch-console-ui] 检查失败：以下文件仍包含未替换的 QwenPaw 品牌文案（应替换为 智造云 AIOS）：\n' + unpatchedFiles.join('\n'))
+    console.error('[patch-console-ui] 检查失败：以下文件仍包含未替换的 QwenPaw 品牌文案（应替换为 智造云AIOS）：\n' + unpatchedFiles.join('\n'))
     process.exit(1)
   }
   const htmlTitle = readFileSync(join(consoleDir, 'index.html'), 'utf8')
   if (htmlTitle.includes('QwenPaw')) {
-    console.error('[patch-console-ui] 检查失败：index.html 仍包含 QwenPaw 品牌标题（应替换为 智造云 AIOS）。')
+    console.error('[patch-console-ui] 检查失败：index.html 仍包含 QwenPaw 品牌标题（应替换为 智造云AIOS）。')
     process.exit(1)
   }
   const html = readFileSync(join(consoleDir, 'index.html'), 'utf8')
