@@ -436,102 +436,228 @@ function applyBrandTheme (consoleDir) {
 }
 
 // 生成内嵌的“文档资料”本地页面（替代上游外链 qwenpaw.agentscope.io）。
-// 每次启动重写，内容随品牌主题着色；视频教程章节固定展示“待开发”。
+// 内容源为仓库 docs/console-help/src/*.zh.md（自官方文档站抓取的中文 Markdown），
+// 构建时做：品牌替换（QwenPaw→智造云AIOS，保护标识符/仓库地址）、图片剔除、
+// 外链文档地址改写为本页锚点，最终渲染为带侧边栏目录的单页离线文档。
+const DOCS_SRC = join(scriptsRoot, '..', '..', '..', 'docs', 'console-help', 'src')
+
+const DOC_TITLES = {
+  intro: '项目介绍', quickstart: '快速开始', desktop: '桌面应用', console: '控制台',
+  mailbox: '邮箱管理与自动化', tui: '终端界面', cli: 'CLI', multiAgent: '多智能体',
+  models: '模型', channels: '频道配置', skills: 'Skills', mcp: 'MCP 与内置工具',
+  browser: '浏览器', acpServer: 'ACP 集成', memory: '长期记忆', embedding: '向量模型',
+  memoryEvolvingAndProactive: '记忆进化与主动交互', computerUse: '电脑操作',
+  chrome: 'Chrome 浏览器扩展', creator: 'Creator', context: '上下文',
+  loopEngineering: '循环工程', commands: '魔法命令', cron: '定时任务', heartbeat: '心跳',
+  config: '配置与工作目录', security: '安全', backup: '备份与恢复', plugins: '插件系统',
+  pluginsMigration: '插件迁移指南', hub: '部署与管理多租户', architecture: '架构设计',
+  faq: '常见问题', apiTutorial: 'RESTful API 接口', community: '问题反馈与交流',
+  contributing: '开源与贡献', roadmap: '路线图', practiceAgentTeam: 'Agent Team 实践',
+}
+
+const DOC_GROUPS = [
+  ['快速上手', ['intro', 'quickstart', 'desktop', 'console', 'tui', 'cli']],
+  ['智能体与能力', ['multiAgent', 'models', 'context', 'loopEngineering', 'commands', 'skills', 'mcp', 'browser', 'chrome', 'computerUse', 'memory', 'embedding', 'memoryEvolvingAndProactive']],
+  ['自动化与集成', ['mailbox', 'channels', 'cron', 'heartbeat', 'acpServer', 'creator']],
+  ['部署与管理', ['config', 'security', 'backup', 'plugins', 'pluginsMigration', 'hub', 'architecture']],
+  ['参考', ['apiTutorial', 'practiceAgentTeam', 'roadmap', 'community', 'contributing', 'faq']],
+]
+
+function escapeHtml (text) {
+  return text.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;').split('"').join('&quot;')
+}
+
+function slugAnchor (id) { return 'doc-' + id }
+
+// 极简 Markdown → HTML（标题/段落/列表/引用/表格/代码块/行内标记；图片剔除）。
+function mdToHtml (md, knownIds) {
+  const esc = escapeHtml
+  const inline = (text) => {
+    let t = esc(text)
+    t = t.replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1') // 剔除图片，保留可选 alt 文本
+    t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, label, url) => {
+      const dm = url.match(/(?:^|qwenpaw\.agentscope\.io)\/docs\/([a-zA-Z-]+)(?:[?#][^)]*)?$/)
+        || (url.startsWith('/docs/') ? [null, url.slice(7).split(/[?#]/)[0]] : null)
+      if (dm) {
+        const id = dm[1]
+        if (knownIds.has(id)) return `<a href="#${slugAnchor(id)}">${label}</a>`
+        return `<strong>${label}</strong>`
+      }
+      return `<a href="${url}" target="_blank" rel="noreferrer">${label}</a>`
+    })
+    t = t.split('`').reduce((acc, part, i) => i % 2 ? acc + '<code>' + part + '</code>' : acc + part, '')
+    t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    t = t.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
+    return t
+  }
+  const lines = md.replace(/\r\n/g, '\n').split('\n')
+  const out = []
+  let i = 0
+  let para = []
+  const flushPara = () => { if (para.length) { out.push('<p>' + para.map(inline).join('<br>') + '</p>'); para = [] } }
+  while (i < lines.length) {
+    const line = lines[i]
+    if (/^```|^~~~/.test(line)) {
+      flushPara()
+      const buf = []
+      i++
+      while (i < lines.length && !/^```|^~~~/.test(lines[i])) { buf.push(lines[i]); i++ }
+      i++
+      out.push('<pre><code>' + esc(buf.join('\n')) + '</code></pre>')
+      continue
+    }
+    const h = line.match(/^(#{1,5})\s+(.*)$/)
+    if (h) {
+      flushPara()
+      const level = Math.min(h[1].length + 1, 6)
+      out.push(`<h${level}>${inline(h[2])}</h${level}>`)
+      i++
+      continue
+    }
+    if (/^\s*\|.*\|\s*$/.test(line) && /^\s*\|[\s:-|]+\|\s*$/.test(lines[i + 1] || '')) {
+      flushPara()
+      const cells = (row) => row.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim())
+      const head = cells(line)
+      i += 2
+      const body = []
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { body.push(cells(lines[i])); i++ }
+      out.push('<table><thead><tr>' + head.map(c => `<th>${inline(c)}</th>`).join('') + '</tr></thead><tbody>'
+        + body.map(r => '<tr>' + r.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>').join('') + '</tbody></table>')
+      continue
+    }
+    if (/^\s*[-*+]\s+/.test(line)) {
+      flushPara()
+      const items = []
+      while (i < lines.length && /^\s*[-*+]\s+/.test(lines[i])) { items.push(lines[i].replace(/^\s*[-*+]\s+/, '')); i++ }
+      out.push('<ul>' + items.map(it => `<li>${inline(it)}</li>`).join('') + '</ul>')
+      continue
+    }
+    if (/^\s*\d+[.)]\s+/.test(line)) {
+      flushPara()
+      const items = []
+      while (i < lines.length && /^\s*\d+[.)]\s+/.test(lines[i])) { items.push(lines[i].replace(/^\s*\d+[.)]\s+/, '')); i++ }
+      out.push('<ol>' + items.map(it => `<li>${inline(it)}</li>`).join('') + '</ol>')
+      continue
+    }
+    if (/^>\s?/.test(line)) {
+      flushPara()
+      const buf = []
+      while (i < lines.length && /^>\s?/.test(lines[i])) { buf.push(lines[i].replace(/^>\s?/, '')); i++ }
+      out.push('<blockquote>' + buf.map(inline).join('<br>') + '</blockquote>')
+      continue
+    }
+    if (/^\s*(---|\*\*\*)\s*$/.test(line)) { flushPara(); out.push('<hr>'); i++; continue }
+    if (!line.trim()) { flushPara(); i++; continue }
+    para.push(line)
+    i++
+  }
+  flushPara()
+  return out.join('\n')
+}
+
 function writeLocalDocs (consoleDir) {
   const t = brandTheme()
   const logo = selectedLogo()
   const logoData = 'data:' + logo.mime + ';base64,' + readFileSync(logo.path).toString('base64')
-  const html = `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>智造云AIOS 帮助中心</title>
-<style>
-:root{--brand:${t.primary};--brand-hover:${t.primaryHover};--bg:#F0F8FA;--card:#fff;--text:#1D2129;--muted:#4E5969;}
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,'Segoe UI','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#F0F8FA 0%,#C4E2EC 100%);color:var(--text);line-height:1.7}
-.wrap{max-width:880px;margin:0 auto;padding:32px 20px 64px}
-header{display:flex;align-items:center;gap:16px;margin-bottom:8px}
-header img{height:56px;width:auto}
-h1{font-size:26px;margin:0}
-.sub{color:var(--muted);margin:0 0 28px}
-nav{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px}
-nav a{color:var(--brand);text-decoration:none;padding:6px 14px;border:1px solid var(--brand);border-radius:18px;font-size:14px}
-nav a:hover{background:var(--brand);color:#fff}
-section{background:var(--card);border-radius:12px;padding:24px 28px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,60,80,.06)}
-h2{font-size:20px;border-left:4px solid var(--brand);padding-left:10px;margin-top:0}
-h3{font-size:16px}
-code{background:#EDF3F5;padding:2px 6px;border-radius:4px;font-size:13px}
-.tag{display:inline-block;background:#FFF3E0;color:#D46B08;border-radius:4px;padding:2px 10px;font-size:13px;margin-left:8px}
-.todo{border:1px dashed var(--brand);border-radius:10px;padding:28px;text-align:center;color:var(--muted)}
-footer{color:var(--muted);font-size:13px;text-align:center;margin-top:32px}
-</style>
-</head>
-<body>
-<div class="wrap">
-<header><img src="${logoData}" alt="智造云AIOS"></header>
-<h1>智造云AIOS 帮助中心</h1>
-<p class="sub">智造云AIOS 2.2.0（灵泽万川 · 企业级智能体操作系统）</p>
-<nav>
-<a href="#tutorial">教程</a>
-<a href="#demo">视频教程</a>
-<a href="#changelog">更新日志</a>
-<a href="#faq">常见问题</a>
-</nav>
-
-<section id="tutorial">
-<h2>教程 · 快速上手</h2>
-<h3>1. 启动与登录</h3>
-<p>运行桌面的「智造云AIOS」启动器，浏览器访问 <code>http://127.0.0.1:8088</code>。首次使用请在登录页注册账号，<b>第一个注册的账号即管理员</b>。忘记密码时删除服务端的 <code>auth.json</code> 后重启即可重置账户。</p>
-<h3>2. 对话与智能体</h3>
-<p>进入「聊天」即可与默认智能体对话；左侧「当前智能体」可切换或新建智能体，每个智能体可单独配置模型、技能与工具。输入框支持 <code>/</code> 快捷指令与 <code>↑↓</code> 浏览历史。</p>
-<h3>3. 工作区</h3>
-<p>左侧「工作区」提供文件、技能、工具、MCP、运行配置等入口。智能体默认在各自的工作目录中读写文件，所有文件操作均可在工作区中查看与回收。</p>
-<h3>4. 团队多用户（Hub 模式）</h3>
-<p>管理员运行 <code>start-hub.cmd</code> 启动 Hub（端口 8000），同事通过局域网地址访问；模型账号（API Key）由管理员在 Hub 服务器上统一配置与分发。</p>
-</section>
-
-<section id="demo">
-<h2>视频教程 <span class="tag">待开发</span></h2>
-<div class="todo">🎬 视频教程正在制作中，敬请期待。<br>当前可先阅读上方「教程」章节的文字版上手指南。</div>
-</section>
-
-<section id="changelog">
-<h2>更新日志</h2>
-<h3>智造云AIOS 2.2.0</h3>
-<ul>
-<li>内核升级：基于 QwenPaw 2.2.0 运行时（性能、稳定性与工具链全面升级）。</li>
-<li>应用解耦：业务应用从系统镜像中剥离，按需独立安装。</li>
-<li>原生登录：内置账户体系，支持单机与 Hub 多用户两种部署。</li>
-<li>品牌化：系统级灵泽万川蓝绿主题，Logo、启动页、登录页全面焕新。</li>
-<li>品牌自定义：支持通过品牌目录自定义 Logo、主题色与登录页封面。</li>
-</ul>
-</section>
-
-<section id="faq">
-<h2>常见问题</h2>
-<h3>Q：双击启动后浏览器没有打开？</h3>
-<p>等待约 10–30 秒让服务完成初始化，然后手动访问 <code>http://127.0.0.1:8088</code>。若端口被占用，启动器会先自动接管本系统的旧实例。</p>
-<h3>Q：忘记登录密码怎么办？</h3>
-<p>关闭服务，删除服务运行目录下的 <code>auth.json</code>，重新启动后即可重新注册（这是官方文档提供的账户重置方式，会清除全部本地账户）。</p>
-<h3>Q：Hub（8000 端口）启动失败？</h3>
-<p>首次启动需要 1–2 分钟装配运行环境，请保持窗口开启；Hub 为前台运行，关闭窗口即停止服务。</p>
-<h3>Q：如何更换系统 Logo 和主题色？</h3>
-<p>在 <code>~/.qwenpaw/branding/</code> 目录放置 <code>logo.json</code> 与 <code>theme.json</code>（详见产品 README「品牌与外观自定义」），重启服务生效。</p>
-</section>
-
-<footer>灵泽万川 · 智造云AIOS 2.2.0 — 本页面为内嵌离线文档</footer>
-</div>
-</body>
-</html>
-`
+  const pages = []
+  for (const [group, ids] of DOC_GROUPS) {
+    for (const id of ids) {
+      const file = join(DOCS_SRC, id + '.zh.md')
+      if (!existsSync(file)) continue
+      pages.push({ id, group, title: DOC_TITLES[id] || id })
+    }
+  }
+  const knownIds = new Set(pages.map(p => p.id))
+  const toc = DOC_GROUPS.map(([group, ids]) => {
+    const items = ids.filter(id => knownIds.has(id))
+    if (!items.length) return ''
+    return '<div class="nav-group"><div class="nav-title">' + group + '</div>' +
+      items.map(id => '<a href="#' + slugAnchor(id) + '">' + (DOC_TITLES[id] || id) + '</a>').join('') + '</div>'
+  }).join('')
+  const sections = pages.map(p => {
+    let md = readFileSync(join(DOCS_SRC, p.id + '.zh.md'), 'utf8')
+    md = md.replace(/^---\n[\s\S]*?\n---\n/, '') // frontmatter
+    const branded = applyBrand(md)
+    const anchorAlias = p.id === 'intro' ? ' id="tutorial"' : (p.id === 'faq' ? ' id="faq"' : '')
+    return '<section id="' + slugAnchor(p.id) + '"' + anchorAlias + '><h2>' + escapeHtml(p.title) + '</h2>' + mdToHtml(branded, knownIds) + '</section>'
+  }).join('\n')
+  const html = ['<!DOCTYPE html>',
+'<html lang="zh-CN">',
+'<head>',
+'<meta charset="utf-8">',
+'<meta name="viewport" content="width=device-width,initial-scale=1">',
+'<title>智造云AIOS 帮助中心</title>',
+'<style>',
+':root{--brand:' + t.primary + ';--brand-hover:' + t.primaryHover + ';--text:#1D2129;--muted:#4E5969;}',
+'*{box-sizing:border-box}',
+'body{margin:0;font-family:-apple-system,\'Segoe UI\',\'Microsoft YaHei\',sans-serif;background:linear-gradient(135deg,#F0F8FA 0%,#C4E2EC 100%);color:var(--text);line-height:1.75}',
+'.layout{display:flex;min-height:100vh}',
+'aside{width:230px;flex-shrink:0;background:#fff;padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid #D8E8EE}',
+'main{flex:1;max-width:900px;margin:0 auto;padding:28px 26px 80px}',
+'header.top{display:flex;align-items:center;gap:14px}',
+'header.top img{height:52px;width:auto}',
+'h1{font-size:24px;margin:0}',
+'.sub{color:var(--muted);margin:4px 0 20px}',
+'.quick{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}',
+'.quick a{color:var(--brand);text-decoration:none;padding:6px 14px;border:1px solid var(--brand);border-radius:18px;font-size:14px}',
+'.quick a:hover{background:var(--brand);color:#fff}',
+'.nav-group{margin-bottom:14px}',
+'.nav-title{font-size:12px;color:var(--muted);margin:8px 6px 4px;letter-spacing:1px}',
+'aside a{display:block;color:var(--text);text-decoration:none;font-size:13px;padding:4px 10px;border-radius:6px}',
+'aside a:hover{background:#EDF5F8;color:var(--brand)}',
+'section{background:#fff;border-radius:12px;padding:22px 28px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,60,80,.06)}',
+'h2{font-size:20px;border-left:4px solid var(--brand);padding-left:10px;margin-top:0}',
+'h3,h4,h5,h6{margin-top:1.2em}',
+'code{background:#EDF3F5;padding:2px 6px;border-radius:4px;font-size:13px}',
+'pre{background:#F5F8FA;border:1px solid #E0EBF0;border-radius:8px;padding:14px;overflow-x:auto}',
+'pre code{background:none;padding:0}',
+'table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}',
+'th,td{border:1px solid #E0EBF0;padding:8px 10px;text-align:left}',
+'th{background:#EDF5F8}',
+'blockquote{border-left:4px solid var(--brand);margin:12px 0;padding:8px 14px;background:#F5FAFC;color:var(--muted)}',
+'a{color:var(--brand)}',
+'.tag{display:inline-block;background:#FFF3E0;color:#D46B08;border-radius:4px;padding:2px 10px;font-size:13px;margin-left:8px}',
+'.todo{border:1px dashed var(--brand);border-radius:10px;padding:26px;text-align:center;color:var(--muted)}',
+'footer{color:var(--muted);font-size:13px;text-align:center;margin-top:30px}',
+'@media (max-width:860px){aside{display:none}}',
+'</style>',
+'</head>',
+'<body>',
+'<div class="layout">',
+'<aside>',
+'<header class="top"><img src="' + logoData + '" alt="智造云AIOS"></header>',
+toc,
+'</aside>',
+'<main>',
+'<h1>智造云AIOS 帮助中心</h1>',
+'<p class="sub">智造云AIOS 2.2.0（灵泽万川 · 企业级智能体操作系统） · 离线内嵌文档</p>',
+'<div class="quick">',
+'<a href="#tutorial">快速上手</a>',
+'<a href="#demo">视频教程</a>',
+'<a href="#changelog">更新日志</a>',
+'<a href="#faq">常见问题</a>',
+'</div>',
+'<section id="demo">',
+'<h2>视频教程 <span class="tag">待开发</span></h2>',
+'<div class="todo">🎬 视频教程正在制作中，敬请期待。<br>当前可先阅读左侧目录的文字版文档。</div>',
+'</section>',
+'<section id="changelog">',
+'<h2>更新日志</h2>',
+'<ul>',
+'<li>智造云AIOS 2.2.0：基于 QwenPaw 2.2.0 运行时；业务应用解耦按需安装；内置账户体系（单机与 Hub 多用户）；灵泽万川蓝绿品牌化主题；支持品牌目录自定义 Logo、主题色与登录页封面。</li>',
+'</ul>',
+'</section>',
+sections,
+'<footer>灵泽万川 · 智造云AIOS 2.2.0 — 本页面为内嵌离线文档</footer>',
+'</main>',
+'</div>',
+'</body>',
+'</html>',
+'' ].join('\n')
   writeAssetWithSiblings(join(consoleDir, 'aios-docs.html'), html)
-  console.log('Console 内嵌帮助文档已生成：aios-docs.html')
+  console.log('Console 内嵌帮助文档已生成：aios-docs.html（' + pages.length + ' 个文档章节）')
 }
-// 抑制宿主“试试桌面模式”新手引导：该引导每次进入应用都会弹出并带全屏遮罩
-// 拦截点击，且不记忆已完成状态。桌面模式仍可从宿主快捷设置进入，这里只隐藏
-// 打扰性的引导弹层与遮罩。
+
 function suppressConsoleTour (consoleDir) {
   const htmlPath = join(consoleDir, 'index.html')
   const html = readFileSync(htmlPath, 'utf8')
