@@ -1,5 +1,8 @@
+// 智造云 AIOS 2.2.0 发布门禁（极简形态：无捆绑业务应用）
+// 检查：跨平台入口完整性、版本锁一致性、脚本语法、控制台品牌化、
+// 打包/清理脚本自检。业务应用已剥离，其验收由各应用独立仓库自行承担。
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
@@ -8,150 +11,53 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const embedded = join(root, 'apps', 'zhizaoyunAIOS')
 const scripts = join(embedded, 'scripts')
 
-for (const removed of [
-  'apps/enterprise/package.json',
-  'apps/enterprise/server/index.js',
-  'pawapps/zhiyun-orders/plugin.json',
-  'pawapps/_shared/zhiyun_workspace.py',
-  'apps/zhizaoyunAIOS/scripts/cleanup-legacy.py',
-  'apps/zhizaoyunAIOS/scripts/set-logo.py',
-  'apps/zhizaoyunAIOS/scripts/verify-r0.mjs',
-  'apps/zhizaoyunAIOS/scripts/verify-s0.mjs',
-]) {
-  assert.equal(existsSync(join(root, removed)), false, `legacy source must be removed: ${removed}`)
-}
-
+// 1) 版本锁一致性（唯一运行时 = QwenPaw 2.2.0）
 const qwenpawLock = JSON.parse(readFileSync(join(embedded, 'qwenpaw.lock.json'), 'utf8'))
-assert.equal(qwenpawLock.schema_version, 1)
-assert.equal(qwenpawLock.package, 'qwenpaw')
 assert.equal(qwenpawLock.version, '2.2.0')
 assert.equal(qwenpawLock.ref, 'v2.2.0')
-assert.match(qwenpawLock.commit, /^[0-9a-f]{40}$/, 'QwenPaw must use a full commit SHA')
-const pawapps = JSON.parse(readFileSync(join(embedded, 'pawapps.lock.json'), 'utf8'))
-assert.equal(pawapps.schema_version, 1)
-assert.ok(pawapps.apps.length >= 2, 'release must include Data Studio and Order Studio')
-assert.equal(new Set(pawapps.apps.map(app => app.id)).size, pawapps.apps.length)
-for (const app of pawapps.apps) assert.match(app.commit, /^[0-9a-f]{40}$/, `${app.id} must use a full commit SHA`)
+assert.ok(!existsSync(join(embedded, 'pawapps.lock.json')), '2.2.0 极简形态不应存在 PawApp 锁')
 
-const catalog = JSON.parse(readFileSync(join(root, 'plugins', 'zhiyun-app-discovery', 'app_catalog.json'), 'utf8'))
-const catalogById = new Map(catalog.apps.map(app => [app.app_id, app]))
-for (const app of pawapps.apps) {
-  const entry = catalogById.get(app.id)
-  assert.ok(entry, `${app.id} must exist in App Discovery`)
-  assert.equal(entry.install_status, 'installed', `${app.id} must be reported as installed`)
-  assert.equal(entry.health, 'available', `${app.id} must be reported as available`)
-  assert.ok(entry.route, `${app.id} must expose a route`)
-}
-
-for (const pluginId of ['zhiyun-app-discovery', 'zhiyun-audit', 'zhiyun-data-core', 'zhiyun-logo']) {
-  const manifest = JSON.parse(readFileSync(join(root, 'plugins', pluginId, 'plugin.json'), 'utf8'))
-  assert.equal(catalogById.get(pluginId)?.version, manifest.version, `${pluginId} catalog version must match plugin.json`)
-}
-
-const start = readFileSync(join(scripts, 'start.mjs'), 'utf8')
-assert.ok(start.includes('for (const app of externalApps)'), 'launcher must install every locked PawApp')
-assert.ok(start.includes('cleanup-legacy.mjs'), 'launcher must use the Desktop-compatible cleanup')
-assert.ok(!start.includes('cleanup-legacy.py'), 'launcher must not depend on Python cleanup')
-assert.ok(!start.includes('8390'), 'launcher must not start the retired service')
-
-const sync = readFileSync(join(scripts, 'sync-pawapps.mjs'), 'utf8')
-assert.ok(sync.includes("'.pawapp-commit'"), 'sync must use a materialization marker')
-assert.ok(sync.includes("rmSync(join(staging, '.git')"), 'sync must remove Git metadata before install')
-assert.ok(sync.includes('AI_OS_OFFLINE') && sync.includes("'bundle', 'create'"), 'sync must support verified PawApp offline bundles')
-const cleanup = readFileSync(join(scripts, 'cleanup-legacy.mjs'), 'utf8')
-assert.ok(cleanup.includes('QWENPAW_WORKING_DIR') && cleanup.includes('COPAW_WORKING_DIR'), 'cleanup must follow the QwenPaw working directory contract')
-for (const pluginId of ['cospaw', 'ai_decision', 'team_chat']) {
-  assert.ok(cleanup.includes(pluginId), `cleanup must quarantine incompatible plugin: ${pluginId}`)
-}
-assert.ok(cleanup.includes('转为受控产品应用'), 'cleanup must document that qwenpaw-creator is now a controlled product app')
-assert.ok(existsSync(join(root, 'plugins', 'qwenpaw-creator', 'backend', 'main.py')), 'controlled creator app is missing')
-assert.ok(existsSync(join(root, 'plugins', 'zhiyun-logo', 'assets', 'default-logo.png')), 'packaged default logo is missing')
-
-const allowedToolTypes = new Set(['file', 'internal', 'network', 'shell'])
-for (const pluginFile of [
-  join(root, 'plugins', 'zhiyun-app-discovery', 'app_discovery_plugin.py'),
-  join(root, 'plugins', 'zhiyun-data-core', 'data_core_plugin.py'),
+// 2) 跨平台入口完整性（单机 8088 + Hub 8000）
+for (const entry of [
+  'setup-ai-os.ps1', 'setup-ai-os.sh', 'setup-hub.ps1', 'setup-hub.sh',
+  'start-ai-os.cmd', 'start-ai-os.sh', 'start-hub.cmd', 'start-hub.sh',
+  'diagnose-ai-os.cmd', 'diagnose-ai-os.sh', 'install-oneclick.cmd', 'install-oneclick.sh',
 ]) {
-  const source = readFileSync(pluginFile, 'utf8')
-  for (const match of source.matchAll(/tool_type="([^"]+)"/g)) {
-    assert.ok(allowedToolTypes.has(match[1]), `invalid QwenPaw governance type ${match[1]} in ${pluginFile}`)
-  }
-}
-
-for (const entry of ['setup-ai-os.ps1', 'setup-ai-os.sh', 'start-ai-os.cmd', 'start-ai-os.sh', 'diagnose-ai-os.cmd', 'diagnose-ai-os.sh', 'set-ai-os-logo.cmd', 'set-ai-os-logo.sh', 'check-ai-os.cmd', 'check-ai-os.sh']) {
   assert.ok(existsSync(join(root, entry)), `missing cross-platform entry: ${entry}`)
 }
 
+// 3) 登录体系：原生认证必须默认启用（QWENPAW_AUTH_ENABLED）
+const start = readFileSync(join(scripts, 'start.mjs'), 'utf8')
+assert.ok(start.includes('QWENPAW_AUTH_ENABLED'), 'start.mjs must enable native console auth')
+assert.ok(!start.includes('plugin'), 'start.mjs must not install bundled plugins (2.2.0 slim)')
+
+// 4) 业务应用剥离后不得残留脚本引用
+for (const banned of ['sync-pawapps', 'pawapp-materialized', 'seed-builtin-agents', 'health-report', 'set-logo', 'cleanup-legacy']) {
+  assert.ok(!existsSync(join(scripts, banned + '.mjs')), `leftover business script: ${banned}.mjs`)
+}
+assert.ok(!existsSync(join(root, 'plugins')), 'vendored plugins/ must be removed in 2.2.0 slim')
+
+// 5) 脚本检查（语法 + 自检）
 const commands = [
-  [process.execPath, [join(root, 'scripts', 'verify-project-plan.mjs')]],
   [process.execPath, ['--check', join(scripts, 'start.mjs')]],
   [process.execPath, ['--check', join(scripts, 'runtime-env.mjs')]],
-  [process.execPath, ['--check', join(scripts, 'sync-pawapps.mjs')]],
   [process.execPath, ['--check', join(scripts, 'doctor.mjs')]],
-  [process.execPath, ['--check', join(scripts, 'cleanup-legacy.mjs')]],
-  [process.execPath, [join(scripts, 'patch-console-ui.mjs'), '--check']],
-  [process.execPath, ['--check', join(scripts, 'set-logo.mjs')]],
-  [process.execPath, ['--check', join(scripts, 'health-report.mjs')]],
-  [process.execPath, [join(scripts, 'health-report.mjs'), '--check']],
-  [process.execPath, [join(scripts, 'verify-health-report.mjs')]],
-  [process.execPath, [join(scripts, 'set-logo.mjs'), '--check']],
-  [process.execPath, [join(scripts, 'sync-pawapps.mjs'), '--check']],
-  [process.execPath, [join(scripts, 'verify-deployment.mjs')]],
-  [process.execPath, [join(scripts, 'verify-no-git-boot.mjs')]],
+  [process.execPath, ['--check', join(scripts, 'ensure-workspace.mjs')]],
+  [process.execPath, ['--check', join(scripts, 'patch-console-ui.mjs')]],
   [process.execPath, [join(scripts, 'verify-runtime.mjs')]],
-  [process.execPath, [join(scripts, 'verify-pawapp-offline.mjs')]],
-  [process.execPath, [join(scripts, 'verify-maintenance.mjs')]],
+  [process.execPath, [join(scripts, 'patch-console-ui.mjs'), '--check']],
   [process.execPath, [join(root, 'scripts', 'release-prune.mjs'), '--check']],
+  [process.execPath, ['--check', join(root, 'scripts', 'make-release-package.mjs')]],
 ]
 for (const [command, args] of commands) {
   const result = spawnSync(command, args, { cwd: root, stdio: 'inherit' })
   assert.equal(result.status, 0, `release check failed: ${command} ${args.join(' ')}`)
 }
 
-const materialize = spawnSync(process.execPath, [join(scripts, 'sync-pawapps.mjs')], { cwd: root, stdio: 'inherit' })
-assert.equal(materialize.status, 0, 'locked PawApps must materialize from GitHub')
-const phase0 = spawnSync(process.execPath, [join(root, 'scripts', 'verify-phase0-controls.mjs')], { cwd: root, stdio: 'inherit' })
-assert.equal(phase0.status, 0, 'Phase 0 repository controls must stay complete')
-const phase1 = spawnSync(process.execPath, [join(root, 'scripts', 'verify-phase1-acceptance.mjs')], { cwd: root, stdio: 'inherit' })
-assert.equal(phase1.status, 0, 'Phase 1 PawApp acceptance candidate must stay consistent')
-const phase2 = spawnSync(process.execPath, [join(root, 'scripts', 'verify-phase2-acceptance.mjs')], { cwd: root, stdio: 'inherit' })
-assert.equal(phase2.status, 0, 'Phase 2 shared-foundations acceptance candidate must stay consistent')
+// 6) 品牌：控制台与 Hub 使用智造云 AIOS 标识；品牌资产在 branding/
+assert.ok(existsSync(join(root, 'branding', 'gear-logo.png')), 'branding/gear-logo.png missing')
+assert.ok(existsSync(join(root, 'branding', 'app.ico')), 'branding/app.ico missing')
+const patch = readFileSync(join(scripts, 'patch-console-ui.mjs'), 'utf8')
+assert.ok(patch.includes('智造云 AIOS'), 'patch-console-ui must brand as 智造云 AIOS')
 
-function pythonFiles (directory) {
-  return readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
-    const path = join(directory, entry.name)
-    return entry.isDirectory() ? pythonFiles(path) : (entry.name.endsWith('.py') ? [path] : [])
-  })
-}
-
-for (const app of pawapps.apps) {
-  const appRoot = join(embedded, 'runtime', 'pawapps', app.install_dir)
-  const manifest = JSON.parse(readFileSync(join(appRoot, 'plugin.json'), 'utf8'))
-  const entry = catalogById.get(app.id)
-  assert.equal(manifest.id, app.id, `${app.id} manifest ID mismatch`)
-  assert.equal(manifest.version, entry.version, `${app.id} catalog version must match materialized manifest`)
-  assert.equal(manifest.meta?.pawapp?.entry_page, entry.route, `${app.id} route must match materialized manifest`)
-  assert.equal(readFileSync(join(appRoot, '.pawapp-commit'), 'utf8').trim(), app.commit, `${app.id} marker must match lock`)
-  assert.equal(existsSync(join(appRoot, '.git')), false, `${app.id} install source must not contain Git metadata`)
-  for (const pluginFile of pythonFiles(join(appRoot, 'backend'))) {
-    const source = readFileSync(pluginFile, 'utf8')
-    for (const match of source.matchAll(/tool_type="([^"]+)"/g)) {
-      assert.ok(allowedToolTypes.has(match[1]), `invalid QwenPaw governance type ${match[1]} in ${pluginFile}`)
-    }
-  }
-}
-
-const python = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3')
-for (const plugin of ['zhiyun-app-discovery', 'zhiyun-audit', 'zhiyun-data-core', 'zhiyun-auth', 'qwenpaw-creator']) {
-  const result = spawnSync(python, ['-m', 'unittest', 'discover', '-s', join(root, 'plugins', plugin), '-p', 'test*.py', '-v'], { cwd: join(root, 'plugins', plugin), stdio: 'inherit' })
-  assert.equal(result.status, 0, `Python tests failed: ${plugin}`)
-}
-
-for (const app of pawapps.apps) {
-  const appRoot = join(embedded, 'runtime', 'pawapps', app.install_dir)
-  const result = spawnSync(python, ['-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test*.py', '-v'], { cwd: appRoot, stdio: 'inherit' })
-  assert.equal(result.status, 0, `Python tests failed: ${app.id}`)
-}
-
-console.log('AI-OS 发布门禁通过：纯QwenPaw架构、跨平台启动、版本锁、系统插件和全部锁定PawApp测试均正常。')
-
+console.log('智造云 AIOS 2.2.0 发布门禁通过：QwenPaw 2.2.0 唯一运行时、原生登录、跨平台入口（单机 8088 + Hub 8000）、控制台品牌化均正常。')

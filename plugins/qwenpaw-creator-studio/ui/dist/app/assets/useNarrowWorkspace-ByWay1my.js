@@ -1,2 +1,0 @@
-import{r}from"./vendor-DK2qpFup.js";import{Q as o}from"./index-CDz6NDxj.js";function d(){const t=o(e=>e.open),i=o(e=>e.width),[n,s]=r.useState(()=>typeof window>"u"?1920:window.innerWidth);return r.useEffect(()=>{const e=()=>s(window.innerWidth);return window.addEventListener("resize",e),()=>window.removeEventListener("resize",e)},[]),t&&n-i<720}function w(t){const[i,n]=r.useState(null);return r.useEffect(()=>{if(!t){n(null);return}n(document.querySelector("[data-detail-rail]"))},[t]),i}export{w as a,d as u};
-//# sourceMappingURL=useNarrowWorkspace-ByWay1my.js.map

@@ -51,14 +51,17 @@ try { run(`git worktree remove --force "${workDir}"`) } catch { /* 未注册时�
 run(`git worktree prune`)
 run(`git worktree add --detach "${workDir}" ${ref}`)
 
-// 版本清单：锁定的 PawApp 与运行时版本随包分发，供校验与诊断
-const lock = JSON.parse(readFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'pawapps.lock.json'), 'utf8'))
+// 版本清单：运行时版本随包分发，供校验与诊断
+const pawappsLockPath = join(workDir, 'apps', 'zhizaoyunAIOS', 'pawapps.lock.json')
+const pawappsLock = existsSync(pawappsLockPath)
+  ? JSON.parse(readFileSync(pawappsLockPath, 'utf8'))
+  : { apps: [] }
 const manifest = [
   'product: zhiyun-ai-os',
   `version: ${version}`,
   'qwenpaw: 2.2.0',
-  `locked_pawapps: ${lock.apps.length}`,
-  ...lock.apps.map(a => `  - ${a.id} @ ${a.commit}`),
+  `locked_pawapps: ${pawappsLock.apps.length}`,
+  ...pawappsLock.apps.map(a => `  - ${a.id} @ ${a.commit}`),
   `channel: ${offline ? 'offline-usb' : 'online-installer'}`,
   offline
     ? 'note: U盘离线安装包 —— 内嵌 Python 运行时缓存、锁定 PawApp 与便携 Node；解压后运行 install-usb.cmd'
@@ -70,7 +73,8 @@ if (offline) {
   // 1) 内嵌运行时缓存（Python 3.12 + uv + wheel 缓存）与锁定 PawApp
   const liveRuntime = join(root, 'apps', 'zhizaoyunAIOS', 'runtime')
   const pkgRuntime = join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime')
-  for (const part of ['cache', 'pawapps']) {
+  // 2.2.0 极简形态无捆绑 PawApp；pawapps 锁不存在时跳过物料嵌入
+  for (const part of existsSync(join(root, 'apps', 'zhizaoyunAIOS', 'pawapps.lock.json')) ? ['cache', 'pawapps'] : ['cache']) {
     const src = join(liveRuntime, part)
     if (!existsSync(src)) {
       console.error(`离线包缺少 ${src}；请先在本机完成一次在线安装。`)
@@ -173,7 +177,7 @@ if (offline) {
     '6. 内置数字员工：首次启动自动安装「客户方案工程师」智能体（含客户方案生成、',
     '   企业联系人深度挖掘两个技能与行业知识库），在左上角智能体切换器中选择即可。',
     '',
-    '常用入口：start-ai-os.cmd（启动）、check-ai-os.cmd（体检）、',
+    '常用入口：start-ai-os.cmd（启动）、diagnose-ai-os.cmd（诊断）、',
     'start-hub.cmd（局域网多用户，0.0.0.0:8000）。',
     '',
     '要求：Windows 10/11 x64；本包未内嵌 node.exe 时需 Node.js 20+。',

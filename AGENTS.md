@@ -1,33 +1,32 @@
-# 灵泽万川智造云 Development Rules
+# 智造云 AIOS Development Rules
 
 These rules apply to the entire repository. Read the PRD in
-`docs/product/AI-OS-PRD-V6.4-QwenPaw-PawApps.md`, the architecture documents,
-and the applicable progress ledger before changing product behavior.
+`docs/product/PRD-V7.0-AIOS-2.2.0.md` before changing product behavior.
 
 ## Architecture
 
-- QwenPaw 2.2.0 is the only runtime, desktop shell, and Agent container (upgraded from 2.1.0; lock entries must move in lockstep).
+- 智造云 AIOS 2.2.0 is a branded build of vanilla QwenPaw 2.2.0 plus
+  QwenPaw Hub (product decision 2026-09-04). This repository contains only
+  launchers, branding assets, setup scripts, docs, and the runtime version
+  lock — no bundled business applications.
+- All business apps (PawApps, vendored plugins, the Studio suite) have been
+  decoupled from this tree. They live in their own repositories and may return
+  later as standalone optional add-ons; do not re-vendor them here.
+- Login uses QwenPaw 2.2.0 native auth: the single-user console enforces
+  `QWENPAW_AUTH_ENABLED=true` (first user registers from the console; the
+  documented reset is deleting `auth.json` under the secret dir). Multi-user
+  login uses QwenPaw Hub accounts (`start-hub.cmd`, port 8000). Do not
+  reintroduce custom auth plugins.
+- Port 8088 is the single-user console; port 8000 is the Hub. Model provider
+  accounts (API keys) are managed centrally on the Hub server via its
+  credential vault and projected into user runtimes as environment variables.
+- Branding: user-visible QwenPaw strings in the console (single-user and Hub)
+  are replaced with 智造云 AIOS by `patch-console-ui.mjs`; brand assets live in
+  `branding/`. Protected technical identifiers (URLs, host APIs, paths) must
+  never be rebranded.
+- QwenPaw 2.2.0 is the only runtime (lock: `apps/zhizaoyunAIOS/qwenpaw.lock.json`);
+  lock entries must move in lockstep with product decisions.
 - Do not restore DeepSeek Harness, the enterprise service, or port 8390.
-- Port 8088 is the only service port for the single-user desktop deployment.
-- QwenPaw Hub (product decision 2026-09-03) is the sanctioned multi-user mode:
-  admins run it with `start-hub.cmd` on port 8000, and model provider accounts
-  (API keys) are managed centrally on the Hub server via its credential vault,
-  projected into each user runtime as environment variables. Do not reintroduce
-  any second application service besides the single-user 8088 app and the Hub.
-- Business features must be delivered as PawApps. This repository contains only
-  system plugins, launchers, the shared Workspace contract, and version locks.
-- Data Studio and Order Studio are independent repositories. Update their lock
-  entries here only after the corresponding external commit is available.
-- QwenPaw Creator ships as three controlled product apps installed with every
-  release (user-mandated lineup): the official studio edition
-  (`plugins/qwenpaw-creator-studio`, re-id'd from upstream), the
-  video-compression edition (`plugins/qwenpaw-creator`), and the smart
-  mixcut edition (`plugins/qwenpaw-creator-mixcut`).
-- Agent Kanban is vendored the same way (`plugins/agent-kanban`): the offline-USB
-  channel must ship both official apps from this tree, so they share the system
-  plugin install path instead of an external PawApp commit lock.
-- Do not edit generated installations under
-  `apps/zhizaoyunAIOS/runtime/pawapps`; change the owning repository instead.
 
 ## Branch and Scope Policy
 
@@ -45,15 +44,14 @@ and the applicable progress ledger before changing product behavior.
 
 ## Required Validation
 
-- Run `node scripts/verify-release.mjs` before delivery. All existing Python
-  tests, runtime semantic-health checks, lock checks, and maintenance checks
-  invoked by that gate must pass.
+- Run `node scripts/verify-release.mjs` before delivery. All lock, entry,
+  syntax, and branding checks invoked by that gate must pass.
 - Add focused backend, frontend-state, tool, database, and runtime-interface
   tests when the changed behavior needs them. A test count alone is not proof of
   business acceptance.
 - Preserve valid Windows (`.cmd`) and Linux (`.sh`) launch and maintenance
   entries. Report the impact on both platforms.
-- Keep manifest, catalog, lock, and progress-ledger versions consistent.
+- Keep manifest and lock versions consistent (system version 2.2.0).
 - If the full gate cannot run because of an external service or network limit,
   run all unaffected checks and report the exact limitation; do not report the
   gate as passed.

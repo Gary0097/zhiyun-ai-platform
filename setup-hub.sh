@@ -36,4 +36,10 @@ UV_PYTHON_PREFERENCE=only-managed \
   "$UV_CMD" pip install --python "$HUB_VENV/bin/python" "qwenpaw[hub]==$VERSION"
 
 "$HUB_QWENPAW" --version | grep -q "version $VERSION\$" || { echo "Hub 环境安装后版本校验失败" >&2; exit 1; }
+
+# Hub 控制台品牌化（智造云 AIOS 风格；失败不阻断，可重跑）
+HUB_CONSOLE="$HUB_VENV/lib/python3.12/site-packages/qwenpaw/console"
+if command -v node >/dev/null 2>&1 && [ -f "$EMBEDDED/scripts/patch-console-ui.mjs" ] && [ -f "$HUB_CONSOLE/index.html" ]; then
+  node "$EMBEDDED/scripts/patch-console-ui.mjs" --console-dir "$HUB_CONSOLE" || echo "提示：Hub 控制台品牌化未完成，可重跑 setup-hub.sh。"
+fi
 echo "QwenPaw Hub $VERSION 运行环境安装完成：$HUB_VENV"

@@ -55,4 +55,11 @@ try {
   foreach ($name in $previous.Keys) { Set-Item -Path "env:$name" -Value $previous[$name] }
 }
 if (-not (Test-HubRuntime)) { throw "QwenPaw Hub 运行环境安装后版本校验失败。" }
+
+# Hub 控制台品牌化（智造云 AIOS 风格；失败不阻断，可重跑）
+$PatchScript = Join-Path $ProjectRoot "apps\zhizaoyunAIOS\scripts\patch-console-ui.mjs"
+$HubConsole = Join-Path $HubVenv "Lib\site-packages\qwenpaw\console"
+if ((Test-Path $PatchScript) -and (Test-Path (Join-Path $HubConsole "index.html"))) {
+  try { & node $PatchScript --console-dir $HubConsole | Out-Null } catch { Write-Host "提示：Hub 控制台品牌化未完成，可重跑 setup-hub.ps1。" }
+}
 Write-Host "QwenPaw Hub $($Lock.version) 运行环境安装完成：$HubVenv"

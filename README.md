@@ -1,190 +1,76 @@
-# 灵泽万川智造云
+# 智造云 AIOS
 
-**运行在 QwenPaw 上的企业 AI 应用工作台**：一个统一桌面，一组面向真实岗位任务的业务应用，一条"导入数据 → 智能分析 → 审阅交付"的完整闭环。
+基于 **原版 QwenPaw 2.2.0 + QwenPaw Hub** 的智造云品牌发行版：开箱即用的企业智能体操作系统。
 
-[![release gate](https://github.com/Gary0097/zhiyun-ai-platform/actions/workflows/release-gate.yml/badge.svg)](https://github.com/Gary0097/zhiyun-ai-platform/actions/workflows/release-gate.yml)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+> 产品定义：[`docs/product/PRD-V7.0-AIOS-2.2.0.md`](docs/product/PRD-V7.0-AIOS-2.2.0.md)
 
 ## 项目介绍
 
-灵泽万川智造云 面向制造型企业的日常经营场景——销售、财务、人力、供应、售后、订单与数据分析——把这些岗位里"反复手工整理 Excel、反复写分析报告"的工作，交给应用内的智能体完成：
+智造云 AIOS 2.2.0 是一台"智造云牌"的 QwenPaw 智能体计算机：
 
-- **直接导入数据即可使用**：每个业务表格支持「下载导入模板 → 填入真实数据 → 导入 Excel/CSV → 一键分析」，导入内容带来源标记，可继续手工修改。
-- **结构化结果而非聊天文字**：每次分析产出 KPI 卡片、明细表、方法标签与 Trace 的**可审阅工件**，由具名审阅人接受/驳回后才可导出。
-- **应用内真实智能体对话**：每个应用内置"问 Agent"，接入本地或云端大模型（OpenAI 兼容接口），流式回答基于本应用真实工具执行，不凭空编造。
-- **数据环境双态**：统一数据中心区分「演示 / 正式」两套数据环境，互不污染；支持批次管理与撤销。
-- **安全底座**：全部 Agent 工具调用进入哈希链审计；系统盘递归删除、磁盘格式化、破坏性 Git 重写、整库整表删除等灾难操作被硬阻断。
-
-## 应用一览
-
-| 应用 | 版本 | 能力 |
-| --- | --- | --- |
-| 企业数据分析中心 Data Studio | 0.9.2 | 数据接入、订单看板、交付风险预警、指标趋势、问数报告 |
-| 智能订单处理中心 Order Studio | 0.7.2 | 客户订单格式化、多模板适配、合同要素提取与一致性验证、异常流程 |
-| 智能销售中心 | 0.3.0 | 销售 BI、RFM 客户分层、业绩达成统计 |
-| 智能财务中心 | 0.3.0 | 报销审核、财务看板、成本预测 |
-| 智能人力中心 | 0.3.0 | 权限建议、通讯录检索、审批路径推荐、员工关怀、人力分析 |
-| 智能供应中心 | 0.3.0 | 供应商评估、智能补货、供应链风险监控 |
-| 智能售后服务中心 | 0.3.0 | 咨询应答、意图识别、售后工单派单、知识库构建 |
-| 系统集成中心 Integration Hub | 0.2.1 | 文件/API/数据库连接器、字段映射、写入统一数据中心 |
-
-系统插件：登录与权限（zhiyun-auth）、统一数据中心（zhiyun-data-core）、安全审计中心（zhiyun-audit）、应用与项目中心（zhiyun-app-discovery）、企业环境初始化器（zhiyun-enterprise-seeder）、品牌 Logo。
+- **原版内核**：QwenPaw 2.2.0（智能体运行时 + 控制台 + Agent 容器），不改内核行为，随锁文件整体升级
+- **原生登录**：单机用 QwenPaw 原生认证（首个用户控制台注册）；多用户用 QwenPaw Hub 账号体系
+- **模型账号集中管理**：管理员在 Hub 服务器端凭据保险库统一录入供应商 API Key，按用户运行环境自动注入——员工全程零接触 Key
+- **智造云品牌**：控制台与 Hub 界面全套"智造云 AIOS"标识与齿轮 Logo
+- **无捆绑业务应用**：应用体系与系统解耦，独立交付、可选加装（历史 19 个业务应用见各应用仓库）
+- **数据留在本机**：工作区、数据库、凭据全部保存在安装目录（云端模型的对话内容会发送给所选供应商，机密场景请用 Ollama/LM Studio 本地模型）
 
 ## 快速运行
 
-> **登录账号：`admin` / `ZhizaoYun@2026`**（详见下方说明）
+### 单机模式（端口 8088）
 
-### 方式一：一键安装包（推荐）
+```cmd
+:: 首次：安装运行环境（需 Node.js 20+）
+install-oneclick.cmd
 
-从 GitHub Releases 下载一键安装包并解压：
-
-**https://github.com/Gary0097/zhiyun-ai-platform/releases/latest**
-
-- Windows：解压后双击 **`install-oneclick.cmd`** —— 自动安装运行时与锁定应用、启动服务并打开浏览器
-- Ubuntu / Linux：`bash install-oneclick.sh`
-- 包内含 `INSTALLER-VERSION.txt` 与 `.sha256` 校验文件；安装器按锁定的正式提交拉取运行时与应用
-
-### 方式二：源码安装
-
-#### 前置要求
-
-- Windows 10/11 x64 或 Ubuntu 22.04/24.04 LTS x86_64
-- [Node.js](https://nodejs.org) ≥ 20、Git
-- 磁盘约 4 GB（QwenPaw 运行时与锁定应用自动下载）
-- 可选：任意 OpenAI 兼容的大模型服务（LM Studio / Ollama / 云端 API），用于应用内 Agent 对话
-
-### Windows
-
-```powershell
-git clone https://github.com/Gary0097/zhiyun-ai-platform.git  # 或直接使用一键安装包
-cd zhiyun-ai-platform
-.\setup-ai-os.ps1      # 首次安装：自举运行时并物化锁定的应用
-.\start-ai-os.cmd      # 启动（唯一入口，服务端口 8088）
+:: 之后：启动
+start-ai-os.cmd
 ```
 
-### Ubuntu / Linux
+打开 http://127.0.0.1:8088 → 注册首个登录账号 → 设置 → 模型 配置供应商 → 开始对话。
 
-```bash
-git clone https://github.com/Gary0097/zhiyun-ai-platform.git
-cd zhiyun-ai-platform
-./setup-ai-os.sh
-./start-ai-os.sh
+### Hub 多用户模式（端口 8000，推荐团队使用）
+
+```cmd
+start-hub.cmd   :: 首次自动安装 Hub 环境（qwenpaw[hub]==2.2.0）
 ```
 
-浏览器打开 **http://127.0.0.1:8088**。
-
-> **默认管理员账号：`admin` / `ZhizaoYun@2026`**
-> ⚠️ 首次登录后请立即在右下角用户卡 → 「账号管理」中修改密码；正式部署务必更换。
-
-**默认管理员账号：`admin` / `ZhizaoYun@2026`**（⚠️ 首次登录后请立即在「账号管理」中修改密码；正式部署务必更换）。
-
-离线部署：预置 `AI_OS_OFFLINE=1` 环境变量后执行安装脚本，使用提前下载的依赖缓存完成无公网安装，详见 [运维文档](docs/operations/QUICKSTART.md)。
-
-### 配置模型（启用 Agent 对话）
-
-1. 打开 `设置 → 模型`，选择任意 OpenAI 兼容 Provider（内置 LM Studio、Ollama、DashScope、OpenRouter 等预设）。
-2. 填入服务地址与 API Key，发现模型后设为默认。
-3. 之后任意应用内点「问 Agent」即为真实流式对话。未配置模型时，应用的分析功能与快捷指令不受影响。
-
-## 5 分钟体验动线
-
-1. 登录后从左侧「应用」打开 **智能销售中心**。
-2. 在「销售BI分析」点 **下载导入模板**，填入你的订单数据（或用仓库 `docs/qa/demo-data/` 里的示例文件）。
-3. 点 **导入 Excel/CSV** 上传 → 表格填充并显示来源标签。
-4. 点 **生成销售BI** → 得到营收/销量/客单价 KPI、月度趋势与 Top 排名。
-5. 输入审阅人姓名 → **接受** → **导出**。
-6. 点右上角 **问 Agent**，直接用自然语言提问（如"分析本月销售趋势"），观察流式回答。
-
-完整演示剧本与验收清单见 [客户演示与验收指南](docs/operations/DEMO-ACCEPTANCE-GUIDE-2026-08-26.md)。
+1. 打开 http://127.0.0.1:8000 注册管理员（首个账号）
+2. 管理界面「凭据管理」录入模型供应商 Key（如 `DASHSCOPE_API_KEY`）
+3. 「用户管理」创建员工账号；关闭自助注册（`hub.yaml` → `registration.enabled: false`）
+4. 员工访问 `http://<服务器IP>:8000` 登录，直接选择模型使用
 
 ## 架构
 
-```text
-用户 / Agent
-    │
-QwenPaw 2.2.0（唯一宿主；桌面单机端口 8088，多用户 Hub 端口 8000）
-    ├── Workspace 文件 / 知识库 / 会话
-    ├── 系统插件（登录 · 数据核心 · 审计 · 应用中心 · 企业初始化器 · 品牌）
-    └── 锁定的业务 PawApps（独立仓库 · 40 位提交锁定 · 可安装/升级/回滚）
+```
+智造云 AIOS 2.2.0
+├─ QwenPaw 2.2.0（原版内核；版本锁 apps/zhizaoyunAIOS/qwenpaw.lock.json）
+│  ├─ 单机控制台  http://127.0.0.1:8088（原生登录 QWENPAW_AUTH_ENABLED）
+│  └─ QwenPaw Hub http://<host>:8000（多用户账号 + 凭据保险库集中管 Key）
+├─ 品牌化 patch-console-ui.mjs（智造云 AIOS 文案 + branding/ 资产）
+└─ 启动/安装脚本（Windows .cmd + Linux .sh 双平台）
 ```
 
-- 所有业务应用使用统一 Workspace 数据核心，通过稳定数据契约共享数据
-- 每个应用独立 GitHub 仓库交付，本仓库以 `pawapps.lock.json` 锁定正式合并提交
-- 数据库、日志、知识文件全部落在 Workspace，升级与回滚不触碰用户数据
-- 不要直接修改 `apps/zhizaoyunAIOS/runtime/pawapps` 或 `~/.qwenpaw/plugins` 中的安装副本；变更请在对应应用仓库进行后更新锁文件
+本仓库只包含：启动器、品牌资产、安装脚本、文档与版本锁。
+**不含任何业务应用**——应用以独立仓库存在，后续可选加装。
 
-## 国内镜像（Gitee）
+## 常用入口
 
-- **https://gitee.com/gary0097/zhiyun-ai-platform** —— 无需翻墙即可克隆/下载
-- 一键安装包：[Gitee Release v1.0.0](https://gitee.com/gary0097/zhiyun-ai-platform/releases/v1.0.0)
-
-## 生产部署
-
-单实例 = 单企业（数据完全隔离）。多企业部署时每台机器/容器独立运行一套。
-
-### 企业实例配置
-
-1. 首次启动后用 `admin` 登录 → 右下角用户卡 → **系统设置**：上传企业 Logo 与登录封面、修改企业名称
-2. **账号管理**：创建各部门成员账号（绑定智能体、数据范围=本部门时需填写部门）
-3. 模型配置：设置 → 模型 → 配置企业自有的大模型服务（OpenAI 兼容接口均可）
-
-### 备份与恢复
-
-- 数据全部落在 `apps/zhizaoyunAIOS/workspace/`（SQLite + 文件），升级/回滚不触碰
-- 统一数据中心内建备份：打开数据中心 → 健康与备份 → 创建备份；恢复前自动创建安全备份
-- 整机备份：停服后打包 `workspace/` 目录即可
-
-### 监控与诊断
-
-- `http://127.0.0.1:8088/api/version` 服务版本探活
-- `http://127.0.0.1:8088/api/zhiyun-data-core/health` 数据核心健康
-- 安全审计中心（`/apps/zhiyun-audit`）：全部 Agent 工具调用可查，哈希链防篡改
-
-### 常见问题
-
-| 现象 | 处理 |
+| 命令 | 用途 |
 | --- | --- |
-| 页面 500 / Internal Server Error | 确认已 `git pull` 到 v1.0.1+（v1.0.1 修复了全新安装目录缺失） |
-| 模型连接失败 | 设置 → 模型 → 测试连接；隧道地址变更后需更新 base_url |
-| 端口 8088 被占 | 修改 `start.mjs` 中的端口或停用占用进程 |
-
-## 相关仓库
-
-| 仓库 | 说明 |
-| --- | --- |
-| [zhiyun-data-studio](https://github.com/Gary0097/zhiyun-data-studio) | 企业数据分析中心 |
-| [zhiyun-order-studio](https://github.com/Gary0097/zhiyun-order-studio) | 智能订单处理中心 |
-| [zhiyun-sales-studio](https://github.com/Gary0097/zhiyun-sales-studio) | 智能销售中心 |
-| [zhiyun-finance-studio](https://github.com/Gary0097/zhiyun-finance-studio) | 智能财务中心 |
-| [zhiyun-people-studio](https://github.com/Gary0097/zhiyun-people-studio) | 智能人力中心 |
-| [zhiyun-supply-studio](https://github.com/Gary0097/zhiyun-supply-studio) | 智能供应中心 |
-| [zhiyun-service-studio](https://github.com/Gary0097/zhiyun-service-studio) | 智能售后服务中心 |
-| [zhiyun-integration-hub](https://github.com/Gary0097/zhiyun-integration-hub) | 系统集成中心 |
+| `start-ai-os.cmd/.sh` | 启动单机服务（8088） |
+| `start-hub.cmd/.sh` | 启动多用户 Hub（8000，首次自动装环境） |
+| `setup-ai-os.ps1/.sh` | 安装/修复单机运行环境 |
+| `setup-hub.ps1/.sh` | 安装/修复 Hub 运行环境 |
+| `diagnose-ai-os.cmd/.sh` | 启动诊断 |
+| `node scripts/verify-release.mjs` | 发布门禁 |
 
 ## 文档
 
-- 使用说明书：[docs/user-manual/README.md](docs/user-manual/README.md)（图文版，含独立 HTML 分发文件）
-- 产品需求：[AI-OS PRD V6.4](docs/product/AI-OS-PRD-V6.4-QwenPaw-PawApps.md)
-- 架构：[QwenPaw-only 目标架构](docs/architecture/QWENPAW-ONLY-ARCHITECTURE.md)
-- 部署运维：[快速部署](docs/operations/QUICKSTART.md) · [PawApp 升级策略](docs/operations/PAWAPP-UPGRADE-POLICY.md)
-- 项目计划：[PROJECT-PLAN](docs/product/PROJECT-PLAN.md) · [双态运行体系](docs/product/AI-OS-SIMULATION-DUAL-STATE-VISION.md)
-- 质量证据：`docs/qa/`（QA 报告、E2E 探测结果与截图）
+- 产品需求：[PRD V7.0（智造云 AIOS 2.2.0）](docs/product/PRD-V7.0-AIOS-2.2.0.md)
+- 使用说明：[docs/user-manual](docs/user-manual/README.md)（v1.x 手册，2.2.0 版重写中）
+- QwenPaw 官方文档：https://qwenpaw.agentscope.io/
 
-## 开发与验收
+## 国内镜像（Gitee）
 
-```bash
-node scripts/verify-release.mjs    # 发布门禁：架构/版本锁/启动器/全部 PawApp 测试
-node scripts/verify-project-plan.mjs
-```
-
-发布门禁会验证纯 QwenPaw 架构、版本锁、启动器、内外部 PawApp 版本与治理类型、全部 Python 测试和 Windows/Linux 双平台入口。遗留架构的移除记录见 [迁移说明](docs/migration/LEGACY_REMOVAL.md)。
-
-贡献流程：一个 issue 一个分支一个 PR；外部应用先在其独立仓库合并，再回本仓库更新锁提交。
-
-## 当前状态
-
-31 项产品能力：13 项已交付、17 项待用户实机验收、1 项（知识库）开发中。五大业务中心已完成真实 Agent 对话接入（0.3.0）；RBAC 服务端强制路由、Excel 持久化导入通道、双平台干净环境自动化验收仍在推进，详见 [PROJECT-PLAN](docs/product/PROJECT-PLAN.md)。
-
-## 许可证
-
-[Apache 2.0](LICENSE)
+仓库同步于 Gitee：`zhiyun-ai-platform`（发布渠道见 dist/ 与 Releases）。
