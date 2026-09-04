@@ -191,9 +191,21 @@ function selectedLogo () {
   return { path: gearLogo, mime: 'image/png', source: '内置智造云 AIOS 齿轮 Logo' }
 }
 
+// 读取 PNG IHDR 的真实宽高，让生成的 SVG 保持 Logo 原始纵横比。
+// 若统一用 512x512 方形 viewBox，横版字标会被大块透明边距居中，
+// 在顶栏/头像等方形上下文里显得极小（曾导致“Logo 看不见/被压扁”）。
+function pngSize (file) {
+  const buf = readFileSync(file)
+  if (buf.length > 24 && buf[12] === 0x49 && buf[13] === 0x48 && buf[14] === 0x44 && buf[15] === 0x52) {
+    return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) }
+  }
+  return { w: 512, h: 512 }
+}
+
 function logoSvg (logo) {
   const encoded = readFileSync(logo.path).toString('base64')
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><image href="data:${logo.mime};base64,${encoded}" width="512" height="512" preserveAspectRatio="xMidYMid meet"/></svg>\n`
+  const { w, h } = logo.mime === 'image/png' ? pngSize(logo.path) : { w: 512, h: 512 }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><image href="data:${logo.mime};base64,${encoded}" width="${w}" height="${h}"/></svg>\n`
 }
 
 // 依据项目运行环境目录推导常见 venv 布局下的 QwenPaw Console 路径，避免依赖
@@ -398,7 +410,7 @@ function themeCss (theme) {
     // 登录页 Logo 放大（上游内联 48px）
     `img[style*="height: 48px"]{height:${theme.loginLogoHeight}px !important;width:auto !important;}`,
     // 顶栏 Logo 放大（上游 16px 的 CSS Module 类，按类名片段匹配以跨哈希稳定命中）
-    `img[class*="logoImg"]{height:40px !important;width:auto !important;max-width:none !important;}`,
+    `img[class*="logoImg"]{height:32px !important;width:auto !important;max-width:none !important;}`,
   ]
   if (theme.loginBg) {
     const data = 'data:image/' + (theme.loginBg.endsWith('.png') ? 'png' : 'jpeg') + ';base64,' + readFileSync(theme.loginBg).toString('base64')
