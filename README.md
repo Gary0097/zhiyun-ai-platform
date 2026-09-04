@@ -4,6 +4,18 @@
 
 > 产品定义：[`docs/product/PRD-V7.0-AIOS-2.2.0.md`](docs/product/PRD-V7.0-AIOS-2.2.0.md)
 
+## 品牌与外观自定义
+
+控制台的品牌（Logo、主题色、登录页封面）在每次启动时由 `apps/zhizaoyunAIOS/scripts/patch-console-ui.mjs`
+应用到 QwenPaw 控制台。默认使用仓库 `branding/` 下的灵泽万川资产；终端用户可在
+Workspace 品牌目录（`~/.qwenpaw/branding/`）放置以下文件进行整机自定义，重启服务后生效：
+
+- `logo.json` — 自定义 Logo：`{"path": "~/.qwenpaw/branding/my-logo.png", "mime": "image/png"}`
+  （替换 favicon、启动页、登录页与聊天头像全部默认 Logo）；
+- `theme.json` — 自定义主题与封面：
+  `{"primary": "#0086AD", "primaryHover": "#00A3C4", "primaryActive": "#00688A", "loginLogoHeight": 88, "loginBg": "cover.jpg"}`
+  （`loginBg` 为 branding 目录内任意 jpg/png，替换登录页背景渐变为封面图）。
+
 ## 项目介绍
 
 智造云 AIOS 2.2.0 是一台"智造云牌"的 QwenPaw 智能体计算机：

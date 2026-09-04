@@ -10,7 +10,8 @@ import { resolveRuntime } from './runtime-env.mjs'
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
 const assetsRoot = join(scriptsRoot, '..', '..', '..', 'branding')
 const gearLogo = join(assetsRoot, 'gear-logo.png')
-const brandLogo = join(assetsRoot, 'default-logo.png')
+const brandLogo = join(assetsRoot, 'brand-logo.png')
+const defaultLogo = join(assetsRoot, 'default-logo.png')
 
 const REPLACEMENTS = [
   {
@@ -147,9 +148,9 @@ function selectedLogo () {
       return { path, mime, source: 'Workspace 自定义 Logo' }
     }
   } catch {}
-  // 默认使用灵泽万川品牌 Logo（横版字标）；缺失时回退内置齿轮 Logo。
-  if (existsSync(brandLogo) && statSync(brandLogo).size > 0) {
-    return { path: brandLogo, mime: 'image/png', source: '内置灵泽万川品牌 Logo' }
+  // 默认使用灵泽万川品牌 Logo（上传版优先，其次旧字标）；缺失时回退齿轮 Logo。
+  for (const [path, source] of [[brandLogo, '内置灵泽万川品牌 Logo（上传版）'], [defaultLogo, '内置灵泽万川品牌 Logo'], [gearLogo, '内置智造云 AIOS 齿轮 Logo']]) {
+    if (existsSync(path) && statSync(path).size > 0) return { path, mime: 'image/png', source }
   }
   return { path: gearLogo, mime: 'image/png', source: '内置智造云 AIOS 齿轮 Logo' }
 }
@@ -313,31 +314,75 @@ function syncConsoleLogo (consoleDir) {
   console.log(`Console favicon、启动页 Logo 与默认 Logo 资产已同步为${logo.source}。`)
 }
 
-// 注入金蝶风格主题（企业蓝）样式，覆盖 antd 默认主色，使登录页与整体控件
-// 恢复蓝系企业风格。仅做颜色层覆盖，不改变布局与交互。
-const KINGDEE_BLUE = '#0052D9'
-const KINGDEE_BLUE_HOVER = '#2B6FE3'
-function applyKingdeeTheme (consoleDir) {
+// 注入灵泽万川蓝绿主题。console 全站配色由 .css-var-r0 上的 antd CSS 变量驱动
+// （上游主色为橙色 --qwenpaw-color-primary:#ff7f16），因此用更高优先级的选择器
+// 覆盖主色系变量 + 登录页背景/Logo 尺寸，实现整体换肤。
+// 主题可通过 Workspace 的 branding/theme.json 自定义：
+// { "primary": "#0086AD", "primaryHover": "#00A3C4", "primaryActive": "#00688A",
+//   "loginLogoHeight": 88, "loginBg": "cover.png"（branding 目录内的图片文件名） }
+const THEME_DEFAULTS = { primary: '#0086AD', primaryHover: '#00A3C4', primaryActive: '#00688A', loginLogoHeight: 88, loginBg: '' }
+function brandTheme () {
+  const branding = join(workingDir(), 'branding')
+  try {
+    const cfg = JSON.parse(readFileSync(join(branding, 'theme.json'), 'utf8'))
+    const hex = v => typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v) ? v : null
+    const theme = {
+      primary: hex(cfg.primary) || THEME_DEFAULTS.primary,
+      primaryHover: hex(cfg.primaryHover) || THEME_DEFAULTS.primaryHover,
+      primaryActive: hex(cfg.primaryActive) || THEME_DEFAULTS.primaryActive,
+      loginLogoHeight: Number.isFinite(cfg.loginLogoHeight) && cfg.loginLogoHeight >= 32 && cfg.loginLogoHeight <= 240 ? cfg.loginLogoHeight : THEME_DEFAULTS.loginLogoHeight,
+      loginBg: ''
+    }
+    if (typeof cfg.loginBg === 'string' && cfg.loginBg && !cfg.loginBg.includes('..')) {
+      const p = join(branding, cfg.loginBg)
+      if (existsSync(p) && statSync(p).size > 0) theme.loginBg = p
+    }
+    return theme
+  } catch {}
+  return { ...THEME_DEFAULTS }
+}
+
+function themeCss (theme) {
+  const p = theme.primary, h = theme.primaryHover, a = theme.primaryActive
+  // 由主色推导的浅色底/描边（保持 antd 层级关系）
+  const bg = '#E8F5F9', bgHover = '#CDEAF2', border = '#8FD1E0', borderHover = '#5FBBD0'
+  const lines = [
+    `:root{--zy-brand:${p};}`,
+    `:root,html .css-var-r0{`,
+    `--qwenpaw-color-primary:${p};--qwenpaw-color-primary-hover:${h};--qwenpaw-color-primary-active:${a};`,
+    `--qwenpaw-color-primary-bg:${bg};--qwenpaw-color-primary-bg-hover:${bgHover};`,
+    `--qwenpaw-color-primary-border:${border};--qwenpaw-color-primary-border-hover:${borderHover};`,
+    `--qwenpaw-color-primary-text:${p};--qwenpaw-color-primary-text-hover:${h};--qwenpaw-color-primary-text-active:${a};`,
+    `--qwenpaw-color-link:${p};--qwenpaw-color-link-hover:${h};--qwenpaw-color-link-active:${a};`,
+    `--qwenpaw-input-active-border-color:${p};--qwenpaw-input-hover-border-color:${h};`,
+    `--qwenpaw-input-active-shadow:0 0 0 2px ${p}1a;--qwenpaw-control-outline:${p}1a;`,
+    `--qwenpaw-control-item-bg-active:${bg};--qwenpaw-control-item-bg-active-hover:${bgHover};`,
+    `--qwenpaw-button-group-border-color:${p};}`,
+    `a{color:${p};}`,
+    // 登录页 Logo 放大（上游内联 48px）
+    `img[style*="height: 48px"]{height:${theme.loginLogoHeight}px !important;width:auto !important;}`,
+  ]
+  if (theme.loginBg) {
+    const data = 'data:image/' + (theme.loginBg.endsWith('.png') ? 'png' : 'jpeg') + ';base64,' + readFileSync(theme.loginBg).toString('base64')
+    lines.push(`div[style*="245, 247, 250"],div[style*="245,247,250"]{background:url("${data}") center/cover no-repeat !important;}`)
+  } else {
+    lines.push(`div[style*="245, 247, 250"],div[style*="245,247,250"]{background:linear-gradient(135deg,#F0F8FA 0%,#C4E2EC 55%,#9FCFDF 100%) !important;}`)
+  }
+  return lines.join(String.fromCharCode(10))
+}
+
+function applyBrandTheme (consoleDir) {
   const htmlPath = join(consoleDir, 'index.html')
-  const html = readFileSync(htmlPath, 'utf8')
-  const styleId = 'zy-kingdee-theme'
-  if (html.includes(`id="${styleId}"`)) return
-  const css = [
-    `:root{--zy-brand:${KINGDEE_BLUE};}`,
-    `.ant-btn-primary,.qwenpaw-btn-primary{background:${KINGDEE_BLUE} !important;border-color:${KINGDEE_BLUE} !important;}`,
-    `.ant-btn-primary:not(:disabled):hover,.qwenpaw-btn-primary:not(:disabled):hover{background:${KINGDEE_BLUE_HOVER} !important;border-color:${KINGDEE_BLUE_HOVER} !important;}`,
-    `a{color:${KINGDEE_BLUE};}`,
-    `.ant-switch-checked,.qwenpaw-switch-checked{background:${KINGDEE_BLUE} !important;}`,
-    `.ant-checkbox-checked .ant-checkbox-inner,.qwenpaw-checkbox-checked .qwenpaw-checkbox-inner{background-color:${KINGDEE_BLUE} !important;border-color:${KINGDEE_BLUE} !important;}`,
-  ].join('\n')
-  const style = `<style id="${styleId}">${css}</style>`
+  let html = readFileSync(htmlPath, 'utf8')
+  html = html.replace(/<style id="zy-(kingdee-theme|brand-theme)">[\s\S]*?<\/style>/g, '')
+  const style = `<style id="zy-brand-theme">${themeCss(brandTheme())}</style>`
   const nextHtml = html.replace(/<\/head>/, style + '</head>')
   if (nextHtml === html) {
-    warn('未找到 </head>，无法注入金蝶风格主题。')
+    warn('未找到 </head>，无法注入品牌主题。')
     return
   }
   writeAssetWithSiblings(htmlPath, nextHtml)
-  console.log('Console 已注入金蝶风格（企业蓝）主题样式。')
+  console.log('Console 已注入灵泽万川蓝绿主题样式。')
 }
 // 抑制宿主“试试桌面模式”新手引导：该引导每次进入应用都会弹出并带全屏遮罩
 // 拦截点击，且不记忆已完成状态。桌面模式仍可从宿主快捷设置进入，这里只隐藏
@@ -461,7 +506,7 @@ if (cacheBust.changed) {
   console.log('Console index.html 已移除主 bundle ?v= 查询参数（避免 console 双重执行）')
 }
 syncConsoleLogo(consoleDir)
-applyKingdeeTheme(consoleDir)
+applyBrandTheme(consoleDir)
 suppressConsoleTour(consoleDir)
 
 
