@@ -6,7 +6,7 @@
 //   目标机器解压后运行 install-usb.cmd 即可，全程无需联网。
 // --no-prune：跳过 dist 历史产物清理（默认打包成功后只保留最近 2 个版本）。
 import { createHash } from 'node:crypto'
-import { execSync, execFileSync } from 'node:child_process'
+import { execSync, execFileSync, spawnSync } from 'node:child_process'
 import { mkdirSync, copyFileSync, readFileSync, writeFileSync, existsSync, statSync, rmSync, cpSync, readdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -51,14 +51,19 @@ try { run(`git worktree remove --force "${workDir}"`) } catch { /* 未注册时�
 run(`git worktree prune`)
 run(`git worktree add --detach "${workDir}" ${ref}`)
 
-// 版本清单：锁定的 PawApp 与运行时版本随包分发，供校验与诊断
-const lock = JSON.parse(readFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'pawapps.lock.json'), 'utf8'))
+// 版本清单：运行时版本随包分发，供校验与诊断
+const pawappsLockPath = join(workDir, 'apps', 'zhizaoyunAIOS', 'pawapps.lock.json')
+const pawappsLock = existsSync(pawappsLockPath)
+  ? JSON.parse(readFileSync(pawappsLockPath, 'utf8'))
+  : { apps: [] }
+// 运行时版本以被打包 ref 的锁为准（--ref 重建旧版本时清单不得错报）
+const qwenpawLock = JSON.parse(readFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'qwenpaw.lock.json'), 'utf8'))
 const manifest = [
   'product: zhiyun-ai-os',
   `version: ${version}`,
-  'qwenpaw: 2.1.0',
-  `locked_pawapps: ${lock.apps.length}`,
-  ...lock.apps.map(a => `  - ${a.id} @ ${a.commit}`),
+  `qwenpaw: ${qwenpawLock.version}`,
+  `locked_pawapps: ${pawappsLock.apps.length}`,
+  ...pawappsLock.apps.map(a => `  - ${a.id} @ ${a.commit}`),
   `channel: ${offline ? 'offline-usb' : 'online-installer'}`,
   offline
     ? 'note: U盘离线安装包 —— 内嵌 Python 运行时缓存、锁定 PawApp 与便携 Node；解压后运行 install-usb.cmd'
@@ -67,10 +72,25 @@ const manifest = [
 writeFileSync(join(workDir, 'INSTALLER-VERSION.txt'), manifest.join('\n') + '\n', 'utf8')
 
 if (offline) {
+  // -1) Hub 依赖预装校验：qwenpaw[hub] 的 wheel 只有在本机装配过 Hub venv
+  //     后才会进入 uv 缓存；仅装过单机版就打离线包会让目标机器 Hub 离线安装失败
+  const hubExe = join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'qwenpaw-hub', 'venv', 'Scripts', 'qwenpaw.exe')
+  const hubProbe = existsSync(hubExe)
+    ? spawnSync(hubExe, ['hub', '--help'], { stdio: 'ignore', timeout: 60000 })
+    : { status: 1 }
+  if (hubProbe.status !== 0) {
+    console.error('离线包要求本机 Hub 运行环境可执行 qwenpaw hub（依赖才会完整进入缓存）；请先成功启动一次 Hub 再打包。')
+    process.exit(1)
+  }
+  // 0) 离线包标记：start-hub.cmd/sh 据此对 Hub 运行环境使用离线安装，
+  //    避免源码/在线安装被误设离线模式后首次启动失败
+  mkdirSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime', 'cache'), { recursive: true })
+  writeFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime', 'cache', 'OFFLINE-PACKAGE'), 'offline-usb' + String.fromCharCode(10), 'utf8')
   // 1) 内嵌运行时缓存（Python 3.12 + uv + wheel 缓存）与锁定 PawApp
   const liveRuntime = join(root, 'apps', 'zhizaoyunAIOS', 'runtime')
   const pkgRuntime = join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime')
-  for (const part of ['cache', 'pawapps']) {
+  // 2.2.0 极简形态无捆绑 PawApp；pawapps 锁不存在时跳过物料嵌入
+  for (const part of existsSync(pawappsLockPath) ? ['cache', 'pawapps'] : ['cache']) {
     const src = join(liveRuntime, part)
     if (!existsSync(src)) {
       console.error(`离线包缺少 ${src}；请先在本机完成一次在线安装。`)
@@ -167,13 +187,14 @@ if (offline) {
     '1. 把整个文件夹（或 zip）拷到目标电脑任意可写目录，解压。',
     '2. 双击 `install-usb.cmd`：自动使用包内 Python/Node 运行时，无需联网。',
     '3. 安装完成会自动启动服务并打开浏览器（默认 http://127.0.0.1:8088）。',
-    '4. 默认管理员账号：admin / ZhizaoYun@2026（首次登录后请修改密码）。',
-    '5. 演示数据：如需注入 2025-12-01 ~ 2026-09-01 的模拟数据，运行',
-    '   `python scripts/qa/generate_demo_dataset.py` 后重启服务。',
-    '6. 内置数字员工：首次启动自动安装「客户方案工程师」智能体（含客户方案生成、',
-    '   企业联系人深度挖掘两个技能与行业知识库），在左上角智能体切换器中选择即可。',
+    '4. 首次使用：打开 http://127.0.0.1:8088 注册账号（第一个注册的账号即管理员，',
+    '   请设置高强度密码；后续用户在登录页自行注册）。',
+    '5. 局域网多用户：运行 `start-hub.cmd` 启动 Hub（0.0.0.0:8000），模型账号',
+    '   （API Key）由管理员在 Hub 管理界面统一配置。',
+    '6. 忘记密码：停止服务后删除服务数据目录下的 `auth.json`，重启后重新注册',
+    '   （官方文档提供的重置方式，会清除全部本地账户）。',
     '',
-    '常用入口：start-ai-os.cmd（启动）、check-ai-os.cmd（体检）、',
+    '常用入口：start-ai-os.cmd（启动）、diagnose-ai-os.cmd（诊断）、',
     'start-hub.cmd（局域网多用户，0.0.0.0:8000）。',
     '',
     '要求：Windows 10/11 x64；本包未内嵌 node.exe 时需 Node.js 20+。',

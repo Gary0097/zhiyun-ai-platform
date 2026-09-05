@@ -10,7 +10,7 @@ echo "============================================"
 command -v node >/dev/null 2>&1 || { echo "[错误] 未检测到 Node.js（需要 20 或以上）：https://nodejs.org"; exit 1; }
 NODE_MAJOR=$(node -p 'process.versions.node.split(".")[0]')
 if [ "$NODE_MAJOR" -lt 20 ]; then echo "[错误] Node.js 版本过低（当前 $(node -v)，需要 ≥ 20）"; exit 1; fi
-command -v git  >/dev/null 2>&1 || { echo "[错误] 未检测到 Git：https://git-scm.com/download/linux"; exit 1; }
+command -v git >/dev/null 2>&1 || echo "[提示] 未检测到 Git：核心安装与启动不受影响（仅在线拉取可选更新时需要）。"
 
 echo "[1/3] 安装运行时与锁定应用（首次约 3-10 分钟）..."
 bash ./setup-ai-os.sh

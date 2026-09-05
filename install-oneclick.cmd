@@ -23,10 +23,7 @@ if %NODE_MAJOR% LSS 20 (
 
 where git >nul 2>nul
 if errorlevel 1 (
-  echo [错误] 未检测到 Git。
-  echo 请先安装：https://git-scm.com/download/win
-  pause
-  exit /b 1
+  echo [提示] 未检测到 Git：核心安装与启动不受影响（仅在线拉取可选更新时需要）。
 )
 
 echo [1/4] 安装运行时与锁定应用（首次约 3-10 分钟，取决于网络）...

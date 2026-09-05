@@ -1,7 +1,19 @@
+# 灵泽万川智造云 AI-OS — QwenPaw Hub（局域网多用户）配置
+# 启动：start-hub.cmd（首次自动安装 Hub 运行环境）
+#
+# 模型账号（API Key）集中管理说明：
+#   不需要给每台电脑/每个员工单独配 Key。管理员启动 Hub 后，在管理界面
+#   “凭据管理”（或 PUT /api/hub/credentials）统一录入供应商 Key，例如：
+#     DASHSCOPE_API_KEY / OPENAI_API_KEY / OPENROUTER_API_KEY /
+#     ANTHROPIC_API_KEY / SILICONFLOW_API_KEY ...
+#   Hub 会把凭据加密保存（凭据保险库），并在启动每个用户的运行环境时
+#   以环境变量注入——员工登录后直接选择模型即可使用，全程接触不到 Key。
+#   凭据保存在 <QWENPAW_WORKING_DIR>/hub/secrets/ 与 control.db，备份请
+#   连同整个 hub/ 数据目录一起备份。
 version: 1
 
 control_plane:
-  public_base_url: http://127.0.0.1:8000
+  public_base_url: http://127.0.0.1:8000   # 启动器会自动派生 hub.runtime.yaml 并替换为本机局域网 IPv4；对外域名部署时在此改为 https://<域名>（需反向代理 TLS）
   registration:
     enabled: true          # 首个注册账户自动成为管理员；建好后建议改为 false
     default_role: user
