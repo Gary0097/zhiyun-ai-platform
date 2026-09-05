@@ -72,6 +72,12 @@ const manifest = [
 writeFileSync(join(workDir, 'INSTALLER-VERSION.txt'), manifest.join('\n') + '\n', 'utf8')
 
 if (offline) {
+  // -1) Hub 依赖预装校验：qwenpaw[hub] 的 wheel 只有在本机装配过 Hub venv
+  //     后才会进入 uv 缓存；仅装过单机版就打离线包会让目标机器 Hub 离线安装失败
+  if (!existsSync(join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'qwenpaw-hub', 'venv'))) {
+    console.error('离线包要求本机已运行过 start-hub.cmd（qwenpaw[hub] 依赖才会进入缓存）；请先启动一次 Hub 再打包。')
+    process.exit(1)
+  }
   // 0) 离线包标记：start-hub.cmd/sh 据此对 Hub 运行环境使用离线安装，
   //    避免源码/在线安装被误设离线模式后首次启动失败
   mkdirSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime', 'cache'), { recursive: true })

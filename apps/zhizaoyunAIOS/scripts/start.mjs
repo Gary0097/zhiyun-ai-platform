@@ -19,6 +19,9 @@ Object.assign(launchEnv, {
   // 登录体系改用 QwenPaw 2.2.0 原生认证：首个用户在控制台注册，
   // 之后所有访问均需登录（多用户场景由 Hub 账号体系承载）
   QWENPAW_AUTH_ENABLED: 'true',
+  // 原生认证密钥固定在安装目录内（auth.json / API Key 等），
+  // 避免落到用户主目录 ~/.qwenpaw.secret，与 README 的数据边界声明一致
+  QWENPAW_SECRET_DIR: process.env.QWENPAW_SECRET_DIR || join(appRoot, 'workspace', 'secret'),
 })
 
 function run (command, args, hint) {

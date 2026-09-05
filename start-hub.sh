@@ -12,7 +12,7 @@ export QWENPAW_WORKING_DIR="${PWD}/apps/zhizaoyunAIOS/workspace"
 mkdir -p "$QWENPAW_WORKING_DIR"
 # 每次启动都做版本/完整性校验（setup-hub.sh 内置版本比对，就绪时秒退）；
 # 离线包标记存在时才强制离线安装
-if [ -f ./apps/zhizaoyunAIOS/runtime/cache/OFFLINE-PACKAGE ]; then export ZAIOS_OFFLINE=1; fi
+if [ -f ./apps/zhizaoyunAIOS/runtime/cache/OFFLINE-PACKAGE ]; then export ZAIOS_OFFLINE=1 UV_OFFLINE=1; fi
 bash ./setup-hub.sh || exit 1
 HUB_BIN=./apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/bin/qwenpaw
 [ -x "$HUB_BIN" ] || HUB_BIN=./apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/Scripts/qwenpaw

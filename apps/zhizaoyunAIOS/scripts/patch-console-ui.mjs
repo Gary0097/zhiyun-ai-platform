@@ -96,6 +96,7 @@ const PROTECTED = [
   '[QwenPaw]',
   'cd QwenPaw',
   'QwenPaw-Tauri',
+  'QwenPaw-Flash',
   'QwenPaw_QA',
   'QwenPawQA',
 ]
@@ -346,6 +347,16 @@ function syncConsoleLogo (consoleDir) {
   if (rasterMime.has(logo.mime)) {
     writeAssetWithSiblings(join(consoleDir, 'qwenpaw.png'), readFileSync(logo.path))
   }
+  else {
+    // SVG 自定义 Logo 无法写入 .png：把启动页 img 改指同步生成的 /qwenpaw.svg
+    const bootHtmlPath = join(consoleDir, 'index.html')
+    let bootHtml = readFileSync(bootHtmlPath, 'utf8')
+    if (bootHtml.includes('src="/qwenpaw.png"')) {
+      bootHtml = bootHtml.split('src="/qwenpaw.png"').join('src="/qwenpaw.svg"')
+      writeAssetWithSiblings(bootHtmlPath, bootHtml)
+      console.log('Console 启动页 Logo 已改为 SVG 引用（自定义 Logo 为 SVG）。')
+    }
+  }
   // 其余上游默认 Logo 资产（登录页 logo-dark/light.svg、creator-logo.png 等）一并
   // 覆盖为当前平台 Logo，避免任何残留的 QwenPaw 黡标识。
   const svgLogo = logoSvg(logo)
@@ -481,6 +492,7 @@ function mdToHtml (md, knownIds) {
     t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, label, url) => {
       const dm = url.match(/(?:^|qwenpaw\.agentscope\.io)\/docs\/([a-zA-Z-]+)(?:[?#][^)]*)?$/)
         || (url.startsWith('/docs/') ? [null, url.slice(7).split(/[?#]/)[0]] : null)
+        || (url.startsWith('./') ? [null, url.slice(2).split(/[?#]/)[0]] : null)
       if (dm) {
         const id = dm[1]
         if (knownIds.has(id)) return `<a href="#${slugAnchor(id)}">${label}</a>`
