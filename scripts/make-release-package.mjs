@@ -106,10 +106,11 @@ if (offline) {
     'chcp 65001 >nul',
     'title Lingze Wanchuan Zhizaoyun AI-OS - USB Offline Setup',
     'cd /d "%~dp0"',
-    // 覆盖升级：停止本产品实例（8088 监听须命令行含 zhizaoyunAIOS|qwenpaw 才杀，
-    // 避免误伤占用该端口的无关应用；同时结束驻留托盘 exe 以解锁升级解压）
-    'powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { $p = Get-CimInstance Win32_Process -Filter (\'ProcessId=\' + $_.OwningProcess); if ($p -and $p.CommandLine -match \'zhizaoyunAIOS|qwenpaw\') { Stop-Process -Id $p.ProcessId -Force } }" >nul 2>&1',
-    'taskkill /IM "智造云AI-OS.exe" /F >nul 2>&1',
+    // 覆盖升级：停止本安装实例（8088 监听须命令行包含本安装目录 %~dp0 才杀，
+    // 避免误伤其他 QwenPaw/智造云安装或占用该端口的无关应用；同时结束驻留托盘
+    // exe 以解锁升级解压）
+    'powershell -NoProfile -Command "$root=[regex]::Escape(\'%~dp0\'); Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { $p = Get-CimInstance Win32_Process -Filter (\'ProcessId=\' + $_.OwningProcess); if ($p -and $p.CommandLine -match $root) { Stop-Process -Id $p.ProcessId -Force } }" >nul 2>&1',
+    "powershell -NoProfile -Command \"Get-Process -Name '智造云AI-OS' -ErrorAction SilentlyContinue | Where-Object { $_.Path -like '%~dp0*' } | Stop-Process -Force\" >nul 2>&1",
     'echo ==============================================',
     'echo   Lingze Wanchuan Zhizaoyun AI-OS - USB offline install',
     'echo   Auto-starts and opens the browser when finished.',
