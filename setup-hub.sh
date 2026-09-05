@@ -5,7 +5,8 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 EMBEDDED="apps/zhizaoyunAIOS"
-VERSION=$(python3 -c "import json;print(json.load(open('$EMBEDDED/qwenpaw.lock.json'))['version'])")
+# 与 setup-ai-os.sh 相同：用 Node 读锁文件，避免依赖系统 python3
+VERSION=$(node -e "const x=require(process.argv[1]); process.stdout.write(x.version)" "$EMBEDDED/qwenpaw.lock.json")
 RUNTIME_CACHE="$EMBEDDED/runtime/cache"
 HUB_VENV="$EMBEDDED/runtime/qwenpaw-hub/venv"
 HUB_QWENPAW="$HUB_VENV/bin/qwenpaw"

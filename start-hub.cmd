@@ -1,23 +1,25 @@
 @echo off
 chcp 65001 >nul
-title 灵泽万川智造云 Hub（局域网多用户）
+title Lingze Wanchuan Zhizaoyun AI-OS Hub
 echo ==============================================
-echo   灵泽万川智造云 Hub — 局域网多用户模式
-echo   首次使用：本机打开 http://127.0.0.1:8000 注册
-echo   第一个注册的账号自动成为管理员
-echo   之后同事用 http://<本机IP>:8000 访问
+echo   Lingze Wanchuan Zhizaoyun AI-OS Hub (LAN multi-user)
+echo   First run: open http://127.0.0.1:8000 and register
+echo   The first registered account becomes the admin
+echo   Then coworkers visit http://THIS-PC-IP:8000
 echo ==============================================
 echo.
-echo 本机 IPv4 地址：
+echo Local IPv4 addresses:
 ipconfig | findstr /i "IPv4"
 echo.
 
 set PYTHONIOENCODING=utf-8
-rem Hub 运行环境缺失或版本不符时自动供给（模型账号请在 Hub 管理界面统一配置）
-if not exist "%~dp0apps\zhizaoyunAIOS\runtime\qwenpaw-hub\venv\Scripts\qwenpaw.exe" (
-  echo [提示] 首次运行：正在安装 QwenPaw Hub 运行环境（数分钟）...
-  powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup-hub.ps1" -Offline -CacheDir "apps\zhizaoyunAIOS\runtime\cache"
-  if errorlevel 1 ( echo [错误] Hub 运行环境安装失败，请查看上方输出。 & pause & exit /b 1 )
-)
+rem 每次启动都做版本/完整性校验：setup-hub.ps1 内置 Test-HubRuntime，
+rem 就绪时立即退出；升级后旧 venv（如 2.1.0）会被自动重建为锁版本。
+rem 默认在线安装；仅当离线包标记存在时才强制离线（UV_OFFLINE），
+rem 避免源码安装因主 setup 未缓存 Hub 依赖 wheel 而首次启动失败。
+set "HUB_SETUP_OPTS="
+if exist "%~dp0apps\zhizaoyunAIOS\runtime\cache\OFFLINE-PACKAGE" set "HUB_SETUP_OPTS=-Offline"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup-hub.ps1" %HUB_SETUP_OPTS% -CacheDir "apps\zhizaoyunAIOS\runtime\cache"
+if errorlevel 1 ( echo [ERROR] Hub runtime setup failed. See output above. & pause & exit /b 1 )
 "%~dp0apps\zhizaoyunAIOS\runtime\qwenpaw-hub\venv\Scripts\qwenpaw.exe" hub --host 0.0.0.0 --port 8000 --force-public --config "%~dp0hub.yaml"
 pause
