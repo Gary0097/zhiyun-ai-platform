@@ -56,10 +56,12 @@ const pawappsLockPath = join(workDir, 'apps', 'zhizaoyunAIOS', 'pawapps.lock.jso
 const pawappsLock = existsSync(pawappsLockPath)
   ? JSON.parse(readFileSync(pawappsLockPath, 'utf8'))
   : { apps: [] }
+// 运行时版本以被打包 ref 的锁为准（--ref 重建旧版本时清单不得错报）
+const qwenpawLock = JSON.parse(readFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'qwenpaw.lock.json'), 'utf8'))
 const manifest = [
   'product: zhiyun-ai-os',
   `version: ${version}`,
-  'qwenpaw: 2.2.0',
+  `qwenpaw: ${qwenpawLock.version}`,
   `locked_pawapps: ${pawappsLock.apps.length}`,
   ...pawappsLock.apps.map(a => `  - ${a.id} @ ${a.commit}`),
   `channel: ${offline ? 'offline-usb' : 'online-installer'}`,
@@ -74,7 +76,7 @@ if (offline) {
   const liveRuntime = join(root, 'apps', 'zhizaoyunAIOS', 'runtime')
   const pkgRuntime = join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime')
   // 2.2.0 极简形态无捆绑 PawApp；pawapps 锁不存在时跳过物料嵌入
-  for (const part of existsSync(join(root, 'apps', 'zhizaoyunAIOS', 'pawapps.lock.json')) ? ['cache', 'pawapps'] : ['cache']) {
+  for (const part of existsSync(pawappsLockPath) ? ['cache', 'pawapps'] : ['cache']) {
     const src = join(liveRuntime, part)
     if (!existsSync(src)) {
       console.error(`离线包缺少 ${src}；请先在本机完成一次在线安装。`)
