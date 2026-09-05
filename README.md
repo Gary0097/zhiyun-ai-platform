@@ -8,9 +8,9 @@
 
 控制台的品牌（Logo、主题色、登录页封面）在每次启动时由 `apps/zhizaoyunAIOS/scripts/patch-console-ui.mjs`
 应用到 QwenPaw 控制台。默认使用仓库 `branding/` 下的灵泽万川资产；终端用户可在
-Workspace 品牌目录（`~/.qwenpaw/branding/`）放置以下文件进行整机自定义，重启服务后生效：
+安装目录内的品牌目录（`apps/zhizaoyunAIOS/workspace/branding/`——启动器通过 QWENPAW_WORKING_DIR 指定工作区）放置以下文件进行整机自定义，重启服务后生效：
 
-- `logo.json` — 自定义 Logo：`{"path": "~/.qwenpaw/branding/my-logo.png", "mime": "image/png"}`
+- `logo.json` — 自定义 Logo：`{"path": "<安装目录>/apps/zhizaoyunAIOS/workspace/branding/my-logo.png", "mime": "image/png"}`
   （替换 favicon、启动页、登录页与聊天头像全部默认 Logo）；
 - `theme.json` — 自定义主题与封面：
   `{"primary": "#0086AD", "primaryHover": "#00A3C4", "primaryActive": "#00688A", "loginLogoHeight": 88, "loginBg": "cover.jpg"}`

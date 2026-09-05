@@ -15,6 +15,15 @@ $HubQwenPaw = Join-Path $HubVenv "Scripts\qwenpaw.exe"
 $HubPython = Join-Path $HubVenv "Scripts\python.exe"
 $CachedUv = Join-Path $RuntimeCache "bin\uv.exe"
 
+# Hub 控制台品牌化（智造云 AIOS 风格；失败不阻断，可重跑）
+function Invoke-HubBranding {
+  $PatchScript = Join-Path $ProjectRoot "apps\zhizaoyunAIOS\scripts\patch-console-ui.mjs"
+  $HubConsole = Join-Path $HubVenv "Lib\site-packages\qwenpaw\console"
+  if ((Test-Path $PatchScript) -and (Test-Path (Join-Path $HubConsole "index.html"))) {
+    try { & node $PatchScript --console-dir $HubConsole | Out-Null } catch { Write-Host "提示：Hub 控制台品牌化未完成，可重跑 setup-hub.ps1。" }
+  }
+}
+
 function Test-HubRuntime {
   if (-not (Test-Path -LiteralPath $HubQwenPaw) -or -not (Test-Path -LiteralPath $HubPython)) { return $false }
   # 经 cmd 隔离探测：venv 损坏时 uv trampoline 会写 stderr，EAP=Stop 下
@@ -23,7 +32,9 @@ function Test-HubRuntime {
   return $LASTEXITCODE -eq 0 -and $versionOutput -match ("version\s+" + [regex]::Escape($Lock.version) + "\s*$")
 }
 if (Test-HubRuntime) {
-  Write-Host "QwenPaw Hub $($Lock.version) 运行环境已就绪：$HubVenv"; exit 0
+  Write-Host "QwenPaw Hub $($Lock.version) 运行环境已就绪：$HubVenv"
+  Invoke-HubBranding
+  exit 0
 }
 
 $UvCommand = if (Test-Path -LiteralPath $CachedUv) { $CachedUv } else { (Get-Command uv -ErrorAction SilentlyContinue).Source }
@@ -56,10 +67,5 @@ try {
 }
 if (-not (Test-HubRuntime)) { throw "QwenPaw Hub 运行环境安装后版本校验失败。" }
 
-# Hub 控制台品牌化（智造云 AIOS 风格；失败不阻断，可重跑）
-$PatchScript = Join-Path $ProjectRoot "apps\zhizaoyunAIOS\scripts\patch-console-ui.mjs"
-$HubConsole = Join-Path $HubVenv "Lib\site-packages\qwenpaw\console"
-if ((Test-Path $PatchScript) -and (Test-Path (Join-Path $HubConsole "index.html"))) {
-  try { & node $PatchScript --console-dir $HubConsole | Out-Null } catch { Write-Host "提示：Hub 控制台品牌化未完成，可重跑 setup-hub.ps1。" }
-}
+Invoke-HubBranding
 Write-Host "QwenPaw Hub $($Lock.version) 运行环境安装完成：$HubVenv"

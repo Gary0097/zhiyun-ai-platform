@@ -5,23 +5,44 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 EMBEDDED="apps/zhizaoyunAIOS"
-VERSION=$(python3 -c "import json;print(json.load(open('$EMBEDDED/qwenpaw.lock.json'))['version'])")
+# 与 setup-ai-os.sh 相同：用 Node 读锁文件，避免依赖系统 python3
+VERSION=$(node -e "const x=require(process.argv[1]); process.stdout.write(x.version)" "$EMBEDDED/qwenpaw.lock.json")
 RUNTIME_CACHE="$EMBEDDED/runtime/cache"
 HUB_VENV="$EMBEDDED/runtime/qwenpaw-hub/venv"
 HUB_QWENPAW="$HUB_VENV/bin/qwenpaw"
 CACHED_UV="$RUNTIME_CACHE/bin/uv"
 
+brand_hub_console() {
+  # Hub 控制台品牌化（智造云 AIOS 风格；失败不阻断，可重跑）——升级后
+  # venv 已就绪的早退路径同样需要执行，否则重装/升级会回退为上游默认外观
+  local console="$HUB_VENV/lib/python3.12/site-packages/qwenpaw/console"
+  if command -v node >/dev/null 2>&1 && [ -f "$EMBEDDED/scripts/patch-console-ui.mjs" ] && [ -f "$console/index.html" ]; then
+    node "$EMBEDDED/scripts/patch-console-ui.mjs" --console-dir "$console" || echo "提示：Hub 控制台品牌化未完成，可重跑 setup-hub.sh。"
+  fi
+}
+
 if [ -x "$HUB_QWENPAW" ] && "$HUB_QWENPAW" --version 2>/dev/null | grep -q "version $VERSION\$"; then
   echo "QwenPaw Hub $VERSION 运行环境已就绪：$HUB_VENV"
+  brand_hub_console
   exit 0
 fi
 
 UV_CMD="$CACHED_UV"
 if [ ! -x "$UV_CMD" ]; then
   if command -v uv >/dev/null 2>&1; then UV_CMD="$(command -v uv)"
-  else
-    echo "未找到 uv；联网环境可先运行安装脚本生成缓存。" >&2
+  elif [ "${ZAIOS_OFFLINE:-0}" = "1" ]; then
+    echo "未找到 uv；离线模式无法引导安装，请先在联网环境运行一次安装生成缓存。" >&2
     exit 1
+  else
+    # 在线引导 uv（与 setup-ai-os.sh 一致）：装进缓存目录，不改 PATH
+    echo "正在联网引导安装 uv ..."
+    mkdir -p "$(dirname "$CACHED_UV")"
+    if curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR="$(cd "$(dirname "$CACHED_UV")" && pwd)" sh; then
+      UV_CMD="$CACHED_UV"
+    else
+      echo "uv 引导安装失败。" >&2; exit 1
+    fi
+    [ -x "$UV_CMD" ] || { echo "uv 引导安装失败。" >&2; exit 1; }
   fi
 fi
 
@@ -37,9 +58,5 @@ UV_PYTHON_PREFERENCE=only-managed \
 
 "$HUB_QWENPAW" --version | grep -q "version $VERSION\$" || { echo "Hub 环境安装后版本校验失败" >&2; exit 1; }
 
-# Hub 控制台品牌化（智造云 AIOS 风格；失败不阻断，可重跑）
-HUB_CONSOLE="$HUB_VENV/lib/python3.12/site-packages/qwenpaw/console"
-if command -v node >/dev/null 2>&1 && [ -f "$EMBEDDED/scripts/patch-console-ui.mjs" ] && [ -f "$HUB_CONSOLE/index.html" ]; then
-  node "$EMBEDDED/scripts/patch-console-ui.mjs" --console-dir "$HUB_CONSOLE" || echo "提示：Hub 控制台品牌化未完成，可重跑 setup-hub.sh。"
-fi
+brand_hub_console
 echo "QwenPaw Hub $VERSION 运行环境安装完成：$HUB_VENV"

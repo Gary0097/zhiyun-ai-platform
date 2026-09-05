@@ -37,6 +37,20 @@ for (const banned of ['sync-pawapps', 'pawapp-materialized', 'seed-builtin-agent
 }
 assert.ok(!existsSync(join(root, 'plugins')), 'vendored plugins/ must be removed in 2.2.0 slim')
 
+// 4.5) 控制台存在性：本机已有项目运行时却找不到 console 属于异常（品牌检查
+// 会静默跳过、门禁虚绿）；完全干净的检出（CI）无运行时，需显式放行环境变量。
+const runtimeRoot = join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'zhizaoyunAIOS')
+const runtimeExists = existsSync(runtimeRoot)
+const allowNoConsole = process.env.GITHUB_ACTIONS === '1' || process.env.ZY_ALLOW_NO_CONSOLE === '1'
+if (runtimeExists) {
+  const hasConsole = ['venv/Lib/site-packages/qwenpaw/console/index.html', 'venv/lib/python3.12/site-packages/qwenpaw/console/index.html']
+    .some(rel => existsSync(join(runtimeRoot, ...rel.split('/'))))
+  assert.ok(hasConsole, 'project runtime exists but qwenpaw console is missing (branding checks would silently skip)')
+} else if (!allowNoConsole) {
+  console.error('警告：未找到项目运行时，控制台品牌检查将跳过。确需跳过请设置 ZY_ALLOW_NO_CONSOLE=1。')
+  process.exit(1)
+}
+
 // 5) 脚本检查（语法 + 自检）
 const commands = [
   [process.execPath, ['--check', join(scripts, 'start.mjs')]],

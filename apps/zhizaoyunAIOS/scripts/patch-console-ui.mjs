@@ -95,6 +95,9 @@ const PROTECTED = [
   '[QwenPaw registry]',
   '[QwenPaw]',
   'cd QwenPaw',
+  'QwenPaw-Tauri',
+  'QwenPaw_QA',
+  'QwenPawQA',
 ]
 
 // 将用户可见的 QwenPaw 品牌文案替换为“智造云 AIOS”，同时保护技术标识、URL、日志前缀与
@@ -578,8 +581,8 @@ function writeLocalDocs (consoleDir) {
     let md = readFileSync(join(DOCS_SRC, p.id + '.zh.md'), 'utf8')
     md = md.replace(/^---\n[\s\S]*?\n---\n/, '') // frontmatter
     const branded = applyBrand(md)
-    const anchorAlias = p.id === 'intro' ? ' id="tutorial"' : (p.id === 'faq' ? ' id="faq"' : '')
-    return '<section id="' + slugAnchor(p.id) + '"' + anchorAlias + '><h2>' + escapeHtml(p.title) + '</h2>' + mdToHtml(branded, knownIds) + '</section>'
+    const anchorAlias = p.id === 'intro' ? '<i id="tutorial"></i>' : (p.id === 'faq' ? '<i id="faq"></i>' : '')
+    return '<section id="' + slugAnchor(p.id) + '">' + anchorAlias + '<h2>' + escapeHtml(p.title) + '</h2>' + mdToHtml(branded, knownIds) + '</section>'
   }).join('\n')
   const html = ['<!DOCTYPE html>',
 '<html lang="zh-CN">',
@@ -766,7 +769,7 @@ if (checkMode) {
 content = branded
 
 if (content !== original) {
-  writeIndependent(bundlePath, content)
+  writeAssetWithSiblings(bundlePath, content)
   console.log('Console UI 定制已应用：' + bundlePath)
 } else {
   console.log('Console UI 定制已是最新状态：' + bundlePath)
@@ -790,7 +793,7 @@ for (const file of collectBrandableFiles(consoleDir)) {
   if (!cc.includes('QwenPaw') && !cc.includes('灵泽万川智造云')) continue
   const out = applyBrand(cc)
   if (out !== cc) {
-    writeIndependent(file, out)
+    writeAssetWithSiblings(file, out)
     extraBranded++
   }
 }

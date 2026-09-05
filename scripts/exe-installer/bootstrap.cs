@@ -511,14 +511,14 @@ class WizardForm : Form, IExtractProgress
         });
         box.Controls.Add(new Label
         {
-            Text = "版本 " + Installer.AppVersion + "   ·   QwenPaw 2.1.0 运行时",
+            Text = "版本 " + Installer.AppVersion + "   ·   QwenPaw 2.2.0 运行时",
             Left = 40, Top = 95, Width = 540, ForeColor = System.Drawing.Color.Gray,
         });
         box.Controls.Add(new Label
         {
             Text = "本向导将完成以下步骤：\n" +
                    "  1. 解压程序文件（约 2.5 GB）\n" +
-                   "  2. 安装内嵌的 Python 运行时与锁定应用（离线，无需联网）\n" +
+                   "  2. 安装内嵌的 Python 运行时与控制台（离线，无需联网）\n" +
                    "  3. 创建桌面快捷方式并启动\n\n" +
                    "要求：Windows 10/11 x64，目标磁盘剩余空间 ≥ 3 GB。",
             Left = 40, Top = 140, Width = 540, Height = 150,

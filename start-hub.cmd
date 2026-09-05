@@ -13,11 +13,15 @@ ipconfig | findstr /i "IPv4"
 echo.
 
 set PYTHONIOENCODING=utf-8
-rem Hub 运行环境缺失或版本不符时自动供给（模型账号请在 Hub 管理界面统一配置）
-if not exist "%~dp0apps\zhizaoyunAIOS\runtime\qwenpaw-hub\venv\Scripts\qwenpaw.exe" (
-  echo [INFO] First run: installing QwenPaw Hub runtime - takes a few minutes...
-  powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup-hub.ps1" -Offline -CacheDir "apps\zhizaoyunAIOS\runtime\cache"
-  if errorlevel 1 ( echo [ERROR] Hub runtime setup failed. See output above. & pause & exit /b 1 )
-)
+rem Hub 数据（数据库/密钥，见 hub.yaml）固定落在安装目录下，避免随用户主目录漂移
+set "QWENPAW_WORKING_DIR=%~dp0apps\zhizaoyunAIOS\workspace"
+rem 每次启动都做版本/完整性校验：setup-hub.ps1 内置 Test-HubRuntime，
+rem 就绪时立即退出；升级后旧 venv（如 2.1.0）会被自动重建为锁版本。
+rem 默认在线安装；仅当离线包标记存在时才强制离线（UV_OFFLINE），
+rem 避免源码安装因主 setup 未缓存 Hub 依赖 wheel 而首次启动失败。
+set "HUB_SETUP_OPTS="
+if exist "%~dp0apps\zhizaoyunAIOS\runtime\cache\OFFLINE-PACKAGE" set "HUB_SETUP_OPTS=-Offline"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup-hub.ps1" %HUB_SETUP_OPTS% -CacheDir "apps\zhizaoyunAIOS\runtime\cache"
+if errorlevel 1 ( echo [ERROR] Hub runtime setup failed. See output above. & pause & exit /b 1 )
 "%~dp0apps\zhizaoyunAIOS\runtime\qwenpaw-hub\venv\Scripts\qwenpaw.exe" hub --host 0.0.0.0 --port 8000 --force-public --config "%~dp0hub.yaml"
 pause
