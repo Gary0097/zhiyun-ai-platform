@@ -28,8 +28,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup-hub.ps1" %HUB_SE
 if errorlevel 1 ( echo [ERROR] Hub runtime setup failed. See output above. & pause & exit /b 1 )
 rem 生成派生配置：public_base_url 用本机局域网 IPv4（OAuth/MCP 回调地址
 rem 必须与浏览器可见地址一致，官方 Hub 指南要求），hub.yaml 保持为模板
-for /f "tokens=14" %%i in ('ipconfig ^| findstr /i "IPv4.192.168"') do set "LAN_IP=%%i"
-if not defined LAN_IP set "LAN_IP=127.0.0.1"
-powershell -NoProfile -Command "(Get-Content -Raw '%~dp0hub.yaml') -replace 'public_base_url: http://127.0.0.1:8000', ('public_base_url: http://' + $env:LAN_IP + ':8000') | Set-Content -Encoding utf8 '%~dp0hub.runtime.yaml'"
+powershell -NoProfile -Command "$ip = Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.IPAddress -notlike '127.*' -and $_.IPAddress -notlike '169.254.*' -and ($_.IPAddress -like '192.168.*' -or $_.IPAddress -like '10.*' -or $_.IPAddress -match '^172\\.(1[6-9]|2[0-9]|3[01])\\.') } | Select-Object -First 1; $lan = if ($ip) { $ip.IPAddress } else { '127.0.0.1' }; (Get-Content -Raw '%~dp0hub.yaml') -replace 'public_base_url: http://127.0.0.1:8000', ('public_base_url: http://' + $lan + ':8000') | Set-Content -Encoding utf8 '%~dp0hub.runtime.yaml'"
 "%~dp0apps\zhizaoyunAIOS\runtime\qwenpaw-hub\venv\Scripts\qwenpaw.exe" hub --host 0.0.0.0 --port 8000 --force-public --config "%~dp0hub.runtime.yaml"
 pause

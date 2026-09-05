@@ -95,7 +95,7 @@ const PROTECTED = [
   '[QwenPaw registry]',
   '[QwenPaw]',
   'cd QwenPaw',
-  'QwenPaw Desktop.app',
+  'QwenPaw Desktop',
   'QwenPaw-Tauri',
   'QwenPaw-Flash',
   'QwenPaw_QA',
@@ -509,12 +509,32 @@ function mdToHtml (md, knownIds) {
     return t
   }
   const lines = md.replace(/\r\n/g, '\n').split('\n')
+  // 引用式链接定义：[id]: url —— 先收集再从正文中剔除
+  const refLinks = {}
+  for (let li = 0; li < lines.length; li++) {
+    const rm = lines[li].match(/^\s{0,3}\[([^\]]+)\]:\s*(\S+)(?:\s+"[^"]*")?\s*$/)
+    if (rm) { refLinks[rm[1].toLowerCase()] = rm[2]; lines[li] = '' }
+  }
+  const inlineWithRefs = (text) => {
+    let t = text.replace(/\[([^\]]+)\]\[([^\]]+)\]/g, (mm, label, ref) => {
+      const url = refLinks[String(ref).toLowerCase()]
+      return url ? '[' + label + '](' + url + ')' : label
+    })
+    return inline(t)
+  }
   const out = []
   let i = 0
   let para = []
-  const flushPara = () => { if (para.length) { out.push('<p>' + para.map(inline).join('<br>') + '</p>'); para = [] } }
+  const flushPara = () => { if (para.length) { out.push('<p>' + para.map(inlineWithRefs).join('<br>') + '</p>'); para = [] } }
   while (i < lines.length) {
     const line = lines[i]
+    if (/^\s*<[a-zA-Z!/]/.test(line)) {
+      flushPara()
+      const buf = []
+      while (i < lines.length && (/^\s*<[a-zA-Z!/]/.test(lines[i]) || (/^\s*\S/.test(lines[i]) && lines[i].includes('>')))) { buf.push(lines[i]); i++ }
+      out.push(buf.join('\n'))
+      continue
+    }
     if (/^```|^~~~/.test(line)) {
       flushPara()
       const buf = []
@@ -547,21 +567,21 @@ function mdToHtml (md, knownIds) {
       flushPara()
       const items = []
       while (i < lines.length && /^\s*[-*+]\s+/.test(lines[i])) { items.push(lines[i].replace(/^\s*[-*+]\s+/, '')); i++ }
-      out.push('<ul>' + items.map(it => `<li>${inline(it)}</li>`).join('') + '</ul>')
+      out.push('<ul>' + items.map(it => `<li>${inlineWithRefs(it)}</li>`).join('') + '</ul>')
       continue
     }
     if (/^\s*\d+[.)]\s+/.test(line)) {
       flushPara()
       const items = []
       while (i < lines.length && /^\s*\d+[.)]\s+/.test(lines[i])) { items.push(lines[i].replace(/^\s*\d+[.)]\s+/, '')); i++ }
-      out.push('<ol>' + items.map(it => `<li>${inline(it)}</li>`).join('') + '</ol>')
+      out.push('<ol>' + items.map(it => `<li>${inlineWithRefs(it)}</li>`).join('') + '</ol>')
       continue
     }
     if (/^>\s?/.test(line)) {
       flushPara()
       const buf = []
       while (i < lines.length && /^>\s?/.test(lines[i])) { buf.push(lines[i].replace(/^>\s?/, '')); i++ }
-      out.push('<blockquote>' + buf.map(inline).join('<br>') + '</blockquote>')
+      out.push('<blockquote>' + buf.map(inlineWithRefs).join('<br>') + '</blockquote>')
       continue
     }
     if (/^\s*(---|\*\*\*)\s*$/.test(line)) { flushPara(); out.push('<hr>'); i++; continue }
