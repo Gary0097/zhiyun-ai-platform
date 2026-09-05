@@ -69,6 +69,7 @@ writeFileSync(join(workDir, 'INSTALLER-VERSION.txt'), manifest.join('\n') + '\n'
 if (offline) {
   // 0) 离线包标记：start-hub.cmd 据此对 Hub 运行环境使用离线安装，
   //    避免源码/在线安装被误设 UV_OFFLINE 后首次启动失败
+  mkdirSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime', 'cache'), { recursive: true })
   writeFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime', 'cache', 'OFFLINE-PACKAGE'), 'offline-usb' + String.fromCharCode(10), 'utf8')
   // 1) 内嵌运行时缓存（Python 3.12 + uv + wheel 缓存）与锁定 PawApp
   const liveRuntime = join(root, 'apps', 'zhizaoyunAIOS', 'runtime')
