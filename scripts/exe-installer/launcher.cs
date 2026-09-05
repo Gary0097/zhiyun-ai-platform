@@ -131,7 +131,7 @@ class Launcher
                 "$c = Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; " +
                 "if (-not $c) { exit 2 } " +
                 "$p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $c.OwningProcess); " +
-                "if ($p -and $p.CommandLine -match 'zhizaoyunAIOS|qwenpaw') { exit 0 } exit 1";
+                "if ($p -and $p.CommandLine -match $root) { exit 0 } exit 1";
             var psi = new ProcessStartInfo("powershell.exe", "-NoProfile -Command \"" + ps + "\"")
             {
                 UseShellExecute = false,
@@ -185,7 +185,7 @@ class Launcher
             // 注意这里绝不能按映像名杀 智造云AI-OS.exe——那是托盘自身
             var ps = "Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | " +
                 "ForEach-Object { $p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $_.OwningProcess); " +
-                "if ($p -and $p.CommandLine -match 'zhizaoyunAIOS|qwenpaw') { Stop-Process -Id $p.ProcessId -Force } }";
+                "if ($p -and $p.CommandLine -match $root) { Stop-Process -Id $p.ProcessId -Force } }";
             var psi = new ProcessStartInfo("powershell.exe", "-NoProfile -Command \"" + ps + "\"")
             {
                 UseShellExecute = false,
