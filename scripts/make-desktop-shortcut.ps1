@@ -39,8 +39,19 @@ $root = [regex]::Escape($Root)
 $m = New-Object System.Threading.Mutex($false, 'Local\ZhizaoyunAIOS.OnlineStart')
 $owned = $false
 try {
-    try { [void]$m.WaitOne(20000); $owned = $true }
+    try { $owned = $m.WaitOne(20000) }
     catch [System.Threading.AbandonedMutexException] { $owned = $true }
+    if (-not $owned) {
+        # 超时未取得互斥体：另一个启动流程持有它，只等就绪，绝不再起第二条管线
+        for ($i = 0; $i -lt 150; $i++) {
+            try {
+                Invoke-WebRequest -Uri 'http://127.0.0.1:8088/api/version' -UseBasicParsing -TimeoutSec 2 | Out-Null
+                exit 0
+            } catch { Start-Sleep 2 }
+        }
+        Write-Host '[ERROR] Service did not become ready. See launcher-service.log'
+        exit 1
+    }
     $c = Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($c) {
         $p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $c.OwningProcess)

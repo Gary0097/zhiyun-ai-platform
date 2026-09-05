@@ -64,7 +64,25 @@ class Launcher
                 }
                 catch { primaryStarting = false; }
                 if (!primaryStarting && File.Exists(serviceEntry))
-                    StartService(serviceEntry, Path.Combine(here, "launcher-service.log"));
+                {
+                    // 二实例拉起前同样发布 Starting 信号，让其它并发触发方
+                    // （在线快捷方式/托盘）能识别“正在启动”而不再重复拉起
+                    EventWaitHandle signal = null;
+                    try { signal = new EventWaitHandle(false, EventResetMode.ManualReset, "Local\\ZhizaoyunAIOS.Starting"); }
+                    catch { }
+                    try { StartService(serviceEntry, Path.Combine(here, "launcher-service.log")); }
+                    finally
+                    {
+                        if (WaitReady(ReadyTimeoutSeconds))
+                        {
+                            if (signal != null) signal.Set();
+                            signal.Close();
+                        }
+                        else if (signal != null) signal.Close();
+                    }
+                    if (ServiceReady() && ServiceIsOurs(here)) { OpenAppWindow(); return 0; }
+                    return 0;
+                }
                 WaitReady(ReadyTimeoutSeconds);
             }
             if (ServiceReady() && ServiceIsOurs(here)) OpenAppWindow();
@@ -176,7 +194,7 @@ class Launcher
     }
 
     // 强制停止 8088 监听实例（与卸载脚本同一命令，已在安装/升级路径实测）
-    internal static void StopLiveService()
+    internal static void StopLiveService(string installRoot)
     {
         try
         {
@@ -191,6 +209,7 @@ class Launcher
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
+            psi.EnvironmentVariables["Z_INSTALL_ROOT"] = installRoot;
             using (var p = Process.Start(psi)) p.WaitForExit(30000);
         }
         catch { }
@@ -305,7 +324,11 @@ class TrayContext : ApplicationContext
             var waiter = new Thread((ThreadStart)delegate
             {
                 if (Launcher.WaitReady(StartTimeoutSeconds + 20))
+                {
+                    // 消费首次开窗标记：Poll 的 SetState(Running) 不会再开第二扇窗
+                    _openWhenReady = false;
                     Launcher.OpenAppWindow();
+                }
                 else
                     MessageBox.Show("服务未能就绪，请查看安装目录 launcher-service.log。",
                         "智造云 AI-OS", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -342,7 +365,7 @@ class TrayContext : ApplicationContext
         KillStarter();
         CloseStartingSignal();
         _startingActive = false;
-        Launcher.StopLiveService();
+        Launcher.StopLiveService(_here);
         SetState(ServiceState.Stopped);
     }
 
@@ -376,7 +399,7 @@ class TrayContext : ApplicationContext
         KillStarter();
         CloseStartingSignal();
         _startingActive = false;
-        Launcher.StopLiveService();
+        Launcher.StopLiveService(_here);
         _poll.Stop();
         _tray.Visible = false;
         _tray.Dispose();
@@ -411,7 +434,8 @@ class TrayContext : ApplicationContext
             }
             return;
         }
-        ServiceState actual = up ? ServiceState.Running : ServiceState.Stopped;
+        // 稳态同样要求归属：其它部署占用 8088 时不允许把托盘转绿
+        ServiceState actual = (up && Launcher.ServiceIsOurs(_here)) ? ServiceState.Running : ServiceState.Stopped;
         if (_state != actual) SetState(actual);
     }
 
