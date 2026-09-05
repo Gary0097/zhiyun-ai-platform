@@ -21,7 +21,7 @@ rem 默认在线安装；仅当离线包标记存在时才强制离线（UV_OFFL
 rem 避免源码安装因主 setup 未缓存 Hub 依赖 wheel 而首次启动失败。
 set "HUB_SETUP_OPTS="
 if exist "%~dp0apps\zhizaoyunAIOS\runtime\cache\OFFLINE-PACKAGE" set "HUB_SETUP_OPTS=-Offline"
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup-hub.ps1" %HUB_SETUP_OPTS% -CacheDir "apps\zhizaoyunAIOS\runtime\cache"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup-hub.ps1" %HUB_SETUP_OPTS% -CacheDir "%~dp0apps\zhizaoyunAIOS\runtime\cache"
 if errorlevel 1 ( echo [ERROR] Hub runtime setup failed. See output above. & pause & exit /b 1 )
 "%~dp0apps\zhizaoyunAIOS\runtime\qwenpaw-hub\venv\Scripts\qwenpaw.exe" hub --host 0.0.0.0 --port 8000 --force-public --config "%~dp0hub.yaml"
 pause
