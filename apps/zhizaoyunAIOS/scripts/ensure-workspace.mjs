@@ -28,12 +28,17 @@ for (const dir of dirs) {
 // 1.x → 2.2.0 升级迁移：只移出已知 1.x 业务插件子目录（zhiyun-* /
 // qwenpaw-creator* / agent-kanban），混合目录中用户自装的兼容插件原地保留。
 // 只做可恢复的移出，绝不删除用户内容；目录为空后移除空壳。
-const legacyPrefixes = ['zhiyun-', 'qwenpaw-creator', 'agent-kanban']
+// 1.x 已退役业务插件的精确目录名（后续回归的独立插件用新 ID，不受影响）
+const legacyPluginIds = [
+  'zhiyun-auth', 'zhiyun-audit', 'zhiyun-logo', 'zhiyun-data-core', 'zhiyun-data-insights',
+  'zhiyun-enterprise-seeder', 'zhiyun-app-discovery',
+  'qwenpaw-creator-studio', 'qwenpaw-creator', 'qwenpaw-creator-mixcut', 'agent-kanban',
+]
 const legacyPlugins = join(workspace, 'plugins')
 if (existsSync(legacyPlugins)) {
   let entries = []
   try { entries = readdirSync(legacyPlugins) } catch { }
-  const legacyDirs = entries.filter(name => legacyPrefixes.some(p => name.startsWith(p)))
+  const legacyDirs = entries.filter(name => legacyPluginIds.includes(name))
   if (legacyDirs.length) {
     const backup = join(workspace, 'plugins.legacy-backup-' + new Date().toISOString().replace(/[:.]/g, '-'))
     mkdirSync(backup, { recursive: true })

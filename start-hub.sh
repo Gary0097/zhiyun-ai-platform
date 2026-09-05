@@ -16,4 +16,10 @@ if [ -f ./apps/zhizaoyunAIOS/runtime/cache/OFFLINE-PACKAGE ]; then export ZAIOS_
 bash ./setup-hub.sh || exit 1
 HUB_BIN=./apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/bin/qwenpaw
 [ -x "$HUB_BIN" ] || HUB_BIN=./apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/Scripts/qwenpaw
-exec "$HUB_BIN" hub --host 0.0.0.0 --port 8000 --force-public --config hub.yaml
+# Local 隔离预检：Linux 需要 Bubblewrap（官方要求），缺失仅警告
+command -v bwrap >/dev/null 2>&1 || echo "[WARN] bwrap (Bubblewrap) not found: Local runtimes will fail to start. Install it (e.g. apt install bubblewrap)."
+# 派生配置：public_base_url 用本机局域网 IPv4（OAuth/MCP 回调需与浏览器可见地址一致）
+LAN_IP=$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}' | head -1)
+[ -n "$LAN_IP" ] || LAN_IP=127.0.0.1
+sed "s|public_base_url: http://127.0.0.1:8000|public_base_url: http://${LAN_IP}:8000|" hub.yaml > hub.runtime.yaml
+exec "$HUB_BIN" hub --host 0.0.0.0 --port 8000 --force-public --config hub.runtime.yaml

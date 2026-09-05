@@ -13,7 +13,7 @@
 version: 1
 
 control_plane:
-  public_base_url: http://127.0.0.1:8000   # 对外部署时改为 https://<域名>（需反向代理 TLS）
+  public_base_url: http://127.0.0.1:8000   # 启动器会自动派生 hub.runtime.yaml 并替换为本机局域网 IPv4；对外域名部署时在此改为 https://<域名>（需反向代理 TLS）
   registration:
     enabled: true          # 首个注册账户自动成为管理员；建好后建议改为 false
     default_role: user

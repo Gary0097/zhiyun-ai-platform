@@ -45,6 +45,7 @@ start-ai-os.cmd
 
 ```cmd
 start-hub.cmd   :: 首次自动安装 Hub 环境（qwenpaw[hub]==2.2.0）
+> Local 运行环境前置要求：Windows 需以管理员身份运行启动器（AppContainer 隔离）；Linux 需安装 Bubblewrap（`apt install bubblewrap`）。启动器会自动检测并提示。
 ```
 
 1. 打开 http://127.0.0.1:8000 注册管理员（首个账号）

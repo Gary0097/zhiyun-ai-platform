@@ -95,6 +95,7 @@ const PROTECTED = [
   '[QwenPaw registry]',
   '[QwenPaw]',
   'cd QwenPaw',
+  'QwenPaw Desktop.app',
   'QwenPaw-Tauri',
   'QwenPaw-Flash',
   'QwenPaw_QA',
