@@ -52,18 +52,20 @@ try {
         exit 0
     }
     Start-Process -FilePath (Join-Path $Root 'start-ai-os.cmd') -WindowStyle Hidden
+    # 就绪等待必须仍在互斥区内：若拉起后立即释放，第二次调用的快捷方式会
+    # 在服务绑定 8088 前拿到互斥体并再起一条完整启动管线（并发改工作区）。
+    for ($i = 0; $i -lt 150; $i++) {
+        try {
+            Invoke-WebRequest -Uri 'http://127.0.0.1:8088/api/version' -UseBasicParsing -TimeoutSec 2 | Out-Null
+            exit 0
+        } catch { Start-Sleep 2 }
+    }
+    Write-Host '[ERROR] Service did not become ready. See launcher-service.log'
+    exit 1
 }
 finally {
     if ($owned) { $m.ReleaseMutex() }
 }
-for ($i = 0; $i -lt 150; $i++) {
-    try {
-        Invoke-WebRequest -Uri 'http://127.0.0.1:8088/api/version' -UseBasicParsing -TimeoutSec 2 | Out-Null
-        exit 0
-    } catch { Start-Sleep 2 }
-}
-Write-Host '[ERROR] Service did not become ready. See launcher-service.log'
-exit 1
 '@
 [System.IO.File]::WriteAllText($ensure, $ensureBody, (New-Object System.Text.UTF8Encoding($false)))
 

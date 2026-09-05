@@ -208,6 +208,18 @@ class Installer
         catch { /* 无运行实例或权限不足时继续安装 */ }
     }
 
+    // 终止整棵进程树：taskkill /T 递归结束 cmd 包装之下的 PowerShell/Node/QwenPaw
+    // 子进程；Process.Kill() 只杀直接包装进程，孤儿进程会继续改写安装目录。
+    static void KillProcessTree(int rootPid)
+    {
+        var psi = new ProcessStartInfo("cmd.exe", "/c taskkill /T /F /PID " + rootPid + " >nul 2>&1")
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+        using (var p = Process.Start(psi)) p.WaitForExit(30000);
+    }
+
     // 端口预检：8088 仍被监听（StopLiveService 后仍在，即非本产品进程）返回 true
     internal static bool PortOccupied()
     {
@@ -304,7 +316,7 @@ class Installer
                         if (childExited && (int)((uint)Environment.TickCount - (uint)exitedAtTicks) > 240 * 1000) break;
                         Thread.Sleep(2000);
                     }
-                    if (!childExited) { try { child.Kill(); } catch { } }
+                    if (!childExited) { try { KillProcessTree(child.Id); } catch { } }
                     log.WriteLine(success ? "service ready" :
                         childExited && childCode != 0 ? "failed: install-usb.cmd exit code " + childCode :
                         "service not ready within timeout");
