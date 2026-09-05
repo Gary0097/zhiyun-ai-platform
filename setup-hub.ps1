@@ -29,7 +29,10 @@ function Test-HubRuntime {
   # 经 cmd 隔离探测：venv 损坏时 uv trampoline 会写 stderr，EAP=Stop 下
   # 直接调用会把它升级为终止性错误（setup-ai-os.ps1 注释中的同一陷阱）
   $versionOutput = & cmd.exe /d /c "`"$HubQwenPaw`" --version 2>&1" | Out-String
-  return $LASTEXITCODE -eq 0 -and $versionOutput -match ("version\s+" + [regex]::Escape($Lock.version) + "\s*$")
+  if (-not ($LASTEXITCODE -eq 0 -and $versionOutput -match ("version\s+" + [regex]::Escape($Lock.version) + "\s*$"))) { return $false }
+  # [hub] 附加依赖可能缺失而 --version 仍成功（安装中断）：追加 hub 子命令探测
+  & cmd.exe /d /c "`"$HubQwenPaw`" hub --help >nul 2>&1"
+  return $LASTEXITCODE -eq 0
 }
 if (Test-HubRuntime) {
   Write-Host "QwenPaw Hub $($Lock.version) 运行环境已就绪：$HubVenv"

@@ -25,20 +25,27 @@ for (const dir of dirs) {
   }
 }
 
-// 1.x → 2.2.0 升级迁移：仅当 plugins 目录中存在已知的 1.x 业务插件
-// （zhiyun-* / qwenpaw-creator* / agent-kanban）时才整体移出——2.2.0 之后
-// 用户自行安装的兼容插件不受影响。只做可恢复的移出，绝不删除用户内容；
-// 移出后目录不存在，逻辑天然幂等。
+// 1.x → 2.2.0 升级迁移：只移出已知 1.x 业务插件子目录（zhiyun-* /
+// qwenpaw-creator* / agent-kanban），混合目录中用户自装的兼容插件原地保留。
+// 只做可恢复的移出，绝不删除用户内容；目录为空后移除空壳。
 const legacyPrefixes = ['zhiyun-', 'qwenpaw-creator', 'agent-kanban']
 const legacyPlugins = join(workspace, 'plugins')
 if (existsSync(legacyPlugins)) {
   let entries = []
   try { entries = readdirSync(legacyPlugins) } catch { }
-  const hasLegacy = entries.some(name => legacyPrefixes.some(p => name.startsWith(p)))
-  if (hasLegacy) {
+  const legacyDirs = entries.filter(name => legacyPrefixes.some(p => name.startsWith(p)))
+  if (legacyDirs.length) {
     const backup = join(workspace, 'plugins.legacy-backup-' + new Date().toISOString().replace(/[:.]/g, '-'))
-    renameSync(legacyPlugins, backup)
-    console.log('  [migrate] 1.x 业务插件目录已移至可恢复备份')
+    mkdirSync(backup, { recursive: true })
+    for (const name of legacyDirs) {
+      renameSync(join(legacyPlugins, name), join(backup, name))
+      console.log('  [migrate] 1.x 业务插件已移至可恢复备份：' + name)
+    }
+    let rest = []
+    try { rest = readdirSync(legacyPlugins) } catch { }
+    if (!rest.length) {
+      try { renameSync(legacyPlugins, legacyPlugins + '.empty-removed') } catch { }
+    }
   }
 }
 

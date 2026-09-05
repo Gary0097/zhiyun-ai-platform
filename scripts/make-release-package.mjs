@@ -6,7 +6,7 @@
 //   目标机器解压后运行 install-usb.cmd 即可，全程无需联网。
 // --no-prune：跳过 dist 历史产物清理（默认打包成功后只保留最近 2 个版本）。
 import { createHash } from 'node:crypto'
-import { execSync, execFileSync } from 'node:child_process'
+import { execSync, execFileSync, spawnSync } from 'node:child_process'
 import { mkdirSync, copyFileSync, readFileSync, writeFileSync, existsSync, statSync, rmSync, cpSync, readdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -74,8 +74,12 @@ writeFileSync(join(workDir, 'INSTALLER-VERSION.txt'), manifest.join('\n') + '\n'
 if (offline) {
   // -1) Hub 依赖预装校验：qwenpaw[hub] 的 wheel 只有在本机装配过 Hub venv
   //     后才会进入 uv 缓存；仅装过单机版就打离线包会让目标机器 Hub 离线安装失败
-  if (!existsSync(join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'qwenpaw-hub', 'venv'))) {
-    console.error('离线包要求本机已运行过 start-hub.cmd（qwenpaw[hub] 依赖才会进入缓存）；请先启动一次 Hub 再打包。')
+  const hubExe = join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'qwenpaw-hub', 'venv', 'Scripts', 'qwenpaw.exe')
+  const hubProbe = existsSync(hubExe)
+    ? spawnSync(hubExe, ['hub', '--help'], { stdio: 'ignore', timeout: 60000 })
+    : { status: 1 }
+  if (hubProbe.status !== 0) {
+    console.error('离线包要求本机 Hub 运行环境可执行 qwenpaw hub（依赖才会完整进入缓存）；请先成功启动一次 Hub 再打包。')
     process.exit(1)
   }
   // 0) 离线包标记：start-hub.cmd/sh 据此对 Hub 运行环境使用离线安装，

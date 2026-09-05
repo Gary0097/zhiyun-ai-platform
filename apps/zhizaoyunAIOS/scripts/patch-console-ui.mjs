@@ -494,7 +494,9 @@ function mdToHtml (md, knownIds) {
         || (url.startsWith('/docs/') ? [null, url.slice(7).split(/[?#]/)[0]] : null)
         || (url.startsWith('./') ? [null, url.slice(2).split(/[?#]/)[0]] : null)
       if (dm) {
-        const id = dm[1]
+        // 文档内链接常用 kebab slug（multi-agent），章节 id 是 camel（multiAgent）
+        const camel = dm[1].replace(/-([a-z])/g, (mm, c) => c.toUpperCase())
+        const id = knownIds.has(dm[1]) ? dm[1] : (knownIds.has(camel) ? camel : dm[1])
         if (knownIds.has(id)) return `<a href="#${slugAnchor(id)}">${label}</a>`
         return `<strong>${label}</strong>`
       }

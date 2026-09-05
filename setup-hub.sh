@@ -21,7 +21,8 @@ brand_hub_console() {
   fi
 }
 
-if [ -x "$HUB_QWENPAW" ] && "$HUB_QWENPAW" --version 2>/dev/null | grep -q "version $VERSION\$"; then
+# hub 子命令探测：基础包装好但 [hub] 附加依赖缺一半时 --version 仍成功
+if [ -x "$HUB_QWENPAW" ] && "$HUB_QWENPAW" --version 2>/dev/null | grep -q "version $VERSION\$" && "$HUB_QWENPAW" hub --help >/dev/null 2>&1; then
   echo "QwenPaw Hub $VERSION 运行环境已就绪：$HUB_VENV"
   brand_hub_console
   exit 0
