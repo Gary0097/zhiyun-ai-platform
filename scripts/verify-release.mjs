@@ -41,7 +41,7 @@ assert.ok(!existsSync(join(root, 'plugins')), 'vendored plugins/ must be removed
 // 会静默跳过、门禁虚绿）；完全干净的检出（CI）无运行时，需显式放行环境变量。
 const runtimeRoot = join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'zhizaoyunAIOS')
 const runtimeExists = existsSync(runtimeRoot)
-const allowNoConsole = process.env.GITHUB_ACTIONS === '1' || process.env.ZY_ALLOW_NO_CONSOLE === '1'
+const allowNoConsole = process.env.GITHUB_ACTIONS === 'true' || process.env.ZY_ALLOW_NO_CONSOLE === '1'
 if (runtimeExists) {
   const hasConsole = ['venv/Lib/site-packages/qwenpaw/console/index.html', 'venv/lib/python3.12/site-packages/qwenpaw/console/index.html']
     .some(rel => existsSync(join(runtimeRoot, ...rel.split('/'))))
