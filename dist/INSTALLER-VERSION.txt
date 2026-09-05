@@ -1,0 +1,6 @@
+product: zhiyun-ai-os
+version: 2.2.0
+qwenpaw: 2.2.0
+locked_pawapps: 0
+channel: offline-usb
+note: 智造云AIOS 2.2.0 极简形态 —— 原版 QwenPaw 2.2.0 + Hub，无捆绑业务应用；内嵌 Python 运行时缓存与便携 Node；解压后运行 install-usb.cmd

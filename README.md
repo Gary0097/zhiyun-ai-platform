@@ -1,59 +1,89 @@
-# DeepSeek Harness
+# 智造云 AIOS
 
-English | [中文](README.zh.md)
+基于 **原版 QwenPaw 2.2.0 + QwenPaw Hub** 的智造云品牌发行版：开箱即用的企业智能体操作系统。
 
-DeepSeek Harness (`dsh`) is an open-source agent harness developed by [DeepSeek AI](https://deepseek.com).
+> 产品定义：[`docs/product/PRD-V7.0-AIOS-2.2.0.md`](docs/product/PRD-V7.0-AIOS-2.2.0.md)
 
-It uses an architecture where **everything is a plugin**, and is powered by [Cordis](https://github.com/cordiverse/cordis), whose design is described in [_A Programming Paradigm for Spatiotemporal Composability_](https://github.com/cordiverse/paper).
+## 品牌与外观自定义
 
-## Developer preview
+控制台的品牌（Logo、主题色、登录页封面）在每次启动时由 `apps/zhizaoyunAIOS/scripts/patch-console-ui.mjs`
+应用到 QwenPaw 控制台。默认使用仓库 `branding/` 下的灵泽万川资产；终端用户可在
+安装目录内的品牌目录（`apps/zhizaoyunAIOS/workspace/branding/`——启动器通过 QWENPAW_WORKING_DIR 指定工作区）放置以下文件进行整机自定义，重启服务后生效：
 
-DeepSeek Harness is currently in _developer preview_ and is iterating rapidly. **THERE WILL BE COMPATIBILITY-BREAKING CHANGES.**
+- `logo.json` — 自定义 Logo：`{"path": "<安装目录>/apps/zhizaoyunAIOS/workspace/branding/my-logo.png", "mime": "image/png"}`
+  （替换 favicon、启动页、登录页与聊天头像全部默认 Logo）；
+- `theme.json` — 自定义主题与封面：
+  `{"primary": "#0086AD", "primaryHover": "#00A3C4", "primaryActive": "#00688A", "loginLogoHeight": 88, "loginBg": "cover.jpg"}`
+  （`loginBg` 为 branding 目录内任意 jpg/png，替换登录页背景渐变为封面图）。
 
-## Run
+## 项目介绍
 
-### Run from `npm`
+智造云 AIOS 2.2.0 是一台"智造云牌"的 QwenPaw 智能体计算机：
 
-Install `Node.js`, then run:
+- **原版内核**：QwenPaw 2.2.0（智能体运行时 + 控制台 + Agent 容器），不改内核行为，随锁文件整体升级
+- **原生登录**：单机用 QwenPaw 原生认证（首个用户控制台注册）；多用户用 QwenPaw Hub 账号体系
+- **模型账号集中管理**：管理员在 Hub 服务器端凭据保险库统一录入供应商 API Key，按用户运行环境自动注入——员工全程零接触 Key
+- **智造云品牌**：控制台与 Hub 界面全套"智造云 AIOS"标识与齿轮 Logo
+- **无捆绑业务应用**：应用体系与系统解耦，独立交付、可选加装（历史 19 个业务应用见各应用仓库）
+- **数据留在本机**：工作区、数据库、凭据全部保存在安装目录（云端模型的对话内容会发送给所选供应商，机密场景请用 Ollama/LM Studio 本地模型）
 
-```sh
-npx @deepseek-ai/dsh web
+## 快速运行
+
+### 单机模式（端口 8088）
+
+```cmd
+:: 首次：安装运行环境（需 Node.js 20+）
+install-oneclick.cmd
+
+:: 之后：启动
+start-ai-os.cmd
 ```
 
-The command starts the Web UI at `http://127.0.0.1:3080` by default and opens it in the default browser for a local launch. An SSH launch only prints the host URL because the SSH client or editor owns the local forwarded address. Pass `--no-open` to run the server without opening a browser. See [Web UI guide](docs/user/guide/index.md).
+打开 http://127.0.0.1:8088 → 注册首个登录账号 → 设置 → 模型 配置供应商 → 开始对话。
 
-### Run from source
+### Hub 多用户模式（端口 8000，推荐团队使用）
 
-To run from a repository checkout:
-
-```sh
-git clone https://github.com/deepseek-ai/deepseek-harness.git
-cd deepseek-harness
-pnpm install
-pnpm run build
-pnpm dsh web
+```cmd
+start-hub.cmd   :: 首次自动安装 Hub 环境（qwenpaw[hub]==2.2.0）
+> Local 运行环境前置要求：Windows 需以管理员身份运行启动器（AppContainer 隔离）；Linux 需安装 Bubblewrap（`apt install bubblewrap`）。启动器会自动检测并提示。
 ```
 
-`pnpm run build` prepares the repository artifacts. `pnpm dsh web` uses those built artifacts without rebuilding.
+1. 打开 http://127.0.0.1:8000 注册管理员（首个账号）
+2. 管理界面「凭据管理」录入模型供应商 Key（如 `DASHSCOPE_API_KEY`）
+3. 「用户管理」创建员工账号；关闭自助注册（`hub.yaml` → `registration.enabled: false`）
+4. 员工访问 `http://<服务器IP>:8000` 登录，直接选择模型使用
 
-## Community and support
+## 架构
 
-- Feel free to submit feedback or bug reports through [GitHub Discussions](https://github.com/deepseek-ai/deepseek-harness/discussions).
-- Add the [`dsh-plugin`](https://github.com/topics/dsh-plugin) topic to your plugin repository for discoverability.
-- Join <a href="https://discord.gg/Ycq5dCaS4">DeepSeek Harness Discord community</a>.
+```
+智造云 AIOS 2.2.0
+├─ QwenPaw 2.2.0（原版内核；版本锁 apps/zhizaoyunAIOS/qwenpaw.lock.json）
+│  ├─ 单机控制台  http://127.0.0.1:8088（原生登录 QWENPAW_AUTH_ENABLED）
+│  └─ QwenPaw Hub http://<host>:8000（多用户账号 + 凭据保险库集中管 Key）
+├─ 品牌化 patch-console-ui.mjs（智造云 AIOS 文案 + branding/ 资产）
+└─ 启动/安装脚本（Windows .cmd + Linux .sh 双平台）
+```
 
-## Contributing
+本仓库只包含：启动器、品牌资产、安装脚本、文档与版本锁。
+**不含任何业务应用**——应用以独立仓库存在，后续可选加装。
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+## 常用入口
 
-## Development
+| 命令 | 用途 |
+| --- | --- |
+| `start-ai-os.cmd/.sh` | 启动单机服务（8088） |
+| `start-hub.cmd/.sh` | 启动多用户 Hub（8000，首次自动装环境） |
+| `setup-ai-os.ps1/.sh` | 安装/修复单机运行环境 |
+| `setup-hub.ps1/.sh` | 安装/修复 Hub 运行环境 |
+| `diagnose-ai-os.cmd/.sh` | 启动诊断 |
+| `node scripts/verify-release.mjs` | 发布门禁 |
 
-Start with the [development guide](docs/development.md) and [architecture documentation](docs/architecture.md).
+## 文档
 
-For agents, follow [AGENTS.md](AGENTS.md).
+- 产品需求：[PRD V7.0（智造云 AIOS 2.2.0）](docs/product/PRD-V7.0-AIOS-2.2.0.md)
+- 使用说明：[docs/user-manual](docs/user-manual/README.md)（v1.x 手册，2.2.0 版重写中）
+- QwenPaw 官方文档：https://qwenpaw.agentscope.io/
 
-## License
+## 国内镜像（Gitee）
 
-[MIT](LICENSE)
-
-Third-party dependencies and their licenses are disclosed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+仓库同步于 Gitee：`zhiyun-ai-platform`（发布渠道见 dist/ 与 Releases）。

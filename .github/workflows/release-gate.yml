@@ -1,0 +1,39 @@
+name: AI-OS release gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-gate-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    timeout-minutes: 25
+    # 成本优化：PR 阶段只在 ubuntu 跑（Windows 分钟按 2x 计费）；
+    # master push / tag / 手动触发时双平台全跑（发布门禁）。
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ github.event_name == 'pull_request' && fromJSON('["ubuntu-24.04"]') || fromJSON('["ubuntu-24.04", "windows-2022"]') }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install release verifier dependencies
+        run: python -m pip install "cryptography>=45,<51"
+      - name: Verify clean QwenPaw release tree and locked PawApps
+        run: node scripts/verify-release.mjs
