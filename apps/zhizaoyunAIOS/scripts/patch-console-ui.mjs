@@ -429,14 +429,62 @@ function themeCss (theme) {
   ]
   if (theme.loginBg) {
     const data = 'data:image/' + (theme.loginBg.endsWith('.png') ? 'png' : 'jpeg') + ';base64,' + readFileSync(theme.loginBg).toString('base64')
-    lines.push(`div[style*="245, 247, 250"],div[style*="245,247,250"]{background:url("${data}") center/cover no-repeat !important;}`)
-  } else {
-    lines.push(`div[style*="245, 247, 250"],div[style*="245,247,250"]{background:linear-gradient(135deg,#F0F8FA 0%,#C4E2EC 55%,#9FCFDF 100%) !important;}`)
+    lines.push(`[class*="login"] > div[style*="245, 247, 250"],body > div[style*="245,247,250"]{background-image:url("${data}") !important;background-size:cover !important;background-position:center !important;}`)
   }
+  // 登录页分栏企业风：左蓝品牌区（网格纹理+Logo+卖点文案）+ 右白表单区。
+  // 宿主登录页是居中卡片布局；这里在宽屏把第一个 login 容器改造为双栏网格，
+  // 并在其前插入品牌区（::before 承载 Logo 与文案），窄屏自动退回卡片居中。
+  const logoPath = selectedLogo().path
+  const logoData = 'data:image/' + (logoPath.endsWith('.svg') ? 'svg+xml' : 'png') + ';base64,' + readFileSync(logoPath).toString('base64')
+  const logoWhite = 'data:image/svg+xml;base64,' + Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + pngSize(logoPath).w + ' ' + pngSize(logoPath).h + '"><g filter="brightness(0) invert(1)"><image href="' + logoData + '" width="' + pngSize(logoPath).w + '" height="' + pngSize(logoPath).h + '"/></g></svg>').toString('base64')
+  lines.push(`
+/* ── 登录页分栏企业风（#126 视觉规范） ─────────────────── */
+/* 锚点：登录路由下 .qwenpaw-app 的直接子容器（含 qwenpaw-form 的卡片） */
+@media (min-width: 900px) {
+  body:has(.qwenpaw-app form){background:#fff !important;}
+  .qwenpaw-app:has(form){position:fixed !important;inset:0 !important;display:grid !important;grid-template-columns:58.333% 41.667% !important;background:#fff !important;}
+  /* 左侧品牌区（只挂最外层 spark 容器，防止内层 qwenpaw-app 二次渲染） */
+  .qwenpaw-app:has(form)::before{content:"";position:absolute;left:0;top:0;bottom:0;width:58.333%;background:linear-gradient(160deg,#1E56C8 0%,#2563D9 55%,#3B82F6 100%);}
+  /* 网格纹理：同样只铺左栏 */
+  .qwenpaw-app:has(form)::after{content:"";position:absolute;left:0;top:0;bottom:0;width:58.333%;pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:44px 44px;}
+  /* 内层同名容器禁用装饰性伪元素 */
+  .qwenpaw-app .qwenpaw-app:has(form)::before,.qwenpaw-app .qwenpaw-app:has(form)::after{content:none !important;}
+  /* 品牌区文案 + 白色 Logo（挂在 app 容器第一个子节点之前不可行，用 body 级伪元素太晚——
+     改为在左栏内部用另一层：直接给 ::before 之上无法再叠文字，因此把文案放在
+     .qwenpaw-app 内新增的元素由 JS 完成，这里仅做背景层） */
+  /* 右侧表单列：把 app 容器的直接子树整体推到第二列 */
+  .qwenpaw-app:has(form) > *{grid-column:2 !important;grid-row:1 !important;position:relative !important;z-index:2 !important;background:#fff !important;min-height:100vh;display:flex;flex-direction:column;justify-content:center;box-shadow:none !important;border-radius:0 !important;max-width:none !important;width:100% !important;overflow:hidden !important;}
+  /* 中间各级容器全部放开宽度（宿主默认卡片宽逐级收窄）：用 * 深度通配 */
+  .qwenpaw-app:has(form) > * , .qwenpaw-app:has(form) > * > *, .qwenpaw-app:has(form) > * > * > *, .qwenpaw-app:has(form) > * > * > * > *{max-width:none !important;width:100% !important;}
+  /* 宿主自带渐变背景的容器（含内嵌 .qwenpaw-app 层）：压平为纯白，避免污染右栏 */
+  .qwenpaw-app:has(form) > div, .qwenpaw-app:has(form) > div > .qwenpaw-app{background:#fff !important;background-image:none !important;}
+  /* 表单及标题区限宽居中，形成设计稿的排版 */
+  /* 卡片内层纵向布局：标题区与表单区各 400px 居中 */
+  .qwenpaw-app:has(form) > * > *{flex-direction:column !important;align-items:center !important;padding:0 32px !important;box-sizing:border-box !important;background:#fff !important;border-radius:0 !important;box-shadow:none !important;}
+  .qwenpaw-app:has(form) form, .qwenpaw-app:has(form) > * > * > div:first-child{max-width:400px !important;width:100% !important;margin:0 auto !important;}
+  /* 标题区（Logo+标题）单行排布、留白与设计稿一致 */
+  .qwenpaw-app:has(form) > * > * > div:first-child{display:flex !important;flex-direction:column !important;align-items:center !important;text-align:center;margin-bottom:8px !important;}
+  .qwenpaw-app:has(form) h2{white-space:nowrap !important;font-size:20px !important;margin:10px 0 0 !important;text-align:center;width:auto !important;}
+  .qwenpaw-app:has(form) img[style*="height: 48px"]{height:56px !important;margin-bottom:8px !important;}
+  .qwenpaw-app:has(form) form::before{content:"";display:block;width:100%;height:3px;background:${p};margin-bottom:40px;border-radius:2px;}
+  /* 登录页 Logo 与标题水平排列（对齐设计稿的 48px Logo + 智造云 字标） */
+  .qwenpaw-app:has(form) img[style*="height: 48px"]{height:52px !important;margin:0 !important;}
+  .qwenpaw-app:has(form) img[style*="height: 48px"] ~ h2, .qwenpaw-app:has(form) h2{font-size:20px !important;}
+}
+@media (max-width: 899px){
+  .qwenpaw-app:has(form)::before,.qwenpaw-app:has(form)::after{display:none;}
+}`)
   return lines.join(String.fromCharCode(10))
 }
 
 function applyBrandTheme (consoleDir) {
+  const theme = brandTheme()
+  const logoPath = selectedLogo().path
+  const logoDataUri = 'data:image/' + (logoPath.endsWith('.svg') ? 'svg+xml' : 'png') + ';base64,' + readFileSync(logoPath).toString('base64')
+  const logoWhite = 'data:image/svg+xml;base64,' + Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + pngSize(logoPath).w + ' ' + pngSize(logoPath).h + '"><g filter="brightness(0) invert(1)"><image href="' + logoDataUri + '" width="' + pngSize(logoPath).w + '" height="' + pngSize(logoPath).h + '"/></g></svg>').toString('base64')
   const htmlPath = join(consoleDir, 'index.html')
   let html = readFileSync(htmlPath, 'utf8')
   html = html.replace(/<style id="zy-(kingdee-theme|brand-theme)">[\s\S]*?<\/style>/g, '')
@@ -447,7 +495,33 @@ function applyBrandTheme (consoleDir) {
     return
   }
   writeAssetWithSiblings(htmlPath, nextHtml)
-  console.log('Console 已注入灵泽万川蓝绿主题样式。')
+  // 品牌区文案/Logo：登录分栏布局的左栏内容（CSS 画不进伪元素之外的图）。
+  // 以 MutationObserver 保证路由切换后仍存在。
+  const brandJs = `<script id="aios-brand-login-copy">(function(){
+    var LOGO = ${JSON.stringify(logoWhite)};
+    var LOGO_RAW = ${JSON.stringify(logoDataUri)};
+    function ensure(){
+      if (!document.querySelector('.qwenpaw-app form')) return;
+      if (document.getElementById('aios-brand-copy')) return;
+      var el = document.createElement('div');
+      el.id = 'aios-brand-copy';
+      el.style.cssText = 'position:fixed;left:5%;bottom:10%;z-index:5;color:#fff;font-size:13px;line-height:1.9;max-width:46%;font-family:inherit;';
+      el.innerHTML = '<div style="display:inline-flex;align-items:center;background:#fff;border-radius:10px;padding:10px 18px;margin-bottom:14px;">'
+        + '<img src="' + LOGO_RAW + '" style="height:44px;width:auto;display:block;">'
+        + '</div>'
+        + '<div style="font-size:15px;font-weight:600;margin-bottom:6px;">灵泽万川智造云</div>导入数据即可分析 · 应用内真实智能体对话<br>可审阅可导出 · 会话、任务与知识按账号隔离';
+      document.body.appendChild(el);
+    }
+    ensure();
+    var t = setInterval(ensure, 800);
+    setTimeout(function(){ clearInterval(t); }, 60000);
+    new MutationObserver(ensure).observe(document.body, {childList:true, subtree:true});
+  })();<\/script>`
+  const copyScript = nextHtml.includes('aios-brand-login-copy')
+    ? nextHtml
+    : nextHtml.replace(/<\/head>/, brandJs + '</head>')
+  if (copyScript !== nextHtml) writeAssetWithSiblings(htmlPath, copyScript)
+  console.log('Console 已注入灵泽万川蓝绿主题样式与登录分栏布局。')
 }
 
 // 生成内嵌的“文档资料”本地页面（替代上游外链 qwenpaw.agentscope.io）。

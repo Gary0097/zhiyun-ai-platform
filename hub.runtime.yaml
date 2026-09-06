@@ -1,0 +1,26 @@
+﻿# 鐏垫辰涓囧窛鏅洪€犱簯 AI-OS 鈥?QwenPaw Hub锛堝眬鍩熺綉澶氱敤鎴凤級閰嶇疆
+# 鍚姩锛歴tart-hub.cmd锛堥娆¤嚜鍔ㄥ畨瑁?Hub 杩愯鐜锛?
+#
+# 妯″瀷璐﹀彿锛圓PI Key锛夐泦涓鐞嗚鏄庯細
+#   涓嶉渶瑕佺粰姣忓彴鐢佃剳/姣忎釜鍛樺伐鍗曠嫭閰?Key銆傜鐞嗗憳鍚姩 Hub 鍚庯紝鍦ㄧ鐞嗙晫闈?
+#   鈥滃嚟鎹鐞嗏€濓紙鎴?PUT /api/hub/credentials锛夌粺涓€褰曞叆渚涘簲鍟?Key锛屼緥濡傦細
+#     DASHSCOPE_API_KEY / OPENAI_API_KEY / OPENROUTER_API_KEY /
+#     ANTHROPIC_API_KEY / SILICONFLOW_API_KEY ...
+#   Hub 浼氭妸鍑嵁鍔犲瘑淇濆瓨锛堝嚟鎹繚闄╁簱锛夛紝骞跺湪鍚姩姣忎釜鐢ㄦ埛鐨勮繍琛岀幆澧冩椂
+#   浠ョ幆澧冨彉閲忔敞鍏モ€斺€斿憳宸ョ櫥褰曞悗鐩存帴閫夋嫨妯″瀷鍗冲彲浣跨敤锛屽叏绋嬫帴瑙︿笉鍒?Key銆?
+#   鍑嵁淇濆瓨鍦?<QWENPAW_WORKING_DIR>/hub/secrets/ 涓?control.db锛屽浠借
+#   杩炲悓鏁翠釜 hub/ 鏁版嵁鐩綍涓€璧峰浠姐€?
+version: 1
+
+control_plane:
+  public_base_url: http://192.168.0.255:8000   # 鍚姩鍣ㄤ細鑷姩娲剧敓 hub.runtime.yaml 骞舵浛鎹负鏈満灞€鍩熺綉 IPv4锛涘澶栧煙鍚嶉儴缃叉椂鍦ㄦ鏀逛负 https://<鍩熷悕>锛堥渶鍙嶅悜浠ｇ悊 TLS锛?
+  registration:
+    enabled: true          # 棣栦釜娉ㄥ唽璐︽埛鑷姩鎴愪负绠＄悊鍛橈紱寤哄ソ鍚庡缓璁敼涓?false
+    default_role: user
+
+runtime:
+  provisioner: local       # Windows 鏈湴杩涚▼闅旂锛堥渶绠＄悊鍛樻潈闄愯繍琛岋級
+
+capacity:
+  max_running_runtimes: 20
+
