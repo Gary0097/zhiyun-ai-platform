@@ -1,14 +1,17 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, writeFileSync, readdirSync, renameSync, statSync } from 'node:fs'
+import { brotliCompressSync, gzipSync } from 'node:zlib'
+import { existsSync, readFileSync, writeFileSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveRuntime } from './runtime-env.mjs'
 
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
-const assetsRoot = join(scriptsRoot, '..', '..', '..', 'plugins', 'zhiyun-logo', 'assets')
+const assetsRoot = join(scriptsRoot, '..', '..', '..', 'branding')
 const gearLogo = join(assetsRoot, 'gear-logo.png')
+const brandLogo = join(assetsRoot, 'brand-logo.png')
+const defaultLogo = join(assetsRoot, 'default-logo.png')
 
 const REPLACEMENTS = [
   {
@@ -39,11 +42,112 @@ const REPLACEMENTS = [
     to: 'avatar:"/qwenpaw.svg"',
     patched: 'avatar:"/qwenpaw.svg"',
   },
+  // ---- QwenPaw 2.2.0 bundle（index-C6K6UUCj.js）----
+  {
+    name: '2.2.0 文档菜单 → 本地内嵌文档',
+    optional: true,
+    from: 'UM=e=>`https://qwenpaw.agentscope.io/docs/intro?lang=${Mo(e)}`',
+    to: 'UM=e=>"/aios-docs.html#tutorial"',
+    patched: 'UM=e=>"/aios-docs.html#tutorial"',
+  },
+  {
+    name: '2.2.0 功能演示 → 本地内嵌文档（视频教程待开发）',
+    optional: true,
+    from: 'GM=e=>`https://qwenpaw.agentscope.io/docs/functiondemo?lang=${Mo(e)}`',
+    to: 'GM=e=>"/aios-docs.html#demo"',
+    patched: 'GM=e=>"/aios-docs.html#demo"',
+  },
+  {
+    name: '2.2.0 更新日志 → 本地内嵌文档',
+    optional: true,
+    from: 'pd=e=>`https://qwenpaw.agentscope.io/release-notes?lang=${Mo(e)}`',
+    to: 'pd=e=>"/aios-docs.html#changelog"',
+    patched: 'pd=e=>"/aios-docs.html#changelog"',
+  },
+  {
+    name: '2.2.0 常见问题 → 本地内嵌文档',
+    optional: true,
+    from: 'jM=e=>`https://qwenpaw.agentscope.io/docs/faq?lang=${Mo(e)}`',
+    to: 'jM=e=>"/aios-docs.html#faq"',
+    patched: 'jM=e=>"/aios-docs.html#faq"',
+  },
+  {
+    name: '2.2.0 GitHub 按钮隐藏',
+    optional: true,
+    from: 'c.jsx(mt,{title:e("header.github"),children:c.jsx(ct,{type:"text",icon:c.jsx(Js,{}),onClick:()=>L(ud),className:F.hideOnMobile,children:e("header.github")})})',
+    to: 'false&&c.jsx(mt,{title:e("header.github"),children:c.jsx(ct,{type:"text",icon:c.jsx(Js,{}),onClick:()=>L(ud),className:F.hideOnMobile,children:e("header.github")})})',
+    patched: 'false&&c.jsx(mt,{title:e("header.github")',
+  },
+  {
+    name: '2.2.0 GitHub 仓库地址改内嵌文档（仅被已隐藏按钮引用）',
+    optional: true,
+    from: 'ud="https://github.com/agentscope-ai/QwenPaw"',
+    to: 'ud="/aios-docs.html#doc-community"',
+    patched: 'ud="/aios-docs.html#doc-community"',
+  },
+  {
+    name: '2.2.0 更新弹窗 FAQ 远程拉取改本地（消除运行时外呼，失败兜底逻辑不变）',
+    optional: true,
+    from: 'H=`https://qwenpaw.agentscope.io/docs/faq.${N}.md`',
+    to: 'H=`/aios-docs-faq.${N}.md`',
+    patched: 'H=`/aios-docs-faq.${N}.md`',
+  },
   {
     name: '默认中文语言',
     from: 'lng:localStorage.getItem("language")||navigator.language||"en"',
     to: 'lng:localStorage.getItem("language")||"zh"',
     patched: 'lng:localStorage.getItem("language")||"zh"',
+  },
+]
+
+// 懒加载 chunk / 非 bundle 资源的外链与 QwenPaw 可见内容清理（全部 optional，
+// 精确匹配当前构建；上游升级后未命中仅告警，不影响启动）。与 REPLACEMENTS 不同，
+// 这些规则会对 console 目录下所有 .js 文件执行，包括登录页 chunk（index-Cs4S3Wa1）。
+const CHUNK_REPLACEMENTS = [
+  {
+    name: '登录页 hubLinks：GitHub 外链移除（保留语言切换）',
+    optional: true,
+    from: 'e.jsxs("a",{href:"https://github.com/agentscope-ai/QwenPaw",target:"_blank",rel:"noopener noreferrer",children:[e.jsx(se,{size:14,strokeWidth:1.8,"aria-hidden":"true"}),"GitHub"]}),e.jsx("span",{"aria-hidden":"true"}),',
+    to: 'false&&(e.jsxs("a",{href:"https://github.com/agentscope-ai/QwenPaw",target:"_blank",rel:"noopener noreferrer",children:[e.jsx(se,{size:14,strokeWidth:1.8,"aria-hidden":"true"}),"GitHub"]}),e.jsx("span",{"aria-hidden":"true"})),',
+    patched: 'false&&(e.jsxs("a",{href:"https://github.com/agentscope-ai/QwenPaw"',
+  },
+  {
+    name: '登录页 hubLinks：QwenPaw 官网外链移除（保留语言切换）',
+    optional: true,
+    from: 'e.jsxs("a",{href:"https://qwenpaw.agentscope.io/",target:"_blank",rel:"noopener noreferrer",children:[e.jsx(te,{size:14,strokeWidth:1.8,"aria-hidden":"true"}),t("login.officialWebsite")]}),e.jsx("span",{"aria-hidden":"true"}),',
+    to: 'false&&(e.jsxs("a",{href:"https://qwenpaw.agentscope.io/",target:"_blank",rel:"noopener noreferrer",children:[e.jsx(te,{size:14,strokeWidth:1.8,"aria-hidden":"true"}),t("login.officialWebsite")]}),e.jsx("span",{"aria-hidden":"true"})),',
+    patched: 'false&&(e.jsxs("a",{href:"https://qwenpaw.agentscope.io/"',
+  },
+  {
+    name: '记忆卡片 ReMe 外链移除（保留“由 ReMe 驱动”文案）',
+    optional: true,
+    from: 'e.jsx("a",{href:"https://github.com/agentscope-ai/ReMe",target:"_blank",rel:"noreferrer",children:"ReMe"})',
+    to: 'false&&e.jsx("a",{href:"https://github.com/agentscope-ai/ReMe",target:"_blank",rel:"noreferrer",children:"ReMe"})',
+    patched: 'false&&e.jsx("a",{href:"https://github.com/agentscope-ai/ReMe"',
+  },
+  {
+    name: '记忆卡片文档链接 → 内嵌文档（全局替换，同文件多处出现）',
+    optional: true,
+    regex: true,
+    from: /https:\/\/qwenpaw\.agentscope\.io\/docs\/memory[^"'`\s\\]*/g,
+    to: '/aios-docs.html#doc-memory',
+    patched: '/aios-docs.html#doc-memory',
+  },
+  {
+    name: 'ACP 文档链接 → 内嵌文档（保留模板字面量外壳，仅替换 URL）',
+    optional: true,
+    regex: true,
+    from: /https:\/\/qwenpaw\.agentscope\.io\/docs\/acp-integration\?lang=[^"'`\s\\]*/g,
+    to: '/aios-docs.html#doc-acpServer',
+    patched: '/aios-docs.html#doc-acpServer',
+  },
+  {
+    name: '频道配置文档链接 → 内嵌文档（上游 channels 锚点无本地对应，统一指向频道章节）',
+    optional: true,
+    regex: true,
+    from: /https:\/\/qwenpaw\.agentscope\.io\/docs\/channels\/[^"'`\s\\]*/g,
+    to: '/aios-docs.html#doc-channels',
+    patched: '/aios-docs.html#doc-channels',
   },
 ]
 
@@ -56,9 +160,14 @@ const PROTECTED = [
   '[QwenPaw registry]',
   '[QwenPaw]',
   'cd QwenPaw',
+  'QwenPaw Desktop',
+  'QwenPaw-Tauri',
+  'QwenPaw-Flash',
+  'QwenPaw_QA',
+  'QwenPawQA',
 ]
 
-// 将用户可见的 QwenPaw 品牌文案替换为“灵泽万川智造云”，同时保护技术标识、URL、日志前缀与
+// 将用户可见的 QwenPaw 品牌文案替换为“智造云 AIOS”，同时保护技术标识、URL、日志前缀与
 // 操作命令，避免破坏 host API / 仓库地址 / macOS 路径 / 审计日志。
 function applyBrand (content) {
   const tokens = PROTECTED.slice().sort((a, b) => b.length - a.length)
@@ -70,7 +179,10 @@ function applyBrand (content) {
     placeholders.push({ ph, t })
     out = out.split(t).join(ph)
   }
-  out = out.split('QwenPaw').join('灵泽万川智造云')
+  out = out.split('QwenPaw').join('智造云AIOS')
+  // 旧品牌名归一：bundle 可能已按历史品牌（灵泽万川智造云）打过补丁，
+  // 重品牌化时一并替换，保证跨版本幂等
+  out = out.split('灵泽万川智造云').join('智造云AIOS')
   for (const { ph, t } of placeholders) out = out.split(ph).join(t)
   return out
 }
@@ -108,6 +220,20 @@ function writeIndependent (file, data) {
   renameSync(tmp, file)
 }
 
+// 写入静态资产并同步刷新同名的 .br / .gz 预压缩副本。console 静态服务支持
+// Content-Encoding 协商，若只改原文件，旧压缩副本仍会被优先返回，导致改动“看不见”。
+function writeAssetWithSiblings (file, data) {
+  writeIndependent(file, data)
+  for (const ext of ['.br', '.gz']) {
+    const sibling = file + ext
+    if (!existsSync(sibling)) continue
+    const compressed = ext === '.br'
+      ? brotliCompressSync(data)
+      : gzipSync(data)
+    writeIndependent(sibling, compressed)
+  }
+}
+
 function workingDir () {
   const explicit = process.env.QWENPAW_WORKING_DIR || process.env.COPAW_WORKING_DIR
   if (explicit) return resolve(explicit)
@@ -128,12 +254,28 @@ function selectedLogo () {
       return { path, mime, source: 'Workspace 自定义 Logo' }
     }
   } catch {}
-  return { path: gearLogo, mime: 'image/png', source: '内置灵泽万川智造云齿轮 Logo' }
+  // 默认使用灵泽万川品牌 Logo（上传版优先，其次旧字标）；缺失时回退齿轮 Logo。
+  for (const [path, source] of [[brandLogo, '内置灵泽万川品牌 Logo（上传版）'], [defaultLogo, '内置灵泽万川品牌 Logo'], [gearLogo, '内置智造云 AIOS 齿轮 Logo']]) {
+    if (existsSync(path) && statSync(path).size > 0) return { path, mime: 'image/png', source }
+  }
+  return { path: gearLogo, mime: 'image/png', source: '内置智造云 AIOS 齿轮 Logo' }
+}
+
+// 读取 PNG IHDR 的真实宽高，让生成的 SVG 保持 Logo 原始纵横比。
+// 若统一用 512x512 方形 viewBox，横版字标会被大块透明边距居中，
+// 在顶栏/头像等方形上下文里显得极小（曾导致“Logo 看不见/被压扁”）。
+function pngSize (file) {
+  const buf = readFileSync(file)
+  if (buf.length > 24 && buf[12] === 0x49 && buf[13] === 0x48 && buf[14] === 0x44 && buf[15] === 0x52) {
+    return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) }
+  }
+  return { w: 512, h: 512 }
 }
 
 function logoSvg (logo) {
   const encoded = readFileSync(logo.path).toString('base64')
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><image href="data:${logo.mime};base64,${encoded}" width="512" height="512" preserveAspectRatio="xMidYMid meet"/></svg>\n`
+  const { w, h } = logo.mime === 'image/png' ? pngSize(logo.path) : { w: 512, h: 512 }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><image href="data:${logo.mime};base64,${encoded}" width="${w}" height="${h}"/></svg>\n`
 }
 
 // 依据项目运行环境目录推导常见 venv 布局下的 QwenPaw Console 路径，避免依赖
@@ -251,7 +393,7 @@ function ensureCacheBust (consoleDir, bundleContent) {
   if (!re.test(html)) return { changed: false }
   const newHtml = html.replace(re, '$1$2')
   if (newHtml === html) return { changed: false }
-  writeIndependent(htmlPath, newHtml)
+  writeAssetWithSiblings(htmlPath, newHtml)
   return { changed: true }
 }
 
@@ -265,17 +407,457 @@ function syncConsoleLogo (consoleDir) {
   const logo = selectedLogo()
   const svgTarget = join(consoleDir, 'qwenpaw.svg')
   writeIndependent(svgTarget, logoSvg(logo))
+  // 启动页（boot screen）Logo：index.html 中 .qwenpaw-boot__logo 直接引用根路径
+  // /qwenpaw.png，需要用当前平台 Logo 物理覆盖该文件（仅位图 Logo 可安全写入 .png）。
+  const rasterMime = new Set(['image/png', 'image/jpeg', 'image/webp'])
+  if (rasterMime.has(logo.mime)) {
+    writeAssetWithSiblings(join(consoleDir, 'qwenpaw.png'), readFileSync(logo.path))
+  }
+  else {
+    // SVG 自定义 Logo 无法写入 .png：把启动页 img 改指同步生成的 /qwenpaw.svg
+    const bootHtmlPath = join(consoleDir, 'index.html')
+    let bootHtml = readFileSync(bootHtmlPath, 'utf8')
+    if (bootHtml.includes('src="/qwenpaw.png"')) {
+      bootHtml = bootHtml.split('src="/qwenpaw.png"').join('src="/qwenpaw.svg"')
+      writeAssetWithSiblings(bootHtmlPath, bootHtml)
+      console.log('Console 启动页 Logo 已改为 SVG 引用（自定义 Logo 为 SVG）。')
+    }
+  }
+  // 其余上游默认 Logo 资产（登录页 logo-dark/light.svg、creator-logo.png 等）一并
+  // 覆盖为当前平台 Logo，避免任何残留的 QwenPaw 黡标识。
+  const svgLogo = logoSvg(logo)
+  for (const name of readdirSync(consoleDir)) {
+    if (/^logo-(dark|light)\.svg$/.test(name)) {
+      writeAssetWithSiblings(join(consoleDir, name), svgLogo)
+    } else if (name === 'creator-logo.png' && rasterMime.has(logo.mime)) {
+      writeAssetWithSiblings(join(consoleDir, name), readFileSync(logo.path))
+    }
+  }
   const htmlPath = join(consoleDir, 'index.html')
   const html = readFileSync(htmlPath, 'utf8')
   const nextHtml = html.replace(/<link rel="icon"[^>]*\/>/, '<link rel="icon" type="image/svg+xml" href="/qwenpaw.svg" />')
   if (nextHtml !== html) {
-    writeIndependent(htmlPath, nextHtml)
+    writeAssetWithSiblings(htmlPath, nextHtml)
   }
-  console.log(`Console favicon 与聊天智能体头像已同步为${logo.source}。`)
+  console.log(`Console favicon、启动页 Logo 与默认 Logo 资产已同步为${logo.source}。`)
 }
-// 抑制宿主“试试桌面模式”新手引导：该引导每次进入应用都会弹出并带全屏遮罩
-// 拦截点击，且不记忆已完成状态。桌面模式仍可从宿主快捷设置进入，这里只隐藏
-// 打扰性的引导弹层与遮罩。
+
+// 注入灵泽万川蓝绿主题。console 全站配色由 .css-var-r0 上的 antd CSS 变量驱动
+// （上游主色为橙色 --qwenpaw-color-primary:#ff7f16），因此用更高优先级的选择器
+// 覆盖主色系变量 + 登录页背景/Logo 尺寸，实现整体换肤。
+// 主题可通过 Workspace 的 branding/theme.json 自定义：
+// { "primary": "#0086AD", "primaryHover": "#00A3C4", "primaryActive": "#00688A",
+//   "loginLogoHeight": 88, "loginBg": "cover.png"（branding 目录内的图片文件名） }
+const THEME_DEFAULTS = { primary: '#0086AD', primaryHover: '#00A3C4', primaryActive: '#00688A', loginLogoHeight: 88, loginBg: '' }
+function brandTheme () {
+  const branding = join(workingDir(), 'branding')
+  try {
+    const cfg = JSON.parse(readFileSync(join(branding, 'theme.json'), 'utf8'))
+    const hex = v => typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v) ? v : null
+    const theme = {
+      primary: hex(cfg.primary) || THEME_DEFAULTS.primary,
+      primaryHover: hex(cfg.primaryHover) || THEME_DEFAULTS.primaryHover,
+      primaryActive: hex(cfg.primaryActive) || THEME_DEFAULTS.primaryActive,
+      loginLogoHeight: Number.isFinite(cfg.loginLogoHeight) && cfg.loginLogoHeight >= 32 && cfg.loginLogoHeight <= 240 ? cfg.loginLogoHeight : THEME_DEFAULTS.loginLogoHeight,
+      loginBg: ''
+    }
+    if (typeof cfg.loginBg === 'string' && cfg.loginBg && !cfg.loginBg.includes('..')) {
+      const p = join(branding, cfg.loginBg)
+      if (existsSync(p) && statSync(p).size > 0) theme.loginBg = p
+    }
+    return theme
+  } catch {}
+  return { ...THEME_DEFAULTS }
+}
+
+function themeCss (theme) {
+  const p = theme.primary, h = theme.primaryHover, a = theme.primaryActive
+  // 由主色推导的浅色底/描边（保持 antd 层级关系）
+  const bg = '#E8F5F9', bgHover = '#CDEAF2', border = '#8FD1E0', borderHover = '#5FBBD0'
+  const lines = [
+    `:root{--zy-brand:${p};}`,
+    `:root,html .css-var-r0{`,
+    `--qwenpaw-color-primary:${p};--qwenpaw-color-primary-hover:${h};--qwenpaw-color-primary-active:${a};`,
+    `--qwenpaw-color-primary-bg:${bg};--qwenpaw-color-primary-bg-hover:${bgHover};`,
+    `--qwenpaw-color-primary-border:${border};--qwenpaw-color-primary-border-hover:${borderHover};`,
+    `--qwenpaw-color-primary-text:${p};--qwenpaw-color-primary-text-hover:${h};--qwenpaw-color-primary-text-active:${a};`,
+    `--qwenpaw-color-link:${p};--qwenpaw-color-link-hover:${h};--qwenpaw-color-link-active:${a};`,
+    `--qwenpaw-input-active-border-color:${p};--qwenpaw-input-hover-border-color:${h};`,
+    `--qwenpaw-input-active-shadow:0 0 0 2px ${p}1a;--qwenpaw-control-outline:${p}1a;`,
+    `--qwenpaw-control-item-bg-active:${bg};--qwenpaw-control-item-bg-active-hover:${bgHover};`,
+    `--qwenpaw-button-group-border-color:${p};}`,
+    `a{color:${p};}`,
+    // 登录页 Logo 放大（上游内联 48px）
+    `img[style*="height: 48px"]{height:${theme.loginLogoHeight}px !important;width:auto !important;}`,
+    // 顶栏 Logo 放大（上游 16px 的 CSS Module 类，按类名片段匹配以跨哈希稳定命中）
+    `img[class*="logoImg"]{height:32px !important;width:auto !important;max-width:none !important;}`,
+  ]
+  if (theme.loginBg) {
+    const data = 'data:image/' + (theme.loginBg.endsWith('.png') ? 'png' : 'jpeg') + ';base64,' + readFileSync(theme.loginBg).toString('base64')
+    lines.push(`[class*="login"] > div[style*="245, 247, 250"],body > div[style*="245,247,250"]{background-image:url("${data}") !important;background-size:cover !important;background-position:center !important;}`)
+  }
+  // 登录页分栏企业风：左蓝品牌区（网格纹理+Logo+卖点文案）+ 右白表单区。
+  // 宿主登录页是居中卡片布局；这里在宽屏把第一个 login 容器改造为双栏网格，
+  // 并在其前插入品牌区（::before 承载 Logo 与文案），窄屏自动退回卡片居中。
+  const logoPath = selectedLogo().path
+  const logoData = 'data:image/' + (logoPath.endsWith('.svg') ? 'svg+xml' : 'png') + ';base64,' + readFileSync(logoPath).toString('base64')
+  const logoWhite = 'data:image/svg+xml;base64,' + Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + pngSize(logoPath).w + ' ' + pngSize(logoPath).h + '"><g filter="brightness(0) invert(1)"><image href="' + logoData + '" width="' + pngSize(logoPath).w + '" height="' + pngSize(logoPath).h + '"/></g></svg>').toString('base64')
+  lines.push(`
+/* ── 登录页分栏企业风（#126 视觉规范） ─────────────────── */
+/* 锚点：登录路由下 .qwenpaw-app 的直接子容器（含 qwenpaw-form 的卡片） */
+@media (min-width: 900px) {
+  body:has(.qwenpaw-app form){background:#fff !important;}
+  .qwenpaw-app:has(form){position:fixed !important;inset:0 !important;display:grid !important;grid-template-columns:58.333% 41.667% !important;background:#fff !important;}
+  /* 左侧品牌区（只挂最外层 spark 容器，防止内层 qwenpaw-app 二次渲染） */
+  .qwenpaw-app:has(form)::before{content:"";position:absolute;left:0;top:0;bottom:0;width:58.333%;background:linear-gradient(160deg,#1E56C8 0%,#2563D9 55%,#3B82F6 100%);}
+  /* 网格纹理：同样只铺左栏 */
+  .qwenpaw-app:has(form)::after{content:"";position:absolute;left:0;top:0;bottom:0;width:58.333%;pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:44px 44px;}
+  /* 内层同名容器禁用装饰性伪元素 */
+  .qwenpaw-app .qwenpaw-app:has(form)::before,.qwenpaw-app .qwenpaw-app:has(form)::after{content:none !important;}
+  /* 品牌区文案 + 白色 Logo（挂在 app 容器第一个子节点之前不可行，用 body 级伪元素太晚——
+     改为在左栏内部用另一层：直接给 ::before 之上无法再叠文字，因此把文案放在
+     .qwenpaw-app 内新增的元素由 JS 完成，这里仅做背景层） */
+  /* 右侧表单列：把 app 容器的直接子树整体推到第二列 */
+  .qwenpaw-app:has(form) > *{grid-column:2 !important;grid-row:1 !important;position:relative !important;z-index:2 !important;background:#fff !important;min-height:100vh;display:flex;flex-direction:column;justify-content:center;box-shadow:none !important;border-radius:0 !important;max-width:none !important;width:100% !important;overflow:hidden !important;}
+  /* 中间各级容器全部放开宽度（宿主默认卡片宽逐级收窄）：用 * 深度通配 */
+  .qwenpaw-app:has(form) > * , .qwenpaw-app:has(form) > * > *, .qwenpaw-app:has(form) > * > * > *, .qwenpaw-app:has(form) > * > * > * > *{max-width:none !important;width:100% !important;}
+  /* 宿主自带渐变背景的容器（含内嵌 .qwenpaw-app 层）：压平为纯白，避免污染右栏 */
+  .qwenpaw-app:has(form) > div, .qwenpaw-app:has(form) > div > .qwenpaw-app{background:#fff !important;background-image:none !important;}
+  /* 表单及标题区限宽居中，形成设计稿的排版 */
+  /* 卡片内层纵向布局：标题区与表单区各 400px 居中 */
+  .qwenpaw-app:has(form) > * > *{flex-direction:column !important;align-items:center !important;padding:0 32px !important;box-sizing:border-box !important;background:#fff !important;border-radius:0 !important;box-shadow:none !important;}
+  .qwenpaw-app:has(form) form, .qwenpaw-app:has(form) > * > * > div:first-child{max-width:400px !important;width:100% !important;margin:0 auto !important;}
+  /* 标题区（Logo+标题）单行排布、留白与设计稿一致 */
+  .qwenpaw-app:has(form) > * > * > div:first-child{display:flex !important;flex-direction:column !important;align-items:center !important;text-align:center;margin-bottom:8px !important;}
+  .qwenpaw-app:has(form) h2{white-space:nowrap !important;font-size:20px !important;margin:10px 0 0 !important;text-align:center;width:auto !important;}
+  .qwenpaw-app:has(form) img[style*="height: 48px"]{height:56px !important;margin-bottom:8px !important;}
+  .qwenpaw-app:has(form) form::before{content:"";display:block;width:100%;height:3px;background:${p};margin-bottom:40px;border-radius:2px;}
+  /* 登录页 Logo 与标题水平排列（对齐设计稿的 48px Logo + 智造云 字标） */
+  .qwenpaw-app:has(form) img[style*="height: 48px"]{height:52px !important;margin:0 !important;}
+  .qwenpaw-app:has(form) img[style*="height: 48px"] ~ h2, .qwenpaw-app:has(form) h2{font-size:20px !important;}
+}
+@media (max-width: 899px){
+  .qwenpaw-app:has(form)::before,.qwenpaw-app:has(form)::after{display:none;}
+}`)
+  return lines.join(String.fromCharCode(10))
+}
+
+function applyBrandTheme (consoleDir) {
+  const theme = brandTheme()
+  const logoPath = selectedLogo().path
+  const logoDataUri = 'data:image/' + (logoPath.endsWith('.svg') ? 'svg+xml' : 'png') + ';base64,' + readFileSync(logoPath).toString('base64')
+  const logoWhite = 'data:image/svg+xml;base64,' + Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + pngSize(logoPath).w + ' ' + pngSize(logoPath).h + '"><g filter="brightness(0) invert(1)"><image href="' + logoDataUri + '" width="' + pngSize(logoPath).w + '" height="' + pngSize(logoPath).h + '"/></g></svg>').toString('base64')
+  const htmlPath = join(consoleDir, 'index.html')
+  let html = readFileSync(htmlPath, 'utf8')
+  html = html.replace(/<style id="zy-(kingdee-theme|brand-theme)">[\s\S]*?<\/style>/g, '')
+  const style = `<style id="zy-brand-theme">${themeCss(brandTheme())}</style>`
+  const nextHtml = html.replace(/<\/head>/, style + '</head>')
+  if (nextHtml === html) {
+    warn('未找到 </head>，无法注入品牌主题。')
+    return
+  }
+  writeAssetWithSiblings(htmlPath, nextHtml)
+  // 品牌区文案/Logo：登录分栏布局的左栏内容（CSS 画不进伪元素之外的图）。
+  // 以 MutationObserver 保证路由切换后仍存在。
+  const brandJs = `<script id="aios-brand-login-copy">(function(){
+    var LOGO = ${JSON.stringify(logoWhite)};
+    var LOGO_RAW = ${JSON.stringify(logoDataUri)};
+    function ensure(){
+      if (!document.querySelector('.qwenpaw-app form')) return;
+      if (document.getElementById('aios-brand-copy')) return;
+      var el = document.createElement('div');
+      el.id = 'aios-brand-copy';
+      el.style.cssText = 'position:fixed;left:5%;bottom:10%;z-index:5;color:#fff;font-size:13px;line-height:1.9;max-width:46%;font-family:inherit;';
+      el.innerHTML = '<div style="display:inline-flex;align-items:center;background:#fff;border-radius:10px;padding:10px 18px;margin-bottom:14px;">'
+        + '<img src="' + LOGO_RAW + '" style="height:44px;width:auto;display:block;">'
+        + '</div>'
+        + '<div style="font-size:15px;font-weight:600;margin-bottom:6px;">灵泽万川智造云</div>导入数据即可分析 · 应用内真实智能体对话<br>可审阅可导出 · 会话、任务与知识按账号隔离';
+      document.body.appendChild(el);
+    }
+    ensure();
+    var t = setInterval(ensure, 800);
+    setTimeout(function(){ clearInterval(t); }, 60000);
+    new MutationObserver(ensure).observe(document.body, {childList:true, subtree:true});
+  })();<\/script>`
+  const copyScript = nextHtml.includes('aios-brand-login-copy')
+    ? nextHtml
+    : nextHtml.replace(/<\/head>/, brandJs + '</head>')
+  if (copyScript !== nextHtml) writeAssetWithSiblings(htmlPath, copyScript)
+  console.log('Console 已注入灵泽万川蓝绿主题样式与登录分栏布局。')
+}
+
+// 生成内嵌的“文档资料”本地页面（替代上游外链 qwenpaw.agentscope.io）。
+// 内容源为仓库 docs/console-help/src/*.zh.md（自官方文档站抓取的中文 Markdown），
+// 构建时做：品牌替换（QwenPaw→智造云AIOS，保护标识符/仓库地址）、图片剔除、
+// 外链文档地址改写为本页锚点，最终渲染为带侧边栏目录的单页离线文档。
+const DOCS_SRC = join(scriptsRoot, '..', '..', '..', 'docs', 'console-help', 'src')
+
+const DOC_TITLES = {
+  intro: '项目介绍', quickstart: '快速开始', console: '控制台',
+  mailbox: '邮箱管理与自动化', tui: '终端界面', cli: 'CLI', multiAgent: '多智能体',
+  models: '模型', channels: '频道配置', skills: 'Skills', mcp: 'MCP 与内置工具',
+  browser: '浏览器', acpServer: 'ACP 集成', memory: '长期记忆', embedding: '向量模型',
+  memoryEvolvingAndProactive: '记忆进化与主动交互', computerUse: '电脑操作',
+  chrome: 'Chrome 浏览器扩展', creator: 'Creator', context: '上下文',
+  loopEngineering: '循环工程', commands: '魔法命令', cron: '定时任务', heartbeat: '心跳',
+  config: '配置与工作目录', security: '安全', backup: '备份与恢复', plugins: '插件系统',
+  pluginsMigration: '插件迁移指南', hub: '部署与管理多租户', architecture: '架构设计',
+  faq: '常见问题', apiTutorial: 'RESTful API 接口', community: '问题反馈与交流',
+  contributing: '开源与贡献', roadmap: '路线图', practiceAgentTeam: 'Agent Team 实践',
+}
+
+const DOC_GROUPS = [
+  // desktop 章节已移除：QwenPaw Desktop 为上游独立发行物，本产品不分发，
+  // 其安装指南（GitHub Releases 下载、QwenPaw-Tauri 安装包）不进入内嵌文档
+  ['快速上手', ['intro', 'quickstart', 'console', 'tui', 'cli']],
+  ['智能体与能力', ['multiAgent', 'models', 'context', 'loopEngineering', 'commands', 'skills', 'mcp', 'browser', 'chrome', 'computerUse', 'memory', 'embedding', 'memoryEvolvingAndProactive']],
+  ['自动化与集成', ['mailbox', 'channels', 'cron', 'heartbeat', 'acpServer', 'creator']],
+  ['部署与管理', ['config', 'security', 'backup', 'plugins', 'pluginsMigration', 'hub', 'architecture']],
+  ['参考', ['apiTutorial', 'practiceAgentTeam', 'roadmap', 'community', 'contributing', 'faq']],
+]
+
+function escapeHtml (text) {
+  return text.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;').split('"').join('&quot;')
+}
+
+function slugAnchor (id) { return 'doc-' + id }
+
+// 极简 Markdown → HTML（标题/段落/列表/引用/表格/代码块/行内标记；图片剔除）。
+function mdToHtml (md, knownIds) {
+  const esc = escapeHtml
+  const inline = (text) => {
+    let t = esc(text)
+    t = t.replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1') // 剔除图片，保留可选 alt 文本
+    t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, label, url) => {
+      const dm = url.match(/(?:^|qwenpaw\.agentscope\.io)\/docs\/([a-zA-Z-]+)(?:[?#][^)]*)?$/)
+        || (url.startsWith('/docs/') ? [null, url.slice(7).split(/[?#]/)[0]] : null)
+        || (url.startsWith('./') ? [null, url.slice(2).split(/[?#]/)[0]] : null)
+      if (!dm) {
+        // 上游生态外链（GitHub agentscope-ai 仓库、*.agentscope.io 官网/文档/协议、
+        // x.com/agentscope_ai、huggingface.co/agentscope-ai 模型库等）一律去链：
+        // 链接文字本身是 URL 时整条删除，否则保留文字改为加粗
+        if (/agentscope/i.test(url)) {
+          return /^https?:\/\//.test(label) ? '' : `<strong>${label}</strong>`
+        }
+      }
+      if (dm) {
+        // 文档内链接常用 kebab slug（multi-agent），章节 id 是 camel（multiAgent）
+        const camel = dm[1].replace(/-([a-z])/g, (mm, c) => c.toUpperCase())
+        const id = knownIds.has(dm[1]) ? dm[1] : (knownIds.has(camel) ? camel : dm[1])
+        if (knownIds.has(id)) return `<a href="#${slugAnchor(id)}">${label}</a>`
+        return `<strong>${label}</strong>`
+      }
+      return `<a href="${url}" target="_blank" rel="noreferrer">${label}</a>`
+    })
+    t = t.split('`').reduce((acc, part, i) => i % 2 ? acc + '<code>' + part + '</code>' : acc + part, '')
+    t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    t = t.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
+    return t
+  }
+  const lines = md.replace(/\r\n/g, '\n').split('\n')
+  // 引用式链接定义：[id]: url —— 先收集再从正文中剔除
+  const refLinks = {}
+  for (let li = 0; li < lines.length; li++) {
+    const rm = lines[li].match(/^\s{0,3}\[([^\]]+)\]:\s*(\S+)(?:\s+"[^"]*")?\s*$/)
+    if (rm) { refLinks[rm[1].toLowerCase()] = rm[2]; lines[li] = '' }
+  }
+  const inlineWithRefs = (text) => {
+    let t = text.replace(/\[([^\]]+)\]\[([^\]]+)\]/g, (mm, label, ref) => {
+      const url = refLinks[String(ref).toLowerCase()]
+      return url ? '[' + label + '](' + url + ')' : label
+    })
+    return inline(t)
+  }
+  const out = []
+  let i = 0
+  let para = []
+  const flushPara = () => { if (para.length) { out.push('<p>' + para.map(inlineWithRefs).join('<br>') + '</p>'); para = [] } }
+  while (i < lines.length) {
+    const line = lines[i]
+    if (/^\s*<[a-zA-Z!/]/.test(line)) {
+      flushPara()
+      const buf = []
+      while (i < lines.length && (/^\s*<[a-zA-Z!/]/.test(lines[i]) || (/^\s*\S/.test(lines[i]) && lines[i].includes('>')))) { buf.push(lines[i]); i++ }
+      out.push(buf.join('\n'))
+      continue
+    }
+    if (/^```|^~~~/.test(line)) {
+      flushPara()
+      const buf = []
+      i++
+      while (i < lines.length && !/^```|^~~~/.test(lines[i])) { buf.push(lines[i]); i++ }
+      i++
+      out.push('<pre><code>' + esc(buf.join('\n')) + '</code></pre>')
+      continue
+    }
+    const h = line.match(/^(#{1,5})\s+(.*)$/)
+    if (h) {
+      flushPara()
+      const level = Math.min(h[1].length + 1, 6)
+      out.push(`<h${level}>${inline(h[2])}</h${level}>`)
+      i++
+      continue
+    }
+    if (/^\s*\|.*\|\s*$/.test(line) && /^\s*\|[\s:-|]+\|\s*$/.test(lines[i + 1] || '')) {
+      flushPara()
+      const cells = (row) => row.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim())
+      const head = cells(line)
+      i += 2
+      const body = []
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { body.push(cells(lines[i])); i++ }
+      out.push('<table><thead><tr>' + head.map(c => `<th>${inline(c)}</th>`).join('') + '</tr></thead><tbody>'
+        + body.map(r => '<tr>' + r.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>').join('') + '</tbody></table>')
+      continue
+    }
+    if (/^\s*[-*+]\s+/.test(line)) {
+      flushPara()
+      const items = []
+      while (i < lines.length && /^\s*[-*+]\s+/.test(lines[i])) { items.push(lines[i].replace(/^\s*[-*+]\s+/, '')); i++ }
+      out.push('<ul>' + items.map(it => `<li>${inlineWithRefs(it)}</li>`).join('') + '</ul>')
+      continue
+    }
+    if (/^\s*\d+[.)]\s+/.test(line)) {
+      flushPara()
+      const items = []
+      while (i < lines.length && /^\s*\d+[.)]\s+/.test(lines[i])) { items.push(lines[i].replace(/^\s*\d+[.)]\s+/, '')); i++ }
+      out.push('<ol>' + items.map(it => `<li>${inlineWithRefs(it)}</li>`).join('') + '</ol>')
+      continue
+    }
+    if (/^>\s?/.test(line)) {
+      flushPara()
+      const buf = []
+      while (i < lines.length && /^>\s?/.test(lines[i])) { buf.push(lines[i].replace(/^>\s?/, '')); i++ }
+      out.push('<blockquote>' + buf.map(inlineWithRefs).join('<br>') + '</blockquote>')
+      continue
+    }
+    if (/^\s*(---|\*\*\*)\s*$/.test(line)) { flushPara(); out.push('<hr>'); i++; continue }
+    if (!line.trim()) { flushPara(); i++; continue }
+    para.push(line)
+    i++
+  }
+  flushPara()
+  return out.join('\n')
+}
+
+function writeLocalDocs (consoleDir) {
+  const t = brandTheme()
+  const logo = selectedLogo()
+  const logoData = 'data:' + logo.mime + ';base64,' + readFileSync(logo.path).toString('base64')
+  const pages = []
+  for (const [group, ids] of DOC_GROUPS) {
+    for (const id of ids) {
+      const file = join(DOCS_SRC, id + '.zh.md')
+      if (!existsSync(file)) continue
+      pages.push({ id, group, title: DOC_TITLES[id] || id })
+    }
+  }
+  const knownIds = new Set(pages.map(p => p.id))
+  const toc = DOC_GROUPS.map(([group, ids]) => {
+    const items = ids.filter(id => knownIds.has(id))
+    if (!items.length) return ''
+    return '<div class="nav-group"><div class="nav-title">' + group + '</div>' +
+      items.map(id => '<a href="#' + slugAnchor(id) + '">' + (DOC_TITLES[id] || id) + '</a>').join('') + '</div>'
+  }).join('')
+  const sections = pages.map(p => {
+    let md = readFileSync(join(DOCS_SRC, p.id + '.zh.md'), 'utf8')
+    md = md.replace(/^---\n[\s\S]*?\n---\n/, '') // frontmatter
+    const branded = applyBrand(md)
+    const anchorAlias = p.id === 'intro' ? '<i id="tutorial"></i>' : (p.id === 'faq' ? '<i id="faq"></i>' : '')
+    return '<section id="' + slugAnchor(p.id) + '">' + anchorAlias + '<h2>' + escapeHtml(p.title) + '</h2>' + mdToHtml(branded, knownIds) + '</section>'
+  }).join('\n')
+  const html = ['<!DOCTYPE html>',
+'<html lang="zh-CN">',
+'<head>',
+'<meta charset="utf-8">',
+'<meta name="viewport" content="width=device-width,initial-scale=1">',
+'<title>智造云AIOS 帮助中心</title>',
+'<style>',
+':root{--brand:' + t.primary + ';--brand-hover:' + t.primaryHover + ';--text:#1D2129;--muted:#4E5969;}',
+'*{box-sizing:border-box}',
+'body{margin:0;font-family:-apple-system,\'Segoe UI\',\'Microsoft YaHei\',sans-serif;background:linear-gradient(135deg,#F0F8FA 0%,#C4E2EC 100%);color:var(--text);line-height:1.75}',
+'.layout{display:flex;min-height:100vh}',
+'aside{width:230px;flex-shrink:0;background:#fff;padding:20px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid #D8E8EE}',
+'main{flex:1;max-width:900px;margin:0 auto;padding:28px 26px 80px}',
+'header.top{display:flex;align-items:center;gap:14px}',
+'header.top img{height:52px;width:auto}',
+'h1{font-size:24px;margin:0}',
+'.sub{color:var(--muted);margin:4px 0 20px}',
+'.quick{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}',
+'.quick a{color:var(--brand);text-decoration:none;padding:6px 14px;border:1px solid var(--brand);border-radius:18px;font-size:14px}',
+'.quick a:hover{background:var(--brand);color:#fff}',
+'.nav-group{margin-bottom:14px}',
+'.nav-title{font-size:12px;color:var(--muted);margin:8px 6px 4px;letter-spacing:1px}',
+'aside a{display:block;color:var(--text);text-decoration:none;font-size:13px;padding:4px 10px;border-radius:6px}',
+'aside a:hover{background:#EDF5F8;color:var(--brand)}',
+'section{background:#fff;border-radius:12px;padding:22px 28px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,60,80,.06)}',
+'h2{font-size:20px;border-left:4px solid var(--brand);padding-left:10px;margin-top:0}',
+'h3,h4,h5,h6{margin-top:1.2em}',
+'code{background:#EDF3F5;padding:2px 6px;border-radius:4px;font-size:13px}',
+'pre{background:#F5F8FA;border:1px solid #E0EBF0;border-radius:8px;padding:14px;overflow-x:auto}',
+'pre code{background:none;padding:0}',
+'table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}',
+'th,td{border:1px solid #E0EBF0;padding:8px 10px;text-align:left}',
+'th{background:#EDF5F8}',
+'blockquote{border-left:4px solid var(--brand);margin:12px 0;padding:8px 14px;background:#F5FAFC;color:var(--muted)}',
+'a{color:var(--brand)}',
+'.tag{display:inline-block;background:#FFF3E0;color:#D46B08;border-radius:4px;padding:2px 10px;font-size:13px;margin-left:8px}',
+'.todo{border:1px dashed var(--brand);border-radius:10px;padding:26px;text-align:center;color:var(--muted)}',
+'footer{color:var(--muted);font-size:13px;text-align:center;margin-top:30px}',
+'@media (max-width:860px){aside{display:none}}',
+'</style>',
+'</head>',
+'<body>',
+'<div class="layout">',
+'<aside>',
+'<header class="top"><img src="' + logoData + '" alt="智造云AIOS"></header>',
+toc,
+'</aside>',
+'<main>',
+'<h1>智造云AIOS 帮助中心</h1>',
+'<p class="sub">智造云AIOS 2.2.0（灵泽万川 · 企业级智能体操作系统） · 离线内嵌文档</p>',
+'<div class="quick">',
+'<a href="#tutorial">快速上手</a>',
+'<a href="#demo">视频教程</a>',
+'<a href="#changelog">更新日志</a>',
+'<a href="#faq">常见问题</a>',
+'</div>',
+'<section id="demo">',
+'<h2>视频教程 <span class="tag">待开发</span></h2>',
+'<div class="todo">🎬 视频教程正在制作中，敬请期待。<br>当前可先阅读左侧目录的文字版文档。</div>',
+'</section>',
+'<section id="changelog">',
+'<h2>更新日志</h2>',
+'<ul>',
+'<li>智造云AIOS 2.2.0：企业级智能体操作系统正式版；业务应用解耦按需安装；内置账户体系（单机与 Hub 多用户）；灵泽万川蓝绿品牌化主题；支持品牌目录自定义 Logo、主题色与登录页封面。</li>',
+'</ul>',
+'</section>',
+sections,
+'<footer>灵泽万川 · 智造云AIOS 2.2.0 — 本页面为内嵌离线文档</footer>',
+'</main>',
+'</div>',
+'</body>',
+'</html>',
+'' ].join('\n')
+  writeAssetWithSiblings(join(consoleDir, 'aios-docs.html'), html)
+  // 桌面更新弹窗 FAQ 的本地数据源（bundle 已改拉取 /aios-docs-faq.<lang>.md）。
+  // 标题必须与 bundle 内的抓取正则严格一致：
+  //   zh: /###\s*智造云AIOS如何更新/   en: /###\s*How to update 智造云AIOS/
+  const faqZh = ['### 智造云AIOS如何更新', '',
+    '- 单机版（start-ai-os.cmd / start-ai-os.sh）：停止服务后重新运行启动器，启动器按版本锁自动升级运行环境，不影响 Workspace 数据。',
+    '- Hub 多用户版（start-hub.cmd / start-hub.sh）：由管理员重新运行启动器完成升级，账号与凭据数据保留。',
+    '- 控制台内无在线自更新；版本升级一律由管理员在服务器上执行。'].join('\n')
+  const faqEn = ['### How to update 智造云AIOS', '',
+    '- Single-user edition (start-ai-os.cmd / start-ai-os.sh): stop the service and re-run the launcher; the runtime upgrades automatically per the version lock without touching Workspace data.',
+    '- Hub multi-user edition (start-hub.cmd / start-hub.sh): the administrator upgrades by re-running the launcher; accounts and credentials are preserved.',
+    '- The console does not self-update online; upgrades are always applied on the server by the administrator.'].join('\n')
+  writeIndependent(join(consoleDir, 'aios-docs-faq.zh.md'), faqZh + '\n')
+  writeIndependent(join(consoleDir, 'aios-docs-faq.en.md'), faqEn + '\n')
+  console.log('Console 内嵌帮助文档已生成：aios-docs.html（' + pages.length + ' 个文档章节）')
+}
+
 function suppressConsoleTour (consoleDir) {
   const htmlPath = join(consoleDir, 'index.html')
   const html = readFileSync(htmlPath, 'utf8')
@@ -287,12 +869,65 @@ function suppressConsoleTour (consoleDir) {
     warn('未找到 </head>，无法注入引导抑制样式。')
     return
   }
-  writeIndependent(htmlPath, nextHtml)
+  writeAssetWithSiblings(htmlPath, nextHtml)
   console.log('Console 新手引导弹层已抑制（style#zy-tour-suppress 注入）。')
 }
 
+// 上游 CompressedStaticFiles 对所有 console 静态资产（包括非哈希命名的
+// index.html、aios-docs.html、FAQ md、logo）统一下发一年 immutable 强缓存，
+// 品牌补丁与内嵌文档更新永远到不了已缓存的浏览器。放宽为 must-revalidate：
+// 浏览器每次协商 ETag（未变时 304，开销极小），启动器每次打补丁后刷新即生效。
+// 改动落在运行时 site-packages 内，运行时重装/升级后由本补丁再次执行恢复；
+// 找不到目标文件（布局变化）时仅告警，不阻断启动。
+const IMMUTABLE_CACHE = '_ASSET_CACHE_CONTROL = "public, max-age=31536000, immutable"'
+const NEGOTIATED_CACHE = '_ASSET_CACHE_CONTROL = "public, max-age=0, must-revalidate"'
+
+function consoleCachePolicyFile (consoleDir) {
+  // consoleDir = <site-packages>/qwenpaw/console
+  return join(dirname(dirname(consoleDir)), 'qwenpaw', 'hub', 'static_files.py')
+}
+
+function relaxConsoleCachePolicy (consoleDir) {
+  const pyFile = consoleCachePolicyFile(consoleDir)
+  if (!existsSync(pyFile)) {
+    warn('未找到 ' + pyFile + '，静态缓存策略未调整（升级后品牌外观可能延迟生效）。')
+    return
+  }
+  const py = readFileSync(pyFile, 'utf8')
+  if (!py.includes(IMMUTABLE_CACHE)) return
+  writeIndependent(pyFile, py.split(IMMUTABLE_CACHE).join(NEGOTIATED_CACHE))
+  console.log('Console 静态缓存策略已调整为 ETag 协商（max-age=0, must-revalidate）。')
+}
+
+// 僵尸 zyb 资产清道夫：canonical 命名修复之前的历史轮次每轮改名都会派生新名，
+// 留下不再被任何内容引用的旧 -zyb 文件。引用归一为本轮终名之后，凡内容中不再
+// 出现的 zyb 文件（连同 .br/.gz 预压缩副本）一并回收，防止 assets 无限膨胀。
+function sweepStaleZybAssets (consoleDir) {
+  const referenced = new Set()
+  for (const file of collectBrandableFiles(consoleDir)) {
+    const c = readFileSync(file, 'utf8')
+    for (const m of c.matchAll(/[\w.-]+-zyb[0-9a-f]{8}\.[a-z]+/g)) referenced.add(m[0])
+  }
+  let removed = 0
+  const walk = dir => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name)
+      if (entry.isDirectory()) { walk(full); continue }
+      const m = entry.name.match(/^([\w.-]+-zyb[0-9a-f]{8}\.[a-z]+?)(?:\.(?:br|gz))?$/)
+      if (m && !referenced.has(m[1])) { rmSync(full, { force: true }); removed++ }
+    }
+  }
+  walk(consoleDir)
+  if (removed) console.log('已清理 ' + removed + ' 个历史遗留的未引用 zyb 资产文件。')
+}
+
 const runtime = resolveRuntime()
-const consoleDir = locateConsoleDir(runtime)
+// --console-dir <目录>：显式指定控制台资产目录（如 Hub venv 的 console），
+// 缺省时按项目运行时解析
+const dirFlagIdx = process.argv.indexOf('--console-dir')
+const consoleDir = dirFlagIdx !== -1 && process.argv[dirFlagIdx + 1]
+  ? process.argv[dirFlagIdx + 1]
+  : locateConsoleDir(runtime)
 
 if (!consoleDir) {
   if (checkMode) {
@@ -319,6 +954,14 @@ for (const r of REPLACEMENTS) {
   }
 }
 
+// 主 bundle 同样套用 chunk 级链接清理（幂等，命中与否均可）
+for (const r of CHUNK_REPLACEMENTS) {
+  if (r.regex) { content = content.replace(r.from, r.to); continue }
+  if (content.includes(r.patched)) continue
+  const idx = findUnpatched(content, r.from, r.patched)
+  if (idx !== -1) content = content.slice(0, idx) + r.to + content.slice(idx + r.from.length)
+}
+
 const branded = applyBrand(content)
 
 if (checkMode) {
@@ -328,7 +971,7 @@ if (checkMode) {
     process.exit(1)
   }
   if (branded !== content) {
-    console.error('[patch-console-ui] 检查失败：console bundle 中仍存在未替换的 QwenPaw 品牌文案（应替换为 灵泽万川智造云）。')
+    console.error('[patch-console-ui] 检查失败：console bundle 中仍存在未替换的 QwenPaw 品牌文案（应替换为 智造云AIOS）。')
     process.exit(1)
   }
   // 校验所有可打补丁的 JS/HTML 资源文件均已替换 QwenPaw 品牌文案。
@@ -338,12 +981,12 @@ if (checkMode) {
     if (cc.includes('QwenPaw') && applyBrand(cc) !== cc) unpatchedFiles.push(file)
   }
   if (unpatchedFiles.length) {
-    console.error('[patch-console-ui] 检查失败：以下文件仍包含未替换的 QwenPaw 品牌文案（应替换为 灵泽万川智造云）：\n' + unpatchedFiles.join('\n'))
+    console.error('[patch-console-ui] 检查失败：以下文件仍包含未替换的 QwenPaw 品牌文案（应替换为 智造云AIOS）：\n' + unpatchedFiles.join('\n'))
     process.exit(1)
   }
   const htmlTitle = readFileSync(join(consoleDir, 'index.html'), 'utf8')
   if (htmlTitle.includes('QwenPaw')) {
-    console.error('[patch-console-ui] 检查失败：index.html 仍包含 QwenPaw 品牌标题（应替换为 灵泽万川智造云）。')
+    console.error('[patch-console-ui] 检查失败：index.html 仍包含 QwenPaw 品牌标题（应替换为 智造云AIOS）。')
     process.exit(1)
   }
   const html = readFileSync(join(consoleDir, 'index.html'), 'utf8')
@@ -372,40 +1015,137 @@ if (checkMode) {
     console.error('[patch-console-ui] 检查失败：index.html favicon 未指向当前平台 Logo。')
     process.exit(1)
   }
+  const cachePolicyFile = consoleCachePolicyFile(consoleDir)
+  if (existsSync(cachePolicyFile) && readFileSync(cachePolicyFile, 'utf8').includes(IMMUTABLE_CACHE)) {
+    console.error('[patch-console-ui] 检查失败：console 静态资产仍为一年 immutable 强缓存，品牌化与文档更新无法到达已缓存的浏览器（应先运行一次 patch-console-ui 应用缓存策略修正）。')
+    process.exit(1)
+  }
   console.log('Console UI 定制检查通过：' + bundlePath)
   process.exit(0)
 }
 
 content = branded
 
-if (content !== original) {
-  writeIndependent(bundlePath, content)
-  console.log('Console UI 定制已应用：' + bundlePath)
-} else {
-  console.log('Console UI 定制已是最新状态：' + bundlePath)
+// ── 品牌化资产内容寻址改名 ─────────────────────────────────────────────
+// 上游 CompressedStaticFiles 对 console 资产按「哈希文件名 ⇒ 内容不可变」
+// 下发一年 immutable 强缓存，而品牌补丁是原位改写哈希文件——存量浏览器
+// 最多一年拿不到新外观（ensureCacheBust 注释假设的 ETag 协商在该服务端
+// 实现下不成立）。因此：
+//   1) 被补丁改写的 JS 一律以内容哈希另存新名（-zyb<hash8>），并全量改写
+//      引用（index.html 的 script src、主 bundle 资源清单里的 chunk 名）；
+//      新名字首次请求必然回源，存量浏览器一次刷新即达新 UI，无需强刷。
+//   2) 原文件名同步刷新为品牌版并更新既有 .br/.gz，兜底仍引用旧名的
+//      启发式缓存 HTML。
+//   3) 非哈希资产（index.html、aios-docs.html、FAQ md、logo 等）的缓存
+//      策略由 relaxConsoleCachePolicy 放宽为 ETag 协商。
+const renames = [] // { file, content, newFile }
+
+// 引用改写会让 content 里的 chunk 名带上 -zyb 后缀；入口与登录 chunk 互引用时，
+// 若 hash 直接基于改写后的 content，每轮重跑的名字都会漂移并派生新僵尸文件
+// （回归测试 test-patch-console-ui.mjs 曾抓到）。命名基准统一用“规范化 content”：
+// 剥离全部 -zyb 后缀后再 hash——无论引用链处于哪一轮，规范化结果一致，名字收敛，
+// 且与首轮（改写前内容）的命名天然兼容。
+const ZYB_SUFFIX = /-zyb[0-9a-f]{8}(?=\.js)/g
+const canonicalJs = text => text.split(ZYB_SUFFIX).join('')
+
+// 历史补丁痕迹标记：命中任意一个说明该 JS 承载品牌化改动（可能是更早版本补丁
+// 原位写入的），即使本次内容无变化也要补一次内容寻址改名，让存量浏览器的
+// immutable 缓存失效。HTML（index.html / aios-docs.html）是固定路由名，永不改名。
+const REPUBLISH_MARKERS = [
+  ...REPLACEMENTS.map(r => r.patched),
+  ...CHUNK_REPLACEMENTS.map(r => r.patched),
+  '/aios-docs.html',
+  '/aios-docs-faq.',
+  '智造云AIOS',
+]
+const needsRepublish = text => REPUBLISH_MARKERS.some(m => text.includes(m))
+
+{
+  const entryBase = bundlePath.split(/[\\/]/).pop()
+  if (content !== original || (!entryBase.includes('-zyb') && needsRepublish(content))) {
+    renames.push({ file: bundlePath, content })
+  }
 }
+
+for (const file of collectBrandableFiles(consoleDir)) {
+  if (file === bundlePath) continue
+  const cc = readFileSync(file, 'utf8')
+  let out = cc
+  for (const r of CHUNK_REPLACEMENTS) {
+    if (r.regex) { out = out.replace(r.from, r.to); continue }
+    if (out.includes(r.patched)) continue
+    const idx = findUnpatched(out, r.from, r.patched)
+    if (idx !== -1) out = out.slice(0, idx) + r.to + out.slice(idx + r.from.length)
+  }
+  if (out.includes('QwenPaw') || out.includes('灵泽万川智造云')) out = applyBrand(out)
+  const base = file.split(/[\\/]/).pop()
+  // 强制重发布：品牌载体 JS 若仍是上游原文件名（历史补丁原位写入），改名以击穿
+  // 存量浏览器的 immutable 缓存——即使本次内容没有任何变化
+  const forceJs = file.endsWith('.js') && !base.includes('-zyb') && needsRepublish(out)
+  if (out === cc && !forceJs) continue
+  if (file.endsWith('.js')) {
+    if (!forceJs) {
+      // 已是内容寻址名（本次微小改动）或非品牌载体：原位刷新即可
+      writeAssetWithSiblings(file, out)
+      continue
+    }
+    renames.push({ file, content: out })
+  } else {
+    writeAssetWithSiblings(file, out)
+  }
+}
+
+const renameMap = new Map() // 旧文件名 → 新文件名
+for (const r of renames) {
+  const base = r.file.split(/[\\/]/).pop()
+  const dot = base.lastIndexOf('.')
+  const newName = base.slice(0, dot) + '-zyb' + hashOf(canonicalJs(r.content)) + base.slice(dot)
+  r.newFile = join(dirname(r.file), newName)
+  if (!renameMap.has(base)) renameMap.set(base, newName)
+}
+
+// 引用改写：扫全部 JS/HTML（含被改名文件自身——主 bundle 资源清单里的
+// chunk 名、index.html 的 script src 都在其中）。先把内容里历史轮次留下的
+// zyb 引用 canonical 化（剥后缀还原为原名），再统一映射到本轮终名——
+// 任何历史漂移名都会被归一，配合尾部清道夫即可回收僵尸文件。
+const rewriteRefs = text => {
+  let t = canonicalJs(text)
+  for (const [oldName, newName] of renameMap) t = t.split(oldName).join(newName)
+  return t
+}
+if (renameMap.size) {
+  for (const file of collectBrandableFiles(consoleDir)) {
+    const renamed = renames.find(r => r.file === file)
+    const text = renamed ? renamed.content : readFileSync(file, 'utf8')
+    const updated = rewriteRefs(text)
+    if (renamed) renamed.content = updated
+    else if (updated !== text) writeAssetWithSiblings(file, updated)
+  }
+}
+
+for (const r of renames) {
+  // 新名字：内容寻址，直接生成全部三种表示（identity/br/gz）
+  writeIndependent(r.newFile, r.content)
+  writeIndependent(r.newFile + '.br', brotliCompressSync(r.content))
+  writeIndependent(r.newFile + '.gz', gzipSync(r.content))
+  // 原名字：刷新为品牌版并同步既有压缩副本
+  writeAssetWithSiblings(r.file, r.content)
+  console.log('品牌化资产已内容寻址更新：' + r.file.split(/[\\/]/).pop() + ' → ' + r.newFile.split(/[\\/]/).pop())
+}
+console.log(renames.length
+  ? 'Console UI 定制已应用（' + renames.length + ' 个 JS 资源）。'
+  : 'Console UI 定制已是最新状态。')
 
 const cacheBust = ensureCacheBust(consoleDir, content)
 if (cacheBust.changed) {
   console.log('Console index.html 已移除主 bundle ?v= 查询参数（避免 console 双重执行）')
 }
 syncConsoleLogo(consoleDir)
+applyBrandTheme(consoleDir)
+writeLocalDocs(consoleDir)
 suppressConsoleTour(consoleDir)
-
-
-// 对其它 Console 资源（懒加载 chunk / vendor）执行同样的品牌替换。
-let extraBranded = 0
-for (const file of collectBrandableFiles(consoleDir)) {
-  if (file === bundlePath) continue
-  const cc = readFileSync(file, 'utf8')
-  if (!cc.includes('QwenPaw')) continue
-  const out = applyBrand(cc)
-  if (out !== cc) {
-    writeIndependent(file, out)
-    extraBranded++
-  }
-}
-if (extraBranded) console.log('已更新 ' + extraBranded + ' 个额外 Console 资源文件品牌文案。')
+relaxConsoleCachePolicy(consoleDir)
+sweepStaleZybAssets(consoleDir)
 
 if (missing.length) {
   warn('以下目标未找到，bundle 可能已更新：' + missing.join('、'))

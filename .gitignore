@@ -42,3 +42,4 @@ apps/zhizaoyunAIOS/workspace/*
 apps/zhizaoyunAIOS/workspace.secret/
 apps/zhizaoyunAIOS/runtime/*
 !apps/zhizaoyunAIOS/runtime/.gitignore
+hub.runtime.yaml
