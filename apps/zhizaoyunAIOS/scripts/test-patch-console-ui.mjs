@@ -198,6 +198,8 @@ try {
   const docs = readFileSync(join(consoleDir, 'aios-docs.html'), 'utf8')
   ok(!/<a href="[^"]*agentscope/i.test(docs), '内嵌文档无 agentscope 外链锚点')
   ok(!docs.includes('id="doc-desktop"'), '内嵌文档不含上游 desktop 章节')
+  ok(!/QwenPaw Desktop(?!\.app)/.test(docs), '行文中的上游桌面版名称已隐藏为中性表述（.app 真实路径按技术标识保留）')
+  ok(docs.includes('智造云AIOS 2.2.0 更新公告') && docs.includes('智能体内核升级 2.1.0 → 2.2.0'), '更新日志为结合内核升级的 2.2.0 完整更新公告')
   ok(docs.includes('企业内支持'), '问题反馈章节已品牌化改写')
   ok(readFileSync(join(consoleDir, 'aios-docs-faq.zh.md'), 'utf8').includes('### 智造云AIOS如何更新'), 'FAQ 本地数据源（zh）标题与 bundle 抓取正则一致')
   ok(readFileSync(join(consoleDir, 'aios-docs-faq.en.md'), 'utf8').includes('### How to update 智造云AIOS'), 'FAQ 本地数据源（en）标题与 bundle 抓取正则一致')
