@@ -201,6 +201,8 @@ try {
   ok(!/QwenPaw Desktop(?!\.app)/.test(docs), '行文中的上游桌面版名称已隐藏为中性表述（.app 真实路径按技术标识保留）')
   ok(docs.includes('智造云AIOS 2.2.0 更新公告') && docs.includes('智能体内核升级 2.1.0 → 2.2.0'), '更新日志为结合内核升级的 2.2.0 完整更新公告')
   ok(docs.includes('企业内支持'), '问题反馈章节已品牌化改写')
+  ok(!/qwenpaw\.agentscope\.io/.test(docs) && !docs.includes('AgentScope Platform') && !docs.includes('魔搭创空间'), '上游官网/云平台/魔搭引用清零（含安装脚本）')
+  ok(docs.includes('install-oneclick.cmd') && docs.includes('start-ai-os.cmd'), '安装指引为智造云AIOS 启动器方式')
   // 表格渲染回归：分隔行字符类 bug 曾使 1546 行表格数据只渲染出 2 张表
   const tableCount = occurrences(docs, '<table>')
   ok(tableCount > 100, 'Markdown 表格正常渲染（' + tableCount + ' 张 ≥100；曾因分隔行正则一字之差全部退化为文本段）')
