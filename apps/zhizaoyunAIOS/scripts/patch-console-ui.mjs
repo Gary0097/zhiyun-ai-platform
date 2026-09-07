@@ -576,6 +576,7 @@ function applyBrandTheme (consoleDir) {
   // 品牌区文案/Logo：登录分栏布局的左栏内容（CSS 画不进伪元素之外的图）。
   // 以 MutationObserver 保证路由切换后仍存在。
   const brandJs = `<script id="aios-brand-login-copy">(function(){
+    var __v='aios-brand-js-v2';
     var LOGO = ${JSON.stringify(logoWhite)};
     var LOGO_RAW = ${JSON.stringify(logoDataUri)};
     function ensure(){
@@ -590,14 +591,37 @@ function applyBrandTheme (consoleDir) {
         + '<div style="font-size:15px;font-weight:600;margin-bottom:6px;">灵泽万川智造云</div>导入数据即可分析 · 应用内真实智能体对话<br>可审阅可导出 · 会话、任务与知识按账号隔离';
       document.body.appendChild(el);
     }
-    ensure();
-    var t = setInterval(ensure, 800);
+    // 右上角帮助入口：顶栏追加「帮助中心」按钮（品牌化后原 GitHub/官网入口已
+    // 移除，帮助入口集中回顶栏，新开标签打开内嵌离线文档）
+    function ensureHelp(){
+      var h = document.querySelector('header');
+      if (!h || document.getElementById('aios-brand-help-btn')) return;
+      var a = document.createElement('a');
+      a.id = 'aios-brand-help-btn';
+      a.href = '/aios-docs.html';
+      a.target = '_blank';
+      a.rel = 'noreferrer';
+      a.textContent = '帮助中心';
+      a.style.cssText = 'display:inline-flex;align-items:center;margin:0 12px 0 4px;font-size:14px;line-height:normal;cursor:pointer;text-decoration:none;color:inherit;';
+      h.appendChild(a);
+    }
+    ensure(); ensureHelp();
+    var t = setInterval(function(){ ensure(); ensureHelp(); }, 800);
     setTimeout(function(){ clearInterval(t); }, 60000);
-    new MutationObserver(ensure).observe(document.body, {childList:true, subtree:true});
+    new MutationObserver(function(){ ensure(); ensureHelp(); }).observe(document.body, {childList:true, subtree:true});
   })();<\/script>`
-  const copyScript = nextHtml.includes('aios-brand-login-copy')
-    ? nextHtml
-    : nextHtml.replace(/<\/head>/, brandJs + '</head>')
+  // 注入脚本的版本升级：旧标签存在但缺当前版本标记时先移除旧标签再注入新版
+  // ——否则「存在即跳过」的幂等设计会让脚本变更永远无法生效。脚本内容有变时
+  // 同步 bump __v 版本串。
+  const BRAND_JS_VERSION_MARK = 'aios-brand-js-v2'
+  let scriptHost = nextHtml
+  const oldScriptRe = /<script id="aios-brand-login-copy">[\s\S]*?<\/script>\n?/
+  if (scriptHost.includes('aios-brand-login-copy') && !scriptHost.includes(BRAND_JS_VERSION_MARK)) {
+    scriptHost = scriptHost.replace(oldScriptRe, '')
+  }
+  const copyScript = scriptHost.includes(BRAND_JS_VERSION_MARK)
+    ? scriptHost
+    : scriptHost.replace(/<\/head>/, brandJs + '</head>')
   if (copyScript !== nextHtml) writeAssetWithSiblings(htmlPath, copyScript)
   console.log('Console 已注入灵泽万川蓝绿主题样式与登录分栏布局。')
 }
@@ -714,9 +738,27 @@ function mdToHtml (md, knownIds) {
       i++
       continue
     }
-    if (/^\s*\|.*\|\s*$/.test(line) && /^\s*\|[\s:-|]+\|\s*$/.test(lines[i + 1] || '')) {
+    // 分隔行字符类中 `-` 必须放在末尾（[\s:|-]）；放在 : 与 | 之间会被解析为
+    // ASCII 范围「: 到 |」，字面连字符不在集合内，导致分隔行永不匹配、全部
+    // 表格退化为带 | 的段落（实测 1546 行表格数据只渲染出 2 张表）
+    if (/^\s*\|.*\|\s*$/.test(line) && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1] || '')) {
       flushPara()
-      const cells = (row) => row.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim())
+      // 单元格切分需感知代码片内的 | 与转义 \|（如 `a \| b`、`/cmd [on\|off]`），
+      // 朴素按 | 切分会错列
+      const cells = (row) => {
+        const s = row.trim().replace(/^\|/, '').replace(/\|$/, '')
+        const out = []
+        let cur = '', inCode = false
+        for (let k = 0; k < s.length; k++) {
+          const ch = s[k]
+          if (ch === '`') { inCode = !inCode; cur += ch; continue }
+          if (ch === '\\' && s[k + 1] === '|') { cur += '|'; k++; continue }
+          if (ch === '|' && !inCode) { out.push(cur.trim()); cur = ''; continue }
+          cur += ch
+        }
+        out.push(cur.trim())
+        return out
+      }
       const head = cells(line)
       i += 2
       const body = []
@@ -777,6 +819,9 @@ function writeLocalDocs (consoleDir) {
   const sections = pages.map(p => {
     let md = readFileSync(join(DOCS_SRC, p.id + '.zh.md'), 'utf8')
     md = md.replace(/^---\n[\s\S]*?\n---\n/, '') // frontmatter
+    // 章节模板自带 <h2>标题</h2>，剔除 Markdown 首个 H1（37 个源文件均以
+    // 「# 标题」开头且与 DOC_TITLES 一致）避免标题双渲染
+    md = md.replace(/^#\s+[^\n]+\n+/, '')
     // 行文中的上游桌面版名称隐藏为中性表述（.app / 安装路径等真路径不受影响）；
     // window.QwenPaw.* 等 API 标识符是代码，必须原样保留
     md = md.replace(/(?<!Local\\)QwenPaw Desktop(?!\.app)/g, '桌面应用版')
@@ -864,6 +909,22 @@ sections,
 '</html>',
 '' ].join('\n')
   writeAssetWithSiblings(join(consoleDir, 'aios-docs.html'), html)
+  // 文档 URL 版本化：aios-docs.html / aios-docs-faq.*.md 是固定文件名，曾被
+  // 上游一年 immutable 缓存的浏览器在 max-age 内不再回源——文档更新永远到不了。
+  // 所有引用统一加 ?v=<内容hash>（先归一历史参数），内容变化即换缓存键。
+  const docsVer = hashOf(html)
+  for (const file of collectBrandableFiles(consoleDir)) {
+    const cc = readFileSync(file, 'utf8')
+    let out = cc
+      .replace(/\/aios-docs\.html\?v=[0-9a-f]{8}/g, '/aios-docs.html')
+      .replace(/\/aios-docs-faq\.\$\{N\}\.md\?v=[0-9a-f]{8}/g, '/aios-docs-faq.${N}.md')
+    if (!out.includes('/aios-docs')) continue
+    out = out
+      .replace(/\/aios-docs\.html(?![\w])/g, '/aios-docs.html?v=' + docsVer)
+      .replace(/\/aios-docs-faq\.\$\{N\}\.md(?![\w?])/g, '/aios-docs-faq.${N}.md?v=' + docsVer)
+    if (out !== cc) writeAssetWithSiblings(file, out)
+  }
+  console.log('内嵌文档引用已版本化：?v=' + docsVer)
   // 桌面更新弹窗 FAQ 的本地数据源（bundle 已改拉取 /aios-docs-faq.<lang>.md）。
   // 标题必须与 bundle 内的抓取正则严格一致：
   //   zh: /###\s*智造云AIOS如何更新/   en: /###\s*How to update 智造云AIOS/
@@ -1069,7 +1130,10 @@ const renames = [] // { file, content, newFile }
 // 剥离全部 -zyb 后缀后再 hash——无论引用链处于哪一轮，规范化结果一致，名字收敛，
 // 且与首轮（改写前内容）的命名天然兼容。
 const ZYB_SUFFIX = /-zyb[0-9a-f]{8}(?=\.js)/g
+// 文档引用的内容版本参数同样要排除出命名基准（版本化发生在改名之后，第二轮
+// 起内容即带 ?v=；不归一则每轮派生新名、集合膨胀——回归测试幂等断言抓到）
 const canonicalJs = text => text.split(ZYB_SUFFIX).join('')
+  .replace(/(\/aios-docs[^'"`\s]*)\?v=[0-9a-f]{8}/g, '$1')
 
 // 历史补丁痕迹标记：命中任意一个说明该 JS 承载品牌化改动（可能是更早版本补丁
 // 原位写入的），即使本次内容无变化也要补一次内容寻址改名，让存量浏览器的
