@@ -764,6 +764,9 @@ function writeLocalDocs (consoleDir) {
   const sections = pages.map(p => {
     let md = readFileSync(join(DOCS_SRC, p.id + '.zh.md'), 'utf8')
     md = md.replace(/^---\n[\s\S]*?\n---\n/, '') // frontmatter
+    // 行文中的上游桌面版名称隐藏为中性表述（.app / 安装路径等真路径不受影响）；
+    // window.QwenPaw.* 等 API 标识符是代码，必须原样保留
+    md = md.replace(/(?<!Local\\)QwenPaw Desktop(?!\.app)/g, '桌面应用版')
     const branded = applyBrand(md)
     const anchorAlias = p.id === 'intro' ? '<i id="tutorial"></i>' : (p.id === 'faq' ? '<i id="faq"></i>' : '')
     return '<section id="' + slugAnchor(p.id) + '">' + anchorAlias + '<h2>' + escapeHtml(p.title) + '</h2>' + mdToHtml(branded, knownIds) + '</section>'
@@ -830,8 +833,14 @@ toc,
 '</section>',
 '<section id="changelog">',
 '<h2>更新日志</h2>',
+'<h3>智造云AIOS 2.2.0 更新公告</h3>',
+'<p><strong>智能体内核升级 2.1.0 → 2.2.0</strong>：升级至 2.2.0 运行时，包含上游稳定性修复与能力更新；旧运行环境首次启动时自动重建，Workspace 会话、知识与文件数据不受影响。</p>',
 '<ul>',
-'<li>智造云AIOS 2.2.0：企业级智能体操作系统正式版；业务应用解耦按需安装；内置账户体系（单机与 Hub 多用户）；灵泽万川蓝绿品牌化主题；支持品牌目录自定义 Logo、主题色与登录页封面。</li>',
+'<li><strong>多用户模式（Hub）</strong>：新增局域网多用户形态，账号统一管理，模型 API Key 由管理员在凭据管理中集中录入并按账号注入，普通用户全程接触不到 Key。</li>',
+'<li><strong>登录体系</strong>：改用原生认证——首个在控制台注册的账号即管理员；单机与 Hub 双形态统一。</li>',
+'<li><strong>应用体系解耦</strong>：业务应用不再捆绑发行，转为独立交付、按需安装；系统本体升级不再影响业务数据。</li>',
+'<li><strong>品牌与体验</strong>：智造云AIOS 全新品牌化界面（主题、Logo、登录页）、内嵌离线帮助中心、竖屏/窄屏适配。</li>',
+'<li><strong>部署改进</strong>：启动器自动校验/重建运行环境、局域网地址自动发现、离线安装包（U 盘分发、全程无网）。</li>',
 '</ul>',
 '</section>',
 sections,
@@ -848,7 +857,8 @@ sections,
   const faqZh = ['### 智造云AIOS如何更新', '',
     '- 单机版（start-ai-os.cmd / start-ai-os.sh）：停止服务后重新运行启动器，启动器按版本锁自动升级运行环境，不影响 Workspace 数据。',
     '- Hub 多用户版（start-hub.cmd / start-hub.sh）：由管理员重新运行启动器完成升级，账号与凭据数据保留。',
-    '- 控制台内无在线自更新；版本升级一律由管理员在服务器上执行。'].join('\n')
+    '- 控制台内无在线自更新；版本升级一律由管理员在服务器上执行。',
+    '- 2.2.0 完整变更见 帮助中心 → 更新日志。'].join('\n')
   const faqEn = ['### How to update 智造云AIOS', '',
     '- Single-user edition (start-ai-os.cmd / start-ai-os.sh): stop the service and re-run the launcher; the runtime upgrades automatically per the version lock without touching Workspace data.',
     '- Hub multi-user edition (start-hub.cmd / start-hub.sh): the administrator upgrades by re-running the launcher; accounts and credentials are preserved.',
