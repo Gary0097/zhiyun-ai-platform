@@ -141,9 +141,9 @@ try {
   const entry = readFileSync(join(assetsDir, entryZybName), 'utf8')
 
   // 主 bundle 替换与保护
-  ok(entry.includes('ud="/aios-docs.html#doc-community"'), 'GitHub 仓库地址（ud）改指内嵌文档')
-  ok(entry.includes('H=`/aios-docs-faq.${N}.md`'), '更新弹窗 FAQ 拉取本地化（消除运行时外呼）')
-  ok(entry.includes('UM=e=>"/aios-docs.html#tutorial"'), '文档菜单 URL 改指内嵌文档')
+  ok(/ud="\/aios-docs\.html\?v=[0-9a-f]{8}#doc-community"/.test(entry), 'GitHub 仓库地址（ud）改指内嵌文档（带版本参数）')
+  ok(/H=`\/aios-docs-faq\.\$\{N\}\.md\?v=[0-9a-f]{8}`/.test(entry), '更新弹窗 FAQ 拉取本地化并带版本参数（消除运行时外呼）')
+  ok(/UM=e=>"\/aios-docs\.html\?v=[0-9a-f]{8}#tutorial"/.test(entry), '文档菜单 URL 改指内嵌文档（带版本参数）')
   ok(entry.includes('lng:localStorage.getItem("language")||"zh"'), '默认语言替换为 zh')
   ok(entry.includes('avatar:"/qwenpaw.svg"'), '欢迎页头像改用品牌 Logo SVG')
   ok(entry.includes('bootTitle="智造云AIOS Console"'), '用户可见 QwenPaw 文案替换为 智造云AIOS')
@@ -165,9 +165,9 @@ try {
   const extraZyb = zybJsFiles().find(n => n.startsWith(EXTRA.replace('.js', '') + '-zyb'))
   ok(!!extraZyb, '懒加载 chunk 已内容寻址改名（' + extraZyb + '）')
   const extra = readFileSync(join(assetsDir, extraZyb), 'utf8')
-  ok(!extra.includes('agentscope.io/docs/memory') && occurrences(extra, '/aios-docs.html#doc-memory') === 2, '记忆文档链接全部改指内嵌文档（含锚点变体）')
-  ok(!extra.includes('agentscope.io/docs/acp-integration') && extra.includes('/aios-docs.html#doc-acpServer'), 'ACP 文档链接改指内嵌文档')
-  ok(!extra.includes('agentscope.io/docs/channels') && occurrences(extra, '/aios-docs.html#doc-channels') === 2, '频道文档链接改指内嵌文档')
+  ok(!extra.includes('agentscope.io/docs/memory') && (extra.match(/\/aios-docs\.html\?v=[0-9a-f]{8}#doc-memory/g) || []).length === 2, '记忆文档链接全部改指内嵌文档（含锚点变体）')
+  ok(!extra.includes('agentscope.io/docs/acp-integration') && /\/aios-docs\.html\?v=[0-9a-f]{8}#doc-acpServer/.test(extra), 'ACP 文档链接改指内嵌文档')
+  ok(!extra.includes('agentscope.io/docs/channels') && (extra.match(/\/aios-docs\.html\?v=[0-9a-f]{8}#doc-channels/g) || []).length === 2, '频道文档链接改指内嵌文档')
   ok(extra.includes('false&&e.jsx("a",{href:"https://github.com/agentscope-ai/ReMe"'), 'ReMe 外链已移除')
 
   // 引用改写：全目录不得再出现裸原文件名引用
@@ -201,11 +201,19 @@ try {
   ok(!/QwenPaw Desktop(?!\.app)/.test(docs), '行文中的上游桌面版名称已隐藏为中性表述（.app 真实路径按技术标识保留）')
   ok(docs.includes('智造云AIOS 2.2.0 更新公告') && docs.includes('智能体内核升级 2.1.0 → 2.2.0'), '更新日志为结合内核升级的 2.2.0 完整更新公告')
   ok(docs.includes('企业内支持'), '问题反馈章节已品牌化改写')
+  // 表格渲染回归：分隔行字符类 bug 曾使 1546 行表格数据只渲染出 2 张表
+  const tableCount = occurrences(docs, '<table>')
+  ok(tableCount > 100, 'Markdown 表格正常渲染（' + tableCount + ' 张 ≥100；曾因分隔行正则一字之差全部退化为文本段）')
+  ok(!/<h2>([^<]{1,40})<\/h2><h2>\1<\/h2>/.test(docs), '章节标题无双渲染（模板 H2 与 Markdown H1 去重）')
+  ok(docs.includes('[on|off]'), '表格单元格内转义竖线 \\| 正确还原为字面 |（不错列）')
   ok(readFileSync(join(consoleDir, 'aios-docs-faq.zh.md'), 'utf8').includes('### 智造云AIOS如何更新'), 'FAQ 本地数据源（zh）标题与 bundle 抓取正则一致')
   ok(readFileSync(join(consoleDir, 'aios-docs-faq.en.md'), 'utf8').includes('### How to update 智造云AIOS'), 'FAQ 本地数据源（en）标题与 bundle 抓取正则一致')
 
   // 竖屏/窄屏适配：品牌文案块必须随分栏布局在 <900px 整体隐藏，宽屏分栏保留
   const themedHtml = readFileSync(join(consoleDir, 'index.html'), 'utf8')
+  ok(themedHtml.includes('aios-brand-help-btn'), '右上角帮助中心入口按钮注入存在')
+  ok(themedHtml.includes('aios-brand-js-v2'), '注入脚本为当前版本（版本标记驱动旧标签替换升级）')
+  ok(themedHtml.includes('/aios-docs.html?v='), '文档引用已带内容版本参数（击穿固定文件名的历史 immutable 缓存）')
   ok(themedHtml.includes('@media (max-width: 899px)') && themedHtml.includes('#aios-brand-copy{display:none !important;}'), '竖屏规则：窄屏下 #aios-brand-copy 品牌文案块整体隐藏（白字叠表单回归）')
   ok(themedHtml.includes('@media (min-width: 900px)') && themedHtml.includes('grid-template-columns:58.333% 41.667%'), '宽屏规则：分栏布局保留（桌面无回归）')
 
