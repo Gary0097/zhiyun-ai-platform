@@ -1,7 +1,7 @@
 {
   "id": "aios-brand",
   "name": "智造云AIOS 品牌层",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "frontend",
   "description": "灵泽万川品牌化：顶栏 Logo 槽位替换、帮助中心路由与菜单、蓝绿主题与聊天主色（全部走 QwenPaw 官方扩展点，运行时升级免疫）",
   "author": "Zhiyun AI",
@@ -13,6 +13,11 @@
     "min": "2.2.0"
   },
   "meta": {
-    "features": ["brand-logo-slot", "help-center-route", "brand-theme", "hide-external-links"]
+    "features": [
+      "brand-logo-slot",
+      "help-center-route",
+      "brand-theme",
+      "hide-external-links"
+    ]
   }
 }

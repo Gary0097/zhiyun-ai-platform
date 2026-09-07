@@ -214,7 +214,8 @@ try {
   // 竖屏/窄屏适配：品牌文案块必须随分栏布局在 <900px 整体隐藏，宽屏分栏保留
   const themedHtml = readFileSync(join(consoleDir, 'index.html'), 'utf8')
   ok(themedHtml.includes('aios-brand-help-btn'), '右上角帮助中心入口按钮注入存在')
-  ok(themedHtml.includes('aios-brand-js-v3'), '注入脚本为当前版本（版本标记驱动旧标签替换升级）')
+  ok(themedHtml.includes('aios-brand-js-v4'), '注入脚本为当前版本（版本标记驱动旧标签替换升级）')
+  ok(themedHtml.includes('if (!document.body) return;'), '注入脚本 body 未就绪安全早退（v3 曾因 head 期访问 body 抛异常整段静默失效）')
   ok(themedHtml.split('\n').every(l => !l.includes('.qwenpaw-app:has(form)') || l.includes('body.zy-login')), '登录页专属 CSS 全部限定在 body.zy-login 路由标记下（防内页含表单被误判为登录页）')
   ok(themedHtml.includes('/aios-docs.html?v='), '文档引用已带内容版本参数（击穿固定文件名的历史 immutable 缓存）')
   ok(themedHtml.includes('@media (max-width: 899px)') && themedHtml.includes('#aios-brand-copy{display:none !important;}'), '竖屏规则：窄屏下 #aios-brand-copy 品牌文案块整体隐藏（白字叠表单回归）')

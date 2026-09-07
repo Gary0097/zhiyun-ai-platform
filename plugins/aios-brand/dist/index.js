@@ -79,7 +79,7 @@
   } catch (e) { /* chat.theme 在旧版缺失时忽略 */ }
 
   /* ── 4) 隐藏顶栏外链入口（文本观察器，不依赖压缩类名） ── */
-  var HIDE_TEXTS = ['GitHub', '文档资料'];
+  var HIDE_TEXTS = ['GitHub'];
   function hideExternalButtons(root) {
     var scope = root || document;
     var buttons = scope.querySelectorAll ? scope.querySelectorAll('header button, [class*="header"] button') : [];

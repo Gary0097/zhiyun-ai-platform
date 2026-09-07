@@ -579,7 +579,7 @@ function applyBrandTheme (consoleDir) {
   // 旧判定会把品牌文案块与登录分栏样式泄漏到内页（agent-config 实测回归）。
   // body.zy-login 标记类同时约束 themeCss 中全部登录页专属规则。
   const brandJs = `<script id="aios-brand-login-copy">(function(){
-    var __v='aios-brand-js-v3';
+    var __v='aios-brand-js-v4';
     var LOGO = ${JSON.stringify(logoWhite)};
     var LOGO_RAW = ${JSON.stringify(logoDataUri)};
     function onLoginRoute(){ return /\\/login\\/?$/.test(location.pathname); }
@@ -612,16 +612,25 @@ function applyBrandTheme (consoleDir) {
       a.style.cssText = 'display:inline-flex;align-items:center;margin:0 12px 0 4px;font-size:14px;line-height:normal;cursor:pointer;text-decoration:none;color:inherit;';
       h.appendChild(a);
     }
-    function tick(){ syncLogin(); ensureHelp(); }
+    // 脚本注入在 </head> 之前，同步执行期 document.body 尚未解析——v3 曾在
+    // 首个同步 tick 里访问 body.classList 抛异常，导致 interval/observer 均未
+    // 注册、整段脚本静默失效。body 未就绪时安全早退，observer 延迟到 body
+    // 存在后的首个 tick 绑定。
+    var obs = null;
+    function tick(){
+      if (!document.body) return;
+      if (!obs) { obs = new MutationObserver(tick); obs.observe(document.body, {childList:true, subtree:true}); }
+      syncLogin();
+      ensureHelp();
+    }
     tick();
     var t = setInterval(tick, 800);
     setTimeout(function(){ clearInterval(t); }, 60000);
-    new MutationObserver(tick).observe(document.body, {childList:true, subtree:true});
   })();<\/script>`
   // 注入脚本的版本升级：旧标签存在但缺当前版本标记时先移除旧标签再注入新版
   // ——否则「存在即跳过」的幂等设计会让脚本变更永远无法生效。脚本内容有变时
   // 同步 bump __v 版本串。
-  const BRAND_JS_VERSION_MARK = 'aios-brand-js-v3'
+  const BRAND_JS_VERSION_MARK = 'aios-brand-js-v4'
   let scriptHost = nextHtml
   const oldScriptRe = /<script id="aios-brand-login-copy">[\s\S]*?<\/script>\n?/
   if (scriptHost.includes('aios-brand-login-copy') && !scriptHost.includes(BRAND_JS_VERSION_MARK)) {
