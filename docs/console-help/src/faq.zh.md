@@ -10,17 +10,9 @@
 
 ### QwenPaw如何安装
 
-QwenPaw 支持多种安装方式，详情请见文档 [快速开始](https://qwenpaw.agentscope.io/docs/quickstart)：
+智造云 AIOS 支持多种安装方式，详情请见 [快速开始](./quickstart)：
 
-1. 一键安装，帮你搞定 Python 环境
-
-```
-# macOS / Linux:
-curl -fsSL https://qwenpaw.agentscope.io/install.sh | bash
-# Windows（PowerShell）:
-irm https://qwenpaw.agentscope.io/install.ps1 | iex
-# 关注文档更新，请先采用pip方式完成一键安装
-```
+1. 启动器安装（推荐）：获取安装包后运行 `install-oneclick.cmd` / `start-ai-os.cmd`（Windows）或 `./start-ai-os.sh`（macOS / Linux），首次启动自动完成运行环境安装；离线环境使用离线安装包，全程无需联网；多用户模式运行 `start-hub.cmd`（端口 8000，首个注册账号即管理员）。
 
 2. pip 安装
 
@@ -42,33 +34,6 @@ docker run -p 127.0.0.1:8088:8088 \
   -v qwenpaw-backups:/app/working.backups \
   agentscope/qwenpaw:latest
 ```
-
-> **⚠️ Windows 企业版 LTSC 用户特别提示**
->
-> 如果您使用的是 Windows LTSC 或受严格安全策略管控的企业环境，PowerShell 可能运行在 **受限语言模式** 下，可能会遇到以下问题：
->
-> 1. **如果你使用的是 CMD（.bat）：脚本执行成功但无法写入`Path`**
->
->    脚本已完成文件安装，由于 **受限语言模式** ，脚本无法自动写入环境变量，此时只需手动配置：
->
->    - **找到安装目录**：
->      - 检查 `uv` 是否可用：在 CMD 中输入 `uv --version` ，如果显示版本号，则**只需配置 QwenPaw 路径**；如果提示 `'uv' 不是内部或外部命令，也不是可运行的程序或批处理文件。`，则需同时配置两者。
->      - uv路径（任选其一，取决于安装位置，若`uv`不可用则填）：通常在`%USERPROFILE%\.local\bin`、`%USERPROFILE%\AppData\Local\uv`或 Python 安装目录下的 `Scripts` 文件夹
->      - QwenPaw路径：通常在 `%USERPROFILE%\.qwenpaw\bin` 。
->    - **手动添加到系统的 Path 环境变量**：
->      - 按 `Win + R`，输入 `sysdm.cpl` 并回车，打开“系统属性”。
->      - 点击 “高级” -> “环境变量”。
->      - 在 “系统变量” 中找到并选中 `Path`，点击 “编辑”。
->      - 点击 “新建”，依次填入上述两个目录路径，点击确定保存。
->
-> 2. **如果你使用的是 PowerShell（.ps1）：脚本运行中断**
->
-> 由于 **受限语言模式** ，脚本可能无法自动下载`uv`。
->
-> - **手动安装uv**：参考 [GitHub Release](https://github.com/astral-sh/uv/releases)下载并将`uv.exe`放至`%USERPROFILE%\.local\bin`或`%USERPROFILE%\AppData\Local\uv`；或者确保已安装 Python ，然后运行`python -m pip install -U uv`
-> - **配置`uv`环境变量**：将`uv`所在目录和 `%USERPROFILE%\.qwenpaw\bin` 添加到系统的 `Path` 变量中。
-> - **重新运行**：打开新终端，再次执行安装脚本以完成 `QwenPaw` 安装。
-> - **配置`QwenPaw`环境变量**：将 `%USERPROFILE%\.qwenpaw\bin` 添加到系统的 `Path` 变量中。
 
 ### QwenPaw如何更新
 
@@ -104,11 +69,7 @@ docker run -p 127.0.0.1:8088:8088 \
   agentscope/qwenpaw:latest
 ```
 
-5. 如果你使用的是桌面版（Tauri 版），已内置应用内更新：应用启动时会自动检测新版本并在界面中提示，你可以选择「安装并重启」立即更新，或「稍后更新」在后台下载。也可从下载页手动获取最新版本：https://qwenpaw.agentscope.io/downloads
-
-升级后重启服务 qwenpaw app。
-
-原 CoPaw 用户升级 QwenPaw，下载最新的 QwenPaw 即可，无需做额外适配即可继续使用 CoPaw 时期的所有配置、记忆、技能等。
+5. 智造云AIOS：停止服务后由管理员重新运行启动器即可（自动按版本锁升级运行环境，Workspace 会话、知识与文件数据不受影响）；完整变更见本帮助中心「更新日志」章节。
 
 ### QwenPaw服务如何启动及初始化
 
@@ -240,7 +201,7 @@ QwenPaw 已开源，官方仓库地址：
 
 ### 最新版本升级内容如何查看
 
-具体版本变更可在官网 [更新日志](https://qwenpaw.agentscope.io/release-notes/?lang=zh) 或 QwenPaw GitHub 仓库 [Releases](https://github.com/agentscope-ai/QwenPaw/releases) 中查看。
+具体版本变更见本帮助中心「[更新日志](#changelog)」章节。
 
 ### 如何配置模型
 

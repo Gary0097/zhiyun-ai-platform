@@ -7,9 +7,7 @@
 | **pip 安装**            | 熟悉 Python 的开发者     | 灵活控制环境，便于开发调试                                       | Python 3.11~3.13              |
 | **脚本安装**            | 不想要手动配置环境的用户 | 零配置，自动管理 Python 环境                                     | 无                            |
 | **Docker**              | 容器化部署或生产环境     | 环境隔离，易于迁移                                               | Docker                        |
-| **AgentScope Platform** | 无本地环境或快速体验     | 注册即可免费体验，无需安装，浏览器直接使用，支持 Beta 与正式版本 | 注册 AgentScope Platform 账号 |
 | **阿里云 ECS**          | 云上稳定运行             | 一键部署，稳定可靠                                               | 阿里云账号                    |
-| **魔搭创空间**          | 无本地环境或快速体验     | 一键部署，云端运行，无需安装                                     | 魔搭账号                      |
 | **桌面应用**            | 不熟悉命令行的用户       | 双击即用，图形化界面                                             | 无                            |
 
 > 📖 阅读前请先了解 [项目介绍](./intro)，完成安装与启动后可查看 [控制台](./console)。
@@ -63,109 +61,36 @@ qwenpaw app
 
 ---
 
-## 方式二：脚本安装
+## 方式二：智造云AIOS 启动器（推荐）
 
-无需预装 Python — 安装脚本通过 [uv](https://docs.astral.sh/uv/) 自动管理一切。
+获取智造云 AIOS 安装包后运行启动器，首次启动自动完成运行环境安装（按版本锁管理，无需手动配置 Python）。
 
-### 步骤一：安装
+### 步骤一：获取安装包
 
-**macOS / Linux：**
+- **在线获取**：从发布渠道获取产品仓库或安装包；
+- **离线环境**：使用离线安装包（U 盘分发，全程无需联网）。
 
-```bash
-curl -fsSL https://qwenpaw.agentscope.io/install.sh | bash
-```
+### 步骤二：启动
 
-然后打开新终端（或执行 `source ~/.zshrc` / `source ~/.bashrc`）。
-
-**Windows (CMD):**
+**Windows：**
 
 ```cmd
-curl -fsSL https://qwenpaw.agentscope.io/install.bat -o install.bat && install.bat
+install-oneclick.cmd   :: 一键安装并启动
+start-ai-os.cmd        :: 单机版启动（控制台 http://127.0.0.1:8088）
+start-hub.cmd          :: 多用户模式（局域网共用，端口 8000）
 ```
-
-**Windows（PowerShell）：**
-
-```powershell
-irm https://qwenpaw.agentscope.io/install.ps1 | iex
-```
-
-然后打开新终端（安装脚本会自动将 QwenPaw 加入 PATH）。
-
-> **⚠️ Windows 企业版 LTSC 用户特别提示**
->
-> 如果您使用的是 Windows LTSC 或受严格安全策略管控的企业环境，PowerShell 可能运行在 **受限语言模式** 下，可能会遇到以下问题：
->
-> 1. **如果你使用的是 CMD（.bat）：脚本执行成功但无法写入`Path`**
->
->    脚本已完成文件安装，由于 **受限语言模式** ，脚本无法自动写入环境变量，此时只需手动配置：
->
->    - **找到安装目录**：
->      - 检查 `uv` 是否可用：在 CMD 中输入 `uv --version` ，如果显示版本号，则**只需配置 QwenPaw 路径**；如果提示 `'uv' 不是内部或外部命令，也不是可运行的程序或批处理文件。`，则需同时配置两者。
->      - uv路径（任选其一，取决于安装位置，若`uv`不可用则填）：通常在`%USERPROFILE%\.local\bin`、`%USERPROFILE%\AppData\Local\uv`或 Python 安装目录下的 `Scripts` 文件夹
->      - QwenPaw路径：通常在 `%USERPROFILE%\.qwenpaw\bin` 。
->    - **手动添加到系统的 Path 环境变量**：
->      - 按 `Win + R`，输入 `sysdm.cpl` 并回车，打开"系统属性"。
->      - 点击 "高级" -> "环境变量"。
->      - 在 "系统变量" 中找到并选中 `Path`，点击 "编辑"。
->      - 点击 "新建"，依次填入上述两个目录路径，点击确定保存。
->
-> 2. **如果你使用的是 PowerShell（.ps1）：脚本运行中断**
->
-> 由于 **受限语言模式** ，脚本可能无法自动下载`uv`。
->
-> - **手动安装uv**：参考 [GitHub Release](https://github.com/astral-sh/uv/releases)下载并将`uv.exe`放至`%USERPROFILE%\.local\bin`或`%USERPROFILE%\AppData\Local\uv`；或者确保已安装 Python ，然后运行`python -m pip install -U uv`
-> - **配置`uv`环境变量**：将`uv`所在目录和 `%USERPROFILE%\.qwenpaw\bin` 添加到系统的 `Path` 变量中。
-> - **重新运行**：打开新终端，再次执行安装脚本以完成 `QwenPaw` 安装。
-> - **配置`QwenPaw`环境变量**：将 `%USERPROFILE%\.qwenpaw\bin` 添加到系统的 `Path` 变量中。
-
-也可以指定选项：
 
 **macOS / Linux：**
 
 ```bash
-# 安装指定版本
-curl -fsSL ... | bash -s -- --version 1.1.0
-
-# 从源码安装（开发/测试用）
-curl -fsSL ... | bash -s -- --from-source
+./start-ai-os.sh
 ```
 
-**Windows（PowerShell）：**
+### 步骤三：注册账号
 
-```powershell
-# 安装指定版本
-.\install.ps1 -Version 0.0.2
+首次启动后在浏览器打开 **http://127.0.0.1:8088/**（单机版）或 **http://<服务器IP>:8000/**（多用户版），点击「创建账号」注册——**首个注册的账号即管理员**。
 
-# 从源码安装（开发/测试用）
-.\install.ps1 -FromSource
-```
-
-升级只需重新运行安装命令。卸载请运行 `qwenpaw uninstall`。
-
-### 步骤二：初始化
-
-在工作目录（默认 `~/.qwenpaw`）下生成 `config.json` 与 `HEARTBEAT.md`。两种方式：
-
-- **快速用默认配置**（不交互，适合先跑起来再改配置）：
-  ```bash
-  qwenpaw init --defaults
-  ```
-- **交互式初始化**（按提示填写心跳间隔、投递目标、活跃时段，并可顺带配置频道与 Skills）：
-  ```bash
-  qwenpaw init
-  ```
-  详见 [CLI - 快速上手](./cli#快速上手)。
-
-若已有配置想覆盖，可使用 `qwenpaw init --force`（会提示确认）。
-初始化后若尚未启用频道，接入钉钉、飞书、QQ 等需在 [频道配置](./channels) 中按文档填写。
-
-### 步骤三：启动服务
-
-```bash
-qwenpaw app
-```
-
-服务默认监听 `127.0.0.1:8088`。若已配置频道，QwenPaw 会在对应 app 内回复；若尚未配置，也可先完成本节再前往频道配置。
+> 启动器依赖 Node.js（国内可从 npmmirror 镜像下载）；首次启动联网安装依赖时建议配置 PyPI 国内镜像变量（详见《国内拉取与测试指引》）。
 
 ---
 
@@ -185,75 +110,6 @@ docker run -p 127.0.0.1:8088:8088 \
 ```
 
 然后在浏览器打开 **http://127.0.0.1:8088/** 进入控制台。配置、记忆与 Skills 保存在 `qwenpaw-data` 卷中；模型配置与 API Key 保存在 `qwenpaw-secrets` 卷中；备份归档保存在 `qwenpaw-backups` 卷中。传入 API Key 可在 `docker run` 时加 `-e DASHSCOPE_API_KEY=xxx` 或 `--env-file .env`。
-
----
-
-## 方式四：AgentScope Platform（无需安装）
-
-[AgentScope Platform](https://platform.agentscope.io/) 是 AgentScope 生态的云端体验平台，提供 QwenPaw 的一键部署和在线运行环境，同时支持 Beta 版本和正式版本试用。注册即可免费体验，无需在本地安装或配置运行环境；登录后一键部署，即可直接在浏览器中使用 QwenPaw。
-
-![AgentScope Platform 中的 QwenPaw 一键部署入口与建议反馈入口](https://img.alicdn.com/imgextra/i4/O1CN01eJWlFV24HEB3V2ATv_!!6000000007365-2-tps-2914-1446.png)
-
-如果在 QwenPaw 部署或使用过程中遇到问题，可点击页面右下角的「建议反馈」提交反馈。
-
----
-
-## 方式五：部署到阿里云 ECS
-
-若希望将 QwenPaw 部署在阿里云上，可使用阿里云 ECS 一键部署：
-
-1. 打开 [QwenPaw 阿里云 ECS 部署链接](https://computenest.console.aliyun.com/service/instance/create/cn-hangzhou?type=user&ServiceId=service-1ed84201799f40879884)，按页面提示填写部署参数；
-2. 参数配置完成后确认费用并创建实例，部署完成后即可获取访问地址并使用服务。
-
-详细步骤与说明请参考 [阿里云开发者社区：QwenPaw 3 分钟部署你的 AI 助理](https://developer.aliyun.com/article/1713682)。
-
----
-
-## 方式六：魔搭创空间一键配置（无需安装）
-
-若不想在本地安装 Python，可通过魔搭创空间将 QwenPaw 部署到云端运行：
-
-1. 先前往 [魔搭](https://modelscope.cn/register?back=%2Fhome) 注册并登录；
-2. 打开 [QwenPaw 创空间](https://modelscope.cn/studios/fork?target=AgentScope/QwenPaw)，一键配置即可使用。
-
-**重要**：使用创空间请将空间设为 **非公开**，否则你的 QwenPaw 可能被他人操纵。
-
----
-
-## 方式七：桌面应用
-
-如果你不习惯使用命令行，可以下载并使用 QwenPaw 的桌面应用版本，无需手动配置 Python 环境或执行命令。
-
-### 特点
-
-- ✅ **零配置**：下载后双击即可运行，无需安装 Python 或配置环境变量
-- ✅ **跨平台**：支持 Windows 10+ 和 macOS 14+ (推荐 Apple Silicon)
-- ✅ **可视化**：自动打开应用界面，无需手动输入地址
-
-### 下载与使用
-
-1. **下载安装包**
-   前往 [GitHub Releases](https://github.com/agentscope-ai/QwenPaw/releases) 下载对应系统的 Tauri 版本：
-
-   - Windows: `QwenPaw-Tauri-<version>-Windows-setup.exe`
-   - macOS: `QwenPaw-Tauri-<version>-macOS.zip`
-
-2. **安装并启动**
-
-   - **Windows**: 双击 `.exe` 文件按向导安装，完成后双击桌面快捷方式启动
-   - **macOS**: 解压 `.zip` 得到 `QwenPaw Desktop.app`，首次需右键选择"打开"以绕过系统安全限制
-
-3. **首次启动提示**
-   首次启动可能需要 10-60 秒（取决于系统配置），应用需要初始化 Python 环境和加载依赖，请耐心等待窗口自动打开。
-
-### 完整使用指南
-
-桌面应用涉及系统权限、安全提示、调试模式等细节，请查看 **[桌面应用完整指南](./desktop)** 了解：
-
-- Windows 两种启动模式（普通版 vs Debug 版）
-- macOS 如何解除系统安全限制（3种方法）
-- 常见问题与解决方案
-- 日志查看与问题报告
 
 ---
 
