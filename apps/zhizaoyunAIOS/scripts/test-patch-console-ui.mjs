@@ -218,6 +218,8 @@ try {
   ok(themedHtml.split('\n').every(l => !l.includes('.qwenpaw-app:has(form)') || l.includes('body.zy-login')), '登录页专属 CSS 全部限定在 body.zy-login 路由标记下（防内页含表单被误判为登录页）')
   ok(themedHtml.includes('/aios-docs.html?v='), '文档引用已带内容版本参数（击穿固定文件名的历史 immutable 缓存）')
   ok(themedHtml.includes('@media (max-width: 899px)') && themedHtml.includes('#aios-brand-copy{display:none !important;}'), '竖屏规则：窄屏下 #aios-brand-copy 品牌文案块整体隐藏（白字叠表单回归）')
+  ok(themedHtml.includes('max-width:400px !important') && themedHtml.includes('padding-left:0 !important'), '窄屏表单防收缩规则存在（阻断宿主嵌套 32px 内边距，卡片限宽 400px 占满可用宽度）')
+  ok(themedHtml.includes('@media (min-width: 900px)') && themedHtml.includes('grid-column:1 / -1 !important'), '宽屏表单跨列规则存在（内层宿主 grid 双列把表单压进 222px 窄列的回归）')
   ok(themedHtml.includes('@media (min-width: 900px)') && themedHtml.includes('grid-template-columns:58.333% 41.667%'), '宽屏规则：分栏布局保留（桌面无回归）')
 
   const run1Zyb = zybJsFiles().sort()

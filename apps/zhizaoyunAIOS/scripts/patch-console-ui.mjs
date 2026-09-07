@@ -516,6 +516,10 @@ function themeCss (theme) {
     background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:44px 44px;}
   /* 内层同名容器禁用装饰性伪元素 */
   body.zy-login .qwenpaw-app .qwenpaw-app:has(form)::before,body.zy-login .qwenpaw-app .qwenpaw-app:has(form)::after{content:none !important;}
+  /* 内层同构 .qwenpaw-app 的宿主默认 grid 是「311px 222px」双列，表单被塞进
+     222px 窄列（实测输入框仅 51px）：让内层子项跨全部列，表单回到右栏居中
+     400px 主列（实测输入框恢复 293px） */
+  body.zy-login .qwenpaw-app:has(form) .qwenpaw-app > *{grid-column:1 / -1 !important;}
   /* 品牌区文案 + 白色 Logo（挂在 app 容器第一个子节点之前不可行，用 body 级伪元素太晚——
      改为在左栏内部用另一层：直接给 ::before 之上无法再叠文字，因此把文案放在
      .qwenpaw-app 内新增的元素由 JS 完成，这里仅做背景层） */
@@ -543,8 +547,11 @@ function themeCss (theme) {
   /* 品牌文案块只属于宽屏分栏布局；窄屏/竖屏必须整体隐藏，否则白字叠在
      浅色表单上不可读（竖屏实测回归） */
   #aios-brand-copy{display:none !important;}
-  /* 竖屏卡片留白：窄边距 + 防横向溢出 */
-  body.zy-login .qwenpaw-app:has(form){padding:24px 16px !important;box-sizing:border-box !important;overflow-x:hidden !important;}
+  /* 宿主登录卡片每层父容器带 32px 横向内边距，320px 视口下输入框只剩
+     117px 完全不可用（实测）：阻断嵌套收缩——容器全宽、各级父层去横向
+     内边距、卡片限宽 400px 居中，表单占满卡片 */
+  body.zy-login .qwenpaw-app:has(form){display:flex !important;flex-direction:column !important;justify-content:center !important;align-items:center !important;min-height:100vh !important;padding:24px 16px !important;box-sizing:border-box !important;overflow-x:hidden !important;}
+  body.zy-login .qwenpaw-app:has(form) > *,body.zy-login .qwenpaw-app:has(form) > * > *,body.zy-login .qwenpaw-app:has(form) > * > * > *{width:100% !important;max-width:400px !important;padding-left:0 !important;padding-right:0 !important;box-sizing:border-box !important;}
   body.zy-login .qwenpaw-app:has(form) form{width:100% !important;box-sizing:border-box !important;}
 }`)
   return lines.join(String.fromCharCode(10))
