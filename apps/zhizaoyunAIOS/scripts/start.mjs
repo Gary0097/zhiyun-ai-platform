@@ -67,6 +67,14 @@ if (existsSync(join(scriptsRoot, 'patch-console-ui.mjs'))) {
   run(process.execPath, [join(scriptsRoot, 'patch-console-ui.mjs')], 'Console UI 品牌化脚本执行失败。')
 }
 
+// 品牌层插件（#126 官方扩展点形态）：启动前（服务离线窗口）安装/更新。
+// 安装命令只接受本地目录且需服务离线，这里正在 spawn 之前，条件满足。
+const brandPlugin = join(repoRoot, 'plugins', 'aios-brand')
+if (existsSync(join(brandPlugin, 'plugin.json'))) {
+  const install = spawnSync(qwenpawCommand, ['plugin', 'install', brandPlugin, '--force'], { cwd: repoRoot, stdio: 'inherit', env: launchEnv })
+  if (install.status !== 0) console.warn('品牌层插件安装失败（不影响启动，外观回退为补丁层）。')
+}
+
 console.log('\n智造云 AIOS 启动中：http://127.0.0.1:8088')
 console.log('运行形态：原生 QwenPaw 2.2.0 单进程；控制台原生登录；无捆绑业务应用。')
 console.log('多用户/集中模型账号：运行 start-hub.cmd（QwenPaw Hub，端口 8000）。\n')

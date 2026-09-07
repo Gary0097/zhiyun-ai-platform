@@ -4,6 +4,12 @@
 
 > 产品定义：[`docs/product/PRD-V7.0-AIOS-2.2.0.md`](docs/product/PRD-V7.0-AIOS-2.2.0.md)
 
+## 品牌层插件（#126）
+
+品牌化的主体已迁移为官方前端扩展插件 `plugins/aios-brand`（顶栏 Logo 槽位、帮助中心路由与菜单、蓝绿主题、隐藏外链入口），
+启动器在服务拉起前用 `qwenpaw plugin install --force` 安装/更新，QwenPaw 运行时升级不需要重建品牌层。
+控制台**文案**品牌化仍由 `patch-console-ui.mjs` 兜底（宿主 i18n 在 bundle 内，无官方覆盖点），属已知残留限制。
+
 ## 品牌与外观自定义
 
 控制台的品牌（Logo、主题色、登录页封面）在每次启动时由 `apps/zhizaoyunAIOS/scripts/patch-console-ui.mjs`

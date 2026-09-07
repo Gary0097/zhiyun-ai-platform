@@ -1,7 +1,7 @@
 // 确保 Workspace 目录结构就绪（智造云 AIOS 2.2.0 极简形态）
 // 2.2.0 登录由 QwenPaw 原生认证承载（QWENPAW_AUTH_ENABLED），不再需要
 // zhiyun-auth 的 users.json/token_secret；仅保留运行必需的基础目录。
-import { mkdirSync, existsSync, renameSync, readdirSync } from 'node:fs'
+import { mkdirSync, existsSync, renameSync, readdirSync, cpSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -51,6 +51,25 @@ if (existsSync(legacyPlugins)) {
     if (!rest.length) {
       try { renameSync(legacyPlugins, legacyPlugins + '.empty-removed') } catch { }
     }
+  }
+}
+
+// 品牌层插件同步：把仓库 plugins/aios-brand 复制到 workspace/plugins（版本
+// 变化才覆盖，幂等）。这是 #126 的官方扩展点形态——QwenPaw 升级不需重建。
+const brandSrc = join(appRoot, '..', '..', 'plugins', 'aios-brand')
+const brandDst = join(workspace, 'plugins', 'aios-brand')
+if (existsSync(join(brandSrc, 'plugin.json'))) {
+  let need = true
+  const manifest = JSON.parse(readFileSync(join(brandSrc, 'plugin.json'), 'utf8'))
+  try {
+    const installed = JSON.parse(readFileSync(join(brandDst, 'plugin.json'), 'utf8'))
+    need = installed.version !== manifest.version
+  } catch { }
+  if (need) {
+    mkdirSync(join(workspace, 'plugins'), { recursive: true })
+    rmSync(brandDst, { recursive: true, force: true })
+    cpSync(brandSrc, brandDst, { recursive: true })
+    console.log(`  [brand] aios-brand v${manifest.version} 已同步到 workspace/plugins`)
   }
 }
 
