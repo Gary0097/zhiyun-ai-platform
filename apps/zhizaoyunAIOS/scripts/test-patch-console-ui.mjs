@@ -202,6 +202,11 @@ try {
   ok(readFileSync(join(consoleDir, 'aios-docs-faq.zh.md'), 'utf8').includes('### 智造云AIOS如何更新'), 'FAQ 本地数据源（zh）标题与 bundle 抓取正则一致')
   ok(readFileSync(join(consoleDir, 'aios-docs-faq.en.md'), 'utf8').includes('### How to update 智造云AIOS'), 'FAQ 本地数据源（en）标题与 bundle 抓取正则一致')
 
+  // 竖屏/窄屏适配：品牌文案块必须随分栏布局在 <900px 整体隐藏，宽屏分栏保留
+  const themedHtml = readFileSync(join(consoleDir, 'index.html'), 'utf8')
+  ok(themedHtml.includes('@media (max-width: 899px)') && themedHtml.includes('#aios-brand-copy{display:none !important;}'), '竖屏规则：窄屏下 #aios-brand-copy 品牌文案块整体隐藏（白字叠表单回归）')
+  ok(themedHtml.includes('@media (min-width: 900px)') && themedHtml.includes('grid-template-columns:58.333% 41.667%'), '宽屏规则：分栏布局保留（桌面无回归）')
+
   const run1Zyb = zybJsFiles().sort()
   const run1EntryContent = entry
 

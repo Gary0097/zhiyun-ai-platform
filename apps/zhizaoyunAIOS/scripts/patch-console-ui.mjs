@@ -540,6 +540,12 @@ function themeCss (theme) {
 }
 @media (max-width: 899px){
   .qwenpaw-app:has(form)::before,.qwenpaw-app:has(form)::after{display:none;}
+  /* 品牌文案块只属于宽屏分栏布局；窄屏/竖屏必须整体隐藏，否则白字叠在
+     浅色表单上不可读（竖屏实测回归） */
+  #aios-brand-copy{display:none !important;}
+  /* 竖屏卡片留白：窄边距 + 防横向溢出 */
+  .qwenpaw-app:has(form){padding:24px 16px !important;box-sizing:border-box !important;overflow-x:hidden !important;}
+  .qwenpaw-app:has(form) form{width:100% !important;box-sizing:border-box !important;}
 }`)
   return lines.join(String.fromCharCode(10))
 }
