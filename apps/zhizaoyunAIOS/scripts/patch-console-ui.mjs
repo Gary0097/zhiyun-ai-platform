@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { brotliCompressSync, gzipSync } from 'node:zlib'
-import { existsSync, readFileSync, writeFileSync, readdirSync, renameSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -899,6 +899,28 @@ function relaxConsoleCachePolicy (consoleDir) {
   console.log('Console 静态缓存策略已调整为 ETag 协商（max-age=0, must-revalidate）。')
 }
 
+// 僵尸 zyb 资产清道夫：canonical 命名修复之前的历史轮次每轮改名都会派生新名，
+// 留下不再被任何内容引用的旧 -zyb 文件。引用归一为本轮终名之后，凡内容中不再
+// 出现的 zyb 文件（连同 .br/.gz 预压缩副本）一并回收，防止 assets 无限膨胀。
+function sweepStaleZybAssets (consoleDir) {
+  const referenced = new Set()
+  for (const file of collectBrandableFiles(consoleDir)) {
+    const c = readFileSync(file, 'utf8')
+    for (const m of c.matchAll(/[\w.-]+-zyb[0-9a-f]{8}\.[a-z]+/g)) referenced.add(m[0])
+  }
+  let removed = 0
+  const walk = dir => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name)
+      if (entry.isDirectory()) { walk(full); continue }
+      const m = entry.name.match(/^([\w.-]+-zyb[0-9a-f]{8}\.[a-z]+?)(?:\.(?:br|gz))?$/)
+      if (m && !referenced.has(m[1])) { rmSync(full, { force: true }); removed++ }
+    }
+  }
+  walk(consoleDir)
+  if (removed) console.log('已清理 ' + removed + ' 个历史遗留的未引用 zyb 资产文件。')
+}
+
 const runtime = resolveRuntime()
 // --console-dir <目录>：显式指定控制台资产目录（如 Hub venv 的 console），
 // 缺省时按项目运行时解析
@@ -1018,6 +1040,14 @@ content = branded
 //      策略由 relaxConsoleCachePolicy 放宽为 ETag 协商。
 const renames = [] // { file, content, newFile }
 
+// 引用改写会让 content 里的 chunk 名带上 -zyb 后缀；入口与登录 chunk 互引用时，
+// 若 hash 直接基于改写后的 content，每轮重跑的名字都会漂移并派生新僵尸文件
+// （回归测试 test-patch-console-ui.mjs 曾抓到）。命名基准统一用“规范化 content”：
+// 剥离全部 -zyb 后缀后再 hash——无论引用链处于哪一轮，规范化结果一致，名字收敛，
+// 且与首轮（改写前内容）的命名天然兼容。
+const ZYB_SUFFIX = /-zyb[0-9a-f]{8}(?=\.js)/g
+const canonicalJs = text => text.split(ZYB_SUFFIX).join('')
+
 // 历史补丁痕迹标记：命中任意一个说明该 JS 承载品牌化改动（可能是更早版本补丁
 // 原位写入的），即使本次内容无变化也要补一次内容寻址改名，让存量浏览器的
 // immutable 缓存失效。HTML（index.html / aios-docs.html）是固定路由名，永不改名。
@@ -1069,19 +1099,25 @@ const renameMap = new Map() // 旧文件名 → 新文件名
 for (const r of renames) {
   const base = r.file.split(/[\\/]/).pop()
   const dot = base.lastIndexOf('.')
-  const newName = base.slice(0, dot) + '-zyb' + hashOf(r.content) + base.slice(dot)
+  const newName = base.slice(0, dot) + '-zyb' + hashOf(canonicalJs(r.content)) + base.slice(dot)
   r.newFile = join(dirname(r.file), newName)
   if (!renameMap.has(base)) renameMap.set(base, newName)
 }
 
 // 引用改写：扫全部 JS/HTML（含被改名文件自身——主 bundle 资源清单里的
-// chunk 名、index.html 的 script src 都在其中）
+// chunk 名、index.html 的 script src 都在其中）。先把内容里历史轮次留下的
+// zyb 引用 canonical 化（剥后缀还原为原名），再统一映射到本轮终名——
+// 任何历史漂移名都会被归一，配合尾部清道夫即可回收僵尸文件。
+const rewriteRefs = text => {
+  let t = canonicalJs(text)
+  for (const [oldName, newName] of renameMap) t = t.split(oldName).join(newName)
+  return t
+}
 if (renameMap.size) {
   for (const file of collectBrandableFiles(consoleDir)) {
     const renamed = renames.find(r => r.file === file)
     const text = renamed ? renamed.content : readFileSync(file, 'utf8')
-    let updated = text
-    for (const [oldName, newName] of renameMap) updated = updated.split(oldName).join(newName)
+    const updated = rewriteRefs(text)
     if (renamed) renamed.content = updated
     else if (updated !== text) writeAssetWithSiblings(file, updated)
   }
@@ -1109,6 +1145,7 @@ applyBrandTheme(consoleDir)
 writeLocalDocs(consoleDir)
 suppressConsoleTour(consoleDir)
 relaxConsoleCachePolicy(consoleDir)
+sweepStaleZybAssets(consoleDir)
 
 if (missing.length) {
   warn('以下目标未找到，bundle 可能已更新：' + missing.join('、'))

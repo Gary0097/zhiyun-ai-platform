@@ -74,6 +74,7 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'patch-console-ui.mjs')]],
   [process.execPath, [join(scripts, 'verify-runtime.mjs')]],
   [process.execPath, [join(scripts, 'patch-console-ui.mjs'), '--check']],
+  [process.execPath, [join(scripts, 'test-patch-console-ui.mjs')]],
   [process.execPath, [join(root, 'scripts', 'release-prune.mjs'), '--check']],
   [process.execPath, ['--check', join(root, 'scripts', 'make-release-package.mjs')]],
 ]
