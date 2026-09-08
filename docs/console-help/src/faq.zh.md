@@ -89,7 +89,7 @@ qwenpaw app
 
 ### Windows 端口 8088 冲突问题
 
-在 Windows 上，Hyper-V 和 WSL2 可能会保留某些端口范围，这可能与 QwenPaw 的默认端口 **8088** 冲突。此问题影响所有安装方式（pip 安装、脚本安装、Docker、桌面应用）。
+在 Windows 上，Hyper-V 和 WSL2 可能会保留某些端口范围，这可能与 QwenPaw 的默认端口 **8088** 冲突。此问题影响所有安装方式（智造云AIOS 启动器、pip 安装、Docker）。
 
 **症状：**
 
@@ -109,7 +109,7 @@ netsh interface ipv4 show excludedportrange protocol=tcp
 
 **解决方案：使用其他端口**
 
-**pip 安装 / 脚本安装：**
+**pip 安装 / 终端启动：**
 
 ```bash
 qwenpaw app --port 8090
@@ -129,12 +129,9 @@ docker run -p 127.0.0.1:8090:8088 \
 
 然后在浏览器中打开 `http://127.0.0.1:8090/`。
 
-**Windows 桌面应用：**
+**智造云AIOS 启动器：**
 
-目前桌面应用默认使用 8088 端口。如果遇到此问题，可以：
-
-1. 改用终端运行 `qwenpaw app --port 8090`
-2. 或从 Windows 保留端口范围中排除 8088（需要管理员权限，可能影响其他服务）
+启动器默认使用 8088 端口。如果遇到此问题，可参考下文「进阶：防止 Windows 保留 8088 端口」从保留范围中排除 8088，或改用 pip 安装后在终端运行 `qwenpaw app --port 8090`。
 
 **进阶：防止 Windows 保留 8088 端口**
 

@@ -203,6 +203,14 @@ try {
   ok(docs.includes('企业内支持'), '问题反馈章节已品牌化改写')
   ok(!/qwenpaw\.agentscope\.io/.test(docs) && !docs.includes('AgentScope Platform') && !docs.includes('魔搭创空间'), '上游官网/云平台/魔搭引用清零（含安装脚本）')
   ok(docs.includes('install-oneclick.cmd') && docs.includes('start-ai-os.cmd'), '安装指引为智造云AIOS 启动器方式')
+  // 安装方式一致性：quickstart 一览表行必须与实际章节对应——脚本安装/阿里云 ECS/
+  // 桌面应用章节已随上游渠道清理移除（desktop 整页不进内嵌文档），一览表行与
+  // FAQ 排查指引不得残留旧方式名，否则用户会照着不存在的安装方式操作
+  const quickstartSec = docs.split('id="doc-quickstart"')[1].split('id="doc-')[0]
+  ok(!quickstartSec.includes('阿里云 ECS') && !quickstartSec.includes('>桌面应用<') && !quickstartSec.includes('>脚本安装<'), 'quickstart 一览表与正文章节一致（无已删章节的残留行）')
+  ok(quickstartSec.includes('智造云AIOS 启动器'), 'quickstart 一览表包含启动器方式（与方式二正文对应）')
+  const faqSec = docs.split('id="doc-faq"')[1].split('id="doc-')[0]
+  ok(!faqSec.includes('脚本安装') && !faqSec.includes('Windows 桌面应用'), 'FAQ 端口冲突排查不再引用已移除的安装方式（脚本安装/桌面应用）')
   // 表格渲染回归：分隔行字符类 bug 曾使 1546 行表格数据只渲染出 2 张表
   const tableCount = occurrences(docs, '<table>')
   ok(tableCount > 100, 'Markdown 表格正常渲染（' + tableCount + ' 张 ≥100；曾因分隔行正则一字之差全部退化为文本段）')

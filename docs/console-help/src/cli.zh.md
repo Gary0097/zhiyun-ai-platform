@@ -232,7 +232,7 @@ qwenpaw models remove-local <model_id> --yes   # 跳过确认
 
 QwenPaw 集成 Ollama 以在本地运行模型。模型从 Ollama 守护进程动态加载——请先从 [ollama.com](https://ollama.com) 安装 Ollama。
 
-安装 Ollama SDK：`pip install 'qwenpaw[ollama]'`（或使用 `--extras ollama` 重新运行安装脚本）
+安装 Ollama SDK：`pip install 'qwenpaw[ollama]'`（或使用 `--extras ollama` 重新运行安装命令）
 
 ```bash
 # 下载 Ollama 模型
