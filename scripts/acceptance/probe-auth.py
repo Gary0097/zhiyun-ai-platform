@@ -18,6 +18,7 @@ p.add_argument('--state', required=True)
 p.add_argument('--hub', action='store_true')
 p.add_argument('--allow-test-registration', action='store_true')
 p.add_argument('--linux-filesystem-probe', action='store_true')
+p.add_argument('--credential-scope-probe', action='store_true')
 args = p.parse_args()
 assert urlparse(args.url).hostname in ('127.0.0.1', 'localhost'), 'Only loopback test instances are allowed'
 state_path = Path(args.state)
@@ -75,6 +76,18 @@ if args.hub:
     code, data = request('POST', '/api/hub/runtimes/' + runtime_id + '/start', {}, token)
     print('RUNTIME_START', code, str(data.get('detail', data.get('state', 'unknown')))[:600], flush=True)
     check(code == 200 and data.get('state') == 'running', 'isolated runtime starts successfully')
+    if args.credential_scope_probe:
+        name = 'AIOS_ACCEPTANCE_' + secrets.token_hex(6).upper()
+        value = secrets.token_urlsafe(24)  # Non-provider marker; never invokes a model.
+        try:
+            check(request('PUT', '/api/hub/credentials', {'scope': 'tenant', 'name': name, 'value': value}, token)[0] == 204, 'administrator stores non-provider credential marker')
+            code, own_metadata = request('GET', '/api/hub/credentials?q=' + name, token=token)
+            check(code == 200 and any(x['name'] == name for x in own_metadata['items']), 'credential metadata visible in administrator tenant')
+            check(value not in json.dumps(own_metadata), 'credential plaintext absent from metadata API')
+            code, employee_metadata = request('GET', '/api/hub/credentials?q=' + name, token=employee['token'])
+            check(code == 200 and not employee_metadata['items'], 'administrator credential is not shared into employee tenant')
+        finally:
+            check(request('DELETE', '/api/hub/credentials/tenant/' + name, token=token)[0] in (204,404), 'non-provider credential marker removed')
     if args.linux_filesystem_probe:
         check(os.name == 'posix' and Path('/proc/self/ns/mnt').exists(), 'Linux mount namespace probe available')
         if 'employee_runtime_id' not in state:
