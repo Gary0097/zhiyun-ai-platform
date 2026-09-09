@@ -88,18 +88,9 @@ class Installer
             File.WriteAllText(launcher, string.Join("\r\n", launcherLines) + "\r\n",
                 new System.Text.UTF8Encoding(false));
 
-            string[] uninstallerLines = {
-                "@echo off", "chcp 65001 >nul",
-                "cd /d \"%~dp0\"",
-                "rem User data remains in the installation directory.",
-                "reg delete HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ZhizaoyunAIOS /f >nul 2>&1",
-                "del \"%USERPROFILE%\\Desktop\\智造云 AI-OS.lnk\" >nul 2>&1",
-                "del \"%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\智造云 AI-OS.lnk\" >nul 2>&1",
-                "echo 已移除快捷方式与卸载项；如需彻底删除请手动删除整个安装目录。",
-                "pause" };
-            string uninstaller = Path.Combine(targetDir, "卸载智造云AI-OS.cmd");
-            File.WriteAllText(uninstaller, string.Join("\r\n", uninstallerLines) + "\r\n",
-                new System.Text.UTF8Encoding(false));
+            string uninstaller = Path.Combine(targetDir, "Uninstall.exe");
+            if (!File.Exists(uninstaller)) throw new IOException("图形卸载程序缺失，请重新下载完整安装包。");
+            RecordInstalledFiles(targetDir, new[] { "智造云AI-OS启动.cmd" });
 
             Type shellType = Type.GetTypeFromProgID("WScript.Shell");
             object shellObj = Activator.CreateInstance(shellType);
@@ -197,7 +188,7 @@ class Installer
             // 终止——通用关键词会把其他 QwenPaw 安装也误认成“自己的”。
             // 目录经 env 传入，避开 cmd/正则的双重转义
             var ps = "$root=[regex]::Escape($env:Z_INSTALL_ROOT); " +
-                "Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | " +
+                "Get-NetTCPConnection -LocalPort 8088,8000 -State Listen -ErrorAction SilentlyContinue | " +
                 "ForEach-Object { $p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $_.OwningProcess); " +
                 "if ($p -and $p.CommandLine -match $root) { Stop-Process -Id $p.ProcessId -Force } }";
             var psi = new ProcessStartInfo("powershell.exe", "-NoProfile -Command \"" + ps + "\"")
@@ -205,7 +196,7 @@ class Installer
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
-            psi.EnvironmentVariables["Z_INSTALL_ROOT"] = installRoot;
+            psi.EnvironmentVariables["Z_INSTALL_ROOT"] = TargetRoot(installRoot);
             using (var p = Process.Start(psi)) p.WaitForExit(30000);
             // 驻留托盘启动器按映像名精确结束，避免升级解压时 exe 被锁
             foreach (var proc in Process.GetProcessesByName("智造云AI-OS"))
@@ -274,76 +265,29 @@ class Installer
 
     static void SilentInstall(string payloadPath, string targetDir)
     {
-        string logPath = Path.Combine(targetDir, "install-log.txt");
+        targetDir = Path.GetFullPath(targetDir);
         Directory.CreateDirectory(targetDir);
-        using (var log = new StreamWriter(
-            new FileStream(Path.Combine(targetDir, "install-log.txt"), FileMode.Create, FileAccess.Write, FileShare.Read)))
+        using (var log = new StreamWriter(new FileStream(Path.Combine(targetDir, "install-log.txt"), FileMode.Create, FileAccess.Write, FileShare.Read)))
         {
-            try
-            {
+            log.AutoFlush = true;
+            try {
                 StopLiveService(targetDir);
-                if (PortOccupied())
-                {
-                    log.WriteLine("failed: port 8088 occupied by another application");
-                    Environment.ExitCode = 2;
-                    return;
-                }
-                int files = ExtractTo(payloadPath, targetDir, null);
-                if (!RegisterIntegration(targetDir)) throw new IOException("系统快捷方式或卸载项创建失败");
-                log.WriteLine("integration: ok");
-                log.WriteLine("done: " + files + " files");
-                log.Flush();
-                var installer = Path.Combine(targetDir, "install-usb.cmd");
-                if (File.Exists(installer))
-                {
-                    log.WriteLine("launching install-usb.cmd");
-                    log.Flush();
-                    var child = Process.Start(new ProcessStartInfo("cmd.exe", "/c \"" + installer + "\"")
-                    {
-                        WorkingDirectory = targetDir,
-                        UseShellExecute = false
-                    });
-                    // 静默安装成功契约 = “服务就绪”。子进程退出与就绪探活
-                    // 在完整支持窗口（10 分钟安装 + 240 秒启动）内一起轮询，
-                    // 避免安装超 3 分钟时误报失败或提前退出。
-                    bool success = false;
-                    bool childExited = false;
-                    int childCode = 0;
-                    long exitedAtTicks = 0;
-                    long startTicks = Environment.TickCount;
-                    while ((int)((uint)Environment.TickCount - (uint)startTicks) < (600 + 240) * 1000)
-                    {
-                        if (!childExited && child.HasExited)
-                        {
-                            childExited = true;
-                            childCode = child.ExitCode;
-                            exitedAtTicks = Environment.TickCount;
-                            log.WriteLine("install-usb.cmd exited: " + childCode);
-                            log.Flush();
-                            if (childCode != 0) break;
-                        }
-                        if (ServiceReady()) { success = true; break; }
-                        if (childExited && (int)((uint)Environment.TickCount - (uint)exitedAtTicks) > 240 * 1000) break;
-                        Thread.Sleep(2000);
-                    }
-                    if (!childExited) { try { KillProcessTree(child.Id); } catch { } }
-                    log.WriteLine(success ? "service ready" :
-                        childExited && childCode != 0 ? "failed: install-usb.cmd exit code " + childCode :
-                        "service not ready within timeout");
-                    log.Flush();
-                    Environment.ExitCode = success ? 0 : 2;
-                }
-                else
-                {
-                    log.WriteLine("failed: install-usb.cmd not found");
-                    Environment.ExitCode = 2;
-                }
-            }
-            catch (Exception ex)
-            {
-                log.WriteLine("failed: " + ex.Message);
-                Environment.ExitCode = 2;
-            }
+                if (PortOccupied()) throw new IOException("端口 8088 正被其他应用使用。");
+                log.WriteLine("Extracting application files");
+                ExtractTo(payloadPath, targetDir, null);
+                int code = RunRuntimeSetup(targetDir, Path.Combine(targetDir, "install-runtime.log"));
+                if (code != 0) throw new IOException("运行环境配置失败：" + code);
+                if (!HasNodeAvailable(targetDir)) throw new IOException("Node.js 20+ 不可用。");
+                if (!RegisterIntegration(targetDir)) throw new IOException("系统集成失败。");
+                string launcher = Path.Combine(targetDir, "智造云AI-OS.exe");
+                if (!File.Exists(launcher)) throw new IOException("桌面启动器缺失。");
+                log.WriteLine("Starting application; waiting for service readiness");
+                var child = Process.Start(new ProcessStartInfo(launcher) { WorkingDirectory = targetDir, UseShellExecute = false });
+                bool ready = WaitReady(600);
+                if (!ready) { try { KillProcessTree(child.Id); } catch { } throw new IOException("服务未在 600 秒内就绪。"); }
+                log.WriteLine("service ready");
+                Environment.ExitCode = 0;
+            } catch (Exception ex) { log.WriteLine("failed: " + ex.Message); Environment.ExitCode = 2; }
         }
     }
 
@@ -352,6 +296,7 @@ class Installer
     {
         string root = TargetRoot(targetDir);
         int files = 0;
+        var installed = new System.Collections.Generic.List<string>();
         using (var archive = ZipFile.OpenRead(payloadPath))
         {
             // Validate the complete archive before changing any installed file.
@@ -378,12 +323,24 @@ class Installer
                 }
                 Directory.CreateDirectory(Path.GetDirectoryName(fullDest));
                 entry.ExtractToFile(fullDest, true);
+                if (!Uninstaller.Protected(normalized)) installed.Add(normalized);
                 done++; files++;
                 if (progress != null && done % 200 == 0)
                     progress.SetProgress(done, total, entry.Name);
             }
         }
+        RecordInstalledFiles(targetDir, installed);
         return files;
+    }
+
+    internal static void RecordInstalledFiles(string targetDir, System.Collections.Generic.IEnumerable<string> paths)
+    {
+        string manifest = Uninstaller.CheckedPath(targetDir, Uninstaller.Manifest);
+        var entries = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (File.Exists(manifest)) foreach (string line in File.ReadAllLines(manifest)) entries.Add(line);
+        foreach (string path in paths) if (!Uninstaller.Protected(path)) entries.Add(path);
+        foreach (string path in entries) Uninstaller.CheckedPath(targetDir, path);
+        File.WriteAllLines(manifest, entries);
     }
 
     static void ValidateDestination(string targetDir, string entryName)
@@ -434,8 +391,30 @@ class Installer
             p.Start(); p.BeginOutputReadLine(); p.BeginErrorReadLine();
             if (!p.WaitForExit(15 * 60 * 1000)) { KillProcessTree(p.Id); p.WaitForExit(); return 2; }
             p.WaitForExit(); // Drain asynchronous redirected output before closing the log.
+            if (p.ExitCode == 0) RecordRuntimeFiles(targetDir);
             return p.ExitCode;
         }
+    }
+
+    static void RecordRuntimeFiles(string targetDir)
+    {
+        string prefix = TargetRoot(targetDir);
+        var paths = new System.Collections.Generic.List<string>();
+        var pending = new System.Collections.Generic.Stack<string>();
+        foreach (string relative in new[] { "apps/zhizaoyunAIOS/runtime/zhizaoyunAIOS/venv", "apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv" })
+        {
+            string folder = Uninstaller.CheckedPath(targetDir, relative);
+            if (Directory.Exists(folder)) pending.Push(folder);
+        }
+        while (pending.Count > 0) {
+            string folder = pending.Pop();
+            foreach (string path in Directory.GetFileSystemEntries(folder)) {
+                string relative = path.Substring(prefix.Length);
+                Uninstaller.CheckedPath(targetDir, relative);
+                if (Directory.Exists(path)) pending.Push(path); else paths.Add(relative);
+            }
+        }
+        RecordInstalledFiles(targetDir, paths);
     }
 
     // 取日志文件最后一个非空行，供进度页实时回显

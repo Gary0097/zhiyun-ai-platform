@@ -49,7 +49,28 @@ class InstallerTests
             string log = Path.Combine(target, "setup-test.log");
             Check(Installer.RunRuntimeSetup(target, log) == 7, "runtime setup failure exit code preserved on special paths");
             Check(File.ReadAllText(log).Contains("setup stdout") && File.ReadAllText(log).Contains("setup stderr"), "both setup output streams captured");
+            string generatedRuntime = Path.Combine(target, "apps", "zhizaoyunAIOS", "runtime", "zhizaoyunAIOS", "venv");
+            Directory.CreateDirectory(generatedRuntime);
+            File.WriteAllText(Path.Combine(generatedRuntime, "runtime-sentinel.txt"), "generated-runtime");
+            File.WriteAllText(Path.Combine(target, "setup-ai-os.ps1"), "param([switch]$Offline,[string]$CacheDir)\nexit 0\n");
+            Check(Installer.RunRuntimeSetup(target, log) == 0, "successful setup records generated runtime files");
+            File.WriteAllText(Path.Combine(target, "user-note.txt"), "keep-me");
+            string manifest = Path.Combine(target, Uninstaller.Manifest);
+            string safeManifest = File.ReadAllText(manifest);
+            File.AppendAllText(manifest, "../escape.txt\n");
+            rejected = false; try { Uninstaller.RemoveFiles(target); } catch (IOException) { rejected = true; }
+            Check(rejected && File.Exists(Path.Combine(target, "program.txt")), "uninstall rejects entire invalid manifest before deleting files");
+            File.WriteAllText(manifest, safeManifest);
+            Uninstaller.RemoveFiles(target);
+            Check(!File.Exists(Path.Combine(target, "program.txt")), "uninstall removes installed program files");
+            Check(!File.Exists(Path.Combine(generatedRuntime, "runtime-sentinel.txt")), "uninstall removes recorded generated runtime files");
+            Check(File.ReadAllText(Path.Combine(target, "user-note.txt")) == "keep-me" && File.ReadAllText(Path.Combine(data, "sentinel.txt")) == "existing-user-data" && File.ReadAllText(Path.Combine(target, "hub.yaml")) == "custom-admin-settings", "uninstall preserves unknown files, workspace and Hub settings");
             Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false);
+            using (var f = new UninstallForm(target)) {
+                f.Show(); Application.DoEvents();
+                using (var bitmap = new Bitmap(f.Width, f.Height)) { f.DrawToBitmap(bitmap, new Rectangle(0,0,f.Width,f.Height)); bitmap.Save(Path.Combine(output, "uninstaller-ready.png")); }
+                f.Close();
+            }
             using (var f = new WizardForm(zip)) {
                 f.Show(); Application.DoEvents();
                 using (var bitmap = new Bitmap(f.Width, f.Height)) { f.DrawToBitmap(bitmap, new Rectangle(0,0,f.Width,f.Height)); bitmap.Save(Path.Combine(output, "installer-ready.png")); }

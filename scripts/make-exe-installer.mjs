@@ -50,7 +50,7 @@ const iconPath = join(root, 'branding', 'app.ico')
 const iconArgs = existsSync(iconPath) ? ['/win32icon:' + iconPath] : []
 if (!iconArgs.length) console.warn('警告：branding/app.ico 不存在，安装程序将使用默认图标。')
 execFileSync(csc, [
-  '/nologo', '/target:winexe', '/optimize+',
+  '/nologo', '/target:winexe', '/optimize+', '/main:Installer',
   '/out:' + stubPath,
   '/win32manifest:' + join(root, 'scripts', 'exe-installer', 'installer.manifest'),
   ...iconArgs,
@@ -60,6 +60,7 @@ execFileSync(csc, [
   '/r:System.Drawing.dll',
   srcPath,
   join(root, 'scripts', 'exe-installer', 'wizard.cs'),
+  join(root, 'scripts', 'exe-installer', 'uninstaller.cs'),
   versionSrc,
 ], { stdio: 'inherit' })
 if (!existsSync(stubPath)) {

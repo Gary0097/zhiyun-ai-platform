@@ -174,6 +174,18 @@ if (offline) {
         launcherSrc,
       ], { stdio: 'inherit' })
       console.log(`内嵌桌面启动器：智造云AI-OS.exe（v${version}）`)
+      const versionSource = join(workDir, 'scripts', 'exe-installer', 'VersionInfo.generated.cs')
+      writeFileSync(versionSource, `static class VersionInfo { public const string AppVersion = "${version}"; }\n`)
+      execFileSync(csc, [
+        '/nologo', '/target:winexe', '/optimize+', '/main:Uninstaller',
+        '/out:' + join(workDir, 'Uninstall.exe'), '/win32icon:' + iconPath,
+        '/win32manifest:' + join(workDir, 'scripts', 'exe-installer', 'installer.manifest'),
+        '/r:System.Windows.Forms.dll', '/r:System.Drawing.dll',
+        '/r:System.IO.Compression.dll', '/r:System.IO.Compression.FileSystem.dll',
+        ...['bootstrap.cs', 'wizard.cs', 'uninstaller.cs'].map(f => join(workDir, 'scripts', 'exe-installer', f)),
+        versionSource,
+      ], { stdio: 'inherit' })
+      rmSync(versionSource)
     } else {
       console.warn('警告：未找到 csc.exe 或 branding/app.ico，离线包不含桌面启动器（安装时回退 .cmd 启动）。')
     }
@@ -187,10 +199,10 @@ if (offline) {
     '1. 把整个文件夹（或 zip）拷到目标电脑任意可写目录，解压。',
     '2. 双击 `install-usb.cmd`：自动使用包内 Python/Node 运行时，无需联网。',
     '3. 安装完成会自动启动服务并打开浏览器（默认 http://127.0.0.1:8088）。',
-    '4. 首次使用：打开 http://127.0.0.1:8088 注册账号（第一个注册的账号即管理员，',
-    '   请设置高强度密码；后续用户在登录页自行注册）。',
-    '5. 局域网多用户：运行 `start-hub.cmd` 启动 Hub（0.0.0.0:8000），模型账号',
-    '   （API Key）由管理员在 Hub 管理界面统一配置。',
+    '4. 单机首次使用：打开 http://127.0.0.1:8088 创建个人账号；单机不开放后续用户注册。',
+    '5. 团队使用：运行 `start-hub.cmd` 并批准管理员权限。首次仅监听本机，',
+    '   打开 http://127.0.0.1:8000 注册管理员，再重启 Hub 开放局域网访问。',
+    '   员工账号与模型凭据由管理员在 Hub 管理界面配置。',
     '6. 忘记密码：停止服务后删除服务数据目录下的 `auth.json`，重启后重新注册',
     '   （官方文档提供的重置方式，会清除全部本地账户）。',
     '',
