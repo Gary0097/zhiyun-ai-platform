@@ -1,6 +1,6 @@
 product: zhiyun-ai-os
 version: 2.2.0
-source_commit: bac4f9128b13db7ed409303c9d68272c12cb63c9
+source_commit: 6fd38b3a9181ba17465fc506f79e5d14c008bf13
 qwenpaw: 2.2.0
 locked_pawapps: 0
 channel: offline-usb

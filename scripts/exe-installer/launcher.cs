@@ -227,7 +227,7 @@ class TrayContext : ApplicationContext
 {
     enum ServiceState { Starting, Running, Stopped }
 
-    const int StartTimeoutSeconds = 250;
+    const int StartTimeoutSeconds = 600;
 
     readonly string _here, _serviceEntry;
     readonly NotifyIcon _tray;

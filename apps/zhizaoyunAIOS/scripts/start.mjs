@@ -27,6 +27,7 @@ Object.assign(launchEnv, {
 function run (command, args, hint) {
   const result = spawnSync(command, args, { cwd: repoRoot, stdio: 'inherit', env: launchEnv })
   if (result.error || result.status !== 0) {
+    console.error(`子进程失败：${result.error?.message || result.signal || 'exit ' + result.status}`)
     console.error(`\n${hint}`)
     process.exit(result.status || 1)
   }

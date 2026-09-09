@@ -67,6 +67,7 @@ if (runtimeExists) {
 
 // 5) 脚本检查（语法 + 自检）
 const commands = [
+  [process.execPath, [join(root, 'scripts', 'test-workspace-paths.mjs')]],
   [process.execPath, [join(root, 'scripts', 'test-hub-config.mjs')]],
   [process.env.PYTHON || 'python', [join(root, 'scripts', 'test-hub-bootstrap.py')]],
   [process.execPath, ['--check', join(scripts, 'start.mjs')]],

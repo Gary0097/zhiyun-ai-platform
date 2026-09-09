@@ -41,13 +41,19 @@ class Uninstaller
 
     internal static string CheckedPath(string root, string relative)
     {
+        string full = NormalizedPath(root, relative);
+        for (string p = full; !string.IsNullOrEmpty(p); p = Path.GetDirectoryName(p))
+            if ((File.Exists(p) || Directory.Exists(p)) && (File.GetAttributes(p) & FileAttributes.ReparsePoint) != 0)
+                throw new IOException("安装路径包含链接，已停止卸载：" + p);
+        return full;
+    }
+
+    internal static string NormalizedPath(string root, string relative)
+    {
         string prefix = Path.GetFullPath(root).TrimEnd('\\', '/') + Path.DirectorySeparatorChar;
         if (Path.IsPathRooted(relative) || relative.Contains(":")) throw new IOException("安装清单包含非法路径。");
         string full = Path.GetFullPath(Path.Combine(prefix, relative));
         if (!full.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) throw new IOException("安装清单路径越界。");
-        for (string p = full; !string.IsNullOrEmpty(p); p = Path.GetDirectoryName(p))
-            if ((File.Exists(p) || Directory.Exists(p)) && (File.GetAttributes(p) & FileAttributes.ReparsePoint) != 0)
-                throw new IOException("安装路径包含链接，已停止卸载：" + p);
         return full;
     }
 

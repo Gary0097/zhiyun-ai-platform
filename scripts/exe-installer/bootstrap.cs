@@ -339,7 +339,9 @@ class Installer
         var entries = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if (File.Exists(manifest)) foreach (string line in File.ReadAllLines(manifest)) entries.Add(line);
         foreach (string path in paths) if (!Uninstaller.Protected(path)) entries.Add(path);
-        foreach (string path in entries) Uninstaller.CheckedPath(targetDir, path);
+        // This only records names; it does not touch the listed files. The
+        // uninstaller checks every filesystem path again before any deletion.
+        foreach (string path in entries) Uninstaller.NormalizedPath(targetDir, path);
         File.WriteAllLines(manifest, entries);
     }
 
@@ -408,10 +410,12 @@ class Installer
         }
         while (pending.Count > 0) {
             string folder = pending.Pop();
+            Uninstaller.CheckedPath(targetDir, folder.Substring(prefix.Length));
             foreach (string path in Directory.GetFileSystemEntries(folder)) {
                 string relative = path.Substring(prefix.Length);
-                Uninstaller.CheckedPath(targetDir, relative);
-                if (Directory.Exists(path)) pending.Push(path); else paths.Add(relative);
+                var attributes = File.GetAttributes(path);
+                if ((attributes & FileAttributes.ReparsePoint) != 0) throw new IOException("运行环境包含链接：" + path);
+                if ((attributes & FileAttributes.Directory) != 0) pending.Push(path); else paths.Add(relative);
             }
         }
         RecordInstalledFiles(targetDir, paths);
