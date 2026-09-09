@@ -73,6 +73,21 @@ node scripts/test-hub-config.mjs
 隔离验收实例。不得针对已有客户实例运行。测试账号状态必须留在 Git 忽略目录。
 HTTP 认证探测不等同于真实模型、文件系统隔离或完整 GUI 验收。
 
+### 覆盖升级人工验收入口
+
+`scripts/acceptance/check-installed-upgrade.ps1` 仅用于本次已注册的独立整包测试目录，
+锁定 037bdbc885 候选 EXE 的 SHA256，不能用于客户安装。默认模式只读，已在
+Windows PowerShell 5 执行通过；不会启动安装或写入文件。
+
+```powershell
+powershell -NoProfile -File scripts/acceptance/check-installed-upgrade.ps1
+```
+
+人工执行覆盖升级时，加 `-ExecuteUpgrade`。这会启动安装程序并重启该测试实例，
+记录账号文件、Hub 配置、工作区标记和安装根目录未知文件的升级前哈希，等待实际
+安装进程结束，核对哈希并用既有测试账号验证登录。观察超时不会终止进程或自动重试。
+该执行分支尚未运行，不能以只读预检代替升级通过；自动审批此前拦截的安装操作仍未获放行。
+
 ## 仍需完成
 
 **发布缺口：管理员集中供给凭据。** 原生 `control_app.py` 使用 `personal-{user_id}`
