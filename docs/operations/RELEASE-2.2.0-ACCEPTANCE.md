@@ -31,6 +31,20 @@
 
 ## 运行命令
 
+### 已构建候选包（2026-09-10，尚未完成安装验收）
+
+源码提交：`bac4f9128b13db7ed409303c9d68272c12cb63c9`。
+
+| 产物 | SHA256 |
+|---|---|
+| `zhiyun-ai-os-v2.2.0-offline-usb.zip` | `8951fc7f024012c45e53e503e6e262f137e9f79c723646b1912e4c5387cbe7e6` |
+| `zhiyun-ai-os-v2.2.0-setup.exe` | `b082884bbce4c9c51cd1cd0efc2378432765f4f6d93aa96501680cbeeb29439a` |
+
+ZIP CRC 与文件清单检查通过：55,687 个条目，包含原生启动器、图形卸载器、
+便携 Node；没有打入用户工作区数据。候选 EXE 约 379 MiB。
+已在独立中文路径目录启动首次静默安装；安装、升级、卸载结果尚待记录。
+候选包是本地验收产物，未发布 GitHub Release。
+
 ```text
 node scripts/verify-release.mjs
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-installer.ps1
