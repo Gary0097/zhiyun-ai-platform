@@ -16,6 +16,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const argv = process.argv.slice(2)
 const version = argv.find(a => !a.startsWith('--')) || process.env.RELEASE_VERSION || ''
 const offline = argv.includes('--offline')
+const cacheArchiveIndex = argv.indexOf('--cache-archive')
+const cacheArchive = cacheArchiveIndex < 0 ? null : argv[cacheArchiveIndex + 1]
+if (cacheArchive && (!offline || !existsSync(cacheArchive))) throw new Error('--cache-archive requires --offline and an existing ZIP')
 const refFlagIdx = argv.indexOf('--ref')
 const ref = refFlagIdx !== -1 ? argv[refFlagIdx + 1] : (process.env.RELEASE_REF || 'master')
 if (!version) {
@@ -61,6 +64,7 @@ const qwenpawLock = JSON.parse(readFileSync(join(workDir, 'apps', 'zhizaoyunAIOS
 const manifest = [
   'product: zhiyun-ai-os',
   `version: ${version}`,
+  `source_commit: ${execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workDir, encoding: 'utf8' }).trim()}`,
   `qwenpaw: ${qwenpawLock.version}`,
   `locked_pawapps: ${pawappsLock.apps.length}`,
   ...pawappsLock.apps.map(a => `  - ${a.id} @ ${a.commit}`),
@@ -107,7 +111,7 @@ if (offline) {
       }
     }
     console.log(`内嵌 runtime/${part}（${dirSizeMb(src)} MB）...`)
-    cpSync(src, join(pkgRuntime, part), { recursive: true })
+    if (!cacheArchive || part !== 'cache') cpSync(src, join(pkgRuntime, part), { recursive: true })
   }
   // 2) 便携 Node（仅 node.exe，约 80MB；start-ai-os.cmd 会自动优先使用）
   const nodeSrc = process.env.NODE_SRC || join(process.env.ProgramFiles || 'C:\\Program Files', 'nodejs', 'node.exe')
@@ -226,7 +230,10 @@ if (existsSync(gitEntry)) {
 try {
   // 跨平台压缩：优先系统 bsdtar（Windows 10+ 自带，大目录远快于 Compress-Archive）
   const windowsTar = join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe')
-  if (process.platform === 'win32' && existsSync(windowsTar)) {
+  if (cacheArchive) {
+    const python = join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'qwenpaw-hub', 'venv', 'Scripts', 'python.exe')
+    execFileSync(python, [join(root, 'scripts', 'package-offline-cache.py'), '--source', workDir, '--cache-archive', cacheArchive, '--output', zipPath], { stdio: 'inherit' })
+  } else if (process.platform === 'win32' && existsSync(windowsTar)) {
     run(`"${windowsTar}" -a -c -f "${zipPath}" -C "${workDir}" .`)
   } else if (process.platform === 'win32') {
     run(`powershell -NoProfile -Command "Compress-Archive -Path '${join(workDir, '*')}' -DestinationPath '${zipPath}' -Force"`)
