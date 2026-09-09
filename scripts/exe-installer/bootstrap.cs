@@ -23,10 +23,13 @@ class Installer
     {
         try
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
             Run();
         }
         catch (Exception ex)
         {
+            Environment.ExitCode = 2;
             MessageBox.Show("安装失败：" + ex.Message, "灵泽万川智造云 AI-OS",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
@@ -37,6 +40,7 @@ class Installer
         string payload = FindPayload();
         if (payload == null)
         {
+            Environment.ExitCode = 2;
             MessageBox.Show("安装包数据缺失（未找到内置载荷）。请重新下载完整安装程序。",
                 "灵泽万川智造云 AI-OS", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
@@ -65,7 +69,7 @@ class Installer
 
     // ── 系统集成：对齐官方 QwenPaw Desktop 的安装体验 ──────────────
     // 桌面/开始菜单快捷方式 + 控制面板卸载项 + 启动器与卸载脚本。
-    internal static bool RegisterIntegration(string targetDir)
+    internal static bool RegisterIntegration(string targetDir, bool createDesktop = true)
     {
         try
         {
@@ -87,7 +91,7 @@ class Installer
             string[] uninstallerLines = {
                 "@echo off", "chcp 65001 >nul",
                 "cd /d \"%~dp0\"",
-                "for /f \"tokens=5\" %%p in ('netstat -ano ^| findstr :8088 ^| findstr LISTENING') do taskkill /PID %%p /F >nul 2>&1",
+                "rem User data remains in the installation directory.",
                 "reg delete HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ZhizaoyunAIOS /f >nul 2>&1",
                 "del \"%USERPROFILE%\\Desktop\\智造云 AI-OS.lnk\" >nul 2>&1",
                 "del \"%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\智造云 AI-OS.lnk\" >nul 2>&1",
@@ -109,6 +113,7 @@ class Installer
             string iconRef = File.Exists(iconSource) ? iconSource + ",0" : launcher;
             foreach (string dir in new[] { desktopDir, startMenuDir })
             {
+                if (dir == desktopDir && !createDesktop) continue;
                 object sc = shellType.InvokeMember("CreateShortcut",
                     System.Reflection.BindingFlags.InvokeMethod, null, shellObj,
                     new object[] { Path.Combine(dir, "智造云 AI-OS.lnk") });
@@ -155,15 +160,15 @@ class Installer
             : "node";
         try
         {
-            var psi = new ProcessStartInfo("cmd.exe",
-                "/c \"\"" + node + "\" -p \"process.versions.node.split('.')[0] >= 20\"\" >nul 2>&1")
+            var psi = new ProcessStartInfo(node,
+                "-e \"process.exit(Number(process.versions.node.split('.')[0]) >= 20 ? 0 : 1)\"")
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
             using (var p = Process.Start(psi))
             {
-                p.WaitForExit(30000);
+                if (!p.WaitForExit(30000)) { p.Kill(); return false; }
                 return p.ExitCode == 0;
             }
         }
@@ -203,7 +208,11 @@ class Installer
             psi.EnvironmentVariables["Z_INSTALL_ROOT"] = installRoot;
             using (var p = Process.Start(psi)) p.WaitForExit(30000);
             // 驻留托盘启动器按映像名精确结束，避免升级解压时 exe 被锁
-            try { foreach (var proc in Process.GetProcessesByName("智造云AI-OS")) proc.Kill(); } catch { }
+            foreach (var proc in Process.GetProcessesByName("智造云AI-OS"))
+            {
+                try { if (proc.MainModule.FileName.StartsWith(TargetRoot(installRoot), StringComparison.OrdinalIgnoreCase)) proc.Kill(); }
+                catch { }
+            }
         }
         catch { /* 无运行实例或权限不足时继续安装 */ }
     }
@@ -280,7 +289,8 @@ class Installer
                     return;
                 }
                 int files = ExtractTo(payloadPath, targetDir, null);
-                log.WriteLine("integration: " + (RegisterIntegration(targetDir) ? "ok" : "failed"));
+                if (!RegisterIntegration(targetDir)) throw new IOException("系统快捷方式或卸载项创建失败");
+                log.WriteLine("integration: ok");
                 log.WriteLine("done: " + files + " files");
                 log.Flush();
                 var installer = Path.Combine(targetDir, "install-usb.cmd");
@@ -325,8 +335,8 @@ class Installer
                 }
                 else
                 {
-                    log.WriteLine("warning: install-usb.cmd not found");
-                    Environment.ExitCode = 0;
+                    log.WriteLine("failed: install-usb.cmd not found");
+                    Environment.ExitCode = 2;
                 }
             }
             catch (Exception ex)
@@ -344,6 +354,9 @@ class Installer
         int files = 0;
         using (var archive = ZipFile.OpenRead(payloadPath))
         {
+            // Validate the complete archive before changing any installed file.
+            foreach (var entry in archive.Entries)
+                ValidateDestination(targetDir, entry.FullName);
             int total = archive.Entries.Count, done = 0;
             foreach (var entry in archive.Entries)
             {
@@ -353,7 +366,11 @@ class Installer
                 string dest = Path.Combine(targetDir, rel.Replace('/', Path.DirectorySeparatorChar));
                 string fullDest = Path.GetFullPath(dest);
                 if (!fullDest.StartsWith(root, StringComparison.OrdinalIgnoreCase))
-                    continue;
+                    throw new InvalidDataException("安装包包含越界路径：" + rel);
+                // Existing user data and administrator Hub settings are never package-owned.
+                string normalized = fullDest.Substring(root.Length).Replace('\\', '/');
+                if (File.Exists(fullDest) && (normalized.StartsWith("apps/zhizaoyunAIOS/workspace/", StringComparison.OrdinalIgnoreCase) ||
+                    normalized.Equals("hub.yaml", StringComparison.OrdinalIgnoreCase))) continue;
                 if (string.IsNullOrEmpty(entry.Name)) // 目录项
                 {
                     Directory.CreateDirectory(fullDest);
@@ -369,24 +386,54 @@ class Installer
         return files;
     }
 
+    static void ValidateDestination(string targetDir, string entryName)
+    {
+        string root = TargetRoot(targetDir);
+        string rel = entryName.Replace('/', Path.DirectorySeparatorChar);
+        if (rel.StartsWith("." + Path.DirectorySeparatorChar)) rel = rel.Substring(2);
+        if (string.IsNullOrEmpty(rel)) return;
+        if (Path.IsPathRooted(rel) || rel.Contains(":"))
+            throw new InvalidDataException("安装包包含非法路径：" + entryName);
+        string dest = Path.GetFullPath(Path.Combine(targetDir, rel));
+        if (!dest.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException("安装包包含越界路径：" + entryName);
+        // A junction within the installation must not redirect writes elsewhere.
+        for (string current = dest; !string.IsNullOrEmpty(current); current = Path.GetDirectoryName(current))
+        {
+            if ((File.Exists(current) || Directory.Exists(current)) &&
+                (File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
+                throw new IOException("安装路径包含链接，请选择普通目录：" + current);
+        }
+    }
+
     // 隐藏窗口运行运行时安装（setup-ai-os.ps1 -Offline），输出重定向到日志文件
     // （cmd 自身重定向，进程不依赖向导的管道）。返回退出码。
     internal static int RunRuntimeSetup(string targetDir, string logPath)
     {
-        var psi = new ProcessStartInfo("cmd.exe",
-            "/c powershell -NoProfile -ExecutionPolicy Bypass -File setup-ai-os.ps1 -Offline -CacheDir \"apps\\zhizaoyunAIOS\\runtime\\cache\" > \"" + logPath + "\" 2>&1")
+        var psi = new ProcessStartInfo("powershell.exe",
+            "-NoProfile -ExecutionPolicy Bypass -File \"" + Path.Combine(targetDir, "setup-ai-os.ps1") +
+            "\" -Offline -CacheDir \"" + Path.Combine(targetDir, "apps", "zhizaoyunAIOS", "runtime", "cache") + "\"")
         {
             WorkingDirectory = targetDir,
             UseShellExecute = false,
             CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
         };
         // 便携 Node 优先（与 install-usb.cmd 一致）
         string portableNode = Path.Combine(targetDir, "extras", "node");
         if (Directory.Exists(portableNode))
             psi.EnvironmentVariables["Path"] = portableNode + ";" + Environment.GetEnvironmentVariable("Path");
-        using (var p = Process.Start(psi))
+        using (var log = new StreamWriter(logPath, false, new System.Text.UTF8Encoding(false)))
+        using (var p = new Process { StartInfo = psi })
         {
-            p.WaitForExit();
+            object sync = new object();
+            log.AutoFlush = true;
+            DataReceivedEventHandler receive = delegate(object sender, DataReceivedEventArgs e) { if (e.Data != null) lock(sync) log.WriteLine(e.Data); };
+            p.OutputDataReceived += receive; p.ErrorDataReceived += receive;
+            p.Start(); p.BeginOutputReadLine(); p.BeginErrorReadLine();
+            if (!p.WaitForExit(15 * 60 * 1000)) { KillProcessTree(p.Id); p.WaitForExit(); return 2; }
+            p.WaitForExit(); // Drain asynchronous redirected output before closing the log.
             return p.ExitCode;
         }
     }
@@ -459,307 +506,4 @@ class Installer
 interface IExtractProgress
 {
     void SetProgress(int done, int total, string current);
-}
-
-// 四页向导：欢迎 → 目录 → 进度 → 完成/失败
-class WizardForm : Form, IExtractProgress
-{
-    readonly string _payload;
-    Panel _welcome, _dir, _progress, _done;
-    TextBox _dirBox;
-    Label _stageLabel, _detailLabel, _errorLabel;
-    ProgressBar _bar;
-    Button _installBtn, _launchBtn;
-    readonly System.Windows.Forms.Timer _tailTimer;
-    string _targetDir, _setupLog;
-    bool _installStarted, _finished;
-
-    public WizardForm(string payload)
-    {
-        _payload = payload;
-        Text = "灵泽万川智造云 AI-OS 安装向导";
-        Width = 640; Height = 420;
-        FormBorderStyle = FormBorderStyle.FixedSingle;
-        MaximizeBox = false; MinimizeBox = false;
-        StartPosition = FormStartPosition.CenterScreen;
-        try { Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
-
-        _welcome = Page(WelcomeContent());
-        _dir = Page(DirContent());
-        _progress = Page(ProgressContent());
-        _done = Page(DoneContent());
-        Controls.Add(_welcome);
-        ShowWelcome();
-
-        // 运行时安装阶段每 600ms 回显日志尾部
-        _tailTimer = new System.Windows.Forms.Timer();
-        _tailTimer.Interval = 600;
-        _tailTimer.Tick += delegate
-        {
-            if (_setupLog != null)
-            {
-                string line = Installer.LastLogLine(_setupLog);
-                if (line.Length > 0) _detailLabel.Text = line;
-            }
-        };
-    }
-
-    Panel Page(Control content)
-    {
-        var p = new Panel { Dock = DockStyle.Fill, Visible = false };
-        p.Controls.Add(content);
-        return p;
-    }
-
-    // ── 第 1 页：欢迎 ──────────────────────────────────────────
-    Control WelcomeContent()
-    {
-        var box = new Panel { Dock = DockStyle.Fill };
-        box.Controls.Add(new Label
-        {
-            Text = "欢迎使用 灵泽万川智造云 AI-OS",
-            Left = 40, Top = 50, Width = 540,
-            Font = new System.Drawing.Font("Microsoft YaHei UI", 16, System.Drawing.FontStyle.Bold),
-        });
-        box.Controls.Add(new Label
-        {
-            Text = "版本 " + Installer.AppVersion + "   ·   QwenPaw 2.2.0 运行时",
-            Left = 40, Top = 95, Width = 540, ForeColor = System.Drawing.Color.Gray,
-        });
-        box.Controls.Add(new Label
-        {
-            Text = "本向导将完成以下步骤：\n" +
-                   "  1. 解压程序文件（约 2.5 GB）\n" +
-                   "  2. 安装内嵌的 Python 运行时与控制台（离线，无需联网）\n" +
-                   "  3. 创建桌面快捷方式并启动\n\n" +
-                   "要求：Windows 10/11 x64，目标磁盘剩余空间 ≥ 3 GB。",
-            Left = 40, Top = 140, Width = 540, Height = 150,
-        });
-        var next = new Button { Text = "下一步 >", Left = 500, Top = 320, Width = 90 };
-        next.Click += delegate { ShowDir(); };
-        box.Controls.Add(next);
-        return box;
-    }
-
-    // ── 第 2 页：选择目录 ──────────────────────────────────────
-    Control DirContent()
-    {
-        var box = new Panel { Dock = DockStyle.Fill };
-        box.Controls.Add(new Label
-        {
-            Text = "选择安装目录",
-            Left = 40, Top = 50, Width = 540,
-            Font = new System.Drawing.Font("Microsoft YaHei UI", 14, System.Drawing.FontStyle.Bold),
-        });
-        box.Controls.Add(new Label { Text = "安装到：", Left = 40, Top = 110, Width = 70 });
-        _dirBox = new TextBox
-        {
-            Left = 115, Top = 106, Width = 380,
-            Text = Path.Combine(Path.GetPathRoot(Environment.SystemDirectory), "zhizaoyunAIOS"),
-        };
-        box.Controls.Add(_dirBox);
-        var browse = new Button { Text = "浏览…", Left = 505, Top = 104, Width = 75 };
-        browse.Click += delegate
-        {
-            using (var dialog = new FolderBrowserDialog())
-            {
-                dialog.Description = "选择安装目录（建议路径不含空格）";
-                dialog.ShowNewFolderButton = true;
-                if (dialog.ShowDialog(this) == DialogResult.OK)
-                    _dirBox.Text = dialog.SelectedPath;
-            }
-        };
-        box.Controls.Add(browse);
-        var hint = new Label { Left = 40, Top = 150, Width = 540, Height = 120, ForeColor = System.Drawing.Color.Gray };
-        hint.Text = "提示：\n" +
-                    "· 目录不存在时会自动创建；建议使用不含空格与中文的路径。\n" +
-                    "· 安装完成后可在控制面板“应用”中卸载。";
-        box.Controls.Add(hint);
-        _installBtn = new Button { Text = "开始安装", Left = 500, Top = 320, Width = 90 };
-        _installBtn.Click += delegate { StartInstall(); };
-        box.Controls.Add(_installBtn);
-        return box;
-    }
-
-    // ── 第 3 页：进度 ──────────────────────────────────────────
-    Control ProgressContent()
-    {
-        var box = new Panel { Dock = DockStyle.Fill };
-        _stageLabel = new Label
-        {
-            Left = 40, Top = 60, Width = 540,
-            Font = new System.Drawing.Font("Microsoft YaHei UI", 12, System.Drawing.FontStyle.Bold),
-            Text = "正在准备…",
-        };
-        _bar = new ProgressBar { Left = 40, Top = 110, Width = 540, Height = 22 };
-        _detailLabel = new Label { Left = 40, Top = 145, Width = 540, Height = 60, Text = "" };
-        box.Controls.Add(_stageLabel);
-        box.Controls.Add(_bar);
-        box.Controls.Add(_detailLabel);
-        return box;
-    }
-
-    // ── 第 4 页：完成 / 失败 ───────────────────────────────────
-    Control DoneContent()
-    {
-        var box = new Panel { Dock = DockStyle.Fill };
-        _errorLabel = new Label
-        {
-            Left = 40, Top = 60, Width = 540, Height = 180, Text = "",
-            Font = new System.Drawing.Font("Microsoft YaHei UI", 11),
-        };
-        box.Controls.Add(_errorLabel);
-        _launchBtn = new Button { Text = "立即启动", Left = 400, Top = 320, Width = 90, Visible = false };
-        _launchBtn.Click += delegate { LaunchApp(); };
-        box.Controls.Add(_launchBtn);
-        var finish = new Button { Text = "完成", Left = 500, Top = 320, Width = 90 };
-        finish.Click += delegate { Close(); };
-        box.Controls.Add(finish);
-        return box;
-    }
-
-    void ShowWelcome() { Swap(_welcome); }
-    void ShowDir() { Swap(_dir); }
-
-    void Swap(Panel page)
-    {
-        foreach (Control c in Controls)
-            if (c is Panel) ((Panel)c).Visible = false;
-        Controls.Add(page);
-        page.Visible = true;
-    }
-
-    void StartInstall()
-    {
-        string dir = _dirBox.Text.Trim();
-        if (dir.Length == 0)
-        {
-            MessageBox.Show(this, "请填写安装目录。", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-        // 空间预检（要求 3GB）
-        try
-        {
-            var drive = new DriveInfo(Path.GetPathRoot(Path.GetFullPath(dir)));
-            if (!drive.IsReady || drive.AvailableFreeSpace < 3L * 1024 * 1024 * 1024)
-            {
-                MessageBox.Show(this, "目标磁盘可用空间不足 3 GB，请换一个目录。",
-                    Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(this, "目录不可用：" + ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-
-        _targetDir = dir;
-        _installStarted = true;
-        Swap(_progress);
-        _stageLabel.Text = "第 1 步 / 共 3 步：解压程序文件";
-        _bar.Style = ProgressBarStyle.Continuous;
-
-        var thread = new Thread(RunInstall);
-        thread.IsBackground = true;
-        thread.Start();
-    }
-
-    void RunInstall()
-    {
-        string fail = null;
-        try
-        {
-            Installer.StopLiveService(_targetDir);
-            if (Installer.PortOccupied())
-                throw new Exception("端口 8088 被其他应用占用（非本安装的服务），无法启动服务。\n" +
-                    "请释放该端口后重新运行安装程序。");
-            Directory.CreateDirectory(_targetDir);
-            int files = Installer.ExtractTo(_payload, _targetDir, this);
-            SetStage("第 2 步 / 共 3 步：安装运行时与应用（离线，约 3-10 分钟）");
-
-            _setupLog = Path.Combine(_targetDir, "install-wizard.log");
-            RunOnUi(delegate { _bar.Style = ProgressBarStyle.Marquee; _tailTimer.Start(); });
-            int code = Installer.RunRuntimeSetup(_targetDir, _setupLog);
-            RunOnUi(delegate { _tailTimer.Stop(); });
-            if (code != 0)
-                throw new Exception("运行时安装失败（退出码 " + code + "），详见日志：\n" + _setupLog);
-
-            SetStage("第 3 步 / 共 3 步：创建快捷方式");
-            bool integrationOk = Installer.RegisterIntegration(_targetDir);
-
-            // Node 可用性校验（extras 内嵌或系统 PATH），缺 Node 则服务无法启动，
-            // 不得向用户报告安装成功
-            if (!Installer.HasNodeAvailable(_targetDir))
-                throw new Exception("未检测到 Node.js 运行环境（包内未内嵌且系统 PATH 中无 node）。" +
-                    "本安装包需要 Node.js 20+，请安装后重新运行安装程序。\nhttps://nodejs.org/zh-cn");
-
-            _finished = true;
-            RunOnUi(delegate
-            {
-                _errorLabel.Text = "安装完成！\n\n" +
-                    (integrationOk
-                        ? "· 桌面与开始菜单已创建“智造云 AI-OS”快捷方式\n"
-                        : "· 注意：快捷方式创建失败，请使用安装目录中的启动脚本\n") +
-                    "· 双击即以独立应用窗口启动（自动拉起本地服务）\n" +
-                    "· 默认管理员账号见安装目录 USB-INSTALL.md";
-                _launchBtn.Visible = File.Exists(Path.Combine(_targetDir, "智造云AI-OS.exe")) ||
-                                     File.Exists(Path.Combine(_targetDir, "智造云AI-OS启动.cmd"));
-                Swap(_done);
-            });
-        }
-        catch (Exception ex)
-        {
-            fail = ex.Message;
-        }
-        if (fail != null)
-        {
-            RunOnUi(delegate
-            {
-                _tailTimer.Stop();
-                _errorLabel.Text = "安装失败：\n\n" + fail + "\n\n" +
-                    (_setupLog != null ? "日志：" + _setupLog : "可重试安装程序。");
-                _errorLabel.ForeColor = System.Drawing.Color.Firebrick;
-                Swap(_done);
-            });
-        }
-    }
-
-    void LaunchApp()
-    {
-        string exe = Path.Combine(_targetDir, "智造云AI-OS.exe");
-        if (File.Exists(exe)) Process.Start(exe);
-        else Process.Start(Path.Combine(_targetDir, "智造云AI-OS启动.cmd"));
-    }
-
-    void SetStage(string text) { RunOnUi(delegate { _stageLabel.Text = text; }); }
-    void RunOnUi(Action a)
-    {
-        if (InvokeRequired) { BeginInvoke(a); return; }
-        a();
-    }
-
-    // IExtractProgress：解压进度（每 200 个文件回调一次）
-    public void SetProgress(int done, int total, string current)
-    {
-        RunOnUi(delegate
-        {
-            _bar.Maximum = Math.Max(1, total);
-            _bar.Value = Math.Min(done, total);
-            _detailLabel.Text = "已解压 " + done + " / " + total + " 个文件";
-        });
-    }
-
-    // 开始安装后不允许直接关窗（避免解压/装运行时中途被打断留下半成品）
-    protected override void OnFormClosing(FormClosingEventArgs e)
-    {
-        if (_installStarted && !_finished && e.CloseReason == CloseReason.UserClosing)
-        {
-            var r = MessageBox.Show(this,
-                "安装仍在进行，中断可能留下不完整的安装。确定退出吗？",
-                Text, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (r == DialogResult.No) { e.Cancel = true; return; }
-        }
-        base.OnFormClosing(e);
-    }
 }

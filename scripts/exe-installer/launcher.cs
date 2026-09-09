@@ -19,7 +19,7 @@ using System.Windows.Forms;
 class Launcher
 {
     const string Url = "http://127.0.0.1:8088";
-    const int ReadyTimeoutSeconds = 240;
+    const int ReadyTimeoutSeconds = 600;
     static Mutex _single;
 
     [STAThread]
@@ -144,7 +144,7 @@ class Launcher
                 return p.ExitCode == 0;
             }
         }
-        catch { return true; }
+        catch { return false; }
     }
 
     internal static bool WaitReady(int timeoutSeconds)
@@ -183,7 +183,7 @@ class Launcher
             // 归属校验后才终止：8088 监听进程命令行须含 zhizaoyunAIOS|qwenpaw
             // （与 start.mjs stopStaleInstance 同规则），避免误杀无关应用；
             // 注意这里绝不能按映像名杀 智造云AI-OS.exe——那是托盘自身
-            var ps = "Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | " +
+            var ps = "$root=[regex]::Escape($env:Z_INSTALL_ROOT); Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | " +
                 "ForEach-Object { $p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $_.OwningProcess); " +
                 "if ($p -and $p.CommandLine -match $root) { Stop-Process -Id $p.ProcessId -Force } }";
             var psi = new ProcessStartInfo("powershell.exe", "-NoProfile -Command \"" + ps + "\"")
@@ -191,6 +191,7 @@ class Launcher
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
+            psi.EnvironmentVariables["Z_INSTALL_ROOT"] = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
             using (var p = Process.Start(psi)) p.WaitForExit(30000);
         }
         catch { }

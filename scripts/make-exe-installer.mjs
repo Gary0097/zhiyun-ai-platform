@@ -52,12 +52,14 @@ if (!iconArgs.length) console.warn('警告：branding/app.ico 不存在，安装
 execFileSync(csc, [
   '/nologo', '/target:winexe', '/optimize+',
   '/out:' + stubPath,
+  '/win32manifest:' + join(root, 'scripts', 'exe-installer', 'installer.manifest'),
   ...iconArgs,
   '/r:System.IO.Compression.dll',
   '/r:System.IO.Compression.FileSystem.dll',
   '/r:System.Windows.Forms.dll',
   '/r:System.Drawing.dll',
   srcPath,
+  join(root, 'scripts', 'exe-installer', 'wizard.cs'),
   versionSrc,
 ], { stdio: 'inherit' })
 if (!existsSync(stubPath)) {
