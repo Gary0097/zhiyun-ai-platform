@@ -81,6 +81,7 @@ const commands = [
   [process.execPath, ['--check', join(root, 'scripts', 'make-release-package.mjs')]],
 ]
 if (process.platform === 'win32') commands.push(['powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', join(root, 'scripts', 'test-installer.ps1')]])
+if (process.platform === 'win32') commands.push(['powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', join(root, 'scripts', 'test-windows-runtime-paths.ps1')]])
 for (const [command, args] of commands) {
   const result = spawnSync(command, args, { cwd: root, stdio: 'inherit' })
   assert.equal(result.status, 0, `release check failed: ${command} ${args.join(' ')}`)

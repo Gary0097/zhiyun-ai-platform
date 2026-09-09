@@ -13,7 +13,7 @@ $CachedUv = Join-Path $RuntimeCache "bin\uv.exe"
 
 function Test-QwenPawRuntime {
   if (-not (Test-Path -LiteralPath $QwenPawCommand) -or -not (Test-Path -LiteralPath $PythonCommand)) { return $false }
-  $venvConfig = Get-Content -LiteralPath (Join-Path $VenvRoot "pyvenv.cfg") -ErrorAction SilentlyContinue
+  $venvConfig = Get-Content -Encoding UTF8 -LiteralPath (Join-Path $VenvRoot "pyvenv.cfg") -ErrorAction SilentlyContinue
   $pythonHome = ($venvConfig | Where-Object { $_ -match '^home\s*=' } | Select-Object -First 1) -replace '^home\s*=\s*', ''
   if ($pythonHome -match '\\Microsoft\\WindowsApps\\') { return $false }
   if (-not $pythonHome -or -not (Test-Path -LiteralPath (Join-Path $pythonHome "python.exe"))) { return $false }

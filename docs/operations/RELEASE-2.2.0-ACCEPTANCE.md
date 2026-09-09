@@ -45,6 +45,12 @@ ZIP CRC 与文件清单检查通过：55,687 个条目，包含原生启动器�
 已在独立中文路径目录启动首次静默安装；安装、升级、卸载结果尚待记录。
 候选包是本地验收产物，未发布 GitHub Release。
 
+**该候选首次安装未通过：** 依赖离线安装成功，但 Windows PowerShell 5 默认编码
+读取 UTF-8 `pyvenv.cfg` 时损坏中文 Python home 路径，导致最终校验失败。
+显式使用 `Get-Content -Encoding UTF8` 后，同一目录立即通过运行时校验。
+已增加实际 PowerShell 5 函数回归测试；需要重建候选并重新执行完整安装，
+不能将上述两个 SHA256 的候选标为合格交付物。
+
 ```text
 node scripts/verify-release.mjs
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-installer.ps1
