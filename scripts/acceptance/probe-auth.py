@@ -6,6 +6,7 @@ file, never stdout. Refuses registration unless --allow-test-registration is set
 import argparse
 import json
 import secrets
+import os
 import urllib.request
 import urllib.error
 from pathlib import Path
@@ -16,6 +17,7 @@ p.add_argument('--url', required=True)
 p.add_argument('--state', required=True)
 p.add_argument('--hub', action='store_true')
 p.add_argument('--allow-test-registration', action='store_true')
+p.add_argument('--linux-filesystem-probe', action='store_true')
 args = p.parse_args()
 assert urlparse(args.url).hostname in ('127.0.0.1', 'localhost'), 'Only loopback test instances are allowed'
 state_path = Path(args.state)
@@ -73,5 +75,63 @@ if args.hub:
     code, data = request('POST', '/api/hub/runtimes/' + runtime_id + '/start', {}, token)
     print('RUNTIME_START', code, str(data.get('detail', data.get('state', 'unknown')))[:600], flush=True)
     check(code == 200 and data.get('state') == 'running', 'isolated runtime starts successfully')
+    if args.linux_filesystem_probe:
+        check(os.name == 'posix' and Path('/proc/self/ns/mnt').exists(), 'Linux mount namespace probe available')
+        if 'employee_runtime_id' not in state:
+            employee_runtime_id = 'acceptance-employee-' + secrets.token_hex(4)
+            code, employee_runtime = request('POST', '/api/hub/runtimes', {'runtime_id': employee_runtime_id, 'auto_start': True}, employee['token'])
+            check(code == 201 and employee_runtime.get('state') == 'running', 'employee creates and starts own isolated runtime')
+            state['employee_runtime_id'] = employee_runtime_id
+            state_path.write_text(json.dumps(state), encoding='utf-8')
+        code, employee_runtime = request('GET', '/api/hub/runtimes/' + state['employee_runtime_id'], token=employee['token'])
+        check(code == 200 and employee_runtime.get('state') == 'running', 'employee runtime is running')
+        own_dir = Path(data['working_dir']).resolve()
+        expected = state_path.resolve().parent.parent / 'workspace' / 'hub'
+        check(own_dir.is_relative_to(expected), 'runtime belongs to disposable acceptance workspace')
+        marker = 'acceptance-boundary-' + secrets.token_hex(8)
+        own = own_dir / marker
+        outside = expected / marker
+        sibling = Path(employee_runtime['working_dir']).resolve() / marker
+        check(sibling.is_relative_to(expected) and not sibling.is_relative_to(own_dir), 'employee has a separate acceptance workspace')
+        try:
+            own.write_text('own-runtime')
+            outside.write_text('host-only')
+            sibling.write_text('employee-only')
+            pending = [int(data['pid'])]
+            isolated = []
+            while pending:
+                pid = pending.pop()
+                proc = Path('/proc') / str(pid)
+                children = proc / 'task' / str(pid) / 'children'
+                if children.exists():
+                    pending.extend(int(x) for x in children.read_text().split())
+                try:
+                    if os.readlink(proc / 'ns/mnt') != os.readlink('/proc/self/ns/mnt'):
+                        isolated.append(proc / 'root')
+                except FileNotFoundError:
+                    pass
+            check(bool(isolated), 'running process uses a separate mount namespace')
+            check(any((root / str(own).lstrip('/')).is_file() for root in isolated), 'own workspace file visible inside running sandbox')
+            check(all(not (root / str(outside).lstrip('/')).exists() for root in isolated), 'host file outside workspace absent from running sandbox')
+            check(all(not (root / str(sibling).lstrip('/')).exists() for root in isolated), 'other user workspace file absent from running sandbox')
+            pending = [int(employee_runtime['pid'])]
+            employee_roots = []
+            while pending:
+                pid = pending.pop()
+                proc = Path('/proc') / str(pid)
+                children = proc / 'task' / str(pid) / 'children'
+                if children.exists():
+                    pending.extend(int(x) for x in children.read_text().split())
+                try:
+                    if os.readlink(proc / 'ns/mnt') != os.readlink('/proc/self/ns/mnt'):
+                        employee_roots.append(proc / 'root')
+                except FileNotFoundError:
+                    pass
+            check(bool(employee_roots) and any((root / str(sibling).lstrip('/')).is_file() for root in employee_roots), 'employee sandbox can see its own workspace file')
+            check(all(not (root / str(own).lstrip('/')).exists() and not (root / str(outside).lstrip('/')).exists() for root in employee_roots), 'employee sandbox cannot see administrator workspace or host file')
+        finally:
+            own.unlink(missing_ok=True)
+            outside.unlink(missing_ok=True)
+            sibling.unlink(missing_ok=True)
 else:
     check(request('POST', '/api/auth/register', state['admin'])[0] == 403, 'single-user registration cannot create another account')
