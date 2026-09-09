@@ -1,0 +1,7 @@
+product: zhiyun-ai-os
+version: 2.2.0
+source_commit: 037bdbc885d3131417aca9517f3e15de0bc0604a
+qwenpaw: 2.2.0
+locked_pawapps: 0
+channel: offline-usb
+note: U盘离线安装包 —— 内嵌 Python 运行时缓存、锁定 PawApp 与便携 Node；解压后运行 install-usb.cmd

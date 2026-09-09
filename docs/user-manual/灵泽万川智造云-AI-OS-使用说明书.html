@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>灵泽万川智造云 AI-OS 使用说明书</title>
+<style>
+  body { font-family: "Microsoft YaHei UI", "PingFang SC", sans-serif; max-width: 960px; margin: 0 auto; padding: 24px 20px 80px; color: #1f2328; line-height: 1.75; }
+  h1 { font-size: 28px; border-bottom: 2px solid #2f6bff; padding-bottom: 10px; }
+  h2 { font-size: 21px; margin-top: 40px; border-left: 4px solid #2f6bff; padding-left: 10px; }
+  h3 { font-size: 17px; margin-top: 26px; }
+  img { max-width: 100%; border: 1px solid #d8dee4; border-radius: 6px; margin: 8px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 14px; }
+  th, td { border: 1px solid #d8dee4; padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: #f2f6ff; }
+  tr:nth-child(even) td { background: #fafbfc; }
+  code { background: #f0f2f5; border-radius: 4px; padding: 1px 5px; font-size: 13px; }
+  pre code { display: block; padding: 12px; overflow-x: auto; }
+  blockquote { border-left: 4px solid #ffb02e; background: #fffaf0; margin: 12px 0; padding: 8px 14px; }
+  a { color: #2f6bff; }
+  hr { border: none; border-top: 1px solid #d8dee4; margin: 28px 0; }
+  .missing { color: #c00; }
+</style>
+</head>
+<body>
+<h1>智造云 AIOS 2.2.0 使用说明</h1>
+<blockquote>当前为候选验收版本。正式发布前，请查看 <code>docs/operations/RELEASE-2.2.0-ACCEPTANCE.md</code> 中的已验证项目与剩余限制。</blockquote>
+<h2 id="1-产品与运行模式">1. 产品与运行模式</h2>
+<p>智造云 AIOS 使用 QwenPaw 2.2.0 原生运行时和 Hub，提供品牌界面、安装程序及启动入口。本发行版不捆绑业务 PawApp 或 Studio 应用；旧业务应用的历史数据不会因架构调整而自动删除。</p>
+<table><thead><tr><th>模式</th><th>用途</th><th>入口</th><th>地址</th></tr></thead><tbody><tr><td>单机</td><td>个人工作空间</td><td><code>start-ai-os.cmd</code> / <code>start-ai-os.sh</code></td><td><code>http://127.0.0.1:8088</code></td></tr><tr><td>Hub</td><td>团队账号与隔离运行环境</td><td><code>start-hub.cmd</code> / <code>start-hub.sh</code></td><td>本机首次配置后开放局域网 8000 端口</td></tr></tbody></table>
+<p>对话、技能、模型配置和工具连接使用原生控制台。云模型会把请求内容发送给所选供应商；本地模型也不代表联网工具、频道或连接器不会向外发送数据。</p>
+<h2 id="2-Windows-安装与启动">2. Windows 安装与启动</h2>
+<p>使用经过校验的 2.2.0 安装包，运行图形安装程序，选择安装目录和桌面快捷方式选项。安装完成后点击“打开智造云 AIOS”，或使用桌面入口。首次启动需要加载运行环境，可能耗时数分钟。</p>
+<p>源码部署使用仓库根目录的 <code>setup-ai-os.ps1</code>，再运行 <code>start-ai-os.cmd</code>。离线 ZIP 必须完整解压后使用，不能只复制启动文件。离线包中的缓存用于安装 Python 依赖，不包含模型服务账号或云模型额度。</p>
+<p>单机首次访问 8088 页面时创建个人账号。没有预置的生产用户名或默认密码，单机模式不开放第二个账号注册。多人使用请部署 Hub。</p>
+<h2 id="3-Windows-Hub">3. Windows Hub</h2>
+<p>运行 <code>start-hub.cmd</code>，按 Windows 提示授予管理员权限。Windows Local 隔离运行环境需要此权限；仅打开登录页不能证明用户运行环境可用。</p>
+<p>首次启动仅监听 <code>127.0.0.1:8000</code>。在本机注册首个管理员后，停止并重新启动 Hub，服务才开放局域网监听。管理员可创建员工账号，也可按组织要求修改 <code>hub.yaml</code> 的注册设置后重启。</p>
+<p>同事使用服务器的局域网地址访问 8000 端口。自定义域名应在 <code>hub.yaml</code> 中配置 <code>public_base_url</code>，并由受信任的反向代理提供 HTTPS。派生的 <code>hub.runtime.yaml</code> 由启动器生成。</p>
+<h2 id="4-Ubuntu-Hub">4. Ubuntu Hub</h2>
+<p>需要 Node.js 20+、可用的 Python 运行环境引导条件，以及 Bubblewrap。运行 <code>bash start-hub.sh</code>，首次账号初始化顺序与 Windows 相同。</p>
+<p>Ubuntu 24.04 WSL2 验收环境已验证 Hub 启动和双向工作区文件隔离。普通 Docker 容器可能不允许 Bubblewrap 所需的命名空间；不要为了启动成功而关闭隔离保护。Windows 离线包的二进制缓存不能当作 Ubuntu 离线依赖包使用。</p>
+<h2 id="5-模型与凭据">5. 模型与凭据</h2>
+<p>在控制台配置所需模型供应商、模型名称和凭据，再进行实际对话验证。模型未配置、凭据无效或网络不可达时，应先处理错误，不以固定文本代替真实模型结果。</p>
+<p>原生 Hub 的凭据保险库按登录账号的个人租户加密保存凭据，并注入同一租户的运行环境。管理员录入的凭据不会自动共享给员工。产品要求的“管理员统一供给、员工零接触密钥”尚未完成验收，跟踪 #138；不能把个人租户配置当作全员供给方案。</p>
+<h2 id="6-数据与备份">6. 数据与备份</h2>
+<p>停止对应服务后，整体备份安装目录中的 <code>apps/zhizaoyunAIOS/workspace</code>，以及存在时的 <code>apps/zhizaoyunAIOS/workspace.secret</code>。Hub 数据位于工作区的 <code>hub</code> 子目录，必须连同数据库、secrets、用户运行环境数据一起备份。不要只复制数据库而遗漏加密密钥。</p>
+<p>升级前还应备份 <code>hub.yaml</code>。旧版业务应用曾使用的其他数据目录也需要保留；新版不负责迁移那些独立应用的数据。</p>
+<p>不要将工作区、备份、密钥或真实账号配置加入 Git 或安装包。</p>
+<h2 id="7-升级与卸载">7. 升级与卸载</h2>
+<p>覆盖升级时选择原安装目录。安装器保留已有工作区和 <code>hub.yaml</code>，只更新程序文件；正式使用前仍应保留可恢复的完整备份。</p>
+<p>图形卸载程序按安装文件清单移除程序、已记录的运行时文件及本安装的快捷方式。工作区、账号、Hub 配置和未知文件保留在原目录。卸载不等于清除个人数据；保留的数据仍需由你妥善管理。</p>
+<p>候选包的完整安装、覆盖升级及卸载流程仍以验收记录为准，不能用专项测试代替整包验证。</p>
+<h2 id="8-常见问题">8. 常见问题</h2>
+<h3 id="8088-或-8000-端口被占用">8088 或 8000 端口被占用</h3>
+<p>确认是否已有智造云实例在运行。不同安装目录的实例不能同时占用相同端口；不要直接结束不明进程。</p>
+<h3 id="Hub-页面能打开但运行环境启动失败">Hub 页面能打开，但运行环境启动失败</h3>
+<p>Windows 检查管理员权限；Ubuntu 检查 Bubblewrap 与宿主机命名空间支持。查看该运行环境的日志，登录成功与运行环境就绪是两个不同阶段。</p>
+<h3 id="忘记单机密码">忘记单机密码</h3>
+<p>先停止单机服务并备份数据，确认当前实例实际使用的 secret 目录，再按原生说明处理其中的 <code>auth.json</code> 并重新注册。此操作重置本地账号，不能用来替代 Hub 账号管理，也不应删除整个工作区。</p>
+<h3 id="界面未更新或显示异常">界面未更新或显示异常</h3>
+<p>确认当前访问的是正确安装实例，重启服务并刷新页面。运行 <code>diagnose-ai-os.cmd</code> / <code>diagnose-ai-os.sh</code> 获取诊断信息。反馈问题时记录系统、窗口尺寸和复现步骤，日志应先移除敏感信息。</p>
+<h3 id="安装失败">安装失败</h3>
+<p>查看安装目录中的 <code>install-wizard.log</code>、<code>install-runtime.log</code> 或 <code>install-log.txt</code>（以实际安装方式为准）。修复原因后重试；不要删除工作区来尝试修复依赖。</p>
+</body>
+</html>
