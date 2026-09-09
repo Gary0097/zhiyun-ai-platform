@@ -1,6 +1,6 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveRuntime, runtimeEnvironment } from './runtime-env.mjs'
 
@@ -27,6 +27,7 @@ Object.assign(launchEnv, {
 function run (command, args, hint) {
   const result = spawnSync(command, args, { cwd: repoRoot, stdio: 'inherit', env: launchEnv })
   if (result.error || result.status !== 0) {
+    console.error(`子进程失败：${result.error?.message || result.signal || 'exit ' + result.status}`)
     console.error(`\n${hint}`)
     process.exit(result.status || 1)
   }
@@ -36,6 +37,7 @@ function run (command, args, hint) {
 // zhizaoyunAIOS / qwenpaw）占用，直接停掉旧进程再启动。外来进程不动，
 // 交给 doctor 的端口检查报错。
 function stopStaleInstance () {
+  if (process.platform !== 'win32') return false
   const probe = spawnSync('powershell', ['-NoProfile', '-Command',
     "(Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1).OwningProcess"], { encoding: 'utf8' })
   const pid = parseInt((probe.stdout || '').trim(), 10)
@@ -44,7 +46,7 @@ function stopStaleInstance () {
     `(Get-Process -Id ${pid} -ErrorAction SilentlyContinue).Path`], { encoding: 'utf8' })
   const ownerPath = (pathProbe.stdout || '').trim()
   if (!ownerPath) return false
-  if (!/zhizaoyunAIOS|qwenpaw/i.test(ownerPath)) return false // 非本平台进程：不接管
+  if (!resolve(ownerPath).toLowerCase().startsWith((resolve(repoRoot) + sep).toLowerCase())) return false
   console.log(`检测到本平台旧实例（PID ${pid}），自动停止以完成升级/重启…`)
   spawnSync('powershell', ['-NoProfile', '-Command',
     `try { Stop-Process -Id ${pid} -Force } catch {}`])
@@ -57,7 +59,9 @@ function stopStaleInstance () {
   return true
 }
 
-try { stopStaleInstance() } catch (e) { console.warn('旧实例接管检查失败：', e.message) }
+if (!process.argv.includes('--check')) {
+  try { stopStaleInstance() } catch (e) { console.warn('旧实例接管检查失败：', e.message) }
+}
 
 run(process.execPath, [join(scriptsRoot, 'doctor.mjs')], '启动诊断未通过；请按上方提示处理后重试。')
 if (process.argv.includes('--check')) process.exit(0)

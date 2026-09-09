@@ -4,13 +4,29 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-EMBEDDED="apps/zhizaoyunAIOS"
+EMBEDDED="$PWD/apps/zhizaoyunAIOS"
 # 与 setup-ai-os.sh 相同：用 Node 读锁文件，避免依赖系统 python3
 VERSION=$(node -e "const x=require(process.argv[1]); process.stdout.write(x.version)" "$EMBEDDED/qwenpaw.lock.json")
 RUNTIME_CACHE="$EMBEDDED/runtime/cache"
 HUB_VENV="$EMBEDDED/runtime/qwenpaw-hub/venv"
 HUB_QWENPAW="$HUB_VENV/bin/qwenpaw"
 CACHED_UV="$RUNTIME_CACHE/bin/uv"
+export UV_NO_MODIFY_PATH=1
+if [ "${ZAIOS_OFFLINE:-0}" = "1" ] || [ "${AI_OS_OFFLINE:-0}" = "1" ]; then
+  export ZAIOS_OFFLINE=1 UV_OFFLINE=1
+fi
+
+canonicalize_hub_python() {
+  # uv's minor-version alias lies outside bubblewrap's allowlisted real Python
+  # prefix. Point this venv at the canonical interpreter, without widening mounts.
+  local python="$HUB_VENV/bin/python"
+  if [ -L "$python" ]; then
+    local canonical
+    canonical=$("$python" -c 'import os,sys; print(os.path.realpath(sys.executable))')
+    [ -x "$canonical" ] || { echo "Hub Python interpreter is unavailable" >&2; return 1; }
+    ln -sfn "$canonical" "$python"
+  fi
+}
 
 brand_hub_console() {
   # Hub 控制台品牌化（智造云 AIOS 风格；失败不阻断，可重跑）——升级后
@@ -24,6 +40,7 @@ brand_hub_console() {
 # hub 子命令探测：基础包装好但 [hub] 附加依赖缺一半时 --version 仍成功
 if [ -x "$HUB_QWENPAW" ] && "$HUB_QWENPAW" --version 2>/dev/null | grep -q "version $VERSION\$" && "$HUB_QWENPAW" hub --help >/dev/null 2>&1; then
   echo "QwenPaw Hub $VERSION 运行环境已就绪：$HUB_VENV"
+  canonicalize_hub_python
   brand_hub_console
   exit 0
 fi
@@ -57,7 +74,10 @@ UV_PYTHON_INSTALL_DIR="$RUNTIME_CACHE/python" \
 UV_PYTHON_PREFERENCE=only-managed \
   "$UV_CMD" pip install --python "$HUB_VENV/bin/python" "qwenpaw[hub]==$VERSION"
 
+canonicalize_hub_python
+
 "$HUB_QWENPAW" --version | grep -q "version $VERSION\$" || { echo "Hub 环境安装后版本校验失败" >&2; exit 1; }
+"$HUB_QWENPAW" hub --help >/dev/null || { echo "Hub 附加依赖安装不完整" >&2; exit 1; }
 
 brand_hub_console
 echo "QwenPaw Hub $VERSION 运行环境安装完成：$HUB_VENV"

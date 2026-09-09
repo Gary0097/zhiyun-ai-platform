@@ -203,6 +203,11 @@ try {
   ok(docs.includes('企业内支持'), '问题反馈章节已品牌化改写')
   ok(!/qwenpaw\.agentscope\.io/.test(docs) && !docs.includes('AgentScope Platform') && !docs.includes('魔搭创空间'), '上游官网/云平台/魔搭引用清零（含安装脚本）')
   ok(docs.includes('install-oneclick.cmd') && docs.includes('start-ai-os.cmd'), '安装指引为智造云AIOS 启动器方式')
+  const quickstartSec = docs.split('id="doc-quickstart"')[1].split('id="doc-')[0]
+  ok(!quickstartSec.includes('阿里云 ECS') && !quickstartSec.includes('>桌面应用<') && !quickstartSec.includes('>脚本安装<'), 'quickstart 一览表与正文章节一致')
+  ok(quickstartSec.includes('智造云AIOS 启动器'), 'quickstart 一览表包含启动器方式')
+  const faqSec = docs.split('id="doc-faq"')[1].split('id="doc-')[0]
+  ok(!faqSec.includes('脚本安装') && !faqSec.includes('Windows 桌面应用'), 'FAQ 排查不再引用已移除的安装方式')
   // 表格渲染回归：分隔行字符类 bug 曾使 1546 行表格数据只渲染出 2 张表
   const tableCount = occurrences(docs, '<table>')
   ok(tableCount > 100, 'Markdown 表格正常渲染（' + tableCount + ' 张 ≥100；曾因分隔行正则一字之差全部退化为文本段）')
@@ -214,13 +219,13 @@ try {
   // 竖屏/窄屏适配：品牌文案块必须随分栏布局在 <900px 整体隐藏，宽屏分栏保留
   const themedHtml = readFileSync(join(consoleDir, 'index.html'), 'utf8')
   ok(themedHtml.includes('aios-brand-help-btn'), '右上角帮助中心入口按钮注入存在')
-  ok(themedHtml.includes('aios-brand-js-v4'), '注入脚本为当前版本（版本标记驱动旧标签替换升级）')
+  ok(themedHtml.includes('aios-brand-js-v6'), '注入脚本为当前版本（版本标记驱动旧标签替换升级）')
   ok(themedHtml.includes('if (!document.body) return;'), '注入脚本 body 未就绪安全早退（v3 曾因 head 期访问 body 抛异常整段静默失效）')
   ok(themedHtml.split('\n').every(l => !l.includes('.qwenpaw-app:has(form)') || l.includes('body.zy-login')), '登录页专属 CSS 全部限定在 body.zy-login 路由标记下（防内页含表单被误判为登录页）')
   ok(themedHtml.includes('/aios-docs.html?v='), '文档引用已带内容版本参数（击穿固定文件名的历史 immutable 缓存）')
   ok(themedHtml.includes('@media (max-width: 899px)') && themedHtml.includes('#aios-brand-copy{display:none !important;}'), '竖屏规则：窄屏下 #aios-brand-copy 品牌文案块整体隐藏（白字叠表单回归）')
-  ok(themedHtml.includes('max-width:400px !important') && themedHtml.includes('padding-left:0 !important'), '窄屏表单防收缩规则存在（阻断宿主嵌套 32px 内边距，卡片限宽 400px 占满可用宽度）')
-  ok(themedHtml.includes('@media (min-width: 900px)') && themedHtml.includes('grid-column:1 / -1 !important'), '宽屏表单跨列规则存在（内层宿主 grid 双列把表单压进 222px 窄列的回归）')
+  ok(themedHtml.includes('max-width:400px !important') && themedHtml.includes('padding:0 !important'), '窄屏表单防收缩规则存在（阻断宿主嵌套 32px 内边距，卡片限宽 400px 占满可用宽度）')
+  ok(themedHtml.includes('@media (min-width: 900px)') && themedHtml.includes('.qwenpaw-app.spark > .qwenpaw-app { grid-column:2; }'), '宽屏表单跨列规则存在（内层宿主 grid 双列把表单压进 222px 窄列的回归）')
   ok(themedHtml.includes('@media (min-width: 900px)') && themedHtml.includes('grid-template-columns:58.333% 41.667%'), '宽屏规则：分栏布局保留（桌面无回归）')
 
   const run1Zyb = zybJsFiles().sort()
@@ -235,6 +240,10 @@ try {
   ok(run2Zyb.every(n => occurrences(n, '-zyb') === 1), '文件名无双重 -zyb 后缀')
   ok(entrySrcInHtml() === entryZybName, 'index.html 入口引用未漂移')
   ok(readFileSync(join(assetsDir, entryZybName), 'utf8') === run1EntryContent, 'zyb 入口内容逐字节一致')
+  const repeatedHtml = readFileSync(join(consoleDir, 'index.html'), 'utf8')
+  const withoutScripts = repeatedHtml.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '')
+  ok(withoutScripts.includes('<style id="zy-brand-theme">'), '重复补丁后主题必须位于 script 外部')
+  ok(withoutScripts.includes('body.zy-login h2 { color:#172b36 !important'), '深色宿主登录标题有完整的浅色背景对比度')
 
   // ── 门禁：--check 通过 / 注入回归必须失败 ─────────────────────────────
   section('门禁（--check）')

@@ -16,6 +16,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const argv = process.argv.slice(2)
 const version = argv.find(a => !a.startsWith('--')) || process.env.RELEASE_VERSION || ''
 const offline = argv.includes('--offline')
+const cacheArchiveIndex = argv.indexOf('--cache-archive')
+const cacheArchive = cacheArchiveIndex < 0 ? null : argv[cacheArchiveIndex + 1]
+if (cacheArchive && (!offline || !existsSync(cacheArchive))) throw new Error('--cache-archive requires --offline and an existing ZIP')
 const refFlagIdx = argv.indexOf('--ref')
 const ref = refFlagIdx !== -1 ? argv[refFlagIdx + 1] : (process.env.RELEASE_REF || 'master')
 if (!version) {
@@ -61,6 +64,7 @@ const qwenpawLock = JSON.parse(readFileSync(join(workDir, 'apps', 'zhizaoyunAIOS
 const manifest = [
   'product: zhiyun-ai-os',
   `version: ${version}`,
+  `source_commit: ${execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workDir, encoding: 'utf8' }).trim()}`,
   `qwenpaw: ${qwenpawLock.version}`,
   `locked_pawapps: ${pawappsLock.apps.length}`,
   ...pawappsLock.apps.map(a => `  - ${a.id} @ ${a.commit}`),
@@ -107,7 +111,7 @@ if (offline) {
       }
     }
     console.log(`内嵌 runtime/${part}（${dirSizeMb(src)} MB）...`)
-    cpSync(src, join(pkgRuntime, part), { recursive: true })
+    if (!cacheArchive || part !== 'cache') cpSync(src, join(pkgRuntime, part), { recursive: true })
   }
   // 2) 便携 Node（仅 node.exe，约 80MB；start-ai-os.cmd 会自动优先使用）
   const nodeSrc = process.env.NODE_SRC || join(process.env.ProgramFiles || 'C:\\Program Files', 'nodejs', 'node.exe')
@@ -174,6 +178,18 @@ if (offline) {
         launcherSrc,
       ], { stdio: 'inherit' })
       console.log(`内嵌桌面启动器：智造云AI-OS.exe（v${version}）`)
+      const versionSource = join(workDir, 'scripts', 'exe-installer', 'VersionInfo.generated.cs')
+      writeFileSync(versionSource, `static class VersionInfo { public const string AppVersion = "${version}"; }\n`)
+      execFileSync(csc, [
+        '/nologo', '/target:winexe', '/optimize+', '/main:Uninstaller',
+        '/out:' + join(workDir, 'Uninstall.exe'), '/win32icon:' + iconPath,
+        '/win32manifest:' + join(workDir, 'scripts', 'exe-installer', 'installer.manifest'),
+        '/r:System.Windows.Forms.dll', '/r:System.Drawing.dll',
+        '/r:System.IO.Compression.dll', '/r:System.IO.Compression.FileSystem.dll',
+        ...['bootstrap.cs', 'wizard.cs', 'uninstaller.cs'].map(f => join(workDir, 'scripts', 'exe-installer', f)),
+        versionSource,
+      ], { stdio: 'inherit' })
+      rmSync(versionSource)
     } else {
       console.warn('警告：未找到 csc.exe 或 branding/app.ico，离线包不含桌面启动器（安装时回退 .cmd 启动）。')
     }
@@ -187,10 +203,10 @@ if (offline) {
     '1. 把整个文件夹（或 zip）拷到目标电脑任意可写目录，解压。',
     '2. 双击 `install-usb.cmd`：自动使用包内 Python/Node 运行时，无需联网。',
     '3. 安装完成会自动启动服务并打开浏览器（默认 http://127.0.0.1:8088）。',
-    '4. 首次使用：打开 http://127.0.0.1:8088 注册账号（第一个注册的账号即管理员，',
-    '   请设置高强度密码；后续用户在登录页自行注册）。',
-    '5. 局域网多用户：运行 `start-hub.cmd` 启动 Hub（0.0.0.0:8000），模型账号',
-    '   （API Key）由管理员在 Hub 管理界面统一配置。',
+    '4. 单机首次使用：打开 http://127.0.0.1:8088 创建个人账号；单机不开放后续用户注册。',
+    '5. 团队使用：运行 `start-hub.cmd` 并批准管理员权限。首次仅监听本机，',
+    '   打开 http://127.0.0.1:8000 注册管理员，再重启 Hub 开放局域网访问。',
+    '   管理员可创建员工账号；凭据按个人租户存储，管理员凭据不会自动共享给员工。',
     '6. 忘记密码：停止服务后删除服务数据目录下的 `auth.json`，重启后重新注册',
     '   （官方文档提供的重置方式，会清除全部本地账户）。',
     '',
@@ -214,7 +230,10 @@ if (existsSync(gitEntry)) {
 try {
   // 跨平台压缩：优先系统 bsdtar（Windows 10+ 自带，大目录远快于 Compress-Archive）
   const windowsTar = join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe')
-  if (process.platform === 'win32' && existsSync(windowsTar)) {
+  if (cacheArchive) {
+    const python = join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'qwenpaw-hub', 'venv', 'Scripts', 'python.exe')
+    execFileSync(python, [join(root, 'scripts', 'package-offline-cache.py'), '--source', workDir, '--cache-archive', cacheArchive, '--output', zipPath], { stdio: 'inherit' })
+  } else if (process.platform === 'win32' && existsSync(windowsTar)) {
     run(`"${windowsTar}" -a -c -f "${zipPath}" -C "${workDir}" .`)
   } else if (process.platform === 'win32') {
     run(`powershell -NoProfile -Command "Compress-Archive -Path '${join(workDir, '*')}' -DestinationPath '${zipPath}' -Force"`)

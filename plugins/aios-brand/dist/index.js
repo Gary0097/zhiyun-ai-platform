@@ -5,7 +5,7 @@
  *   1) Q.slot.replace('header.logo')   —— 顶栏 Logo（含点击放大态）
  *   2) Q.route.add + Q.menu.add        —— 帮助中心页面与侧边栏入口
  *   3) 主题：CSS 变量级换肤 + Q.chat.theme.set 主色
- *   4) 观察者隐藏顶栏外链入口（GitHub / 文档资料——文档已由帮助中心取代）
+ *   4) 观察者隐藏顶栏外链入口（GitHub；文档资料入口保留，条目已全部指向内嵌帮助文档）
  */
 (function () {
   var Q = window.QwenPaw;

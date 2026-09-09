@@ -13,6 +13,13 @@ const gearLogo = join(assetsRoot, 'gear-logo.png')
 const brandLogo = join(assetsRoot, 'brand-logo.png')
 const defaultLogo = join(assetsRoot, 'default-logo.png')
 
+// Inject before the actual closing head, not a literal mentioned inside an
+// already-injected script comment. Repeated patching must keep styles outside JS.
+function injectHead(html, markup) {
+  const index = html.lastIndexOf('</head>')
+  return index < 0 ? html : html.slice(0, index) + markup + html.slice(index)
+}
+
 const REPLACEMENTS = [
   {
     name: '文档资料下拉菜单（桌面）',
@@ -497,63 +504,7 @@ function themeCss (theme) {
     lines.push(`[class*="login"] > div[style*="245, 247, 250"],body > div[style*="245,247,250"]{background-image:url("${data}") !important;background-size:cover !important;background-position:center !important;}`)
   }
   // 登录页分栏企业风：左蓝品牌区（网格纹理+Logo+卖点文案）+ 右白表单区。
-  // 宿主登录页是居中卡片布局；这里在宽屏把第一个 login 容器改造为双栏网格，
-  // 并在其前插入品牌区（::before 承载 Logo 与文案），窄屏自动退回卡片居中。
-  const logoPath = selectedLogo().path
-  const logoData = 'data:image/' + (logoPath.endsWith('.svg') ? 'svg+xml' : 'png') + ';base64,' + readFileSync(logoPath).toString('base64')
-  const logoWhite = 'data:image/svg+xml;base64,' + Buffer.from(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + pngSize(logoPath).w + ' ' + pngSize(logoPath).h + '"><g filter="brightness(0) invert(1)"><image href="' + logoData + '" width="' + pngSize(logoPath).w + '" height="' + pngSize(logoPath).h + '"/></g></svg>').toString('base64')
-  lines.push(`
-/* ── 登录页分栏企业风（#126 视觉规范） ─────────────────── */
-/* 锚点：登录路由下 .qwenpaw-app 的直接子容器（含 qwenpaw-form 的卡片） */
-@media (min-width: 900px) {
-  body.zy-login{background:#fff !important;}
-  body.zy-login .qwenpaw-app:has(form){position:fixed !important;inset:0 !important;display:grid !important;grid-template-columns:58.333% 41.667% !important;background:#fff !important;}
-  /* 左侧品牌区（只挂最外层 spark 容器，防止内层 qwenpaw-app 二次渲染） */
-  body.zy-login .qwenpaw-app:has(form)::before{content:"";position:absolute;left:0;top:0;bottom:0;width:58.333%;background:linear-gradient(160deg,#1E56C8 0%,#2563D9 55%,#3B82F6 100%);}
-  /* 网格纹理：同样只铺左栏 */
-  body.zy-login .qwenpaw-app:has(form)::after{content:"";position:absolute;left:0;top:0;bottom:0;width:58.333%;pointer-events:none;
-    background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:44px 44px;}
-  /* 内层同名容器禁用装饰性伪元素 */
-  body.zy-login .qwenpaw-app .qwenpaw-app:has(form)::before,body.zy-login .qwenpaw-app .qwenpaw-app:has(form)::after{content:none !important;}
-  /* 内层同构 .qwenpaw-app 的宿主默认 grid 是「311px 222px」双列，表单被塞进
-     222px 窄列（实测输入框仅 51px）：让内层子项跨全部列，表单回到右栏居中
-     400px 主列（实测输入框恢复 293px） */
-  body.zy-login .qwenpaw-app:has(form) .qwenpaw-app > *{grid-column:1 / -1 !important;}
-  /* 品牌区文案 + 白色 Logo（挂在 app 容器第一个子节点之前不可行，用 body 级伪元素太晚——
-     改为在左栏内部用另一层：直接给 ::before 之上无法再叠文字，因此把文案放在
-     .qwenpaw-app 内新增的元素由 JS 完成，这里仅做背景层） */
-  /* 右侧表单列：把 app 容器的直接子树整体推到第二列 */
-  body.zy-login .qwenpaw-app:has(form) > *{grid-column:2 !important;grid-row:1 !important;position:relative !important;z-index:2 !important;background:#fff !important;min-height:100vh;display:flex;flex-direction:column;justify-content:center;box-shadow:none !important;border-radius:0 !important;max-width:none !important;width:100% !important;overflow:hidden !important;}
-  /* 中间各级容器全部放开宽度（宿主默认卡片宽逐级收窄）：用 * 深度通配 */
-  body.zy-login .qwenpaw-app:has(form) > * , body.zy-login .qwenpaw-app:has(form) > * > *, body.zy-login .qwenpaw-app:has(form) > * > * > *, body.zy-login .qwenpaw-app:has(form) > * > * > * > *{max-width:none !important;width:100% !important;}
-  /* 宿主自带渐变背景的容器（含内嵌 .qwenpaw-app 层）：压平为纯白，避免污染右栏 */
-  body.zy-login .qwenpaw-app:has(form) > div, body.zy-login .qwenpaw-app:has(form) > div > .qwenpaw-app{background:#fff !important;background-image:none !important;}
-  /* 表单及标题区限宽居中，形成设计稿的排版 */
-  /* 卡片内层纵向布局：标题区与表单区各 400px 居中 */
-  body.zy-login .qwenpaw-app:has(form) > * > *{flex-direction:column !important;align-items:center !important;padding:0 32px !important;box-sizing:border-box !important;background:#fff !important;border-radius:0 !important;box-shadow:none !important;}
-  body.zy-login .qwenpaw-app:has(form) form, body.zy-login .qwenpaw-app:has(form) > * > * > div:first-child{max-width:400px !important;width:100% !important;margin:0 auto !important;}
-  /* 标题区（Logo+标题）单行排布、留白与设计稿一致 */
-  body.zy-login .qwenpaw-app:has(form) > * > * > div:first-child{display:flex !important;flex-direction:column !important;align-items:center !important;text-align:center;margin-bottom:8px !important;}
-  body.zy-login .qwenpaw-app:has(form) h2{white-space:nowrap !important;font-size:20px !important;margin:10px 0 0 !important;text-align:center;width:auto !important;}
-  body.zy-login .qwenpaw-app:has(form) img[style*="height: 48px"]{height:56px !important;margin-bottom:8px !important;}
-  body.zy-login .qwenpaw-app:has(form) form::before{content:"";display:block;width:100%;height:3px;background:${p};margin-bottom:40px;border-radius:2px;}
-  /* 登录页 Logo 与标题水平排列（对齐设计稿的 48px Logo + 智造云 字标） */
-  body.zy-login .qwenpaw-app:has(form) img[style*="height: 48px"]{height:52px !important;margin:0 !important;}
-  body.zy-login .qwenpaw-app:has(form) img[style*="height: 48px"] ~ h2, body.zy-login .qwenpaw-app:has(form) h2{font-size:20px !important;}
-}
-@media (max-width: 899px){
-  body.zy-login .qwenpaw-app:has(form)::before,body.zy-login .qwenpaw-app:has(form)::after{display:none;}
-  /* 品牌文案块只属于宽屏分栏布局；窄屏/竖屏必须整体隐藏，否则白字叠在
-     浅色表单上不可读（竖屏实测回归） */
-  #aios-brand-copy{display:none !important;}
-  /* 宿主登录卡片每层父容器带 32px 横向内边距，320px 视口下输入框只剩
-     117px 完全不可用（实测）：阻断嵌套收缩——容器全宽、各级父层去横向
-     内边距、卡片限宽 400px 居中，表单占满卡片 */
-  body.zy-login .qwenpaw-app:has(form){display:flex !important;flex-direction:column !important;justify-content:center !important;align-items:center !important;min-height:100vh !important;padding:24px 16px !important;box-sizing:border-box !important;overflow-x:hidden !important;}
-  body.zy-login .qwenpaw-app:has(form) > *,body.zy-login .qwenpaw-app:has(form) > * > *,body.zy-login .qwenpaw-app:has(form) > * > * > *{width:100% !important;max-width:400px !important;padding-left:0 !important;padding-right:0 !important;box-sizing:border-box !important;}
-  body.zy-login .qwenpaw-app:has(form) form{width:100% !important;box-sizing:border-box !important;}
-}`)
+  lines.push(readFileSync(join(scriptsRoot, 'login-layout.css'), 'utf8').replaceAll('__PRIMARY__', p))
   return lines.join(String.fromCharCode(10))
 }
 
@@ -567,7 +518,7 @@ function applyBrandTheme (consoleDir) {
   let html = readFileSync(htmlPath, 'utf8')
   html = html.replace(/<style id="zy-(kingdee-theme|brand-theme)">[\s\S]*?<\/style>/g, '')
   const style = `<style id="zy-brand-theme">${themeCss(brandTheme())}</style>`
-  const nextHtml = html.replace(/<\/head>/, style + '</head>')
+  const nextHtml = injectHead(html, style)
   if (nextHtml === html) {
     warn('未找到 </head>，无法注入品牌主题。')
     return
@@ -579,7 +530,7 @@ function applyBrandTheme (consoleDir) {
   // 旧判定会把品牌文案块与登录分栏样式泄漏到内页（agent-config 实测回归）。
   // body.zy-login 标记类同时约束 themeCss 中全部登录页专属规则。
   const brandJs = `<script id="aios-brand-login-copy">(function(){
-    var __v='aios-brand-js-v4';
+    var __v='aios-brand-js-v6';
     var LOGO = ${JSON.stringify(logoWhite)};
     var LOGO_RAW = ${JSON.stringify(logoDataUri)};
     function onLoginRoute(){ return /\\/login\\/?$/.test(location.pathname); }
@@ -595,7 +546,7 @@ function applyBrandTheme (consoleDir) {
       el.innerHTML = '<div style="display:inline-flex;align-items:center;background:#fff;border-radius:10px;padding:10px 18px;margin-bottom:14px;">'
         + '<img src="' + LOGO_RAW + '" style="height:44px;width:auto;display:block;">'
         + '</div>'
-        + '<div style="font-size:15px;font-weight:600;margin-bottom:6px;">灵泽万川智造云</div>导入数据即可分析 · 应用内真实智能体对话<br>可审阅可导出 · 会话、任务与知识按账号隔离';
+        + '<div style="font-size:15px;font-weight:600;margin-bottom:6px;">灵泽万川智造云</div>智能体对话 · 技能与工具连接<br>单机工作空间 · Hub 团队协作';
       document.body.appendChild(el);
     }
     // 右上角帮助入口：顶栏追加「帮助中心」按钮（品牌化后原 GitHub/官网入口已
@@ -612,7 +563,7 @@ function applyBrandTheme (consoleDir) {
       a.style.cssText = 'display:inline-flex;align-items:center;margin:0 12px 0 4px;font-size:14px;line-height:normal;cursor:pointer;text-decoration:none;color:inherit;';
       h.appendChild(a);
     }
-    // 脚本注入在 </head> 之前，同步执行期 document.body 尚未解析——v3 曾在
+    // 脚本注入在 head 结束之前，同步执行期 document.body 尚未解析——v3 曾在
     // 首个同步 tick 里访问 body.classList 抛异常，导致 interval/observer 均未
     // 注册、整段脚本静默失效。body 未就绪时安全早退，observer 延迟到 body
     // 存在后的首个 tick 绑定。
@@ -630,7 +581,7 @@ function applyBrandTheme (consoleDir) {
   // 注入脚本的版本升级：旧标签存在但缺当前版本标记时先移除旧标签再注入新版
   // ——否则「存在即跳过」的幂等设计会让脚本变更永远无法生效。脚本内容有变时
   // 同步 bump __v 版本串。
-  const BRAND_JS_VERSION_MARK = 'aios-brand-js-v4'
+  const BRAND_JS_VERSION_MARK = 'aios-brand-js-v6'
   let scriptHost = nextHtml
   const oldScriptRe = /<script id="aios-brand-login-copy">[\s\S]*?<\/script>\n?/
   if (scriptHost.includes('aios-brand-login-copy') && !scriptHost.includes(BRAND_JS_VERSION_MARK)) {
@@ -638,7 +589,7 @@ function applyBrandTheme (consoleDir) {
   }
   const copyScript = scriptHost.includes(BRAND_JS_VERSION_MARK)
     ? scriptHost
-    : scriptHost.replace(/<\/head>/, brandJs + '</head>')
+    : injectHead(scriptHost, brandJs)
   if (copyScript !== nextHtml) writeAssetWithSiblings(htmlPath, copyScript)
   console.log('Console 已注入灵泽万川蓝绿主题样式与登录分栏布局。')
 }
@@ -965,7 +916,7 @@ function suppressConsoleTour (consoleDir) {
   const styleId = 'zy-tour-suppress'
   if (html.includes(`id="${styleId}"`)) return
   const style = `<style id="${styleId}">.qwenpaw-tour-mask,.qwenpaw-tour{display:none !important;}</style>`
-  const nextHtml = html.replace(/<\/head>/, style + '</head>')
+  const nextHtml = injectHead(html, style)
   if (nextHtml === html) {
     warn('未找到 </head>，无法注入引导抑制样式。')
     return

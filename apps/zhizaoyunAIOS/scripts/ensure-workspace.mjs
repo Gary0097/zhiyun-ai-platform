@@ -1,13 +1,26 @@
 // 确保 Workspace 目录结构就绪（智造云 AIOS 2.2.0 极简形态）
 // 2.2.0 登录由 QwenPaw 原生认证承载（QWENPAW_AUTH_ENABLED），不再需要
 // zhiyun-auth 的 users.json/token_secret；仅保留运行必需的基础目录。
-import { mkdirSync, existsSync, renameSync, readdirSync, cpSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, existsSync, renameSync, readdirSync, copyFileSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
 const appRoot = join(scriptsRoot, '..')
 const workspace = join(appRoot, 'workspace')
+
+// Node 24.11.1 on Windows can terminate natively in fs.cpSync when the
+// installation path contains Chinese characters. Copy the small brand tree
+// using individual filesystem operations; never follow source symlinks.
+function copyBrandTree(source, target) {
+  mkdirSync(target, { recursive: true })
+  for (const entry of readdirSync(source, { withFileTypes: true })) {
+    const from = join(source, entry.name), to = join(target, entry.name)
+    if (entry.isSymbolicLink()) throw new Error('Brand source must not contain symlinks: ' + from)
+    if (entry.isDirectory()) copyBrandTree(from, to)
+    else if (entry.isFile()) copyFileSync(from, to)
+  }
+}
 
 const dirs = [
   'workspaces/default/logs',
@@ -68,7 +81,7 @@ if (existsSync(join(brandSrc, 'plugin.json'))) {
   if (need) {
     mkdirSync(join(workspace, 'plugins'), { recursive: true })
     rmSync(brandDst, { recursive: true, force: true })
-    cpSync(brandSrc, brandDst, { recursive: true })
+    copyBrandTree(brandSrc, brandDst)
     console.log(`  [brand] aios-brand v${manifest.version} 已同步到 workspace/plugins`)
   }
 }
