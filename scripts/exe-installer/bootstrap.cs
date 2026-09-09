@@ -190,7 +190,7 @@ class Installer
             var ps = "$root=[regex]::Escape($env:Z_INSTALL_ROOT); " +
                 "Get-NetTCPConnection -LocalPort 8088,8000 -State Listen -ErrorAction SilentlyContinue | " +
                 "ForEach-Object { $p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $_.OwningProcess); " +
-                "if ($p -and $p.CommandLine -match $root) { Stop-Process -Id $p.ProcessId -Force } }";
+                "if ($p -and $p.CommandLine -match $root) { & taskkill.exe /T /F /PID $p.ProcessId | Out-Null } }";
             var psi = new ProcessStartInfo("powershell.exe", "-NoProfile -Command \"" + ps + "\"")
             {
                 UseShellExecute = false,
@@ -441,7 +441,7 @@ class Installer
         string self = Assembly.GetExecutingAssembly().Location;
         int markerLen = PayloadMarker.Length;
         string tempZip = Path.Combine(Path.GetTempPath(), "zhizaoyun-aos-payload-" +
-            DateTime.Now.ToString("yyyyMMddHHmmss") + ".zip");
+            Guid.NewGuid().ToString("N") + ".zip");
 
         const int chunk = 1 << 20; // 1 MB
         byte[] buffer = new byte[chunk + markerLen];
