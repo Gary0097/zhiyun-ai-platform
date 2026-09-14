@@ -202,7 +202,12 @@ class Installer
             // 驻留托盘启动器按映像名精确结束，避免升级解压时 exe 被锁
             foreach (var proc in Process.GetProcessesByName("智造云AI-OS"))
             {
-                try { if (proc.MainModule.FileName.StartsWith(TargetRoot(installRoot), StringComparison.OrdinalIgnoreCase)) proc.Kill(); }
+                try { if (proc.MainModule.FileName.StartsWith(TargetRoot(installRoot), StringComparison.OrdinalIgnoreCase)) {
+                    // The hidden cmd wrapper can survive its Python child and hold
+                    // launcher-service.log open. Stop the entire owned tree.
+                    KillProcessTree(proc.Id);
+                    proc.WaitForExit(15000);
+                } }
                 catch { }
             }
         }
