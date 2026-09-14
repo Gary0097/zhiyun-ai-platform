@@ -11,11 +11,44 @@ class InstallerTests
     [STAThread]
     static int Main(string[] args)
     {
+        if (args.Length > 0 && args[0] == "--lock-file") {
+            using (var stream = new FileStream(args[1], FileMode.Create, FileAccess.Write, FileShare.Read)) {
+                File.WriteAllText(args[1] + ".ready", "ready");
+                System.Threading.Thread.Sleep(120000);
+            }
+            return 0;
+        }
+        if (args.Length > 0 && args[0] == "--hold-child") {
+            var child = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(args[1], "--lock-file \"" + args[2] + "\"") { UseShellExecute = false, CreateNoWindow = true });
+            File.WriteAllText(args[2] + ".pid", child.Id.ToString());
+            child.WaitForExit();
+            return 0;
+        }
         var output = Path.GetFullPath(args[0]); Directory.CreateDirectory(output);
         string temp = Path.Combine(Path.GetTempPath(), "aios-installer-test-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(temp);
         try {
             var target = Path.Combine(temp, "中文 user's workspace"); Directory.CreateDirectory(target);
+            // Reproduce a launcher child that holds the service log after stop.
+            string fakeLauncher = Path.Combine(target, "智造云AI-OS.exe");
+            string starter = Path.Combine(target, "starter.exe");
+            File.Copy(Assembly.GetExecutingAssembly().Location, fakeLauncher);
+            File.Copy(Assembly.GetExecutingAssembly().Location, starter);
+            string heldLog = Path.Combine(target, "launcher-service.log");
+            var owner = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(fakeLauncher, "--hold-child \"" + starter + "\" \"" + heldLog + "\"") { UseShellExecute = false, CreateNoWindow = true });
+            int childPid = 0;
+            try {
+                for (int wait = 0; wait < 200 && !File.Exists(heldLog + ".ready"); wait++) System.Threading.Thread.Sleep(50);
+                Check(File.Exists(heldLog + ".ready"), "owned launcher child holds service log");
+                childPid = int.Parse(File.ReadAllText(heldLog + ".pid"));
+                Installer.StopLiveService(target);
+                Check(owner.WaitForExit(5000), "upgrade stops owned launcher");
+                using (var stream = new FileStream(heldLog, FileMode.Open, FileAccess.Write, FileShare.None)) { }
+                Check(true, "upgrade stops launcher child and releases service log");
+            } finally {
+                try { if (childPid != 0) System.Diagnostics.Process.GetProcessById(childPid).Kill(); } catch { }
+                try { if (!owner.HasExited) owner.Kill(); } catch { }
+            }
             File.WriteAllText(Path.Combine(target, "hub.yaml"), "custom-admin-settings");
             string data = Path.Combine(target, "apps", "zhizaoyunAIOS", "workspace"); Directory.CreateDirectory(data);
             File.WriteAllText(Path.Combine(data, "sentinel.txt"), "existing-user-data");
