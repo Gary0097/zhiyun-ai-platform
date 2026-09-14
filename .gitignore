@@ -43,3 +43,5 @@ apps/zhizaoyunAIOS/workspace.secret/
 apps/zhizaoyunAIOS/runtime/*
 !apps/zhizaoyunAIOS/runtime/.gitignore
 hub.runtime.yaml
+.aios-updates/
+update-assets/

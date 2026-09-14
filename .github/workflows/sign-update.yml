@@ -1,0 +1,58 @@
+name: Sign reviewed update assets
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Reviewed stable release tag (vX.Y.Z), with draft Windows/Linux assets'
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: sign-update
+  cancel-in-progress: false
+jobs:
+  sign:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    environment: update-release
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Require merged stable tag and draft release
+        env:
+          TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [[ "$TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          git merge-base --is-ancestor HEAD origin/master
+          test "$TAG" = "v$(node -p "JSON.parse(require('fs').readFileSync('apps/zhizaoyunAIOS/qwenpaw.lock.json')).version")"
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          test "$(gh release view "$TAG" --json isPrerelease --jq .isPrerelease)" = false
+      - run: python -m pip install 'cryptography>=45,<51'
+      - run: node scripts/verify-release.mjs
+      - name: Download reviewed assets
+        env:
+          TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p update-assets
+          gh release download "$TAG" -p "zhiyun-ai-os-$TAG-setup.exe" -p "zhiyun-ai-os-$TAG-online-installer.zip" -D update-assets
+      - name: Sign manifest with protected publisher key
+        run: node scripts/updates/sign-release.mjs update-assets
+        env:
+          AIOS_UPDATE_PRIVATE_KEY: ${{ secrets.AIOS_UPDATE_PRIVATE_KEY }}
+      - name: Attach manifest to draft (human publishes separately)
+        env:
+          TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$TAG" update-assets/aios-update.json update-assets/aios-update.sig
