@@ -8,15 +8,15 @@ const appRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
 const repoRoot = join(appRoot, '..', '..')
 const lock = runtimeLock()
 
-assert.equal(lock.version, '2.2.0')
-assert.equal(lock.ref, 'v2.2.0')
+assert.equal(lock.version, '2.2.1')
+assert.equal(lock.ref, 'v2.2.1')
 assert.match(lock.commit, /^[0-9a-f]{40}$/)
 assert.equal(lock.runtime_dir, 'runtime/zhizaoyunAIOS')
 for (const file of ['setup-ai-os.ps1', 'setup-ai-os.sh']) assert.ok(existsSync(join(repoRoot, file)), `missing ${file}`)
 
 assert.equal(matchesVersion('QwenPaw, version 2.1.0', '2.1.0'), true)
 assert.equal(matchesVersion('QwenPaw, version 12.1.0', '2.1.0'), false)
-assert.equal(matchesVersion('QwenPaw, version 3.2.0', '2.2.0b3'), false)
+assert.equal(matchesVersion('QwenPaw, version 3.2.0', '2.2.1b3'), false)
 
 const fakeRoot = join(repoRoot, 'path with spaces', 'runtime')
 const windowsCandidate = runtimeCandidates(fakeRoot, 'win32')[0]
@@ -25,7 +25,7 @@ const project = resolveRuntime({
   allowGlobal: false,
   root: fakeRoot,
   exists: path => path === windowsCandidate.command || path === windowsCandidate.python,
-  probe: () => ({ ok: true, output: 'QwenPaw, version 2.2.0', error: '' }),
+  probe: () => ({ ok: true, output: 'QwenPaw, version 2.2.1', error: '' }),
 })
 assert.equal(project.source, 'project')
 assert.equal(project.command, windowsCandidate.command)

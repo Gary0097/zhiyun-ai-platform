@@ -199,7 +199,7 @@ try {
   ok(!/<a href="[^"]*agentscope/i.test(docs), '内嵌文档无 agentscope 外链锚点')
   ok(!docs.includes('id="doc-desktop"'), '内嵌文档不含上游 desktop 章节')
   ok(!/QwenPaw Desktop(?!\.app)/.test(docs), '行文中的上游桌面版名称已隐藏为中性表述（.app 真实路径按技术标识保留）')
-  ok(docs.includes('智造云AIOS 2.2.0 更新公告') && docs.includes('智能体内核升级 2.1.0 → 2.2.0'), '更新日志为结合内核升级的 2.2.0 完整更新公告')
+  ok(docs.includes('智造云AIOS 2.2.1 更新公告') && docs.includes('智能体内核升级 2.2.0 → 2.2.1'), '更新日志为结合内核升级的 2.2.1 完整更新公告')
   ok(docs.includes('企业内支持'), '问题反馈章节已品牌化改写')
   ok(!/qwenpaw\.agentscope\.io/.test(docs) && !docs.includes('AgentScope Platform') && !docs.includes('魔搭创空间'), '上游官网/云平台/魔搭引用清零（含安装脚本）')
   ok(docs.includes('install-oneclick.cmd') && docs.includes('start-ai-os.cmd'), '安装指引为智造云AIOS 启动器方式')
