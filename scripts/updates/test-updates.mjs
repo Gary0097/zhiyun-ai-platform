@@ -96,3 +96,42 @@ test('upstream beta or unavailable commit never creates an upgrade task', async 
   await assert.rejects(track(async (path, body) => { if (body) writes++; return { tag_name: 'v2.3.0-beta', prerelease: true } }, '2.2.0', 'owner/repo'))
   assert.equal(writes, 0)
 })
+
+// Release verification is stricter than client platform selection.
+test('dual-entry publication rejects missing, tampered or mismatched signed assets', async () => {
+  const { verifyReleaseAssets } = await import('./verify-release-assets.mjs')
+  const directory = mkdtempSync(join(tmpdir(), 'aios-release-test-'))
+  const linux = { ...asset, platform: 'linux', name: 'zhiyun-ai-os-v2.2.1-online-installer.zip' }
+  const full = { ...manifest, assets: [asset, linux] }
+  function writeManifest(value) {
+    const bytes = Buffer.from(JSON.stringify(value))
+    writeFileSync(join(directory, 'aios-update.json'), bytes)
+    writeFileSync(join(directory, 'aios-update.sig'), sign(null, bytes, privateKey))
+  }
+  const verify = () => verifyReleaseAssets(directory, 'v2.2.1', manifest.commit, keys)
+  try {
+    for (const item of full.assets) writeFileSync(join(directory, item.name), data)
+    writeManifest(full)
+    assert.deepEqual(await verify(), full)
+    writeManifest(manifest)
+    await assert.rejects(verify(), /同时包含/)
+    writeManifest({ ...full, commit: 'b'.repeat(40) })
+    await assert.rejects(verify(), /提交/)
+    writeManifest(full)
+    await assert.rejects(verifyReleaseAssets(directory, 'v2.2.2', manifest.commit, keys))
+    writeFileSync(join(directory, 'aios-update.sig'), Buffer.alloc(64))
+    await assert.rejects(verify(), /签名/)
+    writeManifest(full)
+    rmSync(join(directory, linux.name))
+    await assert.rejects(verify())
+    writeFileSync(join(directory, linux.name), Buffer.alloc(data.length))
+    await assert.rejects(verify(), /摘要/)
+    writeFileSync(join(directory, linux.name), Buffer.concat([data, data]))
+    await assert.rejects(verify(), /大小/)
+    writeFileSync(join(directory, linux.name), data.subarray(1))
+    await assert.rejects(verify(), /大小/)
+    writeFileSync(join(directory, linux.name), data)
+    rmSync(join(directory, 'aios-update.json'))
+    await assert.rejects(verify())
+  } finally { rmSync(directory, { recursive: true, force: true }) }
+})
