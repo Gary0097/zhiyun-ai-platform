@@ -5,14 +5,14 @@ These rules apply to the entire repository. Read the PRD in
 
 ## Architecture
 
-- 智造云 AIOS 2.2.0 is a branded build of vanilla QwenPaw 2.2.0 plus
+- 智造云 AIOS 2.2.1 is a branded build of vanilla QwenPaw 2.2.1 plus
   QwenPaw Hub (product decision 2026-09-04). This repository contains only
   launchers, branding assets, setup scripts, docs, and the runtime version
   lock — no bundled business applications.
 - All business apps (PawApps, vendored plugins, the Studio suite) have been
   decoupled from this tree. They live in their own repositories and may return
   later as standalone optional add-ons; do not re-vendor them here.
-- Login uses QwenPaw 2.2.0 native auth: the single-user console enforces
+- Login uses QwenPaw 2.2.1 native auth: the single-user console enforces
   `QWENPAW_AUTH_ENABLED=true` (first user registers from the console; the
   documented reset is deleting `auth.json` under the secret dir). Multi-user
   login uses QwenPaw Hub accounts (`start-hub.cmd`, port 8000). Do not
@@ -24,7 +24,7 @@ These rules apply to the entire repository. Read the PRD in
   are replaced with 智造云 AIOS by `patch-console-ui.mjs`; brand assets live in
   `branding/`. Protected technical identifiers (URLs, host APIs, paths) must
   never be rebranded.
-- QwenPaw 2.2.0 is the only runtime (lock: `apps/zhizaoyunAIOS/qwenpaw.lock.json`);
+- QwenPaw 2.2.1 is the only runtime (lock: `apps/zhizaoyunAIOS/qwenpaw.lock.json`);
   lock entries must move in lockstep with product decisions.
 - Do not restore DeepSeek Harness, the enterprise service, or port 8390.
 
@@ -51,7 +51,7 @@ These rules apply to the entire repository. Read the PRD in
   business acceptance.
 - Preserve valid Windows (`.cmd`) and Linux (`.sh`) launch and maintenance
   entries. Report the impact on both platforms.
-- Keep manifest and lock versions consistent (system version 2.2.0).
+- Keep manifest and lock versions consistent (system version 2.2.1).
 - If the full gate cannot run because of an external service or network limit,
   run all unaffected checks and report the exact limitation; do not report the
   gate as passed.
