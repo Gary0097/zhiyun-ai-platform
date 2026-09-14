@@ -255,6 +255,16 @@ class TrayContext : ApplicationContext
         _stopItem = new MenuItem("停止后台服务", delegate { Stop(); });
         menu.MenuItems.Add(_startItem);
         menu.MenuItems.Add(_stopItem);
+        menu.MenuItems.Add("检查软件更新", delegate {
+            string updater = Path.Combine(_here, "update-ai-os.ps1");
+            if (!File.Exists(updater)) {
+                MessageBox.Show("此安装缺少更新入口，请安装启用在线更新的新版安装包。", "智造云 AIOS");
+                return;
+            }
+            Process.Start(new ProcessStartInfo("powershell.exe", "-NoProfile -ExecutionPolicy Bypass -File \"" + updater + "\"") {
+                UseShellExecute = false, CreateNoWindow = true, WorkingDirectory = _here
+            });
+        });
         menu.MenuItems.Add("-");
         menu.MenuItems.Add("退出（并停止后台服务）", delegate { ExitApp(); });
 

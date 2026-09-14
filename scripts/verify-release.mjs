@@ -22,6 +22,7 @@ for (const entry of [
   'setup-ai-os.ps1', 'setup-ai-os.sh', 'setup-hub.ps1', 'setup-hub.sh',
   'start-ai-os.cmd', 'start-ai-os.sh', 'start-hub.cmd', 'start-hub.sh', 'start-hub.ps1',
   'diagnose-ai-os.cmd', 'diagnose-ai-os.sh', 'install-oneclick.cmd', 'install-oneclick.sh',
+  'update-ai-os.cmd', 'update-ai-os.ps1', 'update-ai-os.sh',
 ]) {
   assert.ok(existsSync(join(root, entry)), `missing cross-platform entry: ${entry}`)
 }
@@ -67,6 +68,7 @@ if (runtimeExists) {
 
 // 5) 脚本检查（语法 + 自检）
 const commands = [
+  [process.execPath, ['--test', join(root, 'scripts', 'updates', 'test-updates.mjs')]],
   [process.execPath, [join(root, 'scripts', 'test-workspace-paths.mjs')]],
   [process.execPath, [join(root, 'scripts', 'test-hub-config.mjs')]],
   [process.env.PYTHON || 'python', [join(root, 'scripts', 'test-hub-bootstrap.py')]],
@@ -81,6 +83,7 @@ const commands = [
   [process.execPath, [join(root, 'scripts', 'release-prune.mjs'), '--check']],
   [process.execPath, ['--check', join(root, 'scripts', 'make-release-package.mjs')]],
 ]
+if (process.platform === 'win32') commands.push(['powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', join(root, 'scripts', 'updates', 'test-recovery.ps1')]])
 if (process.platform === 'win32') commands.push(['powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', join(root, 'scripts', 'test-installer.ps1')]])
 if (process.platform === 'win32') commands.push(['powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', join(root, 'scripts', 'test-windows-runtime-paths.ps1')]])
 for (const [command, args] of commands) {
