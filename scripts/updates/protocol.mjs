@@ -1,7 +1,6 @@
 import { createHash, createPublicKey, verify } from 'node:crypto'
-import { createWriteStream, readFileSync, renameSync, rmSync } from 'node:fs'
-import { Transform } from 'node:stream'
-import { pipeline } from 'node:stream/promises'
+import { readFileSync, renameSync, rmSync } from 'node:fs'
+import { open } from 'node:fs/promises'
 
 export const VERSION = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
 export function compare(a, b) {
@@ -48,20 +47,23 @@ export function releaseAsset(release, name, repository) {
 export async function download(url, asset, target, fetcher = fetch) {
   const part = `${target}.part`
   const hash = createHash('sha256'); let size = 0
+  // Acquire ownership before fetching. Never clean up another downloader's file.
+  const file = await open(part, 'wx', 0o600)
   try {
     const r = await fetcher(url, { signal: AbortSignal.timeout(60 * 60 * 1000) })
     if (!r.ok || !r.body) throw Error(`下载失败 HTTP ${r.status}`)
-    const meter = new Transform({ transform(chunk, encoding, cb) {
+    for await (const chunk of r.body) {
       size += chunk.length
-      if (size > asset.size) return cb(Error('下载文件超出签名清单大小'))
-      hash.update(chunk); cb(null, chunk)
-    } })
-    await pipeline(r.body, meter, createWriteStream(part, { flags: 'wx', mode: 0o600 }))
+      if (size > asset.size) throw Error('下载文件超出签名清单大小')
+      hash.update(chunk)
+      await file.writeFile(chunk)
+    }
+    await file.close()
     if (size !== asset.size || hash.digest('hex') !== asset.sha256) throw Error('下载文件校验失败')
     renameSync(part, target)
   } catch (e) {
-    // An exclusive-create collision belongs to another downloader.
-    if (e.code !== 'EEXIST') rmSync(part, { force: true })
+    await file.close()
+    rmSync(part, { force: true })
     throw e
   }
 }

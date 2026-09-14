@@ -45,6 +45,18 @@ try {
     Check ($LASTEXITCODE -eq 0) 'Launcher compilation failed'
     & $launcher --selftest
     Check ($LASTEXITCODE -eq 0) 'Launcher selftest failed'
+    # Exercise the actual unattended entry, ACL creation, mutex and child-process plumbing.
+    # A clearly isolated metadata stub prevents network access; this is not upgrade acceptance.
+    $helperDir = Join-Path $testRoot 'scripts/updates'
+    New-Item -ItemType Directory -Force -Path $helperDir | Out-Null
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'recovery.ps1') -Destination $helperDir
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot '../../update-ai-os.ps1') -Destination $testRoot
+    'console.log(JSON.stringify({available:false,current:"unit-test-only"}))' | Set-Content -Encoding UTF8 (Join-Path $helperDir 'client.mjs')
+    $checked = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $testRoot 'update-ai-os.ps1') -CheckOnly
+    Check ($LASTEXITCODE -eq 0) 'Unattended check entry failed'
+    Check (($checked | ConvertFrom-Json).current -eq 'unit-test-only') 'Check output lost'
+    $cacheAcl = Get-Acl -LiteralPath (Join-Path $testRoot '.aios-updates')
+    Check $cacheAcl.AreAccessRulesProtected 'Backup directory inherited broad permissions'
     Write-Host 'Recovery tests passed: backup, rollback, data/secrets/config preservation, unknown files, traversal rejection, syntax'
 } finally {
     # Fixed test prefix beneath TEMP only; no user installation paths can reach this cleanup.
