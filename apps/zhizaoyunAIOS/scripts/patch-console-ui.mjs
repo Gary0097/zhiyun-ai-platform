@@ -628,6 +628,8 @@ const DOC_GROUPS = [
 ]
 
 const DISTRIBUTION_DOCS = new Set(['intro', 'quickstart', 'hub', 'config', 'creator', 'roadmap', 'contributing', 'community', 'faq'])
+const USER_GUIDES = new Set('console multiAgent models context loopEngineering commands skills mcp browser chrome memory embedding memoryEvolvingAndProactive mailbox channels cron heartbeat backup'.split(' '))
+const USER_GUIDE_NOTICE = '> 使用说明：以下介绍智造云 AIOS 所集成的上游能力，具体可用项以当前控制台和已安装依赖为准。启动与重启请使用[快速开始](./quickstart)中的安装目录入口；数据位置见[配置与工作目录](./config)。高级示例中的命令和路径保留技术原名，不要用系统 Python 另装一套运行环境。\n\n'
 const REFERENCE_NOTICE = '> 上游技术参考：本章保留 QwenPaw 的技术名称与成果归属，不代表智造云自研或已逐项验收。命令示例须使用本项目运行环境；上游默认 ~/.qwenpaw 不等于本发行版数据目录，请先阅读[配置与工作目录](./config)。安装、账号和团队部署以[快速开始](./quickstart)及[Hub 部署](./hub)为准。\n\n'
 
 function escapeHtml (text) {
@@ -799,7 +801,7 @@ function writeLocalDocs (consoleDir) {
     // 行文中的上游桌面版名称隐藏为中性表述（.app / 安装路径等真路径不受影响）；
     // window.QwenPaw.* 等 API 标识符是代码，必须原样保留
     md = md.replace(/(?<!Local\\)QwenPaw Desktop(?!\.app)/g, '桌面应用版')
-    const branded = DISTRIBUTION_DOCS.has(p.id) ? md : REFERENCE_NOTICE + md
+    const branded = DISTRIBUTION_DOCS.has(p.id) ? md : (USER_GUIDES.has(p.id) ? USER_GUIDE_NOTICE : REFERENCE_NOTICE) + md
     const anchorAlias = p.id === 'intro' ? '<i id="tutorial"></i>' : (p.id === 'faq' ? '<i id="faq"></i>' : '')
     return '<section id="' + slugAnchor(p.id) + '">' + anchorAlias + '<h2>' + escapeHtml(p.title) + '</h2>' + mdToHtml(branded, knownIds) + '</section>'
   }).join('\n')

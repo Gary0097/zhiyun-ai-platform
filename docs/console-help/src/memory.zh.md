@@ -1,6 +1,6 @@
 # 长期记忆
 
-QwenPaw 的长期记忆由工作区的文件系统和 [ReMe](https://github.com/agentscope-ai/ReMe) 个人知识库共同组成。其中，`MEMORY.md` 可由用户和 Agent 共同维护并按需读取；ReMe 则在后台把值得保留的对话和当前已接入的资料整理成结构化的 Markdown 记忆，逐步沉淀为个人知识库，并在需要时找回与当前问题有关的部分。
+智造云 AIOS 的长期记忆由工作区的文件系统和 [ReMe](https://github.com/agentscope-ai/ReMe) 个人知识库共同组成。其中，`MEMORY.md` 可由用户和 Agent 共同维护并按需读取；ReMe 则在后台把值得保留的对话和当前已接入的资料整理成结构化的 Markdown 记忆，逐步沉淀为个人知识库，并在需要时找回与当前问题有关的部分。
 
 简单来说，它像一位不会忘记研究过程、又能随时翻出证据的研究助理，主要做六件事：
 
@@ -12,18 +12,18 @@ QwenPaw 的长期记忆由工作区的文件系统和 [ReMe](https://github.com/
 6. **展开**：先返回最相关的片段，证据不足时再沿文件和链接继续阅读。
 
 <p align="center">
-  <img src="https://img.alicdn.com/imgextra/i3/O1CN01mG5Uot1GQdX33v4h4_!!6000000000617-55-tps-1200-640.svg" alt="QwenPaw 长期记忆从记录、整理到找回的完整循环" />
+  <img src="https://img.alicdn.com/imgextra/i3/O1CN01mG5Uot1GQdX33v4h4_!!6000000000617-55-tps-1200-640.svg" alt="智造云 AIOS 长期记忆从记录、整理到找回的完整循环" />
 </p>
 
 ## 先理解它怎样工作
 
 假设你是一名金融分析师，正在持续研究新能源汽车产业链。几周内，你可能先后讨论过宁德时代的产品结构、动力电池价格、碳酸锂供需，以及“锂价下跌究竟利好电池厂还是会带来库存减值”这样的判断。
 
-这些信息如果只留在聊天记录里，很快就会被新的行情和新闻淹没。QwenPaw 的长期记忆会保留当时的研究现场，把反复验证的结论沉淀为个人知识库，并在下一次写报告时找回相关证据。
+这些信息如果只留在聊天记录里，很快就会被新的行情和新闻淹没。智造云 AIOS 的长期记忆会保留当时的研究现场，把反复验证的结论沉淀为个人知识库，并在下一次写报告时找回相关证据。
 
 ### 1. 记忆首先是你拥有的文件
 
-QwenPaw 和 ReMe 遵循 **Memory as File, File as Memory**。记忆不是藏在不可见的数据库中，而是保存在 Agent workspace 里的普通文件：
+智造云 AIOS 和 ReMe 遵循 **Memory as File, File as Memory**。记忆不是藏在不可见的数据库中，而是保存在 Agent workspace 里的普通文件：
 
 ```text
 workspace/
@@ -44,7 +44,7 @@ workspace/
 
 | 对象或机制                           | 定位与维护方式                                                                                              | 读取或检索方式                                                          |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `MEMORY.md`                          | QwenPaw 管理的核心长期记忆；用户和主会话中的 Agent 都可以自由读取、编辑和更新                               | 通过文件工具按需读取；不属于 ReMe 的 `memory_search` 索引               |
+| `MEMORY.md`                          | 智造云 AIOS 管理的核心长期记忆；用户和主会话中的 Agent 都可以自由读取、编辑和更新                               | 通过文件工具按需读取；不属于 ReMe 的 `memory_search` 索引               |
 | `memory/YYYY-MM-DD.md`               | 当天所有记忆笔记的索引页；ReMe 自动维护 `<!-- notes:auto -->` 区块，用户和主 Agent 可在自动区块之外补充内容 | 属于个人知识库，可被 `memory_search` 找到；也可直接读取并沿索引继续展开 |
 | `memory/YYYY-MM-DD/{name}.md`        | Auto-Memory 为一个 session 创建或更新的一条记忆笔记；`name` 是模型生成的稳定主题或事件名                    | 属于个人知识库；主 Agent 通常不需要主动管理                             |
 | `digest/` 中的所有 `.md`             | ReMe 管理的长期个人知识库；分为 `personal`、`procedure` 和 `wiki` 三类，并用 Wikilink 相互连接              | 属于 `memory_search` 的检索范围，可沿图谱继续展开                       |
@@ -161,7 +161,7 @@ Inbox 只用于查看运行结果；真正可编辑、可复用的记忆仍然�
 
 分析师的知识不只来自对话，还来自论文、新闻和数据源。Auto Resource 是这条外部资料管线的总称，目前仍处于 Beta，正在持续扩展。
 
-当前内置能力是 **Daily Paper**：启用后，QwenPaw 会从 Hugging Face Papers 的周榜和月榜中筛选与你关注主题相关的热门论文，保存原始 PDF，并生成三篇精读和一份每日简报。例如把主题设置为 `battery, lithium, energy storage`，就可以持续补充电池材料、寿命预测和储能技术相关研究。
+当前内置能力是 **Daily Paper**：启用后，智造云 AIOS 会从 Hugging Face Papers 的周榜和月榜中筛选与你关注主题相关的热门论文，保存原始 PDF，并生成三篇精读和一份每日简报。例如把主题设置为 `battery, lithium, energy storage`，就可以持续补充电池材料、寿命预测和储能技术相关研究。
 
 - PDF 写入 `resource/papers/`；
 - 精读和简报写入 `memory/YYYY-MM-DD/`；
@@ -223,7 +223,7 @@ Auto-Link 是 Auto-Dream 构建文档图谱的关键。它不是等整理结束�
   <img src="https://img.alicdn.com/imgextra/i1/O1CN01ddkg0rN9DXK49o5c_!!6000000001181-0-tps-2048-796.jpg" alt="Auto-Dream 完成后推送到 Inbox 的任务摘要" />
 </p>
 
-Auto-Dream 还会生成 `interests.yaml`。它与 QwenPaw 当前的 `/proactive` mode 是独立能力；当前 `/proactive` 不读取该文件。
+Auto-Dream 还会生成 `interests.yaml`。它与 智造云 AIOS 当前的 `/proactive` mode 是独立能力；当前 `/proactive` 不读取该文件。
 
 ### 5. Memory Search 在需要时找回正确的记忆
 
@@ -276,7 +276,7 @@ BM25 擅长“宁德时代”“CATL”“碳酸锂”这类明确名称；向�
 7. 你可以随时检查和修正 Markdown，修改后的内容继续参与后续协作。
 
 <p align="center">
-  <img src="https://img.alicdn.com/imgextra/i2/O1CN019aX2sCLIZvB6wGdo_!!6000000005818-0-tps-3418-1594.jpg" alt="QwenPaw 长期记忆控制台总览" />
+  <img src="https://img.alicdn.com/imgextra/i2/O1CN019aX2sCLIZvB6wGdo_!!6000000005818-0-tps-3418-1594.jpg" alt="智造云 AIOS 长期记忆控制台总览" />
 </p>
 
 ### 6. 实验效果：历史变长后还能找回来吗？
@@ -295,7 +295,7 @@ BM25 擅长“宁德时代”“CATL”“碳酸锂”这类明确名称；向�
 
 ## 参数配置
 
-默认的 `remelight` backend 在 QwenPaw 进程内运行，并复用当前 Agent 的模型完成记忆抽取和整理。你可以在控制台配置，也可以编辑 `agent.json` 中的 `running.reme_light_memory_config`。
+默认的 `remelight` backend 在 智造云 AIOS 进程内运行，并复用当前 Agent 的模型完成记忆抽取和整理。你可以在控制台配置，也可以编辑 `agent.json` 中的 `running.reme_light_memory_config`。
 
 ### 常用配置
 
@@ -381,11 +381,11 @@ POST /api/agents/{agentId}/memory/reindex
 
 ## 其他 Memory Backend
 
-QwenPaw 的记忆系统采用可插拔的 Backend 架构。除了默认的 ReMeLight（本地文件存储）外，还支持通过 `memory_manager_backend` 切换到其他后端。
+智造云 AIOS 的记忆系统采用可插拔的 Backend 架构。除了默认的 ReMeLight（本地文件存储）外，还支持通过 `memory_manager_backend` 切换到其他后端。
 
 ### ADBPG（AnalyticDB for PostgreSQL）
 
-基于云端向量数据库的长期记忆后端，适合需要跨设备共享、大规模语义检索的场景。QwenPaw 通过 ADBPG 记忆服务的 REST API 接入，无需安装额外数据库驱动。
+基于云端向量数据库的长期记忆后端，适合需要跨设备共享、大规模语义检索的场景。智造云 AIOS 通过 ADBPG 记忆服务的 REST API 接入，无需安装额外数据库驱动。
 
 **核心特点：**
 
@@ -400,12 +400,12 @@ QwenPaw 的记忆系统采用可插拔的 Backend 架构。除了默认的 ReMeL
 
 ![adbpg-backend](https://img.alicdn.com/imgextra/i3/O1CN01bH1Rj41wwQs3v04U6_!!6000000006372-2-tps-2954-1484.png)
 
-> ⚠️ 切换后端不支持热更新，保存后需要重启 QwenPaw 才能生效（页面也会以黄色横幅提醒）。
+> ⚠️ 切换后端不支持热更新，保存后需要重启 智造云 AIOS 才能生效（页面也会以黄色横幅提醒）。
 
 > 迁移提示：ADBPG SQL 直连模式已移除。旧配置中的 `api_mode: "sql"`、
 > `host`、`port`、`user`、`password`、`dbname`、LLM 和 Embedding 相关字段
 > 会被忽略；请改为配置 `rest_base_url` 和 `rest_api_key`，保存后重启
-> QwenPaw。
+> 智造云 AIOS。
 
 | 配置项                      | 说明                                                                    | 默认值                                |
 | --------------------------- | ----------------------------------------------------------------------- | ------------------------------------- |

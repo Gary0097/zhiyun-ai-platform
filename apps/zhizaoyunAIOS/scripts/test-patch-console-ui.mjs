@@ -209,7 +209,12 @@ try {
   ok(!quickstartSec.includes('pip install') && quickstartSec.includes('bash setup-ai-os.sh'), '发行版快速开始不再引导裸 pip 安装，包含 Linux 脚本')
   ok(docs.includes('安装包没有预设账号密码'), '发行版说明首次注册而不是默认账号')
   const docSection = id => docs.split('id="doc-' + id + '"')[1].split('</section>')[0]
-  ok(docSection('models').includes('上游技术参考：') && docSection('models').includes('QwenPaw 团队专门训练'), '模型参考保留上游成果署名')
+  ok(docSection('models').includes('使用说明：') && docSection('models').includes('QwenPaw 团队专门训练'), '模型参考保留上游成果署名')
+  ok(docSection('console').includes('start-ai-os.cmd') && docSection('console').includes('bash start-ai-os.sh') && !docSection('console').includes('qwenpaw app'), '控制台以双平台发行版入口启动')
+  ok(!docSection('channels').includes('qwenpaw app') && !docSection('channels').includes('qwenpaw init') && !docSection('channels').includes('pip install &quot;qwenpaw'), '频道指引不再另装和初始化上游运行环境')
+  ok(!docSection('console').includes('和 QwenPaw') && !docSection('channels').includes('启动 QwenPaw'), '普通操作文案使用发行版名称')
+  ok(docSection('models').includes('QwenPaw-Flash') && docSection('models').includes('QwenPaw Local'), '保留真实模型与提供商名称')
+  ok(quickstartSec.includes('点击启动后没有反应') && quickstartSec.includes('launcher-service.log'), '启动失败提供可执行排查步骤')
   ok(!/智造云\s*AIOS\s*(?:团队专门训练|官方还提供)/.test(docs), '不得把上游模型成果归为智造云')
   ok(docSection('hub').includes('start-hub.cmd') && docSection('hub').includes('不会自动共享给员工') && !docSection('hub').includes('pip install -U'), 'Hub 使用发行版入口且如实说明凭据供给边界')
   ok(docSection('creator').includes('不捆绑') && !docSection('creator').includes('3 分钟开始第一个项目'), '独立应用不作为内置交付能力')
