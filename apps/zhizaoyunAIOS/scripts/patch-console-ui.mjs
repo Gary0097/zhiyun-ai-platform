@@ -371,6 +371,9 @@ function collectBrandableFiles (root) {
     for (const entry of entries) {
       const full = join(dir, entry.name)
       if (entry.isDirectory()) { stack.push(full); continue }
+      // Generated documentation has its own attribution policy; console UI
+      // replacement must not relabel upstream authorship in reference chapters.
+      if (entry.name === 'aios-docs.html') continue
       if (entry.name.endsWith('.js') || entry.name.endsWith('.html')) files.push(full)
     }
   }
@@ -596,7 +599,7 @@ function applyBrandTheme (consoleDir) {
 
 // 生成内嵌的“文档资料”本地页面（替代上游外链 qwenpaw.agentscope.io）。
 // 内容源为仓库 docs/console-help/src/*.zh.md（自官方文档站抓取的中文 Markdown），
-// 构建时做：品牌替换（QwenPaw→智造云AIOS，保护标识符/仓库地址）、图片剔除、
+// 发行版章节原文呈现，技术参考保留上游署名与技术标识；构建时做图片剔除、
 // 外链文档地址改写为本页锚点，最终渲染为带侧边栏目录的单页离线文档。
 const DOCS_SRC = join(scriptsRoot, '..', '..', '..', 'docs', 'console-help', 'src')
 
@@ -606,12 +609,12 @@ const DOC_TITLES = {
   models: '模型', channels: '频道配置', skills: 'Skills', mcp: 'MCP 与内置工具',
   browser: '浏览器', acpServer: 'ACP 集成', memory: '长期记忆', embedding: '向量模型',
   memoryEvolvingAndProactive: '记忆进化与主动交互', computerUse: '电脑操作',
-  chrome: 'Chrome 浏览器扩展', creator: 'Creator', context: '上下文',
+  chrome: 'Chrome 浏览器扩展', creator: '独立应用与 Creator', context: '上下文',
   loopEngineering: '循环工程', commands: '魔法命令', cron: '定时任务', heartbeat: '心跳',
-  config: '配置与工作目录', security: '安全', backup: '备份与恢复', plugins: '插件系统',
+  config: '配置与工作目录', configReference: '上游配置项参考', security: '安全', backup: '备份与恢复', plugins: '插件系统',
   pluginsMigration: '插件迁移指南', hub: '部署与管理多租户', architecture: '架构设计',
   faq: '常见问题', apiTutorial: 'RESTful API 接口', community: '问题反馈与交流',
-  contributing: '开源与贡献', roadmap: '路线图', practiceAgentTeam: 'Agent Team 实践',
+  contributing: '技术来源与反馈', roadmap: '发布状态与后续工作', practiceAgentTeam: 'Agent Team 实践',
 }
 
 const DOC_GROUPS = [
@@ -620,9 +623,12 @@ const DOC_GROUPS = [
   ['快速上手', ['intro', 'quickstart', 'console', 'tui', 'cli']],
   ['智能体与能力', ['multiAgent', 'models', 'context', 'loopEngineering', 'commands', 'skills', 'mcp', 'browser', 'chrome', 'computerUse', 'memory', 'embedding', 'memoryEvolvingAndProactive']],
   ['自动化与集成', ['mailbox', 'channels', 'cron', 'heartbeat', 'acpServer', 'creator']],
-  ['部署与管理', ['config', 'security', 'backup', 'plugins', 'pluginsMigration', 'hub', 'architecture']],
+  ['部署与管理', ['config', 'configReference', 'security', 'backup', 'plugins', 'pluginsMigration', 'hub', 'architecture']],
   ['参考', ['apiTutorial', 'practiceAgentTeam', 'roadmap', 'community', 'contributing', 'faq']],
 ]
+
+const DISTRIBUTION_DOCS = new Set(['intro', 'quickstart', 'hub', 'config', 'creator', 'roadmap', 'contributing', 'community', 'faq'])
+const REFERENCE_NOTICE = '> 上游技术参考：本章保留 QwenPaw 的技术名称与成果归属，不代表智造云自研或已逐项验收。命令示例须使用本项目运行环境；上游默认 ~/.qwenpaw 不等于本发行版数据目录，请先阅读[配置与工作目录](./config)。安装、账号和团队部署以[快速开始](./quickstart)及[Hub 部署](./hub)为准。\n\n'
 
 function escapeHtml (text) {
   return text.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;').split('"').join('&quot;')
@@ -793,7 +799,7 @@ function writeLocalDocs (consoleDir) {
     // 行文中的上游桌面版名称隐藏为中性表述（.app / 安装路径等真路径不受影响）；
     // window.QwenPaw.* 等 API 标识符是代码，必须原样保留
     md = md.replace(/(?<!Local\\)QwenPaw Desktop(?!\.app)/g, '桌面应用版')
-    const branded = applyBrand(md)
+    const branded = DISTRIBUTION_DOCS.has(p.id) ? md : REFERENCE_NOTICE + md
     const anchorAlias = p.id === 'intro' ? '<i id="tutorial"></i>' : (p.id === 'faq' ? '<i id="faq"></i>' : '')
     return '<section id="' + slugAnchor(p.id) + '">' + anchorAlias + '<h2>' + escapeHtml(p.title) + '</h2>' + mdToHtml(branded, knownIds) + '</section>'
   }).join('\n')
@@ -855,18 +861,18 @@ toc,
 '</div>',
 '<section id="demo">',
 '<h2>视频教程 <span class="tag">待开发</span></h2>',
-'<div class="todo">🎬 视频教程正在制作中，敬请期待。<br>当前可先阅读左侧目录的文字版文档。</div>',
+'<div class="todo">本版本尚未提供视频教程，请使用左侧文字指引。</div>',
 '</section>',
 '<section id="changelog">',
 '<h2>更新日志</h2>',
 '<h3>智造云AIOS 2.2.0 更新公告</h3>',
 '<p><strong>智能体内核升级 2.1.0 → 2.2.0</strong>：升级至 2.2.0 运行时，包含上游稳定性修复与能力更新；旧运行环境首次启动时自动重建，Workspace 会话、知识与文件数据不受影响。</p>',
 '<ul>',
-'<li><strong>多用户模式（Hub）</strong>：新增局域网多用户形态，账号统一管理，模型 API Key 由管理员在凭据管理中集中录入并按账号注入，普通用户全程接触不到 Key。</li>',
-'<li><strong>登录体系</strong>：改用原生认证——首个在控制台注册的账号即管理员；单机与 Hub 双形态统一。</li>',
+'<li><strong>多用户模式（Hub）</strong>：提供独立账号和用户运行环境。原生凭据按个人租户保存；管理员集中供给模型仍待实现与验收。</li>',
+'<li><strong>登录体系</strong>：单机首次注册账号；Hub 首个账号为管理员。两套账号分别管理，没有预置账号密码。</li>',
 '<li><strong>应用体系解耦</strong>：业务应用不再捆绑发行，转为独立交付、按需安装；系统本体升级不再影响业务数据。</li>',
 '<li><strong>品牌与体验</strong>：智造云AIOS 全新品牌化界面（主题、Logo、登录页）、内嵌离线帮助中心、竖屏/窄屏适配。</li>',
-'<li><strong>部署改进</strong>：启动器自动校验/重建运行环境、局域网地址自动发现、离线安装包（U 盘分发、全程无网）。</li>',
+'<li><strong>部署改进</strong>：按版本锁管理运行环境。Windows 离线依赖不能用于 Linux；离线模型使用还需自行准备权重和依赖，候选包验收状态以发布记录为准。</li>',
 '</ul>',
 '</section>',
 sections,
@@ -897,13 +903,13 @@ sections,
   // 标题必须与 bundle 内的抓取正则严格一致：
   //   zh: /###\s*智造云AIOS如何更新/   en: /###\s*How to update 智造云AIOS/
   const faqZh = ['### 智造云AIOS如何更新', '',
-    '- 单机版（start-ai-os.cmd / start-ai-os.sh）：停止服务后重新运行启动器，启动器按版本锁自动升级运行环境，不影响 Workspace 数据。',
-    '- Hub 多用户版（start-hub.cmd / start-hub.sh）：由管理员重新运行启动器完成升级，账号与凭据数据保留。',
+    '- 先获取新发行版安装包或经审查的项目版本，备份数据并停止服务，再按该版本发布说明更新。',
+    '- 单纯重启旧启动器不会下载新发行版源码；启动脚本只按当前版本锁校验运行环境。',
     '- 控制台内无在线自更新；版本升级一律由管理员在服务器上执行。',
     '- 2.2.0 完整变更见 帮助中心 → 更新日志。'].join('\n')
   const faqEn = ['### How to update 智造云AIOS', '',
-    '- Single-user edition (start-ai-os.cmd / start-ai-os.sh): stop the service and re-run the launcher; the runtime upgrades automatically per the version lock without touching Workspace data.',
-    '- Hub multi-user edition (start-hub.cmd / start-hub.sh): the administrator upgrades by re-running the launcher; accounts and credentials are preserved.',
+    '- Obtain the new distribution package or reviewed project revision, back up data, stop the service, and follow its release instructions.',
+    '- Restarting an old launcher does not download a new distribution; scripts validate the runtime against the current version lock.',
     '- The console does not self-update online; upgrades are always applied on the server by the administrator.'].join('\n')
   writeIndependent(join(consoleDir, 'aios-docs-faq.zh.md'), faqZh + '\n')
   writeIndependent(join(consoleDir, 'aios-docs-faq.en.md'), faqEn + '\n')
@@ -990,6 +996,12 @@ if (!consoleDir) {
   process.exit(0)
 }
 
+// Refresh documentation without rebuilding console assets or restarting services.
+if (process.argv.includes('--docs-only') && !checkMode) {
+  writeLocalDocs(consoleDir)
+  process.exit(0)
+}
+
 const bundlePath = findMainBundle(consoleDir)
 const original = readFileSync(bundlePath, 'utf8')
 let content = original
@@ -1017,6 +1029,13 @@ for (const r of CHUNK_REPLACEMENTS) {
 const branded = applyBrand(content)
 
 if (checkMode) {
+  const docsFile = join(consoleDir, 'aios-docs.html')
+  const docs = existsSync(docsFile) ? readFileSync(docsFile, 'utf8') : ''
+  if (!docs.includes('上游技术参考：') || !docs.includes('安装包没有预设账号密码') ||
+      /智造云\s*AIOS\s*(?:团队专门训练|官方还提供)/.test(docs)) {
+    console.error('[patch-console-ui] 检查失败：帮助文档缺少发行版指引/上游归属，或仍含错误成果声明。')
+    process.exit(1)
+  }
   if (missing.filter(name => !REPLACEMENTS.find(r => r.name === name)?.optional).length) {
     const required = missing.filter(name => !REPLACEMENTS.find(r => r.name === name)?.optional)
     console.error('[patch-console-ui] 检查失败：console bundle 中未找到以下必需目标：' + required.join('、') + '。bundle 可能已随上游升级更新。')
