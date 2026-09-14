@@ -15,6 +15,8 @@ const scripts = join(embedded, 'scripts')
 const qwenpawLock = JSON.parse(readFileSync(join(embedded, 'qwenpaw.lock.json'), 'utf8'))
 assert.equal(qwenpawLock.version, '2.2.1')
 assert.equal(qwenpawLock.ref, 'v2.2.1')
+const installerManifest = readFileSync(join(root, 'scripts/exe-installer/installer.manifest'), 'utf8')
+assert.equal(installerManifest.match(/<assemblyIdentity\s+version="([^"]+)"/)?.[1], qwenpawLock.version + '.0', 'installer manifest must match runtime lock')
 assert.ok(!existsSync(join(embedded, 'pawapps.lock.json')), '2.2.1 极简形态不应存在 PawApp 锁')
 
 // 2) 跨平台入口完整性（单机 8088 + Hub 8000）

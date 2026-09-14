@@ -257,7 +257,7 @@ qwenpaw models set-llm          # 切换到其他 Ollama 模型
 - 通过 Ollama CLI 或 QwenPaw 添加/删除模型时，模型列表自动更新
 
 > **注意：** API Key 的有效性需要用户自行保证，QwenPaw 不会验证。
-> 详见 [配置 — 模型提供商](./config#模型提供商)。
+> 详见 [配置 — 模型提供商](./configReference#模型提供商)。
 
 ### qwenpaw env
 
@@ -277,7 +277,7 @@ qwenpaw env delete TAVILY_API_KEY
 ```
 
 > **注意：** QwenPaw 只负责存储和加载，值的有效性需要用户自行保证。
-> 详见 [配置 — 环境变量](./config#环境变量)。
+> 详见 [配置 — 环境变量](./configReference#环境变量)。
 
 ---
 

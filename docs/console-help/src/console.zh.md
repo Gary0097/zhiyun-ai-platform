@@ -1,7 +1,10 @@
 # 控制台
 
-**控制台** 是 智造云 AIOS 内置的 Web 管理界面。使用桌面快捷方式或安装目录的 `start-ai-os.cmd` 启动（Linux 使用 `bash start-ai-os.sh`）后，在浏览器中打开
-`http://127.0.0.1:8088/` 即可进入。
+**控制台** 是智造云 AIOS 的 Web 管理界面。请按部署方式进入：
+
+- **单机**：使用桌面快捷方式或安装目录的 `start-ai-os.cmd`（Linux：`bash start-ai-os.sh`），访问 `http://127.0.0.1:8088/`。
+- **团队 Hub**：管理员使用 `start-hub.cmd`（Linux：`bash start-hub.sh`），员工访问管理员提供的 `http://服务器地址:8000/` 并登录自己的 Hub 账号。部署与账号边界见 [Hub 部署](./hub)。
+
 
 **在控制台中你可以：**
 
@@ -412,7 +415,7 @@ Console 页面左上角的 **当前智能体** 用于切换当前操作对象；
 
 > **注意：** 环境变量值的有效性需要用户自行保证，智造云 AIOS 只负责存储和加载。
 >
-> 更多说明见 [配置 — 环境变量](./config#环境变量)。
+> 更多说明见 [配置 — 环境变量](./configReference#环境变量)。
 
 ---
 
@@ -459,7 +462,7 @@ Console 页面左上角的 **当前智能体** 用于切换当前操作对象；
 
 在聊天中直接问 智造云 AIOS「最近用了多少 token？」或「帮我看看 token 消耗」，Agent 会调用 `get_token_usage` 工具并返回统计结果。
 
-> 数据存储在 `~/.qwenpaw/token_usage.json`，可通过 `QWENPAW_TOKEN_USAGE_FILE` 环境变量自定义文件名。详见 [配置 — 环境变量](./config#环境变量)。
+> 数据存储在 `~/.qwenpaw/token_usage.json`，可通过 `QWENPAW_TOKEN_USAGE_FILE` 环境变量自定义文件名。详见 [配置 — 环境变量](./configReference#环境变量)。
 
 ---
 
