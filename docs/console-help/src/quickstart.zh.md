@@ -1,249 +1,58 @@
 # 快速开始
 
-本节介绍多种方式安装或开始使用 QwenPaw：
+使用智造云AIOS 启动器或本项目脚本安装，运行时按版本锁管理。不要在系统 Python 中执行未锁版本的 pip 安装来替代发行版安装。
 
-| 安装方式                      | 适用场景                 | 优势                                   | 前置要求         |
-| ----------------------------- | ------------------------ | -------------------------------------- | ---------------- |
-| **智造云AIOS 启动器（推荐）** | 大多数用户               | 零配置，自动管理运行环境，按版本锁升级 | 无               |
-| **pip 安装**                  | 熟悉 Python 的开发者     | 灵活控制环境，便于开发调试             | Python 3.11~3.13 |
-| **Docker**                    | 容器化部署或生产环境     | 环境隔离，易于迁移                     | Docker           |
+| 方式 | 入口 | 前置条件 |
+| --- | --- | --- |
+| Windows 图形安装包 | setup.exe，完成后使用桌面快捷方式 | 对应版本的验收合格安装包 |
+| Windows 源码联网安装 | install-oneclick.cmd | Node.js 20+、网络 |
+| Linux 联网安装 | setup-ai-os.sh、start-ai-os.sh | Node.js 20+、curl、网络 |
+| 团队 Hub | start-hub.cmd 或 start-hub.sh | 见 Hub 部署 |
 
-> 📖 阅读前请先了解 [项目介绍](./intro)，完成安装与启动后可查看 [控制台](./console)。
+## Windows
 
-> 💡 **安装并启动后的关键步骤**：
->
-> 1. 在浏览器访问 [控制台](./console)（`http://127.0.0.1:8088/`）
-> 2. **配置模型**（必需）：设置 → 模型 → 配置 API Key 或下载本地模型
-> 3. 开始对话测试
-> 4. （可选）配置频道以在钉钉、飞书、QQ 等 app 里对话，详见 [频道配置](./channels)
-
----
-
-## 方式一：pip 安装
-
-如果你更习惯自行管理 Python 环境（需 Python >= 3.11, < 3.14）：
-
-```bash
-pip install qwenpaw
-```
-
-可选：先创建并激活虚拟环境再安装（`python -m venv .venv`，Linux/macOS 下
-`source .venv/bin/activate`，Windows 下 `.venv\Scripts\Activate.ps1`）。安装后会提供 `qwenpaw` 命令。
-
-然后按下方 [步骤二：初始化](#步骤二初始化) 和 [步骤三：启动服务](#步骤三启动服务) 操作。
-
-### 步骤二：初始化
-
-在工作目录（默认 `~/.qwenpaw`）下生成 `config.json` 与 `HEARTBEAT.md`。两种方式：
-
-- **快速用默认配置**（不交互，适合先跑起来再改配置）：
-  ```bash
-  qwenpaw init --defaults
-  ```
-- **交互式初始化**（按提示填写心跳间隔、投递目标、活跃时段，并可顺带配置频道与 Skills）：
-  ```bash
-  qwenpaw init
-  ```
-  详见 [CLI - 快速上手](./cli#快速上手)。
-
-若已有配置想覆盖，可使用 `qwenpaw init --force`（会提示确认）。
-初始化后若尚未启用频道，接入钉钉、飞书、QQ 等需在 [频道配置](./channels) 中按文档填写。
-
-### 步骤三：启动服务
-
-```bash
-qwenpaw app
-```
-
-服务默认监听 `127.0.0.1:8088`。若已配置频道，QwenPaw 会在对应 app 内回复；若尚未配置，也可先完成本节再前往频道配置。
-
----
-
-## 方式二：智造云AIOS 启动器（推荐）
-
-获取智造云 AIOS 安装包后运行启动器，首次启动自动完成运行环境安装（按版本锁管理，无需手动配置 Python）。
-
-### 步骤一：获取安装包
-
-- **在线获取**：从发布渠道获取产品仓库或安装包；
-- **离线环境**：使用离线安装包（U 盘分发，全程无需联网）。
-
-### 步骤二：启动
-
-**Windows：**
+运行安装向导，完成后使用“智造云 AI-OS”快捷方式，或在安装目录运行：
 
 ```cmd
-install-oneclick.cmd   :: 一键安装并启动
-start-ai-os.cmd        :: 单机版启动（控制台 http://127.0.0.1:8088）
-start-hub.cmd          :: 多用户模式（局域网共用，端口 8000）
+start-ai-os.cmd
 ```
 
-**macOS / Linux：**
+源码联网安装使用：
+
+```cmd
+install-oneclick.cmd
+```
+
+后台加载可能需要数分钟。托盘显示运行状态；失败时查看安装目录 launcher-service.log，不要连续启动多个实例。
+
+## Linux
+
+在完整项目目录执行：
 
 ```bash
-./start-ai-os.sh
+node --version
+bash setup-ai-os.sh
+bash start-ai-os.sh
 ```
 
-### 步骤三：注册账号
+Node.js 需要 20 或以上。脚本管理项目 Python 环境，无需修改系统 Python。Windows 离线包中的 Node、Python 和缓存不能作为 Linux 离线环境使用。
 
-首次启动后在浏览器打开 **http://127.0.0.1:8088/**（单机版）或 **http://<服务器IP>:8000/**（多用户版），点击「创建账号」注册——**首个注册的账号即管理员**。
+## 登录和模型
 
-> 启动器依赖 Node.js（国内可从 npmmirror 镜像下载）；首次启动联网安装依赖时建议配置 PyPI 国内镜像变量（详见《国内拉取与测试指引》）。
+打开 http://127.0.0.1:8088/，首次自行注册账号，没有预置 admin 密码。升级保留已有账号，不会重新生成默认密码。
 
----
+登录后配置模型供应商或本地模型，完成真实对话后再配置频道和技能。未配置模型时不能把空白或错误结果当成接入成功。
 
-## 方式三：Docker
+## 数据与升级
 
-镜像在 **Docker Hub**（`agentscope/qwenpaw`）。镜像 tag：`latest`（稳定版）；`pre`（PyPI 预发布版）。国内用户也可选用阿里云 ACR：`agentscope-registry.ap-southeast-1.cr.aliyuncs.com/agentscope/qwenpaw`（tag 相同）。
+默认工作区在安装目录 apps/zhizaoyunAIOS/workspace，凭据在其 secret 目录。升级前备份整个工作区，详见[配置与工作目录](./config)。Hub 使用独立账号体系，详见[Hub 部署](./hub)。候选版的验证范围以对应发布说明为准。
 
-拉取并运行：
+## 点击启动后没有反应
 
-```bash
-docker pull agentscope/qwenpaw:latest
-docker run -p 127.0.0.1:8088:8088 \
-  -v qwenpaw-data:/app/working \
-  -v qwenpaw-secrets:/app/working.secret \
-  -v qwenpaw-backups:/app/working.backups \
-  agentscope/qwenpaw:latest
-```
+1. 等待后台加载完成，查看托盘中的启动状态，不要重复点击。
+2. 手动打开 http://127.0.0.1:8088/。如果能打开，服务已经启动，只是浏览器没有自动弹出。
+3. 如果无法打开，在 Windows 安装目录运行 `start-ai-os.cmd`；Linux 在项目目录运行 `bash start-ai-os.sh`，记录终端报错。Windows 同时查看安装目录的 `launcher-service.log`。
+4. 快捷方式失效时，检查其目标是否仍指向当前安装目录；不要用其他目录里的旧启动器。
+5. 若提示端口被占用，先确认占用程序是否为已启动的本系统；不要直接结束不明进程。将报错和日志交给维护人员。
 
-然后在浏览器打开 **http://127.0.0.1:8088/** 进入控制台。配置、记忆与 Skills 保存在 `qwenpaw-data` 卷中；模型配置与 API Key 保存在 `qwenpaw-secrets` 卷中；备份归档保存在 `qwenpaw-backups` 卷中。传入 API Key 可在 `docker run` 时加 `-e DASHSCOPE_API_KEY=xxx` 或 `--env-file .env`。
-
----
-
-## 验证安装（可选）
-
-服务启动后,可通过 HTTP 调用 Agent 接口以确认环境正常。接口为 **POST** `/api/console/chat`,请求体为 JSON,支持 SSE 流式响应。单轮请求示例:
-
-```bash
-curl -N -X POST "http://localhost:8088/api/console/chat" \
-  -H "Content-Type: application/json" \
-  -d '{"input":[{"role":"user","content":[{"type":"text","text":"你好"}]}],"session_id":"session123"}'
-```
-
-同一 `session_id` 可进行多轮对话。
-
----
-
-## 接下来做什么？
-
-### 必要步骤
-
-#### ✅ 1. 配置模型（必需）
-
-QwenPaw 需要大语言模型才能工作。你可以选择以下任一方式：
-
-**选项 A：使用云端模型（需要 API Key）**
-
-1. 在控制台进入 **设置 → 模型**
-2. 选择一个提供商（如 DashScope、ModelScope 等）
-3. 点击 **设置** 按钮，输入你的 **API Key**
-4. 点击 **保存**
-5. 在顶部 **默认 LLM** 中选择该提供商和具体模型
-6. 点击 **保存**
-
-详见 [模型 - 配置云提供商](./models)。
-
-**选项 B：使用本地模型（无需 API Key，完全离线）**
-
-1. 安装本地模型后端：
-
-- QwenPaw Local（llama.cpp）：在 QwenPaw Local 提供商设置中下载 `llama.cpp`，详见 [模型 - 配置本地提供商](./models)。
-- Ollama：从 [Ollama 官网](https://ollama.com/download) 安装 Ollama，并启动 Ollama 服务。
-- LM Studio：从 [LM Studio 官网](https://lmstudio.ai/download) 安装 LM Studio，并启动 LM Studio 服务。
-
-2. 下载模型：
-
-- 对于 QwenPaw Local（llama.cpp），你可以直接在控制台的提供商设置中下载模型，或者手动将 GGUF 模型文件放到本地模型目录中（默认 `~/.qwenpaw/local_models/models/<org>/<model>`，例如 `~/.qwenpaw/local_models/models/Qwen/Qwen3-0.6B-GGUF`）。
-- 对于 Ollama 和 LM Studio，需要先在各自服务中添加模型，之后 QwenPaw 才能自动获取模型列表并连接。
-
-3. 在控制台选择本地提供商和模型
-
-配置好本地模型后，你可以在控制台的 **默认 LLM** 设置中选择它，也可以直接在 **聊天** 页面中切换使用。
-
-#### 🎯 2. 在控制台测试对话
-
-模型配置完成后，在控制台的 **聊天** 页面发送消息测试功能，确认 QwenPaw 可以正常回复。
-
----
-
-### 可选扩展
-
-配置模型并测试成功后，可以根据需要进行以下扩展：
-
-#### 📱 接入消息频道
-
-在钉钉、飞书、QQ、Discord、iMessage 等 app 里与 QwenPaw 对话：
-
-1. 在控制台进入 **控制 → 频道**
-2. 选择要接入的频道
-3. 按照 [频道配置](./channels) 文档获取凭据并填写
-4. 保存后即可在对应 app 中发消息给 QwenPaw
-
-#### 📊 启用 Langfuse tracing
-
-Langfuse tracing 是可选功能。如果不使用 Langfuse，不需要安装额外依赖或配置。
-如需启用，请先安装 Langfuse SDK，并传入 Langfuse 凭据。`LANGFUSE_BASE_URL`
-可以指向 Langfuse Cloud，也可以指向自托管的 Langfuse 实例。
-
-源码或本地部署：
-
-```bash
-pip install "langfuse>=4,<5"
-```
-
-Docker 部署可基于官方镜像构建一个小的自定义镜像：
-
-```dockerfile
-FROM agentscope/qwenpaw:latest
-RUN pip install --no-cache-dir "langfuse>=4,<5"
-```
-
-然后通过环境变量运行 QwenPaw：
-
-```bash
-docker run -p 127.0.0.1:8088:8088 \
-  -e LANGFUSE_SECRET_KEY=sk-lf-... \
-  -e LANGFUSE_PUBLIC_KEY=pk-lf-... \
-  -e LANGFUSE_BASE_URL=https://your-langfuse.example.com \
-  -v qwenpaw-data:/app/working \
-  -v qwenpaw-secrets:/app/working.secret \
-  -v qwenpaw-backups:/app/working.backups \
-  qwenpaw-langfuse:latest
-```
-
-#### 🔧 启用和扩展技能
-
-赋予 QwenPaw 更多能力（PDF 处理、Office 文档、新闻摘要等）：
-
-- 在控制台进入 **智能体 → 技能池** 或 **智能体 → 技能**
-- 导入内置技能、从 Skill Hub 导入、或创建自定义技能
-- 详见 [Skills](./skills)
-
-#### 🔌 接入 MCP 工具
-
-通过 MCP（Model Context Protocol）扩展外部工具能力：
-
-- 在控制台进入 **智能体 → MCP**
-- 创建 MCP 客户端，连接外部工具服务器
-- 详见 [MCP](./mcp)
-
-#### ⏰ 设置定时任务与心跳
-
-让 QwenPaw 自动执行任务：
-
-- **定时任务**：在控制台 **控制 → 定时任务** 中创建，或使用 [CLI](./cli) 的 `qwenpaw cron` 命令
-- **心跳**：配置定时自检或摘要，详见 [心跳](./heartbeat)
-
-#### 👥 创建多智能体
-
-创建多个专用助手，各司其职或互相协作：
-
-- 在控制台 **设置 → 智能体管理** 中创建新智能体
-- 每个智能体拥有独立的配置、记忆、技能和对话历史
-- 启用协作技能让智能体间可以互相通信
-- 详见 [多智能体](./multi-agent)
-
-#### 📂 调整工作目录
-
-如需更改配置文件或工作目录的位置，详见 [配置与工作目录](./config)。
+需要重启时，先通过当前启动器或运行服务的终端正常停止原实例，再使用同一安装目录的入口启动。重启不会下载或升级发行版。

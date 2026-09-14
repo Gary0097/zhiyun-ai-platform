@@ -199,15 +199,30 @@ try {
   ok(!/<a href="[^"]*agentscope/i.test(docs), '内嵌文档无 agentscope 外链锚点')
   ok(!docs.includes('id="doc-desktop"'), '内嵌文档不含上游 desktop 章节')
   ok(!/QwenPaw Desktop(?!\.app)/.test(docs), '行文中的上游桌面版名称已隐藏为中性表述（.app 真实路径按技术标识保留）')
-  ok(docs.includes('智造云AIOS 2.2.0 更新公告') && docs.includes('智能体内核升级 2.1.0 → 2.2.0'), '更新日志为结合内核升级的 2.2.0 完整更新公告')
+  ok(docs.includes('智造云AIOS 2.2.1 更新公告') && docs.includes('智能体内核升级 2.2.0 → 2.2.1'), '更新日志为结合内核升级的 2.2.1 完整更新公告')
   ok(docs.includes('企业内支持'), '问题反馈章节已品牌化改写')
   ok(!/qwenpaw\.agentscope\.io/.test(docs) && !docs.includes('AgentScope Platform') && !docs.includes('魔搭创空间'), '上游官网/云平台/魔搭引用清零（含安装脚本）')
   ok(docs.includes('install-oneclick.cmd') && docs.includes('start-ai-os.cmd'), '安装指引为智造云AIOS 启动器方式')
   const quickstartSec = docs.split('id="doc-quickstart"')[1].split('id="doc-')[0]
   ok(!quickstartSec.includes('阿里云 ECS') && !quickstartSec.includes('>桌面应用<') && !quickstartSec.includes('>脚本安装<'), 'quickstart 一览表与正文章节一致')
   ok(quickstartSec.includes('智造云AIOS 启动器'), 'quickstart 一览表包含启动器方式')
+  ok(!quickstartSec.includes('pip install') && quickstartSec.includes('bash setup-ai-os.sh'), '发行版快速开始不再引导裸 pip 安装，包含 Linux 脚本')
+  ok(docs.includes('安装包没有预设账号密码'), '发行版说明首次注册而不是默认账号')
+  const docSection = id => docs.split('id="doc-' + id + '"')[1].split('</section>')[0]
+  ok(docSection('models').includes('使用说明：') && docSection('models').includes('QwenPaw 团队专门训练'), '模型参考保留上游成果署名')
+  ok(docSection('console').includes('start-ai-os.cmd') && docSection('console').includes('bash start-ai-os.sh') && !docSection('console').includes('qwenpaw app'), '控制台以双平台发行版入口启动')
+  ok(!docSection('channels').includes('qwenpaw app') && !docSection('channels').includes('qwenpaw init') && !docSection('channels').includes('pip install &quot;qwenpaw'), '频道指引不再另装和初始化上游运行环境')
+  ok(!docSection('console').includes('和 QwenPaw') && !docSection('channels').includes('启动 QwenPaw'), '普通操作文案使用发行版名称')
+  ok(docSection('models').includes('QwenPaw-Flash') && docSection('models').includes('QwenPaw Local'), '保留真实模型与提供商名称')
+  ok(quickstartSec.includes('点击启动后没有反应') && quickstartSec.includes('launcher-service.log'), '启动失败提供可执行排查步骤')
+  ok(!/智造云\s*AIOS\s*(?:团队专门训练|官方还提供)/.test(docs), '不得把上游模型成果归为智造云')
+  ok(docSection('hub').includes('start-hub.cmd') && docSection('hub').includes('不会自动共享给员工') && !docSection('hub').includes('pip install -U'), 'Hub 使用发行版入口且如实说明凭据供给边界')
+  ok(docSection('creator').includes('不捆绑') && !docSection('creator').includes('3 分钟开始第一个项目'), '独立应用不作为内置交付能力')
+  ok(!docSection('roadmap').includes('<table>') && docSection('roadmap').includes('不构成智造云的交付承诺'), '上游路线图不冒充发行版承诺')
+  ok(docSection('config').includes('workspace/secret/auth.json') && docSection('config').includes('QWENPAW_SECRET_DIR'), '真实安装数据路径与环境变量保留')
   const faqSec = docs.split('id="doc-faq"')[1].split('id="doc-')[0]
   ok(!faqSec.includes('脚本安装') && !faqSec.includes('Windows 桌面应用'), 'FAQ 排查不再引用已移除的安装方式')
+  ok(!faqSec.includes('pip install') && !faqSec.includes('qwenpaw update') && faqSec.includes('不会下载新的发行版源码'), 'FAQ 不再用上游更新命令代替发行版升级')
   // 表格渲染回归：分隔行字符类 bug 曾使 1546 行表格数据只渲染出 2 张表
   const tableCount = occurrences(docs, '<table>')
   ok(tableCount > 100, 'Markdown 表格正常渲染（' + tableCount + ' 张 ≥100；曾因分隔行正则一字之差全部退化为文本段）')
@@ -249,6 +264,12 @@ try {
   section('门禁（--check）')
   const checkPass = runPatch(['--check'])
   ok(checkPass.status === 0, '--check 对已补丁目录通过（退出码 0）')
+
+  const docsPath = join(consoleDir, 'aios-docs.html')
+  writeFileSync(docsPath, '<html>智造云AIOS 团队专门训练模型</html>')
+  ok(runPatch(['--check']).status !== 0, '错误归属的旧帮助文档必须被门禁拒绝')
+  ok(runPatch(['--docs-only']).status === 0 && readFileSync(docsPath, 'utf8') === docs, '仅文档刷新恢复完整内容与上游归属')
+  ok(readFileSync(join(assetsDir, entryZybName), 'utf8') === run1EntryContent, '相同内容的文档刷新不改变控制台入口')
 
   writeFileSync(pyFile, staticFilesFixture) // 注入：缓存策略回退为一年 immutable
   const checkFail = runPatch(['--check'])
