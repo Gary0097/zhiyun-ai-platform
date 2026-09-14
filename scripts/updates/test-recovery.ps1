@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path $PSHOME 'Modules/Microsoft.PowerShell.Security/Microsoft.PowerShell.Security.psd1') -ErrorAction Stop
 . (Join-Path $PSScriptRoot 'recovery.ps1')
 function Check($Value, $Message) { if (-not $Value) { throw $Message } }
 function Reject([scriptblock]$Action) { $failed = $false; try { & $Action } catch { $failed = $true }; Check $failed 'Expected rejection' }

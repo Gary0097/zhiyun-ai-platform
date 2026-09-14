@@ -1,6 +1,9 @@
 ﻿[CmdletBinding()]
 param([switch]$CheckOnly, [string]$Recover = '')
 $ErrorActionPreference = 'Stop'
+# A launcher inherited from PowerShell 7 can carry its module search path.
+# Load the Windows PowerShell security module explicitly for Set-Acl/Get-FileHash.
+Import-Module (Join-Path $PSHOME 'Modules/Microsoft.PowerShell.Security/Microsoft.PowerShell.Security.psd1') -ErrorAction Stop
 $Root = [IO.Path]::GetFullPath($PSScriptRoot)
 . (Join-Path $Root 'scripts/updates/recovery.ps1')
 Add-Type -AssemblyName System.Windows.Forms
