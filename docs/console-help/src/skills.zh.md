@@ -18,7 +18,7 @@
 
 ## 技能结构
 
-QwenPaw 的 skills 分为两层：
+智造云 AIOS 的 skills 分为两层：
 
 - **技能池：** 共享本地仓库，路径是 `$QWENPAW_WORKING_DIR/skill_pool/`
   （默认 `~/.qwenpaw/skill_pool/`）。
@@ -62,7 +62,7 @@ $QWENPAW_WORKING_DIR/                      # 默认 ~/.qwenpaw
   能。改成新名字保存时，会生成一个改名后的条目。修改内置技能的 `SKILL.md`
   后，该条目会转成自定义技能，之后不会被内置包自动覆盖。
 - **冲突：** 如果保存、导入、上传或广播后会落到一个已经存在的名字上，
-  QwenPaw 不会静默覆盖，而是直接返回冲突。界面 / API 会同时给出一个建议的新名
+  智造云 AIOS 不会静默覆盖，而是直接返回冲突。界面 / API 会同时给出一个建议的新名
   字，便于你按这个名字重试。
 - **自动同步：** 为技能开启后，技能池中的 `SKILL.md` 变化会触发完整技能目录
   同步到相关工作区（详见下文「技能自动化」）。
@@ -78,12 +78,12 @@ $QWENPAW_WORKING_DIR/                      # 默认 ~/.qwenpaw
    | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
    | **browser**                   | 通过 Unified Browser SDK 执行异步 Python，并遵循“感知 → 操作 → 验证”工作流。详见 [浏览器](./browser)。                        | 内置                                                       |
    | **channel_message**           | 在先定位目标 session / channel 后，主动向会话或频道发送单向消息。                                                             | 自建                                                       |
-   | **QA_source_index**           | QwenPaw 自身源码与文档的快速索引技能，用于把关键词映射到本地源码路径和文档。                                                  | 自建                                                       |
+   | **QA_source_index**           | 智造云 AIOS 自身源码与文档的快速索引技能，用于把关键词映射到本地源码路径和文档。                                                  | 自建                                                       |
    | **cron**                      | 定时任务管理。通过 `qwenpaw cron` 或控制台定时任务创建、查询、暂停、恢复、删除定时任务。                                      | 自建                                                       |
    | **dingtalk_channel**          | 通过可视浏览器辅助完成钉钉频道接入流程，并提示用户完成必要手动步骤。                                                          | 自建                                                       |
    | **docx**                      | Word 文档（.docx）的创建、阅读、编辑，含目录、页眉页脚、表格、图片、修订与批注等。                                            | https://github.com/anthropics/skills/tree/main/skills/docx |
    | **file_reader**               | 读取与摘要文本类文件（如 .txt、.md、.json、.csv、.log、.py 等）。PDF 与 Office 由专用 Skill 处理。                            | 自建                                                       |
-   | **guidance**                  | 回答 QwenPaw 安装与配置问题，优先查本地文档。                                                                                 | 自建                                                       |
+   | **guidance**                  | 回答 智造云 AIOS 安装与配置问题，优先查本地文档。                                                                                 | 自建                                                       |
    | **mailbox**                   | 通过 qwenpawmail MCP 连接邮箱，收发、搜索、整理邮件，安全自动处理新邮件并学习可复用流程。详见 [邮箱管理与自动化](./mailbox)。 | 自建                                                       |
    | **multi_agent_collaboration** | 当用户明确要求其他 agent 参与，或需要其他 agent 的上下文与能力时，用于协作与双向沟通。                                        | 自建                                                       |
    | **news**                      | 从指定新闻站点查询最新新闻，支持政治、财经、社会、国际、科技、体育、娱乐等分类，并做摘要。                                    | 自建                                                       |
@@ -123,7 +123,7 @@ $QWENPAW_WORKING_DIR/                      # 默认 ~/.qwenpaw
 ### 外部技能路径
 
 默认情况下，技能池只有一个根目录：主池 `$QWENPAW_WORKING_DIR/skill_pool/`。
-你还可以在配置中登记一个或多个 **外部技能根目录**，让 QwenPaw 把这些目录里的技能
+你还可以在配置中登记一个或多个 **外部技能根目录**，让 智造云 AIOS 把这些目录里的技能
 一并读进 **同一个技能池视图**。这适合复用本机已有的技能集合（例如 git 仓库、团队
 共享目录），而无需把它们复制进主池。
 
@@ -271,14 +271,14 @@ qwenpaw skills info <skill_name> --pool
 ### 手动创建
 
 也可以直接在 `$QWENPAW_WORKING_DIR/workspaces/{agent_id}/skills/` 下创建 skill 文件，包括让
-QwenPaw 帮你写这些文件。
+智造云 AIOS 帮你写这些文件。
 
 这种方式更灵活，但写入位置和 skill 质量不一定总是可控。你需要监督创建过程，
 确认文件确实写进了正确的工作区目录，并检查 skill 内容质量后再使用。
 
 在 `$QWENPAW_WORKING_DIR/workspaces/{agent_id}/skills/` 下新建目录，并放入 `SKILL.md`。
 `SKILL.md` 必须包含带 `name` 和 `description` 的 YAML front matter。若 Skill
-依赖外部二进制或环境变量，可在 `metadata.requires` 中声明；QwenPaw 会将其透出为
+依赖外部二进制或环境变量，可在 `metadata.requires` 中声明；智造云 AIOS 会将其透出为
 `require_bins` 和 `require_envs` 元数据，但不会因此自动禁用 Skill。
 
 #### SKILL.md 示例
@@ -332,7 +332,7 @@ workspace，**默认启用**。
 ```
 
 - **自动更新** 仅支持技能池中的内置技能。当前内置包版本与技能池版本不同时，
-  QwenPaw 无需二次确认便会替换技能池副本。技能池始终跟随当前安装包，因此安装包
+  智造云 AIOS 无需二次确认便会替换技能池副本。技能池始终跟随当前安装包，因此安装包
   降级时也会跟随降级；但不会自动导入新增或缺失技能、删除已移除技能，或覆盖已转成
   自定义的技能。
 - **自动同步** 同时支持内置和自定义技能。`SKILL.md` 变化会触发完整技能目录复制
@@ -393,7 +393,7 @@ workspace，**默认启用**。
 
 内置四个数据源：
 
-- **QwenPaw** —— 公开，始终启用。
+- **智造云 AIOS** —— 公开，始终启用。
 - **ClawHub** —— 公开，始终启用。
 - **ModelScope** —— 公开，始终启用。
 - **Aliyun** —— 需在 **设置 → 环境变量** 中配置
@@ -436,7 +436,7 @@ Discord 上。
 ## Skill Config 运行时注入
 
 每个 Skill 可以在 manifest 条目中存储一个 `config` 对象。这个 config 不只是
-展示字段。当某个 Skill 在当前 workspace 和频道下生效时，QwenPaw 会在该次 Agent
+展示字段。当某个 Skill 在当前 workspace 和频道下生效时，智造云 AIOS 会在该次 Agent
 运行期间把它注入到运行时环境中，Skill 结束后再回滚。
 
 可以在控制台 **工作区 → 技能** 中点击技能的配置图标设置 config，也可以通过

@@ -1,7 +1,7 @@
 # CLI
 
 `qwenpaw` 是 QwenPaw 的命令行工具。本页按「上手 → 配置 → 日常管理」的顺序组织——
-新用户从头读，老用户直接跳到需要的章节。
+本页供维护人员查询底层命令。普通用户请从[快速开始](./quickstart)启动：Windows 使用安装目录的 `start-ai-os.cmd`，Linux 使用 `bash start-ai-os.sh`。
 
 > 还不清楚「频道」「心跳」「定时任务」是什么？先看 [项目介绍](./intro)。
 
@@ -9,7 +9,7 @@
 
 ## 快速上手
 
-第一次用 QwenPaw，只需要这两条命令。
+以下是上游独立运行环境的初始化与开发启动参考，不是智造云安装包的首次启动步骤。已有安装不要重新初始化；维护命令须在项目管理的 Python 环境和正确工作目录中执行。
 
 ### qwenpaw init
 
@@ -257,7 +257,7 @@ qwenpaw models set-llm          # 切换到其他 Ollama 模型
 - 通过 Ollama CLI 或 QwenPaw 添加/删除模型时，模型列表自动更新
 
 > **注意：** API Key 的有效性需要用户自行保证，QwenPaw 不会验证。
-> 详见 [配置 — 模型提供商](./config#模型提供商)。
+> 详见 [配置 — 模型提供商](./configReference#模型提供商)。
 
 ### qwenpaw env
 
@@ -277,7 +277,7 @@ qwenpaw env delete TAVILY_API_KEY
 ```
 
 > **注意：** QwenPaw 只负责存储和加载，值的有效性需要用户自行保证。
-> 详见 [配置 — 环境变量](./config#环境变量)。
+> 详见 [配置 — 环境变量](./configReference#环境变量)。
 
 ---
 

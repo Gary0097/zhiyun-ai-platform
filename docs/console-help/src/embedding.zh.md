@@ -1,14 +1,14 @@
 # 向量模型
 
-假设一个月前，你和 QwenPaw 讨论过：“这次先不迁移数据库，发布后再评估。”今天你问：“当时为什么沿用了旧的数据方案？”
+假设一个月前，你和 智造云 AIOS 讨论过：“这次先不迁移数据库，发布后再评估。”今天你问：“当时为什么沿用了旧的数据方案？”
 
-两句话意思相近，却几乎没有相同的关键词。只靠关键词搜索，很可能找不到那段记忆；Embedding 的作用，就是帮助 QwenPaw 识别这种“说法不同、意思相近”的内容。
+两句话意思相近，却几乎没有相同的关键词。只靠关键词搜索，很可能找不到那段记忆；Embedding 的作用，就是帮助 智造云 AIOS 识别这种“说法不同、意思相近”的内容。
 
 它不是另一套记忆，也不会替你生成答案。它只是给现有记忆增加一种按语义查找的方式。
 
 ## 它怎样帮助长期记忆
 
-QwenPaw 的记忆仍然保存在 workspace 的 Markdown 文件中。启用 Embedding 后，ReMeLight 会为 `memory/` 和 `digest/` 中的文本生成向量，并在搜索时同时使用两条路径：
+智造云 AIOS 的记忆仍然保存在 workspace 的 Markdown 文件中。启用 Embedding 后，ReMeLight 会为 `memory/` 和 `digest/` 中的文本生成向量，并在搜索时同时使用两条路径：
 
 - **BM25 关键词搜索**：擅长函数名、错误码、产品名和原句中的精确词；
 - **Embedding 语义搜索**：擅长同义表达、自然语言改写和主题相关内容；
@@ -33,11 +33,11 @@ Embedding 模型会把一段文本转换成一组固定长度的数字，也就�
 
 ## 当前能力与边界
 
-QwenPaw 通过 AgentScope 2.x 连接 `openai`、`dashscope`、`dashscope_multimodal`、`gemini` 和 `ollama` 后端。目前只有 ReMeLight 直接使用这里的配置。
+智造云 AIOS 通过 AgentScope 2.x 连接 `openai`、`dashscope`、`dashscope_multimodal`、`gemini` 和 `ollama` 后端。目前只有 ReMeLight 直接使用这里的配置。
 
 需要注意：
 
-- 当前只向模型发送 ReMeLight 产生的**文本**；选择多模态类型或模型，不会让 QwenPaw 自动读取图片、音频、视频或 PDF；
+- 当前只向模型发送 ReMeLight 产生的**文本**；选择多模态类型或模型，不会让 智造云 AIOS 自动读取图片、音频、视频或 PDF；
 - Embedding 不会捕获或整理记忆，也没有独立的 Agent 工具；它只为 `memory_search` 和 digest 相似度查询补充语义信号；
 - 选择 ADBPG 等其他记忆后端时，向量能力由对应服务管理，不读取这里的 ReMeLight 配置；
 - 相同输入可以使用本地缓存，减少重复计算和 API 调用。
@@ -103,7 +103,7 @@ QwenPaw 通过 AgentScope 2.x 连接 `openai`、`dashscope`、`dashscope_multimo
 - OpenAI 兼容服务请选择 `openai`，`base_url` 会作为 API 地址；
 - DashScope 当前使用官方 SDK 目的地，自定义 `base_url` 不会改变请求地址；
 - Gemini 当前不使用 `base_url`；
-- Ollama 把 `base_url` 当作 `host`。QwenPaw 在容器中运行时，`localhost` 指向容器自身，应填写进程实际可达的地址。
+- Ollama 把 `base_url` 当作 `host`。智造云 AIOS 在容器中运行时，`localhost` 指向容器自身，应填写进程实际可达的地址。
 
 ### 长文本或批量请求失败
 
@@ -118,10 +118,10 @@ QwenPaw 通过 AgentScope 2.x 连接 `openai`、`dashscope`、`dashscope_multimo
 | `backend`              | 凭证与地址                             | 备注                                                                  |
 | ---------------------- | -------------------------------------- | --------------------------------------------------------------------- |
 | `openai`               | `api_key` 必填；`base_url` 可选        | 用于 OpenAI 及 OpenAI 兼容文本向量服务；仅此后端使用 `use_dimensions` |
-| `dashscope`            | `api_key` 必填                         | 模型名决定文本或多模态 API 路径；QwenPaw 当前只发送文本               |
+| `dashscope`            | `api_key` 必填                         | 模型名决定文本或多模态 API 路径；智造云 AIOS 当前只发送文本               |
 | `dashscope_multimodal` | `api_key` 必填                         | 与 `dashscope` 使用相同适配；不会自动读取多模态文件                   |
 | `gemini`               | `api_key` 必填                         | 当前只发送文本，不开放 `task_type`，也不使用 `base_url`               |
-| `ollama`               | 不需要 API Key；`base_url` 作为 `host` | 本地或自托管文本向量服务，QwenPaw 进程必须能访问该地址                |
+| `ollama`               | 不需要 API Key；`base_url` 作为 `host` | 本地或自托管文本向量服务，智造云 AIOS 进程必须能访问该地址                |
 
 ### 字段
 
@@ -161,7 +161,7 @@ OpenAI 兼容服务示例：
 }
 ```
 
-QwenPaw 正常运行时最多重试 3 次；测试时只重试 1 次，并有 15 秒超时。AgentScope 还会按厂商限制继续拆分批次，因此 `max_batch_size` 是上游限制，实际可用值仍取决于具体模型和服务。
+智造云 AIOS 正常运行时最多重试 3 次；测试时只重试 1 次，并有 15 秒超时。AgentScope 还会按厂商限制继续拆分批次，因此 `max_batch_size` 是上游限制，实际可用值仍取决于具体模型和服务。
 
 ## 相关页面
 

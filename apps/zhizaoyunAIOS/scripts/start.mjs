@@ -4,7 +4,7 @@ import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveRuntime, runtimeEnvironment } from './runtime-env.mjs'
 
-// 智造云 AIOS 2.2.0 —— 原生 QwenPaw 2.2.0 启动器（无捆绑业务应用）
+// 智造云 AIOS 2.2.1 —— 原生 QwenPaw 2.2.1 启动器（无捆绑业务应用）
 // 形态：原生 QwenPaw 单进程 + 控制台原生登录（QWENPAW_AUTH_ENABLED）。
 // 多用户/集中模型账号请使用 start-hub.cmd（QwenPaw Hub）。
 const appRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -16,7 +16,7 @@ const qwenpawCommand = runtime.command || 'qwenpaw'
 
 Object.assign(launchEnv, {
   QWENPAW_WORKING_DIR: join(appRoot, 'workspace'),
-  // 登录体系改用 QwenPaw 2.2.0 原生认证：首个用户在控制台注册，
+  // 登录体系改用 QwenPaw 2.2.1 原生认证：首个用户在控制台注册，
   // 之后所有访问均需登录（多用户场景由 Hub 账号体系承载）
   QWENPAW_AUTH_ENABLED: 'true',
   // 原生认证密钥固定在安装目录内（auth.json / API Key 等），
@@ -80,7 +80,7 @@ if (existsSync(join(brandPlugin, 'plugin.json'))) {
 }
 
 console.log('\n智造云 AIOS 启动中：http://127.0.0.1:8088')
-console.log('运行形态：原生 QwenPaw 2.2.0 单进程；控制台原生登录；无捆绑业务应用。')
+console.log('运行形态：原生 QwenPaw 2.2.1 单进程；控制台原生登录；无捆绑业务应用。')
 console.log('多用户/集中模型账号：运行 start-hub.cmd（QwenPaw Hub，端口 8000）。\n')
 const child = spawn(qwenpawCommand, ['app'], { cwd: repoRoot, stdio: 'inherit', env: launchEnv })
 process.on('SIGINT', () => child.kill('SIGINT'))

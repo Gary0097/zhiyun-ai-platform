@@ -1,4 +1,4 @@
-// 智造云 AIOS 2.2.0 发布门禁（极简形态：无捆绑业务应用）
+// 智造云 AIOS 2.2.1 发布门禁（极简形态：无捆绑业务应用）
 // 检查：跨平台入口完整性、版本锁一致性、脚本语法、控制台品牌化、
 // 打包/清理脚本自检。业务应用已剥离，其验收由各应用独立仓库自行承担。
 import assert from 'node:assert/strict'
@@ -11,11 +11,13 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const embedded = join(root, 'apps', 'zhizaoyunAIOS')
 const scripts = join(embedded, 'scripts')
 
-// 1) 版本锁一致性（唯一运行时 = QwenPaw 2.2.0）
+// 1) 版本锁一致性（唯一运行时 = QwenPaw 2.2.1）
 const qwenpawLock = JSON.parse(readFileSync(join(embedded, 'qwenpaw.lock.json'), 'utf8'))
-assert.equal(qwenpawLock.version, '2.2.0')
-assert.equal(qwenpawLock.ref, 'v2.2.0')
-assert.ok(!existsSync(join(embedded, 'pawapps.lock.json')), '2.2.0 极简形态不应存在 PawApp 锁')
+assert.equal(qwenpawLock.version, '2.2.1')
+assert.equal(qwenpawLock.ref, 'v2.2.1')
+const installerManifest = readFileSync(join(root, 'scripts/exe-installer/installer.manifest'), 'utf8')
+assert.equal(installerManifest.match(/<assemblyIdentity\s+version="([^"]+)"/)?.[1], qwenpawLock.version + '.0', 'installer manifest must match runtime lock')
+assert.ok(!existsSync(join(embedded, 'pawapps.lock.json')), '2.2.1 极简形态不应存在 PawApp 锁')
 
 // 2) 跨平台入口完整性（单机 8088 + Hub 8000）
 for (const entry of [
@@ -97,4 +99,4 @@ assert.ok(existsSync(join(root, 'branding', 'app.ico')), 'branding/app.ico missi
 const patch = readFileSync(join(scripts, 'patch-console-ui.mjs'), 'utf8')
 assert.ok(patch.includes('智造云AIOS'), 'patch-console-ui must brand as 智造云 AIOS')
 
-console.log('智造云 AIOS 2.2.0 发布门禁通过：QwenPaw 2.2.0 唯一运行时、原生登录、跨平台入口（单机 8088 + Hub 8000）、控制台品牌化均正常。')
+console.log('智造云 AIOS 2.2.1 发布门禁通过：QwenPaw 2.2.1 唯一运行时、原生登录、跨平台入口（单机 8088 + Hub 8000）、控制台品牌化均正常。')
