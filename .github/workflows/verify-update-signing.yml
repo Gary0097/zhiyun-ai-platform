@@ -1,0 +1,26 @@
+name: Verify production update signing key
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: verify-update-signing
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    environment: update-release
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify protected key matches reviewed client trust root
+        run: node scripts/updates/verify-publisher-key.mjs
+        env:
+          AIOS_UPDATE_PRIVATE_KEY: ${{ secrets.AIOS_UPDATE_PRIVATE_KEY }}
