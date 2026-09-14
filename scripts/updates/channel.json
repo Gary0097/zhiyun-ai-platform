@@ -1,5 +1,7 @@
 {
   "schema": 1,
   "repository": "Gary0097/zhiyun-ai-platform",
-  "publicKeys": []
+  "publicKeys": [
+    "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEARUjPz12wj0m5xmaZ5CW/C2J5cPsdcK648zlErFxV79U=\n-----END PUBLIC KEY-----\n"
+  ]
 }
