@@ -85,6 +85,7 @@ class Installer
                 "start \"\" http://127.0.0.1:8088",
                 "call start-ai-os.cmd" };
             string launcher = Path.Combine(targetDir, "智造云AI-OS启动.cmd");
+            RecordUpdateIntents(targetDir, new[] { "智造云AI-OS启动.cmd" }, new string[0]);
             File.WriteAllText(launcher, string.Join("\r\n", launcherLines) + "\r\n",
                 new System.Text.UTF8Encoding(false));
 
@@ -282,7 +283,9 @@ class Installer
                 string launcher = Path.Combine(targetDir, "智造云AI-OS.exe");
                 if (!File.Exists(launcher)) throw new IOException("桌面启动器缺失。");
                 log.WriteLine("Starting application; waiting for service readiness");
-                var child = Process.Start(new ProcessStartInfo(launcher) { WorkingDirectory = targetDir, UseShellExecute = false });
+                var launchInfo = new ProcessStartInfo(launcher) { WorkingDirectory = targetDir, UseShellExecute = false };
+                launchInfo.EnvironmentVariables.Remove("AIOS_UPDATE_TRANSACTION");
+                var child = Process.Start(launchInfo);
                 bool ready = WaitReady(600);
                 if (!ready) { try { KillProcessTree(child.Id); } catch { } throw new IOException("服务未在 600 秒内就绪。"); }
                 log.WriteLine("service ready");
@@ -302,6 +305,16 @@ class Installer
             // Validate the complete archive before changing any installed file.
             foreach (var entry in archive.Entries)
                 ValidateDestination(targetDir, entry.FullName);
+            // Persist the full write set before extraction starts. A crash or a late
+            // extraction error must not make partial files invisible to rollback.
+            var intents = new System.Collections.Generic.List<string>();
+            foreach (var entry in archive.Entries) {
+                if (string.IsNullOrEmpty(entry.Name)) continue;
+                string path = Path.GetFullPath(Path.Combine(targetDir, entry.FullName.Replace('/', Path.DirectorySeparatorChar)));
+                string relative = path.Substring(root.Length).Replace('\\', '/');
+                if (!Uninstaller.Protected(relative)) intents.Add(relative);
+            }
+            RecordUpdateIntents(targetDir, intents, new string[0]);
             int total = archive.Entries.Count, done = 0;
             foreach (var entry in archive.Entries)
             {
@@ -345,6 +358,37 @@ class Installer
         File.WriteAllLines(manifest, entries);
     }
 
+    // Write-ahead inventory is separate from the success-only uninstall manifest.
+    // The updater grants only its child installer the transaction location.
+    internal static void RecordUpdateIntents(string targetDir, System.Collections.Generic.IEnumerable<string> files, System.Collections.Generic.IEnumerable<string> trees)
+    {
+        string transaction = Environment.GetEnvironmentVariable("AIOS_UPDATE_TRANSACTION");
+        if (string.IsNullOrEmpty(transaction)) return; // ordinary offline installation
+        string cache = Uninstaller.CheckedPath(targetDir, ".aios-updates") + Path.DirectorySeparatorChar;
+        transaction = Path.GetFullPath(transaction);
+        string name = Path.GetFileName(transaction);
+        if (!transaction.StartsWith(cache, StringComparison.OrdinalIgnoreCase) ||
+            !System.Text.RegularExpressions.Regex.IsMatch(name, "^transaction-[a-f0-9]{32}$") ||
+            !string.Equals(Path.GetDirectoryName(transaction), cache.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
+            throw new IOException("更新事务目录无效。");
+        string relativeJournal = ".aios-updates/" + name + "/write-intents.txt";
+        string journal = Uninstaller.CheckedPath(targetDir, relativeJournal);
+        if (!File.Exists(Path.Combine(transaction, "state.json"))) throw new IOException("更新备份状态缺失。");
+        var lines = new System.Collections.Generic.List<string>();
+        foreach (string kind in new[] { "F", "T" }) {
+            foreach (string relative in kind == "F" ? files : trees) {
+                if (relative.IndexOfAny(new[] { '\r', '\n', '\t' }) >= 0) throw new IOException("更新记录路径无效。");
+                string normalized = Uninstaller.CheckedPath(targetDir, relative).Substring(TargetRoot(targetDir).Length).Replace('\\', '/');
+                if (!Uninstaller.Protected(normalized)) lines.Add(kind + "\t" + normalized);
+            }
+        }
+        using (var stream = new FileStream(journal, FileMode.Append, FileAccess.Write, FileShare.Read))
+        using (var writer = new StreamWriter(stream, new System.Text.UTF8Encoding(false))) {
+            foreach (string line in lines) writer.WriteLine(line);
+            writer.Flush(); stream.Flush(true); // durable before any corresponding writes
+        }
+    }
+
     static void ValidateDestination(string targetDir, string entryName)
     {
         string root = TargetRoot(targetDir);
@@ -369,6 +413,13 @@ class Installer
     // （cmd 自身重定向，进程不依赖向导的管道）。返回退出码。
     internal static int RunRuntimeSetup(string targetDir, string logPath)
     {
+        // A killed installer cannot run finally/RecordRuntimeFiles. Declaring these
+        // managed trees first lets recovery find partial packages independently.
+        RecordUpdateIntents(targetDir, new string[0], new[] {
+            "apps/zhizaoyunAIOS/runtime/zhizaoyunAIOS/venv",
+            "apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv",
+            "apps/zhizaoyunAIOS/runtime/cache"
+        });
         var psi = new ProcessStartInfo("powershell.exe",
             "-NoProfile -ExecutionPolicy Bypass -File \"" + Path.Combine(targetDir, "setup-ai-os.ps1") +
             "\" -Offline -CacheDir \"" + Path.Combine(targetDir, "apps", "zhizaoyunAIOS", "runtime", "cache") + "\"")
@@ -380,6 +431,7 @@ class Installer
             RedirectStandardError = true,
         };
         // 便携 Node 优先（与 install-usb.cmd 一致）
+        psi.EnvironmentVariables.Remove("AIOS_UPDATE_TRANSACTION");
         string portableNode = Path.Combine(targetDir, "extras", "node");
         if (Directory.Exists(portableNode))
             psi.EnvironmentVariables["Path"] = portableNode + ";" + Environment.GetEnvironmentVariable("Path");

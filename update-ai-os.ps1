@@ -89,6 +89,7 @@ try {
     $installInfo = New-Object Diagnostics.ProcessStartInfo
     $installInfo.FileName = $package.path; $installInfo.Arguments = '--dir "' + $Root.TrimEnd('\') + '"'
     $installInfo.UseShellExecute = $false; $installInfo.CreateNoWindow = $true
+    $installInfo.EnvironmentVariables['AIOS_UPDATE_TRANSACTION'] = $transaction
     $installer = [Diagnostics.Process]::Start($installInfo)
     while (-not $installer.WaitForExit(100)) { [Windows.Forms.Application]::DoEvents() }
     if ($installer.ExitCode -ne 0) { throw "安装器失败（$($installer.ExitCode)），请使用保留的备份恢复。" }

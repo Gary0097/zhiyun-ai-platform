@@ -15,6 +15,25 @@ function Test-UpdateData([string]$Relative) {
     $p = $Relative.Replace('\', '/').ToLowerInvariant()
     return $p -eq 'hub.yaml' -or $p -eq 'hub.runtime.yaml' -or $p.StartsWith('apps/zhizaoyunaios/workspace/') -or $p.StartsWith('apps/zhizaoyunaios/workspace.secret/') -or $p.StartsWith('.aios-updates/')
 }
+function Get-UpdateKey([string]$Root, [string]$Relative) {
+    $prefix = [IO.Path]::GetFullPath($Root).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
+    return (Get-UpdatePath $Root $Relative).Substring($prefix.Length).Replace('\', '/').ToLowerInvariant()
+}
+function Get-UpdateTreeFiles([string]$Root, [string]$Relative) {
+    $folder = Get-UpdatePath $Root $Relative
+    if (-not (Test-Path -LiteralPath $folder)) { return }
+    if (-not (Test-Path -LiteralPath $folder -PathType Container)) { throw 'Runtime tree is not a directory' }
+    $prefix = [IO.Path]::GetFullPath($Root).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
+    $queue = New-Object 'System.Collections.Generic.Queue[string]'
+    $queue.Enqueue($folder)
+    while ($queue.Count) {
+        foreach ($item in Get-ChildItem -Force -LiteralPath $queue.Dequeue()) {
+            if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Runtime tree contains a link' }
+            if ($item.PSIsContainer) { $queue.Enqueue($item.FullName) }
+            else { Get-UpdateKey $Root $item.FullName.Substring($prefix.Length) }
+        }
+    }
+}
 function Assert-UpdateStopped([string]$Root) {
     # No process is killed on the basis of a generic product name.
     $prefix = [IO.Path]::GetFullPath($Root).TrimEnd('\') + '\'
@@ -77,23 +96,62 @@ function New-UpdateSnapshot([string]$Root, [string]$Transaction, [scriptblock]$P
     @'
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'recovery.ps1')
-$state = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot 'state.json') | ConvertFrom-Json
-Assert-UpdateStopped $state.root
-Restore-UpdatePrograms $state.root $PSScriptRoot
-Write-Host 'Programs restored. User data was not overwritten. Review data migration recovery before restarting.'
+$mutex = New-Object Threading.Mutex($false, 'Local\ZhizaoyunAIOS.Update')
+$locked = $false
+try {
+    try { $locked = $mutex.WaitOne(0) } catch [Threading.AbandonedMutexException] { $locked = $true }
+    if (-not $locked) { throw 'Another update or recovery is running.' }
+    $state = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot 'state.json') | ConvertFrom-Json
+    Assert-UpdateStopped $state.root
+    Restore-UpdatePrograms $state.root $PSScriptRoot
+    Write-Host 'Programs restored. User data was not overwritten. Review data migration recovery before restarting.'
+} finally {
+    if ($locked) { $mutex.ReleaseMutex() }
+    $mutex.Dispose()
+}
 '@ | Set-Content -Encoding UTF8 (Join-Path $Transaction 'restore.ps1')
 }
 function Restore-UpdatePrograms([string]$Root, [string]$Transaction) {
     $Root = (Get-Item -Force -LiteralPath $Root).FullName
+    $Transaction = (Get-Item -Force -LiteralPath $Transaction).FullName
     $state = Get-Content -Raw -LiteralPath (Join-Path $Transaction 'state.json') | ConvertFrom-Json
     if ([IO.Path]::GetFullPath($state.root) -ne [IO.Path]::GetFullPath($Root)) { throw '备份不属于此安装。' }
-    $snapshot = Join-Path $Transaction 'backup'
+    $snapshot = (Get-Item -Force -LiteralPath (Join-Path $Transaction 'backup')).FullName
     if (-not $state.programs) { throw '备份缺少程序清单，拒绝覆盖未知文件。' }
-    $restore = @($state.programs | Where-Object { -not (Test-UpdateData $_) })
-    $added = @()
+    $before = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    $restore = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    $candidates = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    foreach ($relative in $state.files) { [void]$before.Add((Get-UpdateKey $Root $relative)) }
+    foreach ($relative in $state.programs) {
+        $key = Get-UpdateKey $Root $relative
+        if (-not (Test-UpdateData $key)) { [void]$restore.Add($key) }
+    }
     $installed = Get-UpdatePath $Root '.aios-installed-files'
     if (Test-Path -LiteralPath $installed) {
-        $added = @(Get-Content -Encoding UTF8 -LiteralPath $installed | Where-Object { $_ -and $_ -notin $state.files -and -not (Test-UpdateData $_) })
+        foreach ($relative in Get-Content -Encoding UTF8 -LiteralPath $installed) {
+            if ($relative) { [void]$candidates.Add((Get-UpdateKey $Root $relative)) }
+        }
+    }
+    $journal = Get-UpdatePath $Transaction 'write-intents.txt'
+    if (Test-Path -LiteralPath $journal) {
+        foreach ($line in Get-Content -Encoding UTF8 -LiteralPath $journal) {
+            $parts = $line.Split("`t")
+            if ($parts.Count -ne 2 -or $parts[0] -notin 'F','T') { throw 'Invalid update write inventory' }
+            $key = Get-UpdateKey $Root $parts[1]
+            if ($parts[0] -eq 'F') { [void]$candidates.Add($key) }
+            else {
+                if ($key -notin 'apps/zhizaoyunaios/runtime/zhizaoyunaios/venv','apps/zhizaoyunaios/runtime/qwenpaw-hub/venv','apps/zhizaoyunaios/runtime/cache') { throw 'Unrecognized managed runtime tree' }
+                # Include the snapshot: setup may have deleted old untracked packages.
+                foreach ($path in Get-UpdateTreeFiles $Root $key) { [void]$candidates.Add($path) }
+                foreach ($path in Get-UpdateTreeFiles $snapshot $key) { [void]$candidates.Add($path) }
+            }
+        }
+    }
+    $added = @()
+    foreach ($key in $candidates) {
+        if (Test-UpdateData $key) { continue }
+        if ($before.Contains($key)) { [void]$restore.Add($key) }
+        else { $added += $key }
     }
     # Preflight every source/destination before any mutation.
     foreach ($relative in $restore) {
@@ -101,10 +159,19 @@ function Restore-UpdatePrograms([string]$Root, [string]$Transaction) {
         $source = Get-UpdatePath $snapshot $relative
         if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw '恢复备份缺少文件。' }
     }
-    foreach ($relative in $added) { $null = Get-UpdatePath $Root $relative }
+    $quarantine = Join-Path $Transaction 'quarantine'
     foreach ($relative in $added) {
         $file = Get-UpdatePath $Root $relative
-        if (Test-Path -LiteralPath $file -PathType Leaf) { Remove-Item -LiteralPath $file -Force }
+        $destination = Get-UpdatePath $quarantine $relative
+        if ((Test-Path -LiteralPath $file -PathType Leaf) -and (Test-Path -LiteralPath $destination)) { throw 'Recovery quarantine already contains this file' }
+    }
+    foreach ($relative in $added) {
+        $file = Get-UpdatePath $Root $relative
+        if (Test-Path -LiteralPath $file -PathType Leaf) {
+            $destination = Get-UpdatePath $quarantine $relative
+            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
+            Move-Item -LiteralPath $file -Destination $destination
+        }
     }
     foreach ($relative in $restore) {
         $file = Get-UpdatePath $Root $relative
