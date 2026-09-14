@@ -41,6 +41,8 @@ function Stop-UpdateServices([string]$Root) {
     Assert-UpdateStopped $Root
 }
 function New-UpdateSnapshot([string]$Root, [string]$Transaction, [scriptblock]$Pump = {}) {
+    $Root = (Get-Item -Force -LiteralPath $Root).FullName
+    $Transaction = (Get-Item -Force -LiteralPath $Transaction).FullName
     $snapshot = Join-Path $Transaction 'backup'
     $manifest = Get-UpdatePath $Root '.aios-installed-files'
     if (-not (Test-Path -LiteralPath $manifest -PathType Leaf)) { throw '安装文件清单缺失，无法保证安全恢复。请先修复安装。' }
@@ -66,6 +68,7 @@ function New-UpdateSnapshot([string]$Root, [string]$Transaction, [scriptblock]$P
     $copyOutput = $copy.StandardOutput.ReadToEndAsync(); $copyError = $copy.StandardError.ReadToEndAsync()
     while (-not $copy.WaitForExit(100)) { & $Pump }
     if ($copy.ExitCode -ge 8 -or $null -eq $copy.ExitCode) { throw '升级备份失败，程序未更新。请检查磁盘空间与文件权限。' }
+    $snapshot = (Get-Item -Force -LiteralPath $snapshot).FullName
     $files = @(Get-ChildItem -File -Recurse -Force -LiteralPath $snapshot | ForEach-Object { $_.FullName.Substring($snapshot.Length + 1) })
     if (-not ($files -contains 'apps\zhizaoyunAIOS\qwenpaw.lock.json')) { throw '备份不完整，缺少版本锁。' }
     $programs = @($programs | Where-Object { Test-Path -LiteralPath (Join-Path $snapshot $_) -PathType Leaf })
@@ -81,6 +84,7 @@ Write-Host 'Programs restored. User data was not overwritten. Review data migrat
 '@ | Set-Content -Encoding UTF8 (Join-Path $Transaction 'restore.ps1')
 }
 function Restore-UpdatePrograms([string]$Root, [string]$Transaction) {
+    $Root = (Get-Item -Force -LiteralPath $Root).FullName
     $state = Get-Content -Raw -LiteralPath (Join-Path $Transaction 'state.json') | ConvertFrom-Json
     if ([IO.Path]::GetFullPath($state.root) -ne [IO.Path]::GetFullPath($Root)) { throw '备份不属于此安装。' }
     $snapshot = Join-Path $Transaction 'backup'
