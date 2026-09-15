@@ -49,6 +49,14 @@ const REPLACEMENTS = [
     to: 'avatar:"/qwenpaw.svg"',
     patched: 'avatar:"/qwenpaw.svg"',
   },
+  // 2.2.1 sidebar quick menu: change only its About destination.
+  {
+    name: '2.2.1 右下角关于 → 本地发行版说明',
+    optional: true,
+    from: 'eb="https://qwenpaw.agentscope.io/"',
+    to: 'eb="/aios-docs.html#about"',
+    patched: 'eb="/aios-docs.html#about"',
+  },
   // ---- QwenPaw 2.2.1 bundle（index-C6K6UUCj.js）----
   {
     name: '2.2.1 文档菜单 → 本地内嵌文档',
@@ -861,6 +869,12 @@ toc,
 '<a href="#changelog">更新日志</a>',
 '<a href="#faq">常见问题</a>',
 '</div>',
+'<section id="about">',
+'<h2>关于 智造云AIOS</h2>',
+'<p>智造云AIOS 2.2.1，由灵泽万川提供品牌、安装与维护体验，基于开源 QwenPaw 2.2.1 运行时构建。</p>',
+'<p>Windows 安装版可通过系统托盘的“检查软件更新”或安装目录的 update-ai-os.cmd 检查正式更新。更新前请保存工作；更新过程需要停服和备份。</p>',
+'<p>账号、工作区和模型配置保存在本机。应用与系统独立交付，模型服务由所配置的供应商提供。</p>',
+'</section>',
 '<section id="demo">',
 '<h2>视频教程 <span class="tag">待开发</span></h2>',
 '<div class="todo">本版本尚未提供视频教程，请使用左侧文字指引。</div>',
@@ -1032,6 +1046,10 @@ for (const r of CHUNK_REPLACEMENTS) {
 const branded = applyBrand(content)
 
 if (checkMode) {
+  if (content !== original) {
+    console.error('[patch-console-ui] 检查失败：当前入口仍有待应用的菜单或资源补丁。');
+    process.exit(1)
+  }
   const docsFile = join(consoleDir, 'aios-docs.html')
   const docs = existsSync(docsFile) ? readFileSync(docsFile, 'utf8') : ''
   if (!docs.includes('上游技术参考：') || !docs.includes('安装包没有预设账号密码') ||
@@ -1119,7 +1137,7 @@ const renames = [] // { file, content, newFile }
 // （回归测试 test-patch-console-ui.mjs 曾抓到）。命名基准统一用“规范化 content”：
 // 剥离全部 -zyb 后缀后再 hash——无论引用链处于哪一轮，规范化结果一致，名字收敛，
 // 且与首轮（改写前内容）的命名天然兼容。
-const ZYB_SUFFIX = /-zyb[0-9a-f]{8}(?=\.js)/g
+const ZYB_SUFFIX = /(?:-zyb[0-9a-f]{8})+(?=\.js)/g
 // 文档引用的内容版本参数同样要排除出命名基准（版本化发生在改名之后，第二轮
 // 起内容即带 ?v=；不归一则每轮派生新名、集合膨胀——回归测试幂等断言抓到）
 const canonicalJs = text => text.split(ZYB_SUFFIX).join('')
@@ -1147,7 +1165,11 @@ const needsRepublish = text => REPUBLISH_MARKERS.some(m => text.includes(m))
 for (const file of collectBrandableFiles(consoleDir)) {
   if (file === bundlePath) continue
   const cc = readFileSync(file, 'utf8')
-  let out = cc
+  // Raw and older hashed copies of the entry must receive the same patch.
+  // Otherwise reference normalization can reconnect index.html to stale code.
+  const isEntryAlias = file.split(/[\\/]/).pop().replace(ZYB_SUFFIX, '') ===
+    bundlePath.split(/[\\/]/).pop().replace(ZYB_SUFFIX, '')
+  let out = isEntryAlias ? content : cc
   for (const r of CHUNK_REPLACEMENTS) {
     if (r.regex) { out = out.replace(r.from, r.to); continue }
     if (out.includes(r.patched)) continue
@@ -1174,7 +1196,7 @@ for (const file of collectBrandableFiles(consoleDir)) {
 
 const renameMap = new Map() // 旧文件名 → 新文件名
 for (const r of renames) {
-  const base = r.file.split(/[\\/]/).pop()
+  const base = r.file.split(/[\\/]/).pop().replace(ZYB_SUFFIX, '')
   const dot = base.lastIndexOf('.')
   const newName = base.slice(0, dot) + '-zyb' + hashOf(canonicalJs(r.content)) + base.slice(dot)
   r.newFile = join(dirname(r.file), newName)

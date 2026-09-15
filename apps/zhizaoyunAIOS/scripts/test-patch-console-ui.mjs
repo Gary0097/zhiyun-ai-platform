@@ -45,6 +45,7 @@ const entryFixture = [
   'window.QwenPaw=window.QwenPaw||{};',
   'console.info("[QwenPaw audit] boot");',
   'const upstreamRepo="agentscope-ai/QwenPaw";',
+  'var eb="https://qwenpaw.agentscope.io/";',
   'var ud="https://github.com/agentscope-ai/QwenPaw",qM=3600*1e3;',
   'var UM=e=>`https://qwenpaw.agentscope.io/docs/intro?lang=${Mo(e)}`;',
   'var H=`https://qwenpaw.agentscope.io/docs/faq.${N}.md`;',
@@ -142,6 +143,7 @@ try {
 
   // 主 bundle 替换与保护
   ok(/ud="\/aios-docs\.html\?v=[0-9a-f]{8}#doc-community"/.test(entry), 'GitHub 仓库地址（ud）改指内嵌文档（带版本参数）')
+  ok(/eb="\/aios-docs\.html\?v=[0-9a-f]{8}#about"/.test(entry), '右下角关于打开本地版本说明（带缓存版本）')
   ok(/H=`\/aios-docs-faq\.\$\{N\}\.md\?v=[0-9a-f]{8}`/.test(entry), '更新弹窗 FAQ 拉取本地化并带版本参数（消除运行时外呼）')
   ok(/UM=e=>"\/aios-docs\.html\?v=[0-9a-f]{8}#tutorial"/.test(entry), '文档菜单 URL 改指内嵌文档（带版本参数）')
   ok(entry.includes('lng:localStorage.getItem("language")||"zh"'), '默认语言替换为 zh')
@@ -276,6 +278,16 @@ try {
   ok(runPatch(['--check']).status !== 0, '错误归属的旧帮助文档必须被门禁拒绝')
   ok(runPatch(['--docs-only']).status === 0 && readFileSync(docsPath, 'utf8') === docs, '仅文档刷新恢复完整内容与上游归属')
   ok(readFileSync(join(assetsDir, entryZybName), 'utf8') === run1EntryContent, '相同内容的文档刷新不改变控制台入口')
+
+  const staleEntry = run1EntryContent.replace(/eb="[^"]+"/, 'eb="https://qwenpaw.agentscope.io/"')
+  writeFileSync(join(assetsDir, entryZybName), staleEntry)
+  writeFileSync(join(assetsDir, ENTRY), staleEntry)
+  ok(runPatch(['--check']).status !== 0, '已有品牌版的旧关于链接必须被检查发现')
+  ok(runPatch().status === 0, '已有品牌版可应用新版菜单补丁')
+  const upgradedEntry = entrySrcInHtml()
+  ok(readFileSync(join(assetsDir, upgradedEntry), 'utf8').includes('#about'), '升级后的实际入口引用修复后的关于链接')
+  ok(occurrences(upgradedEntry, '-zyb') === 1, '存量品牌版升级不叠加哈希后缀')
+  ok(runPatch(['--check']).status === 0, '菜单升级后门禁通过')
 
   writeFileSync(pyFile, staticFilesFixture) // 注入：缓存策略回退为一年 immutable
   const checkFail = runPatch(['--check'])
