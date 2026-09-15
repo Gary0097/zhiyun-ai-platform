@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { brotliCompressSync, gzipSync } from 'node:zlib'
+import { brotliCompressSync, gzipSync, brotliDecompressSync, gunzipSync } from 'node:zlib'
 import { existsSync, readFileSync, writeFileSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -230,9 +230,26 @@ function hashOf (value) {
 // 判断，因此一律走“临时文件 + rename 原子替换”：每次写入都落成新文件，
 // 从物理上保证绝不写穿 uv 缓存里的硬链接副本。
 function writeIndependent (file, data) {
+  const bytes = Buffer.isBuffer(data) ? data : Buffer.from(data)
+  if (existsSync(file) && readFileSync(file).equals(bytes)) return
   const tmp = file + '.zy-tmp'
   writeFileSync(tmp, data)
   renameSync(tmp, file)
+}
+
+// Validate the decoded bytes before reusing a compressed representation. This
+// avoids expensive Brotli work on every launch while still repairing stale or
+// corrupt siblings; filenames and mtimes alone are not proof of valid content.
+function writeCompressed (file, data, ext) {
+  const bytes = Buffer.isBuffer(data) ? data : Buffer.from(data)
+  if (existsSync(file)) {
+    try {
+      const encoded = readFileSync(file)
+      const decoded = ext === '.br' ? brotliDecompressSync(encoded) : gunzipSync(encoded)
+      if (decoded.equals(bytes)) return
+    } catch { /* Invalid compressed data must be regenerated. */ }
+  }
+  writeIndependent(file, ext === '.br' ? brotliCompressSync(bytes) : gzipSync(bytes))
 }
 
 // 写入静态资产并同步刷新同名的 .br / .gz 预压缩副本。console 静态服务支持
@@ -242,10 +259,7 @@ function writeAssetWithSiblings (file, data) {
   for (const ext of ['.br', '.gz']) {
     const sibling = file + ext
     if (!existsSync(sibling)) continue
-    const compressed = ext === '.br'
-      ? brotliCompressSync(data)
-      : gzipSync(data)
-    writeIndependent(sibling, compressed)
+    writeCompressed(sibling, data, ext)
   }
 }
 
@@ -1208,7 +1222,9 @@ for (const r of renames) {
 // zyb 引用 canonical 化（剥后缀还原为原名），再统一映射到本轮终名——
 // 任何历史漂移名都会被归一，配合尾部清道夫即可回收僵尸文件。
 const rewriteRefs = text => {
-  let t = canonicalJs(text)
+  // Strip document versions only for hashing, not while rewriting JS names:
+  // removing and restoring the same query each launch forces recompression.
+  let t = text.split(ZYB_SUFFIX).join('')
   for (const [oldName, newName] of renameMap) t = t.split(oldName).join(newName)
   return t
 }
@@ -1225,8 +1241,8 @@ if (renameMap.size) {
 for (const r of renames) {
   // 新名字：内容寻址，直接生成全部三种表示（identity/br/gz）
   writeIndependent(r.newFile, r.content)
-  writeIndependent(r.newFile + '.br', brotliCompressSync(r.content))
-  writeIndependent(r.newFile + '.gz', gzipSync(r.content))
+  writeCompressed(r.newFile + '.br', r.content, '.br')
+  writeCompressed(r.newFile + '.gz', r.content, '.gz')
   // 原名字：刷新为品牌版并同步既有压缩副本
   writeAssetWithSiblings(r.file, r.content)
   console.log('品牌化资产已内容寻址更新：' + r.file.split(/[\\/]/).pop() + ' → ' + r.newFile.split(/[\\/]/).pop())
