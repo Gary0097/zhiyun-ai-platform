@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "package": "qwenpaw",
+  "version": "2.2.1",
+  "python": ">=3.11 <3.14",
+  "repository": "https://github.com/agentscope-ai/QwenPaw.git",
+  "ref": "v2.2.1",
+  "commit": "cae5773707b26ab2fd00903f84b712387894b256",
+  "runtime_dir": "runtime/zhizaoyunAIOS",
+  "license": "Apache-2.0",
+  "integration": "embedded-downstream"
+}

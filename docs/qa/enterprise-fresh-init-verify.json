@@ -1,0 +1,304 @@
+{
+  "generated_at": "2026-08-25",
+  "tmp_db": "C:\\Users\\Gary\\AppData\\Local\\Temp\\seed_verify_wpi2kt37\\enterprise\\enterprise.db",
+  "summaries": {
+    "demo": {
+      "env_id": "env_b1e9a1d673",
+      "tenant_id": "智云智造_env_b1e9a1d673",
+      "data_mode": "demo",
+      "enterprise": "智云智造",
+      "template": "manufacturing",
+      "start_date": "2025-12-01",
+      "end_date": "2026-08-25",
+      "scale": 40,
+      "days": 268,
+      "departments": 6,
+      "org_users": 40,
+      "agents": 9,
+      "apps": 8,
+      "data_sources": 8,
+      "sessions": 15447,
+      "tasks": 30725,
+      "token_total": 35013011,
+      "success": 28492,
+      "failed": 2233,
+      "auth": {
+        "auth_users_file": "C:\\Users\\Gary\\AppData\\Local\\Temp\\seed_verify_wpi2kt37\\work\\auth\\users.json",
+        "created": 40,
+        "kept": 0,
+        "updated": 0
+      }
+    },
+    "production": {
+      "env_id": "env_0bcc6650b5",
+      "tenant_id": "智云智造_env_0bcc6650b5",
+      "data_mode": "production",
+      "enterprise": "智云智造",
+      "template": "manufacturing",
+      "start_date": "2025-12-01",
+      "end_date": "2026-08-25",
+      "scale": 40,
+      "days": 268,
+      "departments": 6,
+      "org_users": 40,
+      "agents": 9,
+      "apps": 8,
+      "data_sources": 8,
+      "sessions": 15447,
+      "tasks": 30725,
+      "token_total": 35013011,
+      "success": 28492,
+      "failed": 2233,
+      "auth": {
+        "auth_users_file": "C:\\Users\\Gary\\AppData\\Local\\Temp\\seed_verify_wpi2kt37\\work\\auth\\users.json",
+        "created": 0,
+        "kept": 40,
+        "updated": 40
+      }
+    }
+  },
+  "checks": [
+    {
+      "name": "demo: enterprise_meta 存在",
+      "ok": true,
+      "detail": "智云智造 2025-12-01~2026-08-25"
+    },
+    {
+      "name": "demo: 起始日期为 2025-12-01",
+      "ok": true,
+      "detail": "2025-12-01"
+    },
+    {
+      "name": "demo: 结束日期为今天或晚于今天",
+      "ok": true,
+      "detail": "2026-08-25 vs 2026-08-25"
+    },
+    {
+      "name": "production: enterprise_meta 存在",
+      "ok": true,
+      "detail": "智云智造 2025-12-01~2026-08-25"
+    },
+    {
+      "name": "production: 起始日期为 2025-12-01",
+      "ok": true,
+      "detail": "2025-12-01"
+    },
+    {
+      "name": "production: 结束日期为今天或晚于今天",
+      "ok": true,
+      "detail": "2026-08-25 vs 2026-08-25"
+    },
+    {
+      "name": "demo: departments 非空",
+      "ok": true,
+      "detail": "count=6"
+    },
+    {
+      "name": "demo: roles 非空",
+      "ok": true,
+      "detail": "count=3"
+    },
+    {
+      "name": "demo: org_users 非空",
+      "ok": true,
+      "detail": "count=40"
+    },
+    {
+      "name": "demo: agents 非空",
+      "ok": true,
+      "detail": "count=9"
+    },
+    {
+      "name": "demo: skills 非空",
+      "ok": true,
+      "detail": "count=24"
+    },
+    {
+      "name": "demo: apps 非空",
+      "ok": true,
+      "detail": "count=8"
+    },
+    {
+      "name": "demo: data_sources 非空",
+      "ok": true,
+      "detail": "count=8"
+    },
+    {
+      "name": "demo: agent_tools 非空",
+      "ok": true,
+      "detail": "count=17"
+    },
+    {
+      "name": "demo: agent_app_access 非空",
+      "ok": true,
+      "detail": "count=30"
+    },
+    {
+      "name": "demo: sessions 非空",
+      "ok": true,
+      "detail": "count=15447"
+    },
+    {
+      "name": "demo: tasks 非空",
+      "ok": true,
+      "detail": "count=30725"
+    },
+    {
+      "name": "demo: token_usage 非空",
+      "ok": true,
+      "detail": "count=10526"
+    },
+    {
+      "name": "demo: operation_logs 非空",
+      "ok": true,
+      "detail": "count=236"
+    },
+    {
+      "name": "demo: login_activity 非空",
+      "ok": true,
+      "detail": "count=8950"
+    },
+    {
+      "name": "demo: files 非空",
+      "ok": true,
+      "detail": "count=17582"
+    },
+    {
+      "name": "demo: file_downloads 非空",
+      "ok": true,
+      "detail": "count=32602"
+    },
+    {
+      "name": "demo: business_events 非空",
+      "ok": true,
+      "detail": "count=100747"
+    },
+    {
+      "name": "production: departments 非空",
+      "ok": true,
+      "detail": "count=6"
+    },
+    {
+      "name": "production: roles 非空",
+      "ok": true,
+      "detail": "count=3"
+    },
+    {
+      "name": "production: org_users 非空",
+      "ok": true,
+      "detail": "count=40"
+    },
+    {
+      "name": "production: agents 非空",
+      "ok": true,
+      "detail": "count=9"
+    },
+    {
+      "name": "production: skills 非空",
+      "ok": true,
+      "detail": "count=24"
+    },
+    {
+      "name": "production: apps 非空",
+      "ok": true,
+      "detail": "count=8"
+    },
+    {
+      "name": "production: data_sources 非空",
+      "ok": true,
+      "detail": "count=8"
+    },
+    {
+      "name": "production: agent_tools 非空",
+      "ok": true,
+      "detail": "count=17"
+    },
+    {
+      "name": "production: agent_app_access 非空",
+      "ok": true,
+      "detail": "count=30"
+    },
+    {
+      "name": "production: sessions 非空",
+      "ok": true,
+      "detail": "count=15447"
+    },
+    {
+      "name": "production: tasks 非空",
+      "ok": true,
+      "detail": "count=30725"
+    },
+    {
+      "name": "production: token_usage 非空",
+      "ok": true,
+      "detail": "count=10526"
+    },
+    {
+      "name": "production: operation_logs 非空",
+      "ok": true,
+      "detail": "count=236"
+    },
+    {
+      "name": "production: login_activity 非空",
+      "ok": true,
+      "detail": "count=8950"
+    },
+    {
+      "name": "production: files 非空",
+      "ok": true,
+      "detail": "count=17582"
+    },
+    {
+      "name": "production: file_downloads 非空",
+      "ok": true,
+      "detail": "count=32602"
+    },
+    {
+      "name": "production: business_events 非空",
+      "ok": true,
+      "detail": "count=100747"
+    },
+    {
+      "name": "Time Machine: 2026-03 窗口会话仅落在窗口内",
+      "ok": true,
+      "detail": "2026-03-02~2026-03-31 count=1601"
+    },
+    {
+      "name": "双态隔离: demo/production 各自有会话",
+      "ok": true,
+      "detail": "demo=15447 prod=15447"
+    },
+    {
+      "name": "双态隔离: demo env 不泄漏 production 记录",
+      "ok": true,
+      "detail": "crossing=0"
+    },
+    {
+      "name": "统计可追溯: token_usage.token == business_events(全量).token",
+      "ok": true,
+      "detail": "token_usage=35013011 events=35013011"
+    },
+    {
+      "name": "统计可追溯: token_usage.token == business_events(仅task).token",
+      "ok": true,
+      "detail": "token_usage=35013011 bus_task=35013011"
+    },
+    {
+      "name": "统计可追溯: business_events(仅task).token == tasks.token",
+      "ok": true,
+      "detail": "bus_task=35013011 tasks=35013011"
+    },
+    {
+      "name": "统计可追溯: tasks 行数 == token_usage.calls",
+      "ok": true,
+      "detail": "tasks=30725 calls=30725"
+    },
+    {
+      "name": "Epic2: Agent->Skill->Tool 绑定落地",
+      "ok": true,
+      "detail": "skills=24 agent_tools=17"
+    }
+  ],
+  "passed": 48,
+  "total": 48
+}
