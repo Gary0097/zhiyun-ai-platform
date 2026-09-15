@@ -13,11 +13,11 @@
 // 上游 bundle 升级导致目标串漂移时，本测试会第一时间变红。
 // 由 scripts/verify-release.mjs 调用；亦可单独运行：node test-patch-console-ui.mjs
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, rmSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, rmSync, statSync, utimesSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { brotliCompressSync, brotliDecompressSync, gzipSync } from 'node:zlib'
+import { brotliCompressSync, brotliDecompressSync, gzipSync, gunzipSync } from 'node:zlib'
 import assert from 'node:assert/strict'
 
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
@@ -269,6 +269,20 @@ try {
   ok(withoutScripts.includes('body.zy-login h2 { color:#172b36 !important'), '深色宿主登录标题有完整的浅色背景对比度')
 
   // ── 门禁：--check 通过 / 注入回归必须失败 ─────────────────────────────
+  section('重复启动复用压缩资产并修复损坏副本')
+  const warmFiles = ['', '.br', '.gz'].map(ext => join(assetsDir, entryZybName + ext))
+  const stamp = new Date('2020-01-01T00:00:00Z')
+  for (const file of warmFiles) utimesSync(file, stamp, stamp)
+  ok(runPatch().status === 0, '未变化资源重复启动成功')
+  ok(warmFiles.every(file => statSync(file).mtimeMs === stamp.getTime()), '未变化入口及压缩文件不重复写入')
+  writeFileSync(warmFiles[1], Buffer.from('corrupt brotli'))
+  writeFileSync(warmFiles[2], gzipSync('valid gzip with stale content'))
+  ok(runPatch().status === 0, '损坏及内容过期的压缩资源自动修复')
+  ok(brotliDecompressSync(readFileSync(warmFiles[1])).equals(readFileSync(warmFiles[0])), '损坏 Brotli 恢复正确内容')
+  ok(gunzipSync(readFileSync(warmFiles[2])).equals(readFileSync(warmFiles[0])), '可解压但过期的 gzip 恢复正确内容')
+  rmSync(warmFiles[2])
+  ok(runPatch().status === 0 && gunzipSync(readFileSync(warmFiles[2])).equals(readFileSync(warmFiles[0])), '缺失的内容寻址压缩副本重建')
+
   section('门禁（--check）')
   const checkPass = runPatch(['--check'])
   ok(checkPass.status === 0, '--check 对已补丁目录通过（退出码 0）')
