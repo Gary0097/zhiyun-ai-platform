@@ -1,0 +1,479 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""在途 / 未发货订单 交付风险红黄绿评分（需求2）
+
+口径（datahub/docs/业务口径要点.md · 风险预警口径）：
+  · 固定时点 = configuration.snapshot_at（不用机器时间）
+  · 订单完成 = 全量签收；分批发货按运单量累计，未收满即仍在风险敞口内
+  · 红 ≥ risk_red_threshold(0.65)；黄 ≥ risk_yellow_threshold(0.30)；其余绿
+  · 承诺日期已过且未全量签收 = 已发生的延期事实，单独标 "红-延期事实"，不包装成预测
+  · 概率为经验概率/交期紧迫度评分，未经真实数据校准；样本量与外推不足必须披露
+
+方法（全部由 SQL 聚合算出，可复算）：
+  A. 在途（有已发未签运单）
+     允许在途天数 allowed = 承诺交期 − 发货时间
+     经验分布 D = 同线路历史已签收运单的在途天数（线路 n<min_samples 退到运输方式，再退到全网）
+     P(延期) = P(d > allowed)，Beta(1,1) 平滑：p=(k+1)/(n+2)
+     P50/P90 预计签收 = 发货时间 + D 的 P50/P90
+  B. 未发货（无任何运单）
+     预测签收 pred = 发货节点计划完成(SHIP planned_end) + 线路在途 P50
+     残差经验分布 E = 历史已全量签收订单的 (实际签收 − pred)，按履约方式分桶
+     buffer = 承诺交期 − pred ；P(延期) = P(e > buffer)，同样平滑
+     P50/P90 预计签收 = pred + E 的 P50/P90
+  辅助信号（只作依据展示，不参与打分，避免未校准的加权）：
+     超时未完节点、当前节点、供应商 ETA 晚于采购承诺、不合格质检、未关闭异常、
+     物流延误事件、承运商承诺晚于客户承诺、ERP 原始风险标记（仅保留原始标记）
+
+用法: python3 delivery_risk.py [--db PATH] [--out DIR] [--csv]
+输出: delivery_risk_<YYYYMMDD>.md / .csv
+"""
+import argparse
+import csv
+import json
+import os
+import sqlite3
+from datetime import datetime, timedelta, timezone
+
+MIN_SAMPLES_KEY = "risk_min_samples"
+SNAP_KEY = "snapshot_at"
+
+
+# ---------- helpers ----------
+def cfg(con):
+    return dict(con.execute("SELECT config_key, config_value FROM configuration").fetchall())
+
+
+def jd(iso):
+    """ISO(带+08:00) -> 儒略日浮点，用 UTC epoch 天数差即可（同一时区基准）。"""
+    if not iso:
+        return None
+    s = iso.replace("T", " ").replace("+08:00", "").replace("+00:00", "")
+    return datetime.fromisoformat(s).timestamp() / 86400.0
+
+
+def fmt(j):
+    return (datetime.fromtimestamp(j * 86400, timezone(timedelta(hours=8)))
+            .strftime("%Y-%m-%d %H:%M")) if j is not None else "-"
+
+
+def quant(sorted_vals, q):
+    """离散分位：rn = int(n*q)+1（与历史口径一致）。"""
+    if not sorted_vals:
+        return None
+    n = len(sorted_vals)
+    i = min(max(int(n * q) + 1, 1), n)
+    return sorted_vals[i - 1]
+
+
+def beta_p(vals, thr, strict_greater=True):
+    """经验 P(x > thr)，Beta(1,1) 平滑。返回 (p, k, n)。"""
+    n = len(vals)
+    k = sum(1 for v in vals if v > thr) if strict_greater else sum(1 for v in vals if v >= thr)
+    return (k + 1.0) / (n + 2.0), k, n
+
+
+def find_db(explicit=None):
+    here = os.path.dirname(os.path.abspath(__file__))
+    for c in [explicit,
+              os.path.join(os.getcwd(), "datahub", "agent_data.sqlite"),
+              os.path.join(here, "agent_data.sqlite")]:
+        if c and os.path.isfile(c):
+            return c
+    raise SystemExit("agent_data.sqlite not found")
+
+
+# ---------- data loading ----------
+def load(con):
+    orders = {}
+    for r in con.execute("""SELECT o.sales_order_id,o.work_order_id,o.customer_id,o.product_id,
+            o.quantity,o.unit,o.contract_amount,o.promised_delivery_at,o.route_id,o.fulfillment_mode,
+            o.delivery_basis,o.source_risk_flag,o.source_risk_reason,o.created_at,
+            c.customer_name,c.customer_tier,rt.route_name,rt.transport_mode,rt.baseline_transit_days,p.product_name
+        FROM orders o
+        LEFT JOIN customers c ON c.customer_id=o.customer_id
+        LEFT JOIN routes rt ON rt.route_id=o.route_id
+        LEFT JOIN products p ON p.product_id=o.product_id
+        WHERE o.is_effective=1"""):
+        orders[r[0]] = dict(zip([k for k in ("sales_order_id", "work_order_id", "customer_id", "product_id",
+                                             "quantity", "unit", "contract_amount", "promised", "route_id",
+                                             "mode", "delivery_basis", "src_flag", "src_reason", "created",
+                                             "customer", "tier", "route_name", "tmode", "base_transit",
+                                             "product")], r))
+
+    ships = [dict(zip(("shipment_id", "sales_order_id", "route_id", "carrier", "quantity", "unit",
+                       "dispatched_at", "carrier_promised_at", "received_at", "status"), r))
+             for r in con.execute("SELECT shipment_id,sales_order_id,route_id,carrier,quantity,unit,"
+                                  "dispatched_at,carrier_promised_at,received_at,status FROM shipments")]
+
+    nodes = [dict(zip(("sales_order_id", "stage_code", "stage_name", "sequence", "planned_end_at",
+                       "actual_end_at", "stage_status"), r))
+             for r in con.execute("SELECT sales_order_id,stage_code,stage_name,sequence,planned_end_at,"
+                                  "actual_end_at,stage_status FROM stage_nodes ORDER BY sales_order_id,sequence")]
+
+    exc = [dict(zip(("sales_order_id", "severity", "exception_type", "opened_at", "closed_at", "status"), r))
+           for r in con.execute("SELECT sales_order_id,severity,exception_type,opened_at,closed_at,status "
+                                "FROM exceptions")]
+
+    ev = [dict(zip(("shipment_id", "event_at", "event_status"), r))
+          for r in con.execute("SELECT shipment_id,event_at,event_status FROM logistics_events")]
+
+    po = [dict(zip(("sales_order_id", "actual_receipt_at", "promised_receipt_at", "supplier_confirmed_eta"), r))
+          for r in con.execute("SELECT sales_order_id,actual_receipt_at,promised_receipt_at,supplier_confirmed_eta "
+                               "FROM procurement_lines")]
+
+    qc = con.execute("SELECT sales_order_id, COUNT(*) FROM quality_inspections WHERE result='不合格' "
+                     "GROUP BY 1").fetchall()
+    return orders, ships, nodes, exc, ev, po, dict(qc)
+
+
+# ---------- empirical distributions ----------
+DELAY_WORDS = ("延误", "异常", "滞留", "退")
+
+
+def is_delay(status):
+    return any(w in (status or "") for w in DELAY_WORDS)
+
+
+def transit_by_route(ships, delay_ship):
+    """route_id -> {'all':[...], 1:[有延误事件], 0:[无延误事件]} 在途天数（已签收）"""
+    d = {}
+    for s in ships:
+        if s["received_at"] and s["dispatched_at"]:
+            v = jd(s["received_at"]) - jd(s["dispatched_at"])
+            b = d.setdefault(s["route_id"], {"all": [], 0: [], 1: []})
+            b["all"].append(v)
+            b[1 if s["shipment_id"] in delay_ship else 0].append(v)
+    return d
+
+
+def err_by_mode(orders, ships, nodes, tr, exc_first_opened):
+    """历史已全量签收订单：残差 = 实际签收 − (SHIP计划完成 + 线路在途P50)
+       分桶键 (履约方式, 快照前是否已有异常开启)"""
+    disp, recv, recv_t = {}, {}, {}
+    for s in ships:
+        disp[s["sales_order_id"]] = disp.get(s["sales_order_id"], 0) + s["quantity"]
+        if s["received_at"]:
+            recv[s["sales_order_id"]] = recv.get(s["sales_order_id"], 0) + s["quantity"]
+            if s["received_at"] > recv_t.get(s["sales_order_id"], ""):
+                recv_t[s["sales_order_id"]] = s["received_at"]
+    ship_plan = {k: v for k, v in
+                 ((n["sales_order_id"], n["planned_end_at"]) for n in nodes if n["stage_code"] == "SHIP")}
+    p50 = {r: quant(sorted(v["all"]), 0.5) for r, v in tr.items()}
+    allp50 = quant(sorted([x for v in tr.values() for x in v["all"]]), 0.5)
+    out = {}
+    for oid, o in orders.items():
+        if recv.get(oid, 0) < o["quantity"] or oid not in recv_t:
+            continue                      # 只用已全量签收的历史单做标定
+        sp = ship_plan.get(oid)
+        if not sp:
+            continue
+        pred = jd(sp) + (p50.get(o["route_id"]) or allp50)
+        # 标定用"签收前已出现异常"，与在单口径"快照前已出现异常"对齐（订单尚未关闭）
+        flag = 1 if exc_first_opened.get(oid) and exc_first_opened[oid] < recv_t[oid] else 0
+        out.setdefault((o["mode"], flag), []).append(jd(recv_t[oid]) - pred)
+        out.setdefault((o["mode"], "A"), []).append(jd(recv_t[oid]) - pred)
+        out.setdefault(("ALL", "A"), []).append(jd(recv_t[oid]) - pred)
+    return out
+
+
+# ---------- per-order signals ----------
+def node_signals(nodes_for_order, snap):
+    open_nodes = [n for n in nodes_for_order if not n["actual_end_at"]]
+    overdue = [n for n in open_nodes if jd(n["planned_end_at"]) < snap]
+    cur = min(open_nodes, key=lambda n: n["sequence"]) if open_nodes else None
+    return {
+        "open_nodes": len(open_nodes),
+        "overdue_nodes": len(overdue),
+        "max_overdue_d": round(max((snap - jd(n["planned_end_at"]) for n in overdue), default=0.0), 1),
+        "cur_stage": cur["stage_name"] if cur else "已全量发运",
+        "cur_status": cur["stage_status"] if cur else "-",
+        "ship_plan": next((n["planned_end_at"] for n in nodes_for_order if n["stage_code"] == "SHIP"), None),
+    }
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--db")
+    ap.add_argument("--out")
+    ap.add_argument("--json", action="store_true")
+    a = ap.parse_args()
+
+    db = find_db(a.db)
+    con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    C = cfg(con)
+    snap_iso = C[SNAP_KEY]
+    snap = jd(snap_iso)
+    min_n = int(C.get(MIN_SAMPLES_KEY, 5))
+    red = float(C["risk_red_threshold"])
+    yel = float(C["risk_yellow_threshold"])
+
+    orders, ships, nodes, exc, ev, po, badqc = load(con)
+    by_order_nodes = {}
+    for n in nodes:
+        by_order_nodes.setdefault(n["sales_order_id"], []).append(n)
+    disp, recv, open_ship = {}, {}, {}
+    for s in ships:
+        oid = s["sales_order_id"]
+        disp[oid] = disp.get(oid, 0) + s["quantity"]
+        if s["received_at"]:
+            recv[oid] = recv.get(oid, 0) + s["quantity"]
+        else:
+            open_ship.setdefault(oid, []).append(s)
+
+    delay_ship = {e["shipment_id"] for e in ev if is_delay(e["event_status"])}
+    exc_open_before = {e["sales_order_id"] for e in exc
+                       if e["sales_order_id"] and e["opened_at"] and jd(e["opened_at"]) <= snap}
+    exc_first_opened = {}
+    for e in exc:
+        if e["sales_order_id"] and e["opened_at"]:
+            cur = exc_first_opened.get(e["sales_order_id"])
+            if cur is None or e["opened_at"] < cur:
+                exc_first_opened[e["sales_order_id"]] = e["opened_at"]
+    tr = transit_by_route(ships, delay_ship)
+    tr_all = sorted(x for v in tr.values() for x in v["all"])
+    tr_by_mode = {}
+    for s in ships:
+        if s["received_at"] and s["dispatched_at"]:
+            rmode = orders.get(s["sales_order_id"], {}).get("tmode")
+            tr_by_mode.setdefault(rmode, []).append(jd(s["received_at"]) - jd(s["dispatched_at"]))
+    er = err_by_mode(orders, ships, nodes, tr, exc_first_opened)
+    er_all = sorted(er[("ALL", "A")])
+
+    exc_open, ev_by_ship = {}, {}
+    for e in exc:
+        if not e["closed_at"]:
+            exc_open.setdefault(e["sales_order_id"], []).append(e)
+    for e in ev:
+        ev_by_ship.setdefault(e["shipment_id"], []).append(e)
+
+    rows = []
+    for oid, o in orders.items():
+        got = recv.get(oid, 0)
+        if got >= o["quantity"]:
+            continue                                   # 已完成，不在敞口内
+        grp = "在途" if open_ship.get(oid) else "未发货"
+        promise = jd(o["promised"])
+        d2p = round(promise - snap, 1)                 # 距承诺交期天数（负=已过）
+        sig = node_signals(by_order_nodes.get(oid, []), snap)
+        r = {"grp": grp, "sales_order_id": oid, "work_order_id": o["work_order_id"],
+             "customer": o["customer"], "tier": o["tier"], "product": o["product"],
+             "mode": o["mode"], "qty": o["quantity"], "unit": o["unit"], "amount": o["contract_amount"],
+             "shipped": disp.get(oid, 0), "signed": got, "open_qty": o["quantity"] - got,
+             "route": o["route_name"], "promised": o["promised"][:16], "d2p": d2p,
+             "cur_stage": sig["cur_stage"], "cur_status": sig["cur_status"],
+             "overdue_nodes": sig["overdue_nodes"], "max_overdue_d": sig["max_overdue_d"],
+             "open_exc": len(exc_open.get(oid, [])),
+             "exc_seen": sum(1 for e in exc if e["sales_order_id"] == oid and e["opened_at"]
+                             and jd(e["opened_at"]) <= snap),
+             "open_exc_sev": "/".join(sorted({e["severity"] for e in exc_open.get(oid, [])})) or "-",
+             "bad_qc": badqc.get(oid, 0), "src_flag": o["src_flag"] or "-", "src_reason": o["src_reason"] or "-"}
+
+        if grp == "在途":
+            worst, curve, cname = -1, None, None
+            p50j = p90j = None
+            for s in open_ship[oid]:
+                dl = 1 if s["shipment_id"] in delay_ship else 0
+                rb = tr.get(s["route_id"], {"all": [], 0: [], 1: []})
+                # 非对称条件化：已观测到延误事件 -> 用"有延误"条件分布（升级）；
+                # 暂无延误事件 -> 仍用线路全量分布，不假设它后续也不会延误（避免幸存者偏差压低分数）
+                if dl and len(rb[1]) >= min_n:
+                    vals, src = sorted(rb[1]), f"线路{s['route_id']}×有延误事件"
+                elif len(rb["all"]) >= min_n:
+                    vals, src = sorted(rb["all"]), (f"线路{s['route_id']}(延误桶样本不足回退)" if dl
+                                                    else f"线路{s['route_id']}全量")
+                elif len(tr_by_mode.get(o["tmode"], [])) >= min_n:
+                    vals, src = sorted(tr_by_mode[o["tmode"]]), f"运输方式{o['tmode']}(回退)"
+                else:
+                    vals, src = tr_all, "全网(回退)"
+                allowed = promise - jd(s["dispatched_at"])
+                p, k, n = beta_p(vals, allowed)
+                if p > worst:
+                    worst, curve, cname = p, vals, src
+                # 预计签收取各在途运单中最晚的一批（全量签收才算完成）
+                e50 = jd(s["dispatched_at"]) + quant(vals, 0.5)
+                e90 = jd(s["dispatched_at"]) + quant(vals, 0.9)
+                p50j = e50 if p50j is None else max(p50j, e50)
+                p90j = e90 if p90j is None else max(p90j, e90)
+            # 物流事件 / 承运商承诺
+            delay_ev = sum(1 for s in open_ship[oid] for e in ev_by_ship.get(s["shipment_id"], [])
+                           if any(w in (e["event_status"] or "") for w in ("延误", "异常", "滞留", "退")))
+            last_ev = max((e for s in open_ship[oid] for e in ev_by_ship.get(s["shipment_id"], [])),
+                          key=lambda e: e["event_at"], default=None)
+            carrier_late = max((jd(s["carrier_promised_at"]) - promise for s in open_ship[oid]
+                                if s["carrier_promised_at"]), default=None)
+            r.update({"ref_id": ",".join(s["shipment_id"] for s in open_ship[oid]),
+                      "dispatched": min(s["dispatched_at"][:16] for s in open_ship[oid]),
+                      "curve_n": len(curve) if curve else 0, "curve_src": cname,
+                      "delay_ev": delay_ev,
+                      "last_ev": (last_ev["event_status"] + "@" + last_ev["event_at"][:16]) if last_ev else "-",
+                      "carrier_late_d": round(carrier_late, 1) if carrier_late is not None else None,
+                      "p50_recv": fmt(p50j), "p90_recv": fmt(p90j),
+                      "basis": f"在途天数经验分布[{cname},n={len(curve) if curve else 0}] vs 允许天数"
+                               + ("；分批发货余量未发" if disp.get(oid, 0) < o["quantity"] else "")})
+            p = worst
+            r["buffer_d"] = round(promise - p50j, 1) if p50j else None
+
+        else:  # 未发货
+            sp = sig["ship_plan"]
+            vals = sorted(tr.get(o["route_id"], {"all": []})["all"]) or tr_all
+            t50 = quant(vals, 0.5)
+            pred = (jd(sp) + t50) if sp else None
+            flag = 1 if oid in exc_open_before else 0     # 在单：快照前已出现异常
+            # 同样非对称：有异常才升级到"有异常"条件分布；无异常用履约方式全量（不假设后续也不出异常）
+            if flag and len(er.get((o["mode"], 1), [])) >= min_n:
+                e, esrc = sorted(er[(o["mode"], 1)]), f"履约{o['mode']}×曾开异常"
+            elif len(er.get((o["mode"], "A"), [])) >= min_n:
+                e, esrc = sorted(er[(o["mode"], "A")]), (f"履约{o['mode']}(曾开异常桶样本不足回退)" if flag
+                                                         else f"履约{o['mode']}全量")
+            else:
+                e, esrc = er_all, "全量历史(回退)"
+            p = None
+            if pred is not None:
+                buffer_d = promise - pred
+                p, k, n = beta_p(e, buffer_d)
+                r["plan_vs_promise_d"] = round(promise - jd(sp), 1)
+                r["ship_plan"] = sp[:10]
+                r.update({"curve_n": n, "curve_src": esrc, "buffer_d": round(buffer_d, 1),
+                          "p50_recv": fmt(pred + quant(e, 0.5)), "p90_recv": fmt(pred + quant(e, 0.9)),
+                          "basis": f"发货节点计划{sp[:10]}+线路在途P50 {t50:.0f}天，残差经验分布({esrc},n={n})"})
+            else:
+                r.update({"curve_n": len(e), "curve_src": esrc, "buffer_d": None,
+                          "p50_recv": "-", "p90_recv": "-", "basis": "缺发货节点计划，无法预测→人工复核"})
+            # 采购 / 供应商标记
+            openpo = [x for x in po if x["sales_order_id"] == oid and not x["actual_receipt_at"]]
+            eta_late = max(((jd(x["supplier_confirmed_eta"]) - jd(x["promised_receipt_at"]))
+                            for x in openpo if x["supplier_confirmed_eta"] and x["promised_receipt_at"]),
+                           default=None)
+            r.update({"ref_id": o["work_order_id"] or oid, "dispatched": None, "delay_ev": 0,
+                      "last_ev": "-", "carrier_late_d": None,
+                      "open_po": len(openpo),
+                      "eta_late_d": round(eta_late, 1) if eta_late is not None else 0.0})
+
+        overdue_fact = promise < snap
+        r["overdue_fact"] = 1 if overdue_fact else 0
+        if overdue_fact:
+            r["score"], r["level"] = 1.0, "红-延期事实"
+        else:
+            if p is None:
+                r["score"], r["level"] = None, "人工复核"
+            else:
+                r["score"], r["level"] = round(p, 3), ("红" if p >= red else "黄" if p >= yel else "绿")
+        rows.append(r)
+
+    rows.sort(key=lambda r: (r["grp"], -(r["score"] or 0), r["d2p"]))
+
+    out_dir = a.out or os.path.join(os.getcwd(), "datahub", "output")
+    os.makedirs(out_dir, exist_ok=True)
+    day = snap_iso[:10].replace("-", "")
+    csv_path = os.path.join(out_dir, f"delivery_risk_{day}.csv")
+    cols = ["grp", "level", "score", "sales_order_id", "work_order_id", "customer", "tier", "product",
+            "mode", "qty", "unit", "shipped", "signed", "open_qty", "amount", "route", "promised", "d2p",
+            "p50_recv", "p90_recv", "buffer_d", "plan_vs_promise_d", "ship_plan", "curve_n", "curve_src", "basis",
+            "cur_stage", "cur_status", "overdue_nodes", "max_overdue_d", "delay_ev", "last_ev",
+            "carrier_late_d", "open_exc", "open_exc_sev", "exc_seen", "bad_qc", "open_po", "eta_late_d",
+            "src_flag", "src_reason", "overdue_fact", "dispatched", "ref_id"]
+    with open(csv_path, "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
+        w.writeheader()
+        for r in rows:
+            w.writerow(r)
+
+    # 敞口量/金额（按单位分列，不相加）
+    by_unit = {}
+    amt = 0.0
+    for r in rows:
+        by_unit[r["unit"]] = by_unit.get(r["unit"], 0) + r["open_qty"]
+        amt += (r.get("amount") or 0) * r["open_qty"] / max(r["qty"], 1)
+    unit_txt = " / ".join(f"**{v} {u}**" for u, v in sorted(by_unit.items(), key=lambda x: -x[1]))
+
+    summary = {"snapshot": snap_iso, "open_orders": len(rows),
+               "open_qty_by_unit": by_unit, "open_amount_cny": round(amt, 2),
+               "by_grp": {g: sum(1 for r in rows if r["grp"] == g) for g in ("在途", "未发货")},
+               "by_level": {L: sum(1 for r in rows if r["level"] == L)
+                            for L in ("红-延期事实", "红", "黄", "绿", "人工复核")},
+               "csv": csv_path}
+
+    # ---------- markdown ----------
+    def tbl(rs, note_col=True):
+        head = ("| 组 | 订单号 | 工单/运单 | 客户 | 等级 | 评分 | 承诺交期 | 距承诺(天) | P50预计签收 | "
+                "P90预计签收 | buffer(天) | 样本n | 当前节点 | 超时未完节点 | 未关闭异常 | 曾开异常 | 依据 |\n"
+                "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
+        out = head
+        for r in rs:
+            out += (f"| {r['grp']} | {r['sales_order_id']} | {r['ref_id']} | {r['customer']} | {r['level']} | "
+                    f"{r['score'] if r['score'] is not None else '-'} | {r['promised'][:10]} | {r['d2p']} | "
+                    f"{r['p50_recv']} | {r['p90_recv']} | {r['buffer_d'] if r['buffer_d'] is not None else '-'} | "
+                    f"{r['curve_n']} | {r['cur_stage']}/{r['cur_status']} | {r['overdue_nodes']}"
+                    f"({'+' + str(r['max_overdue_d']) + '天' if r['max_overdue_d'] else '无'}) | "
+                    f"{r['open_exc']}({r['open_exc_sev']}) | {r['exc_seen']} | {r['basis']} |\n")
+        return out
+
+    md = []
+    md.append(f"# 在途 / 未发货订单 交付风险红黄绿（快照 {snap_iso}，Asia/Shanghai）\n")
+    md.append(f"- 敞口订单 **{len(rows)}** 单 = 在途 **{summary['by_grp']['在途']}** + 未发货 "
+              f"**{summary['by_grp']['未发货']}**（口径：已生效 769 单中未全量签收者；分批发货按运单量累计）")
+    md.append(f"- 等级：红-延期事实 **{summary['by_level']['红-延期事实']}** ｜ 红 **{summary['by_level']['红']}** ｜ "
+              f"黄 **{summary['by_level']['黄']}** ｜ 绿 **{summary['by_level']['绿']}**"
+              f"（阈值 红≥{red}、黄≥{yel}，取自 configuration）")
+    md.append(f"- 未交付量按单位分列：{unit_txt}（各单位不可相加）；"
+              f"按未交付量折算的合同金额敞口 **{amt:,.2f} 元**\n")
+    md.append("## 一、已发生的延期事实（承诺已过、未全量签收）\n")
+    md.append("> 这是**事实**不是预测：承诺日期已早于快照，延期已经发生。评分固定 1.0，单列以免与概率混淆。\n")
+    md.append(tbl([r for r in rows if r["level"] == "红-延期事实"]))
+    # 未发货红黄成因分档（计划层面 vs 执行层面 vs 缓冲不足）
+    us = [r for r in rows if r["grp"] == "未发货" and r["level"] in ("红", "黄", "红-延期事实")]
+    g_plan = [r for r in us if (r.get("plan_vs_promise_d") or 0) < 0]
+    g_exec = [r for r in us if r not in g_plan and r.get("ship_plan") and r["ship_plan"] <= snap_iso[:10]]
+    g_buf = [r for r in us if r not in g_plan and r not in g_exec]
+    md.append("## 二、未发货红/黄的成因分档（计划层 vs 执行层）\n")
+    md.append(f"- **排期本身赶不上承诺**（发货节点计划晚于承诺交期）：**{len(g_plan)}** 单 —— "
+              f"{'、'.join(r['sales_order_id'] for r in g_plan)}\n  "
+              f"  这类不是车间执行慢，是接单排期与承诺冲突，只能重排产或与客户改约；与 ERP 自带 `source_risk_flag` 无关（多数标记为\"否\"）。")
+    md.append(f"- **计划已过仍未完成**（执行滞后，发货节点计划日 ≤ 快照仍未发货）：**{len(g_exec)}** 单 —— "
+              f"{'、'.join(r['sales_order_id'] + '(计划' + r['ship_plan'] + ')' for r in g_exec) if g_exec else '无'}")
+    md.append(f"- **计划可行但缓冲不足**（历史残差 P50≈+2.6 天吃掉余量）：**{len(g_buf)}** 单 —— "
+              f"{'、'.join(r['sales_order_id'] for r in g_buf)}\n")
+    md.append("## 三、红色（预测延期概率 ≥ 0.65）\n")
+    md.append(tbl([r for r in rows if r["level"] == "红"]))
+    md.append("## 四、黄色（0.30 ≤ 概率 < 0.65）\n")
+    md.append(tbl([r for r in rows if r["level"] == "黄"]))
+    md.append(f"## 五、绿色（概率 < 0.30）共 {summary['by_level']['绿']} 单\n")
+    md.append("明细见 `delivery_risk_%s.csv`（含全部 89 单、评分、依据与信号列）。\n" % day)
+    md.append("""## 方法与口径
+
+| 组 | 预测签收 | 评分（延期概率） |
+|---|---|---|
+| 在途 | 发货时间 + 同线路历史在途天数 P50/P90 | P(线路历史在途天数 > 承诺交期−发货时间)，按"该运单是否已出现延误/异常物流事件"分桶 |
+| 未发货 | 发货节点(SHIP)计划完成 + 线路在途P50 + 残差分布 P50/P90 | P(残差 > 承诺交期 − 预测点)，残差=历史已全量签收订单「实际签收−预测点」，按 履约方式 × 快照前是否已有异常 分桶 |
+
+- **条件分桶（非对称）**：历史 724 单已签收运单里，出现过延误/异常事件的平均在途 12.6 天、没出现的 5.3 天；680 单已全量签收订单里，签收前没出现过异常的残差均值约 −2.9 天、出现过的约 +3.7 天。所以"有没有已观测到的坏信号"决定用哪条经验曲线，而不是事后拍系数加权。
+- **只升级不降级**：已出现延误事件/异常的订单改用"有信号"条件分布；暂无信号的订单仍用**全量**分布，而不是"最终也没出信号"的分布——后者对还没走完的订单是幸存者偏差，会把分数系统性压低。
+- 概率用 Beta(1,1) 平滑 `(k+1)/(n+2)`，避免小样本 0/1 极端值；分桶样本量 < `risk_min_samples=5` 时逐级回退（线路×事件→线路→运输方式→全网 / 履约×异常→履约→全量历史）并在"依据"列标注回退原因。
+- 辅助信号（超时未完节点、承运商承诺、不合格质检、供应商 ETA、ERP 原始风险标记）**只作依据展示，不参与打分**——加权系数无法用本数据集校准，避免制造虚假精度。
+- 关联键：`sales_order_id` / `work_order_id` / `shipment_id`；未按合同号跨表 JOIN。
+- **交期紧迫度评分，未经真实数据校准**：残差分布来自同一份历史（n=680 已全量签收单），未做时间外验证；异常与延期存在同源/反向因果（因为慢才产生异常），条件概率只用于分档不作因果解释。`buffer` 为承诺交期与预测签收点的天数差（负=预测已赶不上）。
+- 只读计算，未写库、未回写企业系统、未真实推送。
+
+数据源：`datahub/agent_data.sqlite`（orders / shipments / stage_nodes / routes / logistics_events / exceptions / procurement_lines / quality_inspections）
+复算：`python3 datahub/scripts/delivery_risk.py`
+""")
+    md_path = os.path.join(out_dir, f"delivery_risk_{day}.md")
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(md))
+    summary["md"] = md_path
+    if a.json:
+        print(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1))
+    else:
+        print(json.dumps(summary, ensure_ascii=False, indent=1))
+        for r in rows:
+            if r["level"] in ("红-延期事实", "红", "黄", "人工复核"):
+                print(f"{r['grp']}|{r['level']}|{r['score']}|{r['sales_order_id']}|{r['customer']}|"
+                      f"{r['qty']}{r['unit']}|承诺{r['promised']}|d2p={r['d2p']}|P50={r['p50_recv']}|"
+                      f"P90={r['p90_recv']}|buffer={r['buffer_d']}|n={r['curve_n']}|"
+                      f"节点{r['cur_stage']}/{r['cur_status']}|超时{r['overdue_nodes']}|异常{r['open_exc']}|"
+                      f"延误事件{r['delay_ev']}|{r['basis']}")
+    con.close()
+
+
+if __name__ == "__main__":
+    main()

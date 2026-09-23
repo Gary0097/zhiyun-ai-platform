@@ -1,0 +1,56 @@
+{
+  "2026-09-17": {
+    "order-parser-agent\u001fqwen\u001fqwen3.8-flash": {
+      "provider_id": "qwen",
+      "model_name": "qwen3.8-flash",
+      "prompt_tokens": 60874,
+      "completion_tokens": 356,
+      "cache_read_tokens": 34560,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 60874,
+      "cache_observed_calls": 4,
+      "call_count": 4,
+      "agent_id": "order-parser-agent"
+    }
+  },
+  "2026-09-18": {
+    "default\u001fqwen\u001fqwen3.8-flash": {
+      "provider_id": "qwen",
+      "model_name": "qwen3.8-flash",
+      "prompt_tokens": 5726991,
+      "completion_tokens": 49574,
+      "cache_read_tokens": 5513216,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 5726991,
+      "cache_observed_calls": 125,
+      "call_count": 125,
+      "agent_id": "default"
+    },
+    "procurement-agent\u001fqwen\u001fqwen3.8-flash": {
+      "provider_id": "qwen",
+      "model_name": "qwen3.8-flash",
+      "prompt_tokens": 167763,
+      "completion_tokens": 4254,
+      "cache_read_tokens": 136320,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 167763,
+      "cache_observed_calls": 11,
+      "call_count": 11,
+      "agent_id": "procurement-agent"
+    }
+  },
+  "2026-09-20": {
+    "default\u001fqwen\u001fqwen3.8-flash": {
+      "provider_id": "qwen",
+      "model_name": "qwen3.8-flash",
+      "prompt_tokens": 540309,
+      "completion_tokens": 15078,
+      "cache_read_tokens": 481408,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 540309,
+      "cache_observed_calls": 16,
+      "call_count": 16,
+      "agent_id": "default"
+    }
+  }
+}

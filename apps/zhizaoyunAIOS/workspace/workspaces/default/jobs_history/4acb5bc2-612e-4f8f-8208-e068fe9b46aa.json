@@ -1,0 +1,20 @@
+[
+  {
+    "error": "missed scheduled run at 2026-09-18T19:11:36+00:00: late by 370480s, grace=600s",
+    "run_at": "2026-09-23T02:06:16.561433Z",
+    "status": "skipped",
+    "trigger": "scheduled"
+  },
+  {
+    "error": null,
+    "run_at": "2026-09-18T19:11:53.183940Z",
+    "status": "success",
+    "trigger": "scheduled"
+  },
+  {
+    "error": null,
+    "run_at": "2026-09-18T19:11:33.539879Z",
+    "status": "success",
+    "trigger": "manual"
+  }
+]

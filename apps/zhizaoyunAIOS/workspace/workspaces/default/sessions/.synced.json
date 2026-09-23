@@ -1,0 +1,89 @@
+{
+  "version": 2,
+  "files": {
+    "console/default_1789663876662-1vj07e5.json": {
+      "sha256": "691cf2d884d4ddc6d7bb936e2d203b92a36b1a86a5b9ada7505c9c04f1932866",
+      "session_id": "1789663876662-1vj07e5",
+      "messages": 10,
+      "aged_out": 0,
+      "rows_processed": 10,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "96ee05fd15254609954822fec80803b4",
+        "sync:default_1789663876662-1vj07e5"
+      ]
+    },
+    "console/local_cron--4acb5bc2-612e-4f8f-8208-e068fe9b46aa.json": {
+      "sha256": "8152f589295545e5a5a3c91dbd8113803f42dce6d879417830a2ec21cd4b7b7d",
+      "session_id": "cron:4acb5bc2-612e-4f8f-8208-e068fe9b46aa",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 6,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "024c4a39a8dd4617ae33ef58d42f2658",
+        "sync:local_cron--4acb5bc2-612e-4f8f-8208-e068fe9b46aa"
+      ]
+    },
+    "console/local_cron--ada60a9c-8ce6-4177-bc6b-7fe9078e9874.json": {
+      "sha256": "12379f211fbe204fe25b114ef6c0b550d7e293d2b54c5616cb7a861c493ccba2",
+      "session_id": "cron:ada60a9c-8ce6-4177-bc6b-7fe9078e9874",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 4,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "abeb21ce744c41f28038e7c5695de224",
+        "sync:local_cron--ada60a9c-8ce6-4177-bc6b-7fe9078e9874"
+      ]
+    },
+    "console/local_cron--adf8b46c-9e16-47b4-a9e7-913b59dedfe0.json": {
+      "sha256": "6dcc02a454076141b6449b8f66c9e5a61566e6271c1ab46adf243be33a453a65",
+      "session_id": "cron:adf8b46c-9e16-47b4-a9e7-913b59dedfe0",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 8,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "1a0510dc11e24504808c901f9693d2c1",
+        "sync:local_cron--adf8b46c-9e16-47b4-a9e7-913b59dedfe0"
+      ]
+    },
+    "console/local_cron--b70bfd12-515e-4cee-b594-5b3b4cc3f999.json": {
+      "sha256": "acea1f741b6e02665768681d67b5e60948f5220cbe6e598f0effdac5f932f2ae",
+      "session_id": "cron:b70bfd12-515e-4cee-b594-5b3b4cc3f999",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 7,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "3a8ead19fd4640408c908ce7d4816165",
+        "sync:local_cron--b70bfd12-515e-4cee-b594-5b3b4cc3f999"
+      ]
+    },
+    "console/local_cron--c217a37e-bbc9-446e-ae70-b1e05a303a42.json": {
+      "sha256": "f9abde5be0a7eaeae66d187d4f403f9b3077a336905625e0cda0b5702f96e729",
+      "session_id": "cron:c217a37e-bbc9-446e-ae70-b1e05a303a42",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 8,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "d1187e6d77e14190a8c72aaf4c4ad016",
+        "sync:local_cron--c217a37e-bbc9-446e-ae70-b1e05a303a42"
+      ]
+    },
+    "console/local_cron--cb60f68c-6fdc-4d72-a63b-b774e74d1628.json": {
+      "sha256": "f41feb1d9307115536e7f6e0598ff79ad278a6193a3c3c6fdfb002a43f0c0a01",
+      "session_id": "cron:cb60f68c-6fdc-4d72-a63b-b774e74d1628",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 13,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "23a05b9b0d55474e98d15f38a9dfe22d",
+        "sync:local_cron--cb60f68c-6fdc-4d72-a63b-b774e74d1628"
+      ]
+    }
+  }
+}

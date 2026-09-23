@@ -1,0 +1,84 @@
+---
+description: '2026-09-18 对 zhiyun-ai-platform 服务器进行的只读排查记录：确认 8399/8299 端口处于 LISTEN
+  状态但无法获取监听进程 PID 及工作目录（ps/lsof 均无返回）；未找到前端文件 index-BMMJGmGa.js、含"四元组/真实异常记录"的源代码文件、/api/knowledge/quads
+  的数据存储文件，以及含"真实订单样例"的模板文件；确认 datahub-dashboard.html 路径为 /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/console/datahub-dashboard.html；提取定时任务「每日运营早报」（ID:
+  8fd0a135-ae86-43e9-9193-afd4b6a40dc6）的完整 JSON 配置（cron 30 9 * * *，Asia/Shanghai）；全盘搜索"模拟日报""模拟数据"命中
+  5 个文件（app.log 两处、collect.py 两处、collection_report.md、bad_cases_review_20260918.md），内容均为"本报告为模拟数据演示产物；未向任何真实系统写入"类标记。'
+name: server-readonly-investigation
+session_id: qpsid_sha256_ec625b567f7299eef64b5a01aa8762b365cba6a793d36ec5ef192eebbfe37654
+source_conversation: '[[mem_session/dialog/qpsid_sha256_ec625b567f7299eef64b5a01aa8762b365cba6a793d36ec5ef192eebbfe37654.jsonl]]'
+---
+
+# 服务器只读排查报告（2026-09-18）
+
+## 1. 智能客服与客户运营应用（8399 端口）
+
+- **端口状态**：`ss` 确认 `0.0.0.0:8399` 与 `[::]:8399` 均处于 `LISTEN` 状态。
+- **进程信息**：无法获取监听进程的 PID、命令或工作目录（`ps` 与 `lsof -iTCP:8399` 均未返回命中）。
+- **前端资源**：全盘搜索 `index-BMMJGmGa.js`，未找到任何匹配文件。
+- **后端代码关键词**：搜索"四元组"或"真实异常记录"，未在 `.py/.js/.ts/.vue/.html` 等源代码文件中命中；仅历史会话/日志 JSON 中出现过这些词。
+- **`/api/knowledge/quads` 数据存储**：未找到名为 `quads` 的 JSON/SQLite/DB 文件，也未检索到含 `quads` 字段的数据库文件。
+
+## 2. 智能订单处理中心应用（8299 端口）
+
+- **端口状态**：`ss` 确认 `0.0.0.0:8299` 与 `[::]:8299` 均处于 `LISTEN` 状态。
+- **进程信息**：同样无法获取监听进程的 PID/工作目录。
+- **模板/源文件关键词**：全盘搜索"真实订单样例"，未找到任何匹配文件。
+
+## 3. datahub-dashboard.html 路径
+
+已确认绝对路径：
+```
+/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/console/datahub-dashboard.html
+```
+
+## 4. 定时任务「每日运营早报」
+
+**任务 ID**：`8fd0a135-ae86-43e9-9193-afd4b6a40dc6`
+
+**完整配置原文**（来源：`/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/jobs.json`）：
+
+```json
+{
+  "id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+  "name": "每日运营早报",
+  "request": {
+    "input": [
+      {
+        "content": [
+          {
+            "text": "生成今日客服与订单运营早报，简明输出三部分：1) 昨日智能客服咨询量与意图分布（订单查询/售后报修/财务支持等六类）；2) 待处理售后工单与高风险订单提醒（预测完工偏差大于3天的订单）；3) 8001知识库与智能客服应用运行状态一句话。",
+            "type": "text"
+          }
+        ],
+        "role": "user",
+        "type": "message"
+      }
+    ],
+    "session_id": "",
+    "user_id": "default"
+  },
+  "schedule": {
+    "cron": "30 9 * * *",
+    "timezone": "Asia/Shanghai",
+    "type": "cron"
+  }
+}
+```
+
+## 5. 全盘搜索「模拟日报」「模拟数据」
+
+在 `/root/zhiyun-ai-platform` 范围内命中以下文件：
+
+| 文件路径 | 行号 | 命中内容 |
+|---|---|---|
+| `.../logs/app.log` | 7460 | `> 文件页脚标注"本文件为演示用模拟数据，非真实商业文件"。` |
+| `.../logs/app.log` | 42706 | `> 本报告为模拟数据演示产物；未向任何真实系统写入。` |
+| `.../working/skill_pool/datahub/scripts/collect.py` | 179 | `"> 本报告为模拟数据演示产物；未向任何真实系统写入。"` |
+| `.../working/workspaces/datahub-agent/datahub/output/collection_report.md` | 9 | `> 本报告为模拟数据演示产物；未向任何真实系统写入。` |
+| `.../working/workspaces/datahub-agent/datahub/output/bad_cases_review_20260918.md` | 149 | `> 本单为模拟数据演示产物：全程只读 agent_data.sqlite，未写库、未回写企业系统、未做真实外发。` |
+| `.../working/workspaces/datahub-agent/datahub/scripts/collect.py` | 179 | `"> 本报告为模拟数据演示产物；未向任何真实系统写入。"` |
+
+---
+
+**结论**：已确认 datahub-dashboard 路径、早报任务原文及模拟数据命中文件；8399/8299 进程详情及 quads/订单样例源码路径未能确认，需补充应用部署路径或代码仓库权限。

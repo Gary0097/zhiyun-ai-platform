@@ -1,0 +1,37 @@
+{
+  "schema_version": "workspace-skill-manifest.v1",
+  "version": 1789671123877,
+  "skills": {
+    "weknora_kb_qa": {
+      "enabled": true,
+      "channels": [
+        "all"
+      ],
+      "preload": false,
+      "source": "customized",
+      "installed_from": "zip",
+      "config": {},
+      "metadata": {
+        "name": "weknora_kb_qa",
+        "description": "智造云知识库(WeKnora)问数技能。当用户询问金汉隆/公司产品、设备型号、技术规格、包装机、装盒机、售后服务、生产工艺等企业知识问题，或明确要求查询知识库/问数时使用。通过 WeKnora API 检索知识库并生成基于文档的回答。Use when the user asks about company products, equipment specs, packaging machinery knowledge, or explicitly requests a knowledge-base lookup.",
+        "version_text": "1.0",
+        "emoji": "📚",
+        "commit_text": "",
+        "source": "customized",
+        "protected": false,
+        "requirements": {
+          "require_bins": [],
+          "require_envs": [],
+          "require_mcps": []
+        },
+        "updated_at": "2026-09-17T18:51:18.700027Z"
+      },
+      "requirements": {
+        "require_bins": [],
+        "require_envs": [],
+        "require_mcps": []
+      },
+      "updated_at": "2026-09-17T18:51:18.700027Z"
+    }
+  }
+}

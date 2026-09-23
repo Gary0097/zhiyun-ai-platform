@@ -1,0 +1,111 @@
+{
+  "jobs": [
+    {
+      "dispatch": {
+        "channel": "console",
+        "meta": {},
+        "mode": "final",
+        "silent": false,
+        "target": {
+          "session_id": "",
+          "user_id": "default"
+        },
+        "type": "channel"
+      },
+      "enabled": true,
+      "id": "fb32a946-4007-4c2b-850f-c723f29329f8",
+      "meta": {},
+      "name": "运维-重跑Windows迁移包导出",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "请依次执行以下服务器运维命令并报告每步结果（直接执行，不要询问确认）：\n\n1) 清理卡住的导出进程与容器：\npkill -f /tmp/e.sh 2>/dev/null; docker ps -aq --filter ancestor=alpine 2>/dev/null | xargs -r docker rm -f 2>/dev/null; echo STEP1-DONE\n\n2) 修正 /tmp/e.sh 的卷导出镜像（本地没有 alpine）。用 python3 执行：\npython3 -c \"\np='/tmp/e.sh'; s=open(p).read()\ns=s.replace('alpine \\\\\\n    tar czf \\\"/dst/${vol}.tgz\\\" -C /src . 2>/dev/null', 'postgres:16-alpine \\\\\\n    sh -c \\\"tar czf /dst/${vol}.tgz -C /src .\\\"')\ns=s.replace('docker run --rm -v \\\"$vol\\\":/src -v \\\"$B/volumes\\\":/dst alpine', 'docker run --rm -v \\\"$vol\\\":/src -v \\\"$B/volumes\\\":/dst postgres:16-alpine')\nopen(p,'w').write(s); print('PATCHED')\n\"\n\n3) 确认修改生效：\ngrep -n 'postgres:16-alpine' /tmp/e.sh | head -3\n\n4) 后台重跑导出：\nnohup bash /tmp/e.sh > /tmp/export.log 2>&1 & sleep 8; tail -5 /tmp/export.log\n\n完成后汇报各步输出。",
+                "type": "text"
+              }
+            ],
+            "role": "user",
+            "type": "message"
+          }
+        ],
+        "session_id": "",
+        "user_id": "default"
+      },
+      "runtime": {
+        "max_concurrency": 1,
+        "misfire_grace_seconds": 600,
+        "share_session": true,
+        "timeout_seconds": 600,
+        "tool_safety": false
+      },
+      "save_result_to_inbox": true,
+      "schedule": {
+        "cron": null,
+        "repeat_count": null,
+        "repeat_end_type": null,
+        "repeat_every_days": null,
+        "repeat_until": null,
+        "run_at": "2026-09-18T18:35:28Z",
+        "timezone": "UTC",
+        "type": "once"
+      },
+      "task_type": "agent",
+      "text": null
+    },
+    {
+      "dispatch": {
+        "channel": "console",
+        "meta": {},
+        "mode": "final",
+        "silent": false,
+        "target": {
+          "session_id": "",
+          "user_id": "default"
+        },
+        "type": "channel"
+      },
+      "enabled": true,
+      "id": "d6005a8c-52ea-405b-ab26-77c1860497db",
+      "meta": {},
+      "name": "运维-打包Windows迁移包",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "执行以下服务器运维步骤并汇报（直接执行）：\n\n1) 查看导出进度：\ntail -8 /tmp/export.log\n\n2) 把两段 base64 解码写入迁移包（一条命令，注意引号原样）：\necho IyDmmbrpgKDkupEgQUlPUyBXaW5kb3dzIOS4gOmUrumDqOe9suiEmuacrAojIOeUqOazle+8mueuoeeQhuWRmCBQb3dlclNoZWxsIOS4reaJp+ihjCAgLlxkZXBsb3kucHMxCiMg5YmN572u77yaTm9kZS5qcyAyMCvjgIFEb2NrZXIgRGVza3RvcO+8iOi/kOihjOS4re+8ieOAgVB5dGhvbiAzLjExK++8iOWQqyBwaXDvvInjgIHlpJbnvZEKJEVycm9yQWN0aW9uUHJlZmVyZW5jZSA9ICJTdG9wIgokcGtnID0gJFBTU2NyaXB0Um9vdApXcml0ZS1Ib3N0ICI9PT09IOaZuumAoOS6kSBBSU9TIFdpbmRvd3Mg6YOo572yID09PT0iIC1Gb3JlZ3JvdW5kQ29sb3IgQ3lhbgoKIyAtLS0tLS0tLS0tIDAuIOWJjee9ruajgOafpSAtLS0tLS0tLS0tCmZ1bmN0aW9uIE5lZWQoJGNtZCwgJGhpbnQpIHsKICBpZiAoLW5vdCAoR2V0LUNvbW1hbmQgJGNtZCAtRXJyb3JBY3Rpb24gU2lsZW50bHlDb250aW51ZSkpIHsKICAgIFdyaXRlLUhvc3QgIlvplJnor69dIOe8uuWwkSAkY21k44CCJGhpbnQiIC1Gb3JlZ3JvdW5kQ29sb3IgUmVkOyBleGl0IDEKICB9Cn0KTmVlZCBub2RlICAgIuivt+WuieijhSBOb2RlLmpzIDIwK++8mmh0dHBzOi8vbm9kZWpzLm9yZyIKTmVlZCBkb2NrZXIgIuivt+WuieijheW5tuWQr+WKqCBEb2NrZXIgRGVza3RvcO+8mmh0dHBzOi8vd3d3LmRvY2tlci5jb20vcHJvZHVjdHMvZG9ja2VyLWRlc2t0b3AiCk5lZWQgcHl0aG9uICLor7flronoo4UgUHl0aG9uIDMuMTEr77yI5Yu+6YCJIEFkZCB0byBQQVRI77yJIgpkb2NrZXIgaW5mbyAqPiAkbnVsbAppZiAoJExBU1RFWElUQ09ERSAtbmUgMCkgeyBXcml0ZS1Ib3N0ICJb6ZSZ6K+vXSBEb2NrZXIg5pyq6L+Q6KGMIiAtRm9yZWdyb3VuZENvbG9yIFJlZDsgZXhpdCAxIH0KCiMgLS0tLS0tLS0tLSAxLiDnq6/lj6PljaDnlKjmo4Dmn6XvvIhJSVMg562J77yJIC0tLS0tLS0tLS0KJHBvcnRzID0gODAwMCw4MDAxLDgwMDIsODE5OSw4Mjk5LDgzMDEsODMwMiw4MzEwLDgzOTksMTgwMDAsMTg3OTAKJGJ1c3kgPSBAKCkKZm9yZWFjaCAoJHAgaW4gJHBvcnRzKSB7CiAgaWYgKEdldC1OZXRUQ1BDb25uZWN0aW9uIC1Mb2NhbFBvcnQgJHAgLVN0YXRlIExpc3RlbiAtRXJyb3JBY3Rpb24gU2lsZW50bHlDb250aW51ZSkgeyAkYnVzeSArPSAkcCB9Cn0KaWYgKCRidXN5KSB7CiAgV3JpdGUtSG9zdCAiW+itpuWRil0g5Lul5LiL56uv5Y+j5bey6KKr5Y2g55So77yaJCgkYnVzeSAtam9pbiAnLCcp44CC57un57ut5bCG5a+86Ie05a+55bqU5pyN5Yqh5ZCv5Yqo5aSx6LSl77yI6Zqn6YGT5qih5byP5Lya6Lez6L+H77yJ44CCIiAtRm9yZWdyb3VuZENvbG9yIFllbGxvdwogIFJlYWQtSG9zdCAi5Zue6L2m57un57ut77yMQ3RybCtDIOmAgOWHuiIKfQoKIyAtLS0tLS0tLS0tIDIuIOaZuumAoOS6kSBIdWIgLS0tLS0tLS0tLQpXcml0ZS1Ib3N0ICJgblsxLzVdIOWuieijheaZuumAoOS6kSBIdWIg6L+Q6KGM5pe277yI6aaW5qyhIDMtMTAg5YiG6ZKf77yM5Zyo57q/5a6J6KOF77yJLi4uIiAtRm9yZWdyb3VuZENvbG9yIEN5YW4KJGFpb3MgPSBKb2luLVBhdGggJHBrZyAiYWlvcy1wbGF0Zm9ybSIKUHVzaC1Mb2NhdGlvbiAkYWlvcwpjbWQgL2MgInNldHVwLWh1Yi5jbWQiIDI+JjEgfCBTZWxlY3QtT2JqZWN0IC1MYXN0IDUKUG9wLUxvY2F0aW9uCgojIOaBouWkjSBIdWIg5pWw5o2u77yI6LSm5Y+3L+aZuuiDveS9ky/lr7nor50v5a6a5pe25Lu75YqhL+WHreaNru+8iQokd3MgPSBKb2luLVBhdGggJGFpb3MgImFwcHNcemhpemFveXVuQUlPU1x3b3Jrc3BhY2UiCk5ldy1JdGVtIC1JdGVtVHlwZSBEaXJlY3RvcnkgLUZvcmNlIC1QYXRoICIkd3NcaHViIiB8IE91dC1OdWxsCkNvcHktSXRlbSAiJHBrZ1xhaW9zLWRhdGFcaHViXCoiICIkd3NcaHViXCIgLVJlY3Vyc2UgLUZvcmNlCldyaXRlLUhvc3QgIiAgSHViIOaVsOaNruW3suaBouWkje+8iGNvbnRyb2wuZGIgLyBydW50aW1lcyAvIHNlY3JldHPvvIkiCgojIC0tLS0tLS0tLS0gMy4g5ZCv5YqoIEh1Yu+8iOmmluasoeazqOWGjOeuoeeQhuWRmOW3sueUseaVsOaNruW4pui/h++8jOebtOaOpeWQr+WKqO+8iSAtLS0tLS0tLS0tCldyaXRlLUhvc3QgImBuWzIvNV0g5ZCv5YqoIEh1Yu+8iDgwMDDvvIkuLi4iIC1Gb3JlZ3JvdW5kQ29sb3IgQ3lhbgpTdGFydC1Qcm9jZXNzIGNtZCAtQXJndW1lbnRMaXN0ICIvYyIsICJzdGFydC1odWIuY21kIiAtV29ya2luZ0RpcmVjdG9yeSAkYWlvcyAtV2luZG93U3R5bGUgTWluaW1pemVkCiRvayA9ICRmYWxzZQpmb3IgKCRpID0gMDsgJGkgLWx0IDQwOyAkaSsrKSB7CiAgdHJ5IHsgJHIgPSBJbnZva2UtV2ViUmVxdWVzdCAiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2FwaS92ZXJzaW9uIiAtVXNlQmFzaWNQYXJzaW5nIC1UaW1lb3V0U2VjIDI7IGlmICgkci5TdGF0dXNDb2RlIC1lcSAyMDApIHsgJG9rID0gJHRydWU7IGJyZWFrIH0gfSBjYXRjaCB7IFN0YXJ0LVNsZWVwIDMgfQp9CldyaXRlLUhvc3QgKCQoaWYgKCRvaykgeyAiICBIdWIg5bey5bCx57uqIGh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIgfSBlbHNlIHsgIiAgSHViIOacquWcqOmihOacn+aXtumXtOWwsee7qu+8jOeojeWQjuaJi+WKqOajgOafpSBzdGFydC1odWIuY21kIOeql+WPoyIgfSkpCgojIGNvbnNvbGUg5ZOB54mM6KGl5LiB77ya5ZCI5ZCM566h55CGICsg5pm66IO95a6i5pyN5L6n6L655qCP5YWl5Y+jCldyaXRlLUhvc3QgImBuWzMvNV0g5rOo5YWl5bqU55So5YWl5Y+j6KGl5LiB77yI5ZCI5ZCM566h55CGIC8g5pm66IO95a6i5pyN77yJLi4uIiAtRm9yZWdyb3VuZENvbG9yIEN5YW4KJGNvbnNvbGVBc3NldHMgPSBHZXQtQ2hpbGRJdGVtICIkYWlvc1xhcHBzXHpoaXphb3l1bkFJT1NccnVudGltZVxxd2VucGF3LWh1Ylx2ZW52XExpYlxzaXRlLXBhY2thZ2VzXHF3ZW5wYXdcY29uc29sZVxhc3NldHMiIC1EaXJlY3RvcnkgLUVycm9yQWN0aW9uIFNpbGVudGx5Q29udGludWUKJGFzc2V0c0RpciA9ICIkYWlvc1xhcHBzXHpoaXphb3l1bkFJT1NccnVudGltZVxxd2VucGF3LWh1Ylx2ZW52XExpYlxzaXRlLXBhY2thZ2VzXHF3ZW5wYXdcY29uc29sZVxhc3NldHMiCiRjb25zb2xlRGlyID0gU3BsaXQtUGF0aCAkYXNzZXRzRGlyCmlmIChUZXN0LVBhdGggJGNvbnNvbGVEaXIpIHsKICBDb3B5LUl0ZW0gIiRwa2dccGF0Y2hlc1xjb25zb2xlLWFzc2V0c1wqLmpzIiAkYXNzZXRzRGlyIC1Gb3JjZQogICRpZHggPSBKb2luLVBhdGggJGNvbnNvbGVEaXIgImluZGV4Lmh0bWwiCiAgJGh0bWwgPSBHZXQtQ29udGVudCAkaWR4IC1SYXcgLUVuY29kaW5nIFVURjgKICBpZiAoJGh0bWwgLW5vdG1hdGNoICJjc2VydmljZS1hcHAtZW50cnkiKSB7CiAgICAkaHRtbCA9ICRodG1sIC1yZXBsYWNlICI8L2hlYWQ+IiwgIjxzY3JpcHQgZGVmZXIgc3JjPSIiL2Fzc2V0cy9jc2VydmljZS1hcHAtZW50cnkuanMiIj48L3NjcmlwdD48L2hlYWQ+IgogICAgU2V0LUNvbnRlbnQgJGlkeCAkaHRtbCAtRW5jb2RpbmcgVVRGOCAtTm9OZXdsaW5lCiAgICBXcml0ZS1Ib3N0ICIgIGluZGV4Lmh0bWwg5bey5rOo5YWlIGNzZXJ2aWNlIOWFpeWPoyIKICB9CiAgaWYgKCRodG1sIC1ub3RtYXRjaCAiY29udHJhY3QtYXBwLWVudHJ5IikgewogICAgJGh0bWwgPSAkaHRtbCAtcmVwbGFjZSAiPC9oZWFkPiIsICI8c2NyaXB0IGRlZmVyIHNyYz0iIi9hc3NldHMvY29udHJhY3QtYXBwLWVudHJ5LmpzIiI+PC9zY3JpcHQ+PC9oZWFkPiIKICAgIFNldC1Db250ZW50ICRpZHggJGh0bWwgLUVuY29kaW5nIFVURjggLU5vTmV3bGluZQogICAgV3JpdGUtSG9zdCAiICBpbmRleC5odG1sIOW3suazqOWFpSBjb250cmFjdCDlhaXlj6MiCiAgfQogIFdyaXRlLUhvc3QgIiAg5a6M5oiQ77yI5Yi35paw5rWP6KeI5Zmo5Y2z5Y+v6KeB5L6n6L655qCP5YWl5Y+j77yJIgp9IGVsc2UgeyBXcml0ZS1Ib3N0ICIgIFvorablkYpdIOacquaJvuWIsCBjb25zb2xlIOebruW9le+8jOi3s+i/h+ihpeS4gSIgLUZvcmVncm91bmRDb2xvciBZZWxsb3cgfQoKIyAtLS0tLS0tLS0tIDQuIERvY2tlciDlupTnlKggLS0tLS0tLS0tLQpXcml0ZS1Ib3N0ICJgbls0LzVdIOWQr+WKqCBEb2NrZXIg5bqU55So77yI55+l6K+G5bqTL+WQiOWQjC/mmbrog73lrqLmnI0v6LSi5YqhL+mUgOWUri/ljY/lkIwv6K6i5Y2V77yJLi4uIiAtRm9yZWdyb3VuZENvbG9yIEN5YW4KJGFwcHMgPSAid2Vrbm9yYSIsInBhcGVybGVzcyIsImNzZXJ2aWNlIiwiZmluYW5jZS1odWIiLCJzYWxlcy1wbGF0Zm9ybSIsIm1jYyIsIm9yZGVyLWNlbnRlciIKZm9yZWFjaCAoJGEgaW4gJGFwcHMpIHsKICAkZCA9IEpvaW4tUGF0aCAkcGtnICJhcHBzXCRhIgogIGlmICgtbm90IChUZXN0LVBhdGggJGQpKSB7IFdyaXRlLUhvc3QgIiAgW+i3s+i/h10gJGEiOyBjb250aW51ZSB9CiAgV3JpdGUtSG9zdCAiICDlkK/liqggJGEgLi4uIgogIFB1c2gtTG9jYXRpb24gJGQKICBkb2NrZXIgY29tcG9zZSB1cCAtZCAtLWJ1aWxkIDI+JjEgfCBTZWxlY3QtT2JqZWN0IC1MYXN0IDIKICBQb3AtTG9jYXRpb24KfQoKIyDmlbDmja7ljbflr7zlhaXvvIjpppbmrKHpg6jnvbLml7YgY29tcG9zZSDlt7Llu7rnqbrljbfvvIznjrDlnKjopobnm5bkuLrlr7zlh7rnmoTmlbDmja7vvIkKV3JpdGUtSG9zdCAiYG4gIOWvvOWFpeaVsOaNruWNty4uLiIKR2V0LUNoaWxkSXRlbSAiJHBrZ1x2b2x1bWVzXCoudGd6IiB8IEZvckVhY2gtT2JqZWN0IHsKICAkdm9sID0gJF8uQmFzZU5hbWUKICBkb2NrZXIgdm9sdW1lIGluc3BlY3QgJHZvbCAqPiAkbnVsbAogIGlmICgkTEFTVEVYSVRDT0RFIC1uZSAwKSB7IGRvY2tlciB2b2x1bWUgY3JlYXRlICR2b2wgfCBPdXQtTnVsbCB9CiAgV3JpdGUtSG9zdCAiICAgICR2b2wiCiAgZG9ja2VyIHJ1biAtLXJtIC12ICIke3ZvbH06L2RzdCIgLXYgIiQoJF8uRnVsbE5hbWUpOi9zcmMudGd6IiBhbHBpbmUgc2ggLWMgImNkIC9kc3QgJiYgdGFyIHh6ZiAvc3JjLnRneiIgMj4kbnVsbAp9CgojIC0tLS0tLS0tLS0gNS4g6KO4IFB5dGhvbiDmnI3liqEgLS0tLS0tLS0tLQpXcml0ZS1Ib3N0ICJgbls1LzVdIOWQr+WKqOaZuuiDvemHh+i0rSg4MDAyKSDkuI4g57uP6JCl55yL5p2/KDE4NzkwKS4uLiIgLUZvcmVncm91bmRDb2xvciBDeWFuCmZvcmVhY2ggKCRzdmMgaW4gQChAe2Q9InpoaXphb3l1bi1wdXJjaGFzZSI7IGY9InB1cmNoYXNlX2FwaS5weSJ9LCBAe2Q9InpoaXphb3l1bi1kYXRhaHViIjsgZj0iZGF0YWh1Yl9hcGkucHkifSkpIHsKICAkZCA9IEpvaW4tUGF0aCAkcGtnICJhcHBzXCQoJHN2Yy5kKSIKICBpZiAoVGVzdC1QYXRoICIkZFxyZXF1aXJlbWVudHMudHh0IikgeyBwaXAgaW5zdGFsbCAtcSAtciAiJGRccmVxdWlyZW1lbnRzLnR4dCIgMj4kbnVsbCB9CiAgU3RhcnQtUHJvY2VzcyBweXRob24gLUFyZ3VtZW50TGlzdCAkc3ZjLmYgLVdvcmtpbmdEaXJlY3RvcnkgJGQgLVdpbmRvd1N0eWxlIE1pbmltaXplZAogIFdyaXRlLUhvc3QgIiAgJCgkc3ZjLmQpIOW3suWQr+WKqCIKfQoKIyAtLS0tLS0tLS0tIOmqjOivgSAtLS0tLS0tLS0tCldyaXRlLUhvc3QgImBuPT09PSDpg6jnvbLlrozmiJDvvIzmnI3liqHpqozor4EgPT09PSIgLUZvcmVncm91bmRDb2xvciBDeWFuCiRjaGVja3MgPSBAezgwMDA9Ikh1YiI7IDgwMDE9IuefpeivhuW6kyI7IDgwMDI9IuaZuuiDvemHh+i0rSI7IDgxOTk9IlBhcGVybGVzcyI7IDgyOTk9IuiuouWNleWkhOeQhuS4reW/gyI7CiAgICAgICAgICAgIDgzMDE9Iui0ouWKoeS4reaeoiI7IDgzMDI9IumUgOWUrumpvumptuiIsSI7IDgzMTA9IueuoeeQhuWNj+WQjCI7IDgzOTk9IuaZuuiDveWuouacjSI7IDE4NzkwPSLnu4/okKXnnIvmnb8ifQpmb3JlYWNoICgkcCBpbiAoJGNoZWNrcy5LZXlzIHwgU29ydC1PYmplY3QpKSB7CiAgdHJ5IHsKICAgICRyID0gSW52b2tlLVdlYlJlcXVlc3QgImh0dHA6Ly8xMjcuMC4wLjE6JHAvIiAtVXNlQmFzaWNQYXJzaW5nIC1UaW1lb3V0U2VjIDQKICAgIFdyaXRlLUhvc3QgKCIgIHswLC02fSB7MSwtMTB9IEhUVFAgezJ9IiAtZiAkcCwgJGNoZWNrc1skcF0sICRyLlN0YXR1c0NvZGUpIC1Gb3JlZ3JvdW5kQ29sb3IgR3JlZW4KICB9IGNhdGNoIHsgV3JpdGUtSG9zdCAoIiAgezAsLTZ9IHsxLC0xMH0g5pyq5bCx57uqIiAtZiAkcCwgJGNoZWNrc1skcF0pIC1Gb3JlZ3JvdW5kQ29sb3IgWWVsbG93IH0KfQpXcml0ZS1Ib3N0ICJgbuWxgOWfn+e9keiuv+mXru+8mmh0dHA6Ly885pys5py6SVA+OjgwMDAg77yI6Ziy54Gr5aKZ5pS+6KGM6KeBIFJFQURNRS1XSU5ET1dTLm1k77yJIgo= | base64 -d > /export/zhiyun-windows-bundle/deploy.ps1\necho IyDmmbrpgKDkupEgQUlPUyDigJQgV2luZG93cyDkuLvmnLrpg6jnvbLmiYvlhowKCuebruagh++8muaKiuaVtOWll+aZuumAoOS6ke+8iEh1YiArIOefpeivhuW6kyArIDcg5Liq5Lia5Yqh5bqU55So77yJ6YOo572y5YiwIFdpbmRvd3Mg5Li75py677yI5aaCIDE5Mi4xNjcuMzAuMu+8ieacrOWcsOi/kOihjOOAggoKIyMg5LiA44CB5YmN572u5p2h5Lu277yI6YOo572y5YmN5LiA5qyh5oCn5YeG5aSH77yJCgp8IOS+nei1liB8IOimgeaxgiB8IOajgOafpeWRveS7pCB8CnwtLS18LS0tfC0tLXwKfCBOb2RlLmpzIHwgMjArIHwgYG5vZGUgLXZgIHwKfCBEb2NrZXIgRGVza3RvcCB8IOW3suWuieijheW5tui/kOihjO+8iFdTTDIg5ZCO56uv77yJIHwgYGRvY2tlciBpbmZvYCB8CnwgUHl0aG9uIHwgMy4xMSsg5LiU5ZyoIFBBVEjvvIjli77ov4cgQWRkIHRvIFBBVEjvvIkgfCBgcHl0aG9uIC0tdmVyc2lvbmAgfAp8IOWklue9kSB8IOiDveiuv+mXriBucG0gLyBEb2NrZXIgSHViIC8gUHl0aG9uIOa6kCB8IOaJk+W8gOe9kemhteWNs+WPryB8Cnwg56OB55uYIHwg4omlIDIwR0Ig5Y+v55SoIHwg4oCUIHwKfCDnq6/lj6Pnqbrpl7IgfCA4MDAwLzgwMDEvODAwMi84MTk5LzgyOTkvODMwMS84MzAyLzgzMTAvODM5OS8xODAwMC8xODc5MCB8IOmDqOe9suiEmuacrOS8muiHquWKqOajgOafpSB8Cgo+IOiLpeW3sui/kOihjCBJSVPvvIjlpoIgNjA4OCDnq6/lj6PvvInvvIzkuI7kuIrov7Dnq6/lj6PkuI3lhrLnqoHvvIzml6DpnIDlpITnkIbjgIIKCiMjIOS6jOOAgemDqOe9suatpemqpAoKMS4g5oqKIGB6aGl5dW4td2luZG93cy1idW5kbGVgIOaVtOS4quebruW9leaLt+WIsOebruagh+S4u+acuu+8iOWmgiBgRDpcemhpeXVuXGDvvIkKMi4gKirnrqHnkIblkZggUG93ZXJTaGVsbCoqIOS4reaJp+ihjO+8mgogICBgYGBwb3dlcnNoZWxsCiAgIGNkIEQ6XHpoaXl1blx6aGl5dW4td2luZG93cy1idW5kbGUKICAgU2V0LUV4ZWN1dGlvblBvbGljeSAtU2NvcGUgUHJvY2VzcyBCeXBhc3MgLUZvcmNlCiAgIC5cZGVwbG95LnBzMQogICBgYGAKMy4g562J5b6F5a6M5oiQ77yI6aaW5qyh57qmIDIwLTQwIOWIhumSn++8mkh1YiDov5DooYzml7blnKjnur/lronoo4UgKyA3IOS4quW6lOeUqOmVnOWDj+aehOW7uu+8iQo0LiDohJrmnKzmnIDlkI7kvJrpgJDkuIDpqozor4EgMTAg5Liq5pyN5Yqh55qEIEhUVFAg54q25oCBCgojIyDkuInjgIHpmLLngavlopnmlL7ooYzvvIjkvpvlsYDln5/nvZHlkIzkuovorr/pl67vvIkKCueuoeeQhuWRmCBQb3dlclNoZWxsIOS4gOasoeaJp+ihjO+8mgoKYGBgcG93ZXJzaGVsbApmb3JlYWNoICgkcCBpbiA4MDAwLDgwMDEsODAwMiw4MTk5LDgyOTksODMwMSw4MzAyLDgzMTAsODM5OSwxODc5MCkgewogIE5ldy1OZXRGaXJld2FsbFJ1bGUgLURpc3BsYXlOYW1lICJaaGlZdW5DbG91ZC0kcCIgLURpcmVjdGlvbiBJbmJvdW5kIC1Mb2NhbFBvcnQgJHAgLVByb3RvY29sIFRDUCAtQWN0aW9uIEFsbG93Cn0KYGBgCgrkuYvlkI7lkIzkuovorr/pl64gYGh0dHA6Ly885Li75py6SVA+OjgwMDBg77yISHVi77yJ562J5Y2z5Y+v44CCSHViIOWGheW1jOW6lOeUqO+8iOWQiOWQjOeuoeeQhiAvIOaZuuiDveWuouacjeS4juWuouaIt+i/kOiQpe+8iQrnmoQgaWZyYW1lIOS8muaMieiuv+mXruS4u+acuuWQjeiHquWKqOaLvOaOpeerr+WPo++8jOaXoOmcgOmineWklumFjee9ruOAggoKIyMg5Zub44CB5bey6ZqP5YyF6L+B56e755qE5pWw5o2uCgotIEh1YiDlhajpg6jotKblj7fkuI7mlbDmja7vvJphZG1pbiAvIHd1eGlhb2xlaSAvIHdhbmd4aWFveWFuIOetieeUqOaIt+OAgeaZuuiDveS9k++8iOWQq+i0ouWKoeS4ieaZuuiDveS9k++8ieOAgQogIOWOhuWPsuWvueivneOAgeWumuaXtuS7u+WKoe+8iOavj+aXpei/kOiQpeaXqeaKpSAvIOavj+WRqOefpeivhuW6k+W3oeajgO+8ieOAgeaooeWei+WHreaNruOAgXRva2VuIOeUqOmHjwotIOefpeivhuW6k++8iFdlS25vcmHvvInvvJo1IOS4quefpeivhuW6k+OAgeWFqOmDqOaWh+aho+S4juWQkemHj+aVsOaNruOAgeaZuuiDveS9kyLlsI/mmboiCi0g5ZCI5ZCM5bqT77yIUGFwZXJsZXNz77yJ77ya5YWo6YOo5ZCI5ZCM5paH5qGj5LiO5pWw5o2u5bqTCi0g5pm66IO95a6i5pyN5LiO5a6i5oi36L+Q6JCl77ya6K6i5Y2V5pWw5o2u77yIODAwIOecn+WunuiuouWNle+8ieOAgeW3peWNleOAgeefpeivhuWbm+WFg+e7hAotIOaZuuiDvemHh+i0rSAvIOe7j+iQpeeci+adv++8muWQhOiHquaVsOaNruebruW9lQoKPiDimqDvuI8g6L+B56e755qE5piv5a+85Ye65pe25Yi755qE5b+r54Wn44CC6Iul5rqQ5pyN5Yqh5Zmo5LuN5Zyo5L2/55So77yM5YiH5o2i5YmN6ZyA6YeN5paw5a+85LiA5qyh5pWw5o2u5Y2377yI6YeN6LeR5a+85Ye66ISa5pys56ysIDUg5q2l77yJ44CCCgojIyDkupTjgIHml6XluLjlkK/lgZwKCi0gSHVi77yaYGFpb3MtcGxhdGZvcm1cc3RhcnQtaHViLmNtZGDvvIjnqpflj6Pkv53mjIHlvIDlkK/vvJvlhbPnqpfljbPlgZzvvIkKLSBEb2NrZXIg5bqU55So77ya5byA5py65ZCOIERvY2tlciBEZXNrdG9wIOiHquWKqOaLiei1t++8iGNvbXBvc2Ug6K6+572u5LqGIHJlc3RhcnQ6IHVubGVzcy1zdG9wcGVk77yJCi0g5pm66IO96YeH6LStIC8g57uP6JCl55yL5p2/77ya6YeN5paw6L+Q6KGMIGBkZXBsb3kucHMxYCDnrKwgNSDmraXvvIzmiJblgZrmiJDorqHliJLku7vliqHvvIjnmbvlvZXml7blkK/liqggcHl0aG9u77yJCgojIyDlha3jgIHluLjop4Hpl67popgKCnwg546w6LGhIHwg5aSE55CGIHwKfC0tLXwtLS18CnwgSHViIOi1t+S4jeadpSB8IOeciyBgYWlvcy1wbGF0Zm9ybWAg5by55Ye655qEIGNtZCDnqpflj6PmiqXplJnvvJvpppbmrKHpnIDlpJbnvZHoo4Xov5DooYzml7YgfAp8IOafkOW6lOeUqOerr+WPo+iiq+WNoCB8IOaUueivpeW6lOeUqCBjb21wb3NlIOeahOerr+WPo+aYoOWwhO+8iOW3pui+ueerr+WPo++8iSB8Cnwg55+l6K+G5bqT5qOA57SiIDQyOSB8IOWQkemHj+aooeWei+WFjei0uemineW6pumZkOa1ge+8jOetiSAxIOWIhumSn+mHjeivleaIluaNouaooeWei+mFjee9riB8CnwgRG9ja2VyIOaehOW7uuaFoiB8IOmFjee9ruWbveWGhemVnOWDj+WKoOmAn++8iERvY2tlciBEZXNrdG9wIOiuvue9riDihpIgRG9ja2VyIEVuZ2luZe+8iSB8CnwgaWZyYW1lIOW6lOeUqOaJk+S4jeW8gCB8IOehruiupOWvueW6lOWuueWZqOerr+WPo+WcqOi3ke+8mmBkb2NrZXIgcHNgIHwK | base64 -d > /export/zhiyun-windows-bundle/README-WINDOWS.md\n然后：ls -la /export/zhiyun-windows-bundle/deploy.ps1 /export/zhiyun-windows-bundle/README-WINDOWS.md\n\n3) 若第 1 步日志显示导出已完成（出现\"完成。包体量\"字样），执行打包：\ncd /export && nohup tar czf zhiyun-windows-bundle.tar.gz zhiyun-windows-bundle > /tmp/tar.log 2>&1 &\necho TAR-STARTED\n若未完成则只回答\"导出仍在进行\"，不要打包。\n\n汇报每步输出。",
+                "type": "text"
+              }
+            ],
+            "role": "user",
+            "type": "message"
+          }
+        ],
+        "session_id": "",
+        "user_id": "default"
+      },
+      "runtime": {
+        "max_concurrency": 1,
+        "misfire_grace_seconds": 600,
+        "share_session": true,
+        "timeout_seconds": 600,
+        "tool_safety": false
+      },
+      "save_result_to_inbox": true,
+      "schedule": {
+        "cron": null,
+        "repeat_count": null,
+        "repeat_end_type": null,
+        "repeat_every_days": null,
+        "repeat_until": null,
+        "run_at": "2026-09-18T18:41:17Z",
+        "timezone": "UTC",
+        "type": "once"
+      },
+      "task_type": "agent",
+      "text": null
+    }
+  ],
+  "version": 2
+}

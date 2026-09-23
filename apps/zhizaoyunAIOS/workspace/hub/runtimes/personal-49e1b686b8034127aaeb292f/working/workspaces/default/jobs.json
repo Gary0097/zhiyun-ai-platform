@@ -1,0 +1,111 @@
+{
+  "jobs": [
+    {
+      "dispatch": {
+        "channel": "console",
+        "meta": {},
+        "mode": "final",
+        "silent": false,
+        "target": {
+          "session_id": "",
+          "user_id": "default"
+        },
+        "type": "channel"
+      },
+      "enabled": true,
+      "id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+      "meta": {},
+      "name": "每日运营早报",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "生成今日客服与订单运营早报，简明输出三部分：1) 昨日智能客服咨询量与意图分布（订单查询/售后报修/财务支持等六类）；2) 待处理售后工单与高风险订单提醒（预测完工偏差大于3天的订单）；3) 8001知识库与智能客服应用运行状态一句话。",
+                "type": "text"
+              }
+            ],
+            "role": "user",
+            "type": "message"
+          }
+        ],
+        "session_id": "",
+        "user_id": "default"
+      },
+      "runtime": {
+        "max_concurrency": 1,
+        "misfire_grace_seconds": 600,
+        "share_session": true,
+        "timeout_seconds": 300,
+        "tool_safety": false
+      },
+      "save_result_to_inbox": true,
+      "schedule": {
+        "cron": "30 9 * * *",
+        "repeat_count": null,
+        "repeat_end_type": null,
+        "repeat_every_days": null,
+        "repeat_until": null,
+        "run_at": null,
+        "timezone": "Asia/Shanghai",
+        "type": "cron"
+      },
+      "task_type": "agent",
+      "text": null
+    },
+    {
+      "dispatch": {
+        "channel": "console",
+        "meta": {},
+        "mode": "final",
+        "silent": false,
+        "target": {
+          "session_id": "",
+          "user_id": "default"
+        },
+        "type": "channel"
+      },
+      "enabled": true,
+      "id": "37ed15b6-6c69-48be-8a1d-6d8d4c4412ac",
+      "meta": {},
+      "name": "每周知识库巡检",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "执行每周知识库健康巡检：检查 8001 知识库五个库的文档解析状态、智能客服小智的检索命中率，输出巡检结论与需要补充的知识点清单。",
+                "type": "text"
+              }
+            ],
+            "role": "user",
+            "type": "message"
+          }
+        ],
+        "session_id": "",
+        "user_id": "default"
+      },
+      "runtime": {
+        "max_concurrency": 1,
+        "misfire_grace_seconds": 600,
+        "share_session": true,
+        "timeout_seconds": 300,
+        "tool_safety": false
+      },
+      "save_result_to_inbox": true,
+      "schedule": {
+        "cron": "0 10 * * mon",
+        "repeat_count": null,
+        "repeat_end_type": null,
+        "repeat_every_days": null,
+        "repeat_until": null,
+        "run_at": null,
+        "timezone": "Asia/Shanghai",
+        "type": "cron"
+      },
+      "task_type": "agent",
+      "text": null
+    }
+  ],
+  "version": 2
+}

@@ -1,0 +1,16 @@
+{
+  "2026-09-17": {
+    "default\u001fqwen\u001fqwen3.8-flash": {
+      "provider_id": "qwen",
+      "model_name": "qwen3.8-flash",
+      "prompt_tokens": 10909,
+      "completion_tokens": 197,
+      "cache_read_tokens": 0,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 10909,
+      "cache_observed_calls": 2,
+      "call_count": 2,
+      "agent_id": "default"
+    }
+  }
+}

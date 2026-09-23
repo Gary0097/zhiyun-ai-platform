@@ -1,0 +1,6 @@
+migrated:
+- client_key: anysearch
+  card_path: /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-3ab73e50c0644630954c1506/working/workspaces/QwenPaw_QA_Agent_0.2/drivers/mcp/anysearch.yaml
+  credential_ref: ''
+skipped: []
+warnings: []

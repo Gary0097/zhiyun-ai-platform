@@ -1,0 +1,1 @@
+{"chats": [], "groups": [{"id": "default", "kind": "default", "name": "Uncategorized", "order": 0, "pinned": false, "source": "chat"}, {"id": "cron", "kind": "cron", "name": "Scheduled tasks", "order": 1, "pinned": false, "source": "cron"}, {"id": "subagents", "kind": "subagents", "name": "Subagents", "order": 2, "pinned": false, "source": "subagents"}]}

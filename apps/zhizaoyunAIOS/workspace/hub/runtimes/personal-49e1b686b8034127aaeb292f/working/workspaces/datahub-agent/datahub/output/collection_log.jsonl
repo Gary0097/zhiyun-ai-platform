@@ -1,0 +1,9 @@
+{"source": "WMS", "record": "WMS0000001", "action": "ignored-duplicate"}
+{"source": "WMS", "record": "BAD-WMS-NEG", "action": "quarantined", "reasons": ["负绝对数量"]}
+{"source": "ERP", "record": "BAD-ERP-ORDER", "action": "quarantined", "reasons": ["未知订单（订单号不存在）"]}
+{"source": "ERP", "record": "BAD-ERP-SKU", "action": "quarantined", "reasons": ["未知SKU"]}
+{"source": "MES", "record": "BAD-MES-TIME", "action": "quarantined", "reasons": ["时间倒置（start > end）"]}
+{"source": "OA", "record": "BAD-OA-DATE", "action": "quarantined", "reasons": ["无效日期（2026-02-30）"]}
+{"source": "ERP", "record": "BAD-ERP-MISSING", "action": "quarantined", "reasons": ["缺业务键（订单号为空）"]}
+{"source": "WMS", "record": "BAD-WMS-UNIT", "action": "quarantined", "reasons": ["单位冲突（源=公斤，库内=件）"]}
+{"source": "MES", "record": "BAD-MES-FUTURE", "action": "quarantined", "reasons": ["未来实际事件（2026-09-19 08:00 晚于快照）"]}

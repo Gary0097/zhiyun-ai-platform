@@ -1,0 +1,40 @@
+{
+  "schema_version": "workspace-skill-manifest.v1",
+  "version": 1789872405886,
+  "skills": {
+    "huoban-sync": {
+      "enabled": true,
+      "channels": [
+        "all"
+      ],
+      "preload": false,
+      "source": "customized",
+      "metadata": {
+        "name": "huoban-sync",
+        "description": "伙伴云(Huoban)CRM数据同步：把伙伴云合同表（业务员/推广人员/原始业务员/合同金额）同步进销售分析平台(8302)的业绩归因，并查询三本账与归因明细。当用户要求\"同步伙伴云\"、\"更新业绩归因\"、\"销售贡献排行\"、\"查某人的归因\"时使用。",
+        "version_text": "1.0.0",
+        "emoji": "🔗",
+        "commit_text": "",
+        "source": "customized",
+        "protected": false,
+        "requirements": {
+          "require_bins": [
+            "python3"
+          ],
+          "require_envs": [],
+          "require_mcps": []
+        },
+        "updated_at": "2026-09-20T02:46:20.007801Z"
+      },
+      "requirements": {
+        "require_bins": [
+          "python3"
+        ],
+        "require_envs": [],
+        "require_mcps": []
+      },
+      "updated_at": "2026-09-20T02:46:20.007801Z",
+      "config": {}
+    }
+  }
+}

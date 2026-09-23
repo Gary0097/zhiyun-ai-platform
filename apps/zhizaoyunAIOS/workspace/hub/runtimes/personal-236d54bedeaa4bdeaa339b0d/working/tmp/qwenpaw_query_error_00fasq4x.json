@@ -1,0 +1,60 @@
+{
+  "trace": "Traceback (most recent call last):\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/runtime/runtime.py\", line 106, in run\n    ctx.agent = await builder.build(ctx)\n                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/runtime/builder.py\", line 433, in build\n    model, _formatter = await run_sync_io(\n                        ^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/utils/io_utils.py\", line 136, in run_sync_io\n    return await _wait_for_task_completion(task)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/utils/io_utils.py\", line 100, in _wait_for_task_completion\n    await asyncio.shield(task)\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/cache/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/cache/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/runtime/builder.py\", line 604, in build_model\n    model, formatter = create_model_and_formatter(\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/agents/model_factory.py\", line 2194, in create_model_and_formatter\n    raise ProviderError(\nqwenpaw.exceptions.ProviderError: Provider 'chinaunion' not found.\n",
+  "exception_type": "ProviderError",
+  "exception_message": "Provider 'chinaunion' not found.",
+  "request_info": {
+    "session_id": "1789716019876-ip56ka6",
+    "user_id": "default",
+    "channel": "console"
+  },
+  "request": {
+    "input": [
+      {
+        "id": "23e634c907f343519a8da62517265f30",
+        "type": "message",
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "delta": false,
+            "index": null,
+            "status": "created",
+            "object": "content",
+            "msg_id": null,
+            "text": "哪些物料低于安全库存？请用SQL查询给出清单。"
+          }
+        ],
+        "status": "in_progress",
+        "metadata": {
+          "qwenpaw_client_message_id": "cde437e4-052d-422e-8610-1f774abc24e7"
+        }
+      }
+    ],
+    "session_id": "1789716019876-ip56ka6",
+    "user_id": "default",
+    "stream": true,
+    "metadata": null,
+    "channel": "console",
+    "channel_meta": {
+      "session_id": "1789716019876-ip56ka6",
+      "user_id": "default",
+      "request_context": {
+        "source": "console_chat",
+        "agent_id": "procurement-agent",
+        "chat_id": "4e3852a9-25e4-4cf8-84f9-967118784bff",
+        "sdk_session_id": "1789716019876-ip56ka6",
+        "approval_level": "AUTO"
+      },
+      "bot_prefix": ""
+    },
+    "request_context": {
+      "source": "console_chat",
+      "agent_id": "procurement-agent",
+      "chat_id": "4e3852a9-25e4-4cf8-84f9-967118784bff",
+      "sdk_session_id": "1789716019876-ip56ka6",
+      "approval_level": "AUTO"
+    }
+  },
+  "agent_state": null,
+  "ts_utc": "2026-09-18T07:22:36Z"
+}

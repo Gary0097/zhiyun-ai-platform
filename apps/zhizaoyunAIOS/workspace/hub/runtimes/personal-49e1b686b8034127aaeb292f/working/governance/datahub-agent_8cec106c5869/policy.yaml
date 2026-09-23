@@ -1,0 +1,164 @@
+version: '2.0'
+execution_level: smart
+audit_level: all
+env_blacklist:
+- OPENAI_API_KEY
+- ANTHROPIC_API_KEY
+- AWS_SECRET_ACCESS_KEY
+- AWS_ACCESS_KEY_ID
+user_rules:
+- match: 'Bash(cd datahub && rm -f output/_delivered.json && python3 scripts/query.py
+    "
+
+    WITH s AS (SELECT sales_order_id, SUM(CASE WHEN received_at IS NOT NULL AND received_at<>''''
+    THEN quantity ELSE 0 END) recv_qty, SUM(CASE WHEN received_at IS NULL OR received_at=''''
+    THEN quantity ELSE 0 END) open_qty, MAX(received_at) last_recv FROM shipments
+    GROUP BY sales_order_id)
+
+    SELECT o.sales_order_id, c.customer_name, o.quantity, o.unit, o.promised_delivery_at,
+    s.last_recv AS delivered_at,
+
+    CAST(julianday(substr(s.last_recv,1,10))-julianday(substr(o.promised_delivery_at,1,10))
+    AS INTEGER) late_days
+
+    FROM orders o JOIN s ON s.sales_order_id=o.sales_order_id LEFT JOIN customers
+    c ON c.customer_id=o.customer_id
+
+    WHERE o.is_effective=1 AND s.recv_qty>=o.quantity AND s.open_qty=0
+
+    ORDER BY s.last_recv DESC LIMIT 10" 2>&1)'
+  action: allow
+  reason: user approved
+  grantee: datahub-agent
+  duration: session
+  session_id: bt-t02-1789685333
+- match: "Bash(cd datahub && cat output/delivered_orders.sql | python3 scripts/query.py\
+    \ --json --limit 700 > output/_delivered.json && python3 - <<'PY'\nimport json,\
+    \ csv\nd = json.load(open('output/_delivered.json'))\nrows = d['rows']; cols =\
+    \ d['columns']\nprint('rows:', len(rows))\nwith open('output/delivered_orders.csv','w',newline='',encoding='utf-8-sig')\
+    \ as f:\n    w = csv.DictWriter(f, fieldnames=cols); w.writeheader(); w.writerows(rows)\n\
+    print('cols:', cols)\nprint('first:', rows[0])\nprint('last:', rows[-1])\nPY\n\
+    rm -f datahub/output/_delivered.json; wc -l datahub/output/delivered_orders.csv)"
+  action: allow
+  reason: user approved
+  grantee: datahub-agent
+  duration: session
+  session_id: bt-t02-1789685333
+- match: Read(WORKSPACE_DIR/**)
+  action: allow
+  reason: File read within workspace
+- match: Write(WORKSPACE_DIR/**)
+  action: allow
+  reason: File write within workspace
+- match: Edit(WORKSPACE_DIR/**)
+  action: allow
+  reason: File edit within workspace
+- match: Append(WORKSPACE_DIR/**)
+  action: allow
+  reason: File append within workspace
+- match: Grep(WORKSPACE_DIR/**)
+  action: allow
+  reason: Content search within workspace
+- match: Glob(WORKSPACE_DIR/**)
+  action: allow
+  reason: File listing within workspace
+- match: ViewImage(WORKSPACE_DIR/**)
+  action: allow
+  reason: Image view within workspace
+- match: ViewVideo(WORKSPACE_DIR/**)
+  action: allow
+  reason: Video view within workspace
+- match: SendFileToUser(WORKSPACE_DIR/**)
+  action: allow
+  reason: File send within workspace
+- match: DesktopScreenshot(WORKSPACE_DIR/**)
+  action: allow
+  reason: File send within workspace
+- match: '*(/tmp/**)'
+  action: allow
+  reason: Scratch directory access for tmp
+- match: '*(WORKSPACE_DIR/**)'
+  action: allow
+  reason: Coding project dir
+- match: Bash(gh)
+  action: allow
+  reason: GitHub CLI operations
+- match: Bash(gh *)
+  action: allow
+  reason: GitHub CLI operations
+- match: Read(**)
+  action: allow
+  reason: Read-only file access (global)
+- match: Grep(**)
+  action: allow
+  reason: Content search (global)
+- match: Glob(**)
+  action: allow
+  reason: File listing (global)
+- match: SendFileToUser(**)
+  action: allow
+  reason: File send to user (global)
+- match: WebSearch(**)
+  action: allow
+  reason: Allow web search
+- match: WebFetch(**)
+  action: allow
+  reason: Allow web fetch
+- match: ViewImage(**)
+  action: allow
+  reason: Image view (global)
+- match: ViewVideo(**)
+  action: allow
+  reason: Video view (global)
+- match: AstSearch(**)
+  action: allow
+  reason: AST search (global)
+- match: Browser(**)
+  action: allow
+  reason: Allow all browser access
+applied_migrations:
+- '*(/tmp/**)'
+- '*(CODING_PROJECT_DIR/**)'
+- Append(WORKSPACE_DIR/**)
+- AstSearch(**)
+- Bash(gh *)
+- Bash(gh)
+- Browser(**)
+- DesktopScreenshot(WORKSPACE_DIR/**)
+- Edit(WORKSPACE_DIR/**)
+- Glob(**)
+- Glob(WORKSPACE_DIR/**)
+- Grep(**)
+- Grep(WORKSPACE_DIR/**)
+- Read(**)
+- Read(WORKSPACE_DIR/**)
+- SendFileToUser(**)
+- SendFileToUser(WORKSPACE_DIR/**)
+- ViewImage(**)
+- ViewImage(WORKSPACE_DIR/**)
+- ViewVideo(**)
+- ViewVideo(WORKSPACE_DIR/**)
+- WebFetch(**)
+- WebSearch(**)
+- Write(WORKSPACE_DIR/**)
+sensitive_paths:
+- ~/.ssh/
+- ~/.aws/
+- ~/.gnupg/
+- ~/.kube/
+- ~/.config/gcloud/
+- ~/.azure/
+- ~/.docker/config.json
+- ~/.env
+- ~/.git-credentials
+- ~/.netrc
+- ~/.npmrc
+- ~/.pypirc
+shell_evasion_checks:
+  command_substitution: true
+  obfuscated_flags: true
+  backslash_escaped_whitespace: true
+  backslash_escaped_operators: true
+  newlines: true
+  comment_quote_desync: true
+  quoted_newline: true

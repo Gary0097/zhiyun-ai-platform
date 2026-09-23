@@ -1,0 +1,113 @@
+{
+  "version": 2,
+  "files": {
+    "console/default_acc-222020-1.json": {
+      "sha256": "9e806d11d8a705a947f622c796e3c9e833218daadf1d45503751b76123546e43",
+      "session_id": "acc-222020-1",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 6,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "93a14ff848094bca87a327a8408bb9a7",
+        "sync:default_acc-222020-1"
+      ]
+    },
+    "console/default_acc-222104-1.json": {
+      "sha256": "860eff351b40592202b9af73658e4a24f0d643e8d162bf3da8848d00cb3550c1",
+      "session_id": "acc-222104-1",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 23,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "770b944c71b94073a211abc3d49062f5",
+        "sync:default_acc-222104-1"
+      ]
+    },
+    "console/default_acc-222341-2.json": {
+      "sha256": "abdbd80fd93c81a2a804720b5054f5cdc808bd41e846b9402ca67e0b6873b79c",
+      "session_id": "acc-222341-2",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 20,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "632be87c6eea4d5d81baa63f19868e5c",
+        "sync:default_acc-222341-2"
+      ]
+    },
+    "console/default_acc-222531-3.json": {
+      "sha256": "d9cc3a52d07971816d61d5af9dfe0833e6e19cd5a42eb38eb8fb6e3ffd54b8bb",
+      "session_id": "acc-222531-3",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 21,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "50a19c5696b14f8596c5186bf2d4d55c",
+        "sync:default_acc-222531-3"
+      ]
+    },
+    "console/default_acc-222838-4.json": {
+      "sha256": "961192bcff11dc0f6ca371d2912621aefe51754efd0f2c50d5de34c9aaf38d51",
+      "session_id": "acc-222838-4",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 11,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "aa55cdfbd23347ed9b767136c48a4c01",
+        "sync:default_acc-222838-4"
+      ]
+    },
+    "console/default_acc-223034-5.json": {
+      "sha256": "eb4cae0327bcbc2d149ef7025f8fc8479ada0f37b465a6342db168a8ec230950",
+      "session_id": "acc-223034-5",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 8,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "d7196d69f79147c2a6b78a54ffc7e234",
+        "sync:default_acc-223034-5"
+      ]
+    },
+    "console/default_acc-223145-6.json": {
+      "sha256": "c13eb013614eb12a49d49599d71ef67dbbd6e5bebe257fa7f3ea3fe06453c6c1",
+      "session_id": "acc-223145-6",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 10,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "f4280ce2fe104d89a6261813691ce0a4",
+        "sync:default_acc-223145-6"
+      ]
+    },
+    "console/default_1789689588381-x9mii6z.json": {
+      "sha256": "b5f6330599ab51aaecefc42d7c7638a030058354b228ddb3f87bf87489c261c6",
+      "session_id": "1789689588381-x9mii6z",
+      "messages": 12,
+      "aged_out": 0,
+      "rows_processed": 48,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "5f06e598cc0f48d59af7b54e2d34d41a",
+        "sync:default_1789689588381-x9mii6z"
+      ]
+    },
+    "wechat/o9cq80zuPxg5_k8rP-NU5LfHrfos@im.wechat_wechat--o9cq80zuPxg5_k8rP-NU5LfHrfos@im.wechat.json": {
+      "sha256": "da5a6510d503c0907026c69948f11d607ca587d2fcb0307bfbfa605099f82b1f",
+      "session_id": "wechat:o9cq80zuPxg5_k8rP-NU5LfHrfos@im.wechat",
+      "messages": 8,
+      "aged_out": 0,
+      "rows_processed": 49,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "1bc58a8454d04749a7ef46b6ef9afe51",
+        "sync:o9cq80zuPxg5_k8rP-NU5LfHrfos@im.wechat_wechat--o9cq80zuPxg5_k8rP-NU5LfHrfos@im.wechat"
+      ]
+    }
+  }
+}

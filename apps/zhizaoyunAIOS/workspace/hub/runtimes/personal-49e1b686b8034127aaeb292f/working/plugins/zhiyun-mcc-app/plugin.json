@@ -1,0 +1,18 @@
+{
+  "id": "zhiyun-mcc-app",
+  "name": "管理协同中心",
+  "version": "1.0.0",
+  "type": "frontend",
+  "description": "管理协同中心入口：权限系统 / 通讯录 / 知识库 / 审批流 / 员工关怀 / 人力分析，从控制台一键打开（免登录）",
+  "author": "Zhiyun AI",
+  "entry": {
+    "frontend": "dist/index.js"
+  },
+  "dependencies": [],
+  "qwenpaw_version": {
+    "min": "2.2.0"
+  },
+  "meta": {
+    "features": ["app-entry", "iframe-route"]
+  }
+}

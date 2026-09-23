@@ -1,0 +1,16 @@
+{
+  "completed_at": 1789781634.877636,
+  "created_at": 1789781400.0149941,
+  "events": [],
+  "meta": {
+    "dispatch_channel": "console",
+    "job_id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+    "job_name": "每日运营早报",
+    "silent": false,
+    "target_session_id": "",
+    "target_user_id": "default",
+    "task_type": "agent"
+  },
+  "run_id": "446817d2-36f8-4fde-aef8-428bc8f4875f",
+  "status": "success"
+}

@@ -1,0 +1,250 @@
+[
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789759175.6319115,
+    "event_type": "cron_result",
+    "id": "2933f3ee-8932-44f7-b5de-9017175e9ecc",
+    "payload": {
+      "job_id": "adf8b46c-9e16-47b4-a9e7-913b59dedfe0",
+      "job_name": "ops-check3",
+      "run_id": "e21a8967-a659-41a7-b72b-a90a7ac1ef6a",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "adf8b46c-9e16-47b4-a9e7-913b59dedfe0",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: ops-check3"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789759160.7532449,
+    "event_type": "cron_result",
+    "id": "a8d6cf9d-b1a3-4119-9d4a-58a3e1d86127",
+    "payload": {
+      "job_id": "adf8b46c-9e16-47b4-a9e7-913b59dedfe0",
+      "job_name": "ops-check3",
+      "run_id": "85809a11-c263-484a-838c-f7b1e6ba9a1e",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "manual"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "adf8b46c-9e16-47b4-a9e7-913b59dedfe0",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: ops-check3"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789759103.7204685,
+    "event_type": "cron_result",
+    "id": "a3aea65d-8c45-4d67-884f-d1290d0c7408",
+    "payload": {
+      "job_id": "b70bfd12-515e-4cee-b594-5b3b4cc3f999",
+      "job_name": "ops-check2",
+      "run_id": "289df6ca-2727-4390-96bd-185f351755af",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "b70bfd12-515e-4cee-b594-5b3b4cc3f999",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: ops-check2"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789759088.7119937,
+    "event_type": "cron_result",
+    "id": "0ec6b32b-ae13-4434-ab0c-62cfe2366eda",
+    "payload": {
+      "job_id": "b70bfd12-515e-4cee-b594-5b3b4cc3f999",
+      "job_name": "ops-check2",
+      "run_id": "84ac90b4-88f8-4f0f-8a13-211448cb79d2",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "manual"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "b70bfd12-515e-4cee-b594-5b3b4cc3f999",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: ops-check2"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789758842.9151738,
+    "event_type": "cron_result",
+    "id": "327d2fb7-bbee-4443-ba87-62c8036f97d3",
+    "payload": {
+      "job_id": "c217a37e-bbc9-446e-ae70-b1e05a303a42",
+      "job_name": "ops-dump",
+      "run_id": "04755077-4f57-40bc-9b21-ce3ad5d8acb5",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "c217a37e-bbc9-446e-ae70-b1e05a303a42",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: ops-dump"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789758827.7250113,
+    "event_type": "cron_result",
+    "id": "15b8a855-178f-4672-acc3-0f5cd5009b96",
+    "payload": {
+      "job_id": "c217a37e-bbc9-446e-ae70-b1e05a303a42",
+      "job_name": "ops-dump",
+      "run_id": "7be5349c-9677-4455-8bb3-9079dd43a162",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "manual"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "c217a37e-bbc9-446e-ae70-b1e05a303a42",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: ops-dump"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789758713.1877797,
+    "event_type": "cron_result",
+    "id": "d831d5ea-22ce-435e-ac87-20f7a2ddc0fd",
+    "payload": {
+      "job_id": "4acb5bc2-612e-4f8f-8208-e068fe9b46aa",
+      "job_name": "ops-query",
+      "run_id": "c807abb5-6909-4a5e-bd06-4ac9008106e6",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "4acb5bc2-612e-4f8f-8208-e068fe9b46aa",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: ops-query"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789758693.5435348,
+    "event_type": "cron_result",
+    "id": "1894fca6-293d-453e-9b8d-f9b09c029c6b",
+    "payload": {
+      "job_id": "4acb5bc2-612e-4f8f-8208-e068fe9b46aa",
+      "job_name": "ops-query",
+      "run_id": "4f12f85d-6d80-4fa9-b02e-3a5537276880",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "manual"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "4acb5bc2-612e-4f8f-8208-e068fe9b46aa",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: ops-query"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789758584.463148,
+    "event_type": "cron_result",
+    "id": "2d9eb1e9-ad1b-4ace-90b4-872d00047cda",
+    "payload": {
+      "job_id": "cb60f68c-6fdc-4d72-a63b-b774e74d1628",
+      "job_name": "ops-restart-export",
+      "run_id": "47a9a48c-5b47-4d57-8128-0d80720bb516",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "cb60f68c-6fdc-4d72-a63b-b774e74d1628",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: ops-restart-export"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789758545.603564,
+    "event_type": "cron_result",
+    "id": "cab3a275-1021-4079-9dcc-a410bb048cc7",
+    "payload": {
+      "job_id": "cb60f68c-6fdc-4d72-a63b-b774e74d1628",
+      "job_name": "ops-restart-export",
+      "run_id": "47501715-bcd0-4cb1-9285-8e9fecb5a207",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "manual"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "cb60f68c-6fdc-4d72-a63b-b774e74d1628",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: ops-restart-export"
+  },
+  {
+    "agent_id": "default",
+    "body": "AutoDream completed\n\n- Date: 2026-09-17\n- Scan window: 2026-09-16, 2026-09-17\n- Files: 2 scanned, 2 changed, 0 unchanged, 0 deleted\n- Extracted: 1 unit(s), 1 topic candidate(s)\n- Integrated: 1 ok, 0 skipped, 0 failed\n- Topics: 1 written to memory/2026-09-17/interests.yaml\n- Catalog: checkpointed 2 changed path(s)\n- Created: digest/wiki/ai-enterprise-system-boundary.md\n\nChanges:\n- [digest/wiki/ai-enterprise-system-boundary.md][CREATE]: 已创建 AI-企业系统对接能力边界 wiki 节点，确立AI不内建具体企业级功能、仅在逻辑层面辅助支持、落地需对接原生模块的原则，并以智造云6项功能评估为先例。Sources引用两个unit_path来源，正文无独立关系字段。",
+    "created_at": 1789686064.8473206,
+    "event_type": "auto_dream_result",
+    "id": "c7c5f34e-9d96-41f8-8ef9-fbedac9a32ad",
+    "payload": {
+      "date": "",
+      "hint": "",
+      "job_name": "auto_dream",
+      "session_id": ""
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "auto_dream",
+    "source_type": "memory",
+    "status": "success",
+    "title": "Auto-dream result"
+  },
+  {
+    "agent_id": "default",
+    "body": "已创建日记记忆 `zhizao-cloud-capability-assessment.md`，记录用户对智造云管理协同中心6项功能（权限系统、通讯录、知识库、审批流、员工关怀、人力分析）的询问及AI助手的能力边界说明。",
+    "created_at": 1789664504.7924442,
+    "event_type": "auto_memory_result",
+    "id": "fb0c7c93-2e7c-4d3a-824b-30bf00b85596",
+    "payload": {
+      "date": "",
+      "hint": "",
+      "job_name": "auto_memory",
+      "session_id": "qpsid_sha256_b1c8164ad5f6d64393593ee4ff023710b05d94dd9f66a2dde545004f78babe77"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "auto_memory",
+    "source_type": "memory",
+    "status": "success",
+    "title": "Auto-memory result"
+  }
+]

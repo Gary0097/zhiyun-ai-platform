@@ -1,0 +1,40 @@
+{
+  "schema_version": "workspace-skill-manifest.v1",
+  "version": 1789865372335,
+  "skills": {
+    "zhibang-erp": {
+      "enabled": true,
+      "channels": [
+        "all"
+      ],
+      "preload": false,
+      "source": "customized",
+      "metadata": {
+        "name": "zhibang-erp",
+        "description": "智邦国际ERP数据导入与查询：通过智邦开放平台 OpenApi 快速把客户等业务数据写入智邦ERP（支持 Excel/CSV 批量导入、自动去重），也支持客户查询、详情、调用任意已文档化接口。当用户要求\"导入ERP\"、\"数据写入智邦ERP\"、\"ERP批量导入客户\"、\"查ERP客户\"时使用。内置金汉隆内网ERP地址与账号。",
+        "version_text": "1.0.0",
+        "emoji": "🏢",
+        "commit_text": "",
+        "source": "customized",
+        "protected": false,
+        "requirements": {
+          "require_bins": [
+            "python3"
+          ],
+          "require_envs": [],
+          "require_mcps": []
+        },
+        "updated_at": "2026-09-20T00:44:34.161799Z"
+      },
+      "requirements": {
+        "require_bins": [
+          "python3"
+        ],
+        "require_envs": [],
+        "require_mcps": []
+      },
+      "updated_at": "2026-09-20T00:44:34.161799Z",
+      "config": {}
+    }
+  }
+}

@@ -1,0 +1,8 @@
+---
+description: 1 note(s) today.
+name: '2026-09-18'
+---
+
+<!-- notes:auto -->
+- [[memory/2026-09-18/server-readonly-investigation.md]] name: server-readonly-investigation description: 2026-09-18 对 zhiyun-ai-platform 服务器进行的只读排查记录：确认 8399/8299 端口处于 LISTEN 状态但无法获取监听进程 PID 及工作目录（ps/lsof 均无返回）；未找到前端文件 index-BMMJGmGa.js、含"四元组/真实异常记录"的源代码文件、/api/knowledge/quads 的数据存储文件，以及含"真实订单样例"的模板文件；确认 datahub-dashboard.html 路径为 /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/console/datahub-dashboard.html；提取定时任务「每日运营早报」（ID: 8fd0a135-ae86-43e9-9193-afd4b6a40dc6）的完整 JSON 配置（cron 30 9 * * *，Asia/Shanghai）；全盘搜索"模拟日报""模拟数据"命中 5 个文件（app.log 两处、collect.py 两处、collection_report.md、bad_cases_review_20260918.md），内容均为"本报告为模拟数据演示产物；未向任何真实系统写入"类标记。
+<!-- /notes:auto -->

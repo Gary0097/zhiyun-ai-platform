@@ -1,0 +1,288 @@
+[
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789954310.7572122,
+    "event_type": "cron_result",
+    "id": "e67dd0a2-c6e3-4b87-8a3b-835c29cab5f7",
+    "payload": {
+      "job_id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+      "job_name": "每日运营早报",
+      "run_id": "458bbcdd-a0c2-466e-ba6e-82c3020e95b4",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 每日运营早报"
+  },
+  {
+    "agent_id": "procurement-agent",
+    "body": "已创建日记记忆 `memory/2026-09-21/procurement-replenishment-high-risk-audit.md`，完整记录了 2026-09-18 快照下的补货清单与供应商推荐、12 批全部逾期在途对补货结论的修正、近期订单与 3 月复盘数据、10 项高风险（含 S024/S037 重复编码导致控制模块 TOP1 失效）、可复用的业务口径、建议动作及 kb_search 报错等待办。",
+    "created_at": 1789952526.2119007,
+    "event_type": "auto_memory_result",
+    "id": "ad05f8f0-0a8d-4a73-8db6-575b29cec19b",
+    "payload": {
+      "date": "",
+      "hint": "",
+      "job_name": "auto_memory",
+      "session_id": "qpsid_sha256_2992b549fbd6862d99997a246342bd081f7da9fb5a28a433400e89b53788e893"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "auto_memory",
+    "source_type": "memory",
+    "status": "success",
+    "title": "Auto-memory result"
+  },
+  {
+    "agent_id": "datahub-agent",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789948975.580876,
+    "event_type": "cron_result",
+    "id": "af95a7bf-3fb7-4849-bff9-3d457c921432",
+    "payload": {
+      "job_id": "685f812b-86c5-49c4-9154-bbb902878404",
+      "job_name": "每日经营简报（北京时间 08:00）",
+      "run_id": "941a8b5a-838d-4b14-b942-3fe169113733",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "685f812b-86c5-49c4-9154-bbb902878404",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 每日经营简报（北京时间 08:00）"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789867820.018825,
+    "event_type": "cron_result",
+    "id": "4e62dee1-392c-4f08-b5cf-6cbbbd077233",
+    "payload": {
+      "job_id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+      "job_name": "每日运营早报",
+      "run_id": "23ef7494-ec00-4b24-b61c-56a4fc15b6d9",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": true,
+    "severity": "info",
+    "source_id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 每日运营早报"
+  },
+  {
+    "agent_id": "datahub-agent",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789862445.1786919,
+    "event_type": "cron_result",
+    "id": "fede725b-cdc3-4fdd-a20b-7f706866aeda",
+    "payload": {
+      "job_id": "685f812b-86c5-49c4-9154-bbb902878404",
+      "job_name": "每日经营简报（北京时间 08:00）",
+      "run_id": "d02ecd11-d58a-4172-a472-50a901a62b94",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": true,
+    "severity": "info",
+    "source_id": "685f812b-86c5-49c4-9154-bbb902878404",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 每日经营简报（北京时间 08:00）"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789781634.9115777,
+    "event_type": "cron_result",
+    "id": "3c901d37-786f-4446-a53c-fb3505617db0",
+    "payload": {
+      "job_id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+      "job_name": "每日运营早报",
+      "run_id": "446817d2-36f8-4fde-aef8-428bc8f4875f",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 每日运营早报"
+  },
+  {
+    "agent_id": "datahub-agent",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789776103.6579735,
+    "event_type": "cron_result",
+    "id": "c28abefc-34c1-4315-a7cc-ebd06ad3e720",
+    "payload": {
+      "job_id": "685f812b-86c5-49c4-9154-bbb902878404",
+      "job_name": "每日经营简报（北京时间 08:00）",
+      "run_id": "c7d73ad0-530e-4345-a037-2a8d505d95f6",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "685f812b-86c5-49c4-9154-bbb902878404",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 每日经营简报（北京时间 08:00）"
+  },
+  {
+    "agent_id": "procurement-agent",
+    "body": "AutoDream completed\n\n- Date: 2026-09-18\n- Scan window: 2026-09-17, 2026-09-18\n- Files: 2 scanned, 2 changed, 0 unchanged, 0 deleted\n- Extracted: 5 unit(s), 5 topic candidate(s)\n- Integrated: 5 ok, 0 skipped, 0 failed\n- Topics: 3 written to memory/2026-09-18/interests.yaml\n- Catalog: checkpointed 2 changed path(s)\n- Created: digest/procedure/replenishment-advice-calculation-runbook.md, digest/procedure/supplier-recommendation-triple-gate.md, digest/wiki/recommendation-confidence-downgrade.md, digest/wiki/lead-time-gap-principle.md, digest/personal/caliber-conflict-flag-not-silent-fix.md\n\nChanges:\n- [digest/procedure/replenishment-advice-calculation-runbook.md][CREATE]: >\n- [digest/procedure/supplier-recommendation-triple-gate.md][CREATE]: >\n- [digest/wiki/recommendation-confidence-downgrade.md][CREATE]: 新建 wiki 概念节点「推荐可信度降级原则」：首行给出\"可信度取决于样本量与门槛达成度，证据不足时降级为人工决策+缓解措施、系统不编造推荐\"的主张；正文两种形态（整品类无合格候选＝品类级问题→特批+加严检验+新供应商开发；满分薄样本→主供+分单/小批验证）与区分点（弱证据结论标注\"助手判断，非视图结论\"、口径分歧不擅自改判）。已把 [[digest/procedure/supplier-recommendation-triple-gate.md]] 与 [[digest/procedure/replenishment-advice-calculation-runbook.md]] 作为落地流程织入自然句子，Sources 用完整句子引用 memory/2026-09-18 明细并说明 M09/M01 两处证据。frontmatter 设 kind: concept。\n- [digest/wiki/lead-time-gap-principle.md][CREATE]: >\n- [digest/personal/caliber-conflict-flag-not-silent-fix.md][CREATE]: >",
+    "created_at": 1789772803.7830102,
+    "event_type": "auto_dream_result",
+    "id": "9dc5ffde-4e23-4bd6-8236-ecb75200b941",
+    "payload": {
+      "date": "",
+      "hint": "",
+      "job_name": "auto_dream",
+      "session_id": ""
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "auto_dream",
+    "source_type": "memory",
+    "status": "success",
+    "title": "Auto-dream result"
+  },
+  {
+    "agent_id": "procurement-agent",
+    "body": "已创建记忆文件 `memory/2026-09-18/replenishment-advice-supplier-shortlist.md`，完整记录了 2026-09-18 08:00 快照下的 6 项低库存清单、5 单补货量与供应商推荐（含 M03/M07 比价与 M09 转人工）、昨日消耗 217 的明细、可复用 SQL 以及发现的\"紧急\"口径冲突。",
+    "created_at": 1789716021.9762468,
+    "event_type": "auto_memory_result",
+    "id": "e1ba66ff-8c93-42ca-9208-5268166a31ed",
+    "payload": {
+      "date": "",
+      "hint": "",
+      "job_name": "auto_memory",
+      "session_id": "qpsid_sha256_a5b436f3d133cbba37f4210b5f0112a11b0eb7085a865dfb5d9b99ed1b055943"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "auto_memory",
+    "source_type": "memory",
+    "status": "success",
+    "title": "Auto-memory result"
+  },
+  {
+    "agent_id": "default",
+    "body": "已创建日记笔记 `server-readonly-investigation`，记录了 2026-09-18 服务器只读排查的完整结果，包括端口监听状态、关键文件路径、定时任务原文及业务数据搜索结果。",
+    "created_at": 1789705721.7562535,
+    "event_type": "auto_memory_result",
+    "id": "62d31867-478f-48a7-bb96-e010d5e97904",
+    "payload": {
+      "date": "",
+      "hint": "",
+      "job_name": "auto_memory",
+      "session_id": "qpsid_sha256_ec625b567f7299eef64b5a01aa8762b365cba6a793d36ec5ef192eebbfe37654"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "auto_memory",
+    "source_type": "memory",
+    "status": "success",
+    "title": "Auto-memory result"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789695010.4826727,
+    "event_type": "cron_result",
+    "id": "9c1df431-1bf7-4c57-b830-7042401222c2",
+    "payload": {
+      "job_id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+      "job_name": "每日运营早报",
+      "run_id": "0718fa2b-70f4-40e3-81bb-63ee743c5249",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": true,
+    "severity": "info",
+    "source_id": "8fd0a135-ae86-43e9-9193-afd4b6a40dc6",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 每日运营早报"
+  },
+  {
+    "agent_id": "datahub-agent",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789689633.5297172,
+    "event_type": "cron_result",
+    "id": "fa519bf0-189d-4709-94ac-03534e51b296",
+    "payload": {
+      "job_id": "685f812b-86c5-49c4-9154-bbb902878404",
+      "job_name": "每日经营简报（北京时间 08:00）",
+      "run_id": "47ed0da1-14df-42fa-8203-75e3b476830c",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": true,
+    "severity": "info",
+    "source_id": "685f812b-86c5-49c4-9154-bbb902878404",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 每日经营简报（北京时间 08:00）"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789686277.4090226,
+    "event_type": "cron_result",
+    "id": "6fb82bb8-b736-494b-821f-5c67597b3306",
+    "payload": {
+      "job_id": "37ed15b6-6c69-48be-8a1d-6d8d4c4412ac",
+      "job_name": "每周知识库巡检",
+      "run_id": "6a287799-0e63-4331-a949-e57eb0e9ef3c",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "manual"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "37ed15b6-6c69-48be-8a1d-6d8d4c4412ac",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 每周知识库巡检"
+  },
+  {
+    "agent_id": "datahub-agent",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789683738.5085282,
+    "event_type": "cron_result",
+    "id": "1df7c97d-8397-4b39-a6ea-abdbdc0ab6c3",
+    "payload": {
+      "job_id": "685f812b-86c5-49c4-9154-bbb902878404",
+      "job_name": "每日经营简报（北京时间 08:00）",
+      "run_id": "32bd0f72-fb7f-4c35-a969-82da67398233",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "manual"
+    },
+    "read": true,
+    "severity": "info",
+    "source_id": "685f812b-86c5-49c4-9154-bbb902878404",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 每日经营简报（北京时间 08:00）"
+  }
+]

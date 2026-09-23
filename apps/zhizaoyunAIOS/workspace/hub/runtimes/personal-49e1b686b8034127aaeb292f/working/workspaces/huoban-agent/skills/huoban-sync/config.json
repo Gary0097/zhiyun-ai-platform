@@ -1,0 +1,5 @@
+{
+  "sales_api": "http://127.0.0.1:8302",
+  "huoban_page": "https://app.huoban.com/navigations/3300000036414292/pages/7000000000360617",
+  "note": "伙伴云OpenAPI凭据（HUOBAN_TICKET）开通后可改为直连拉取；当前用 data/huoban/ 导出JSON"
+}

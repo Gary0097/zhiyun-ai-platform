@@ -1,0 +1,18 @@
+{
+  "id": "zhiyun-cservice-app",
+  "name": "智能客服与客户运营",
+  "version": "1.0.0",
+  "type": "frontend",
+  "description": "智能客服与客户运营应用入口：从控制台一键打开（Hub 免密自动登录，方法同合同管理）",
+  "author": "Zhiyun AI",
+  "entry": {
+    "frontend": "dist/index.js"
+  },
+  "dependencies": [],
+  "qwenpaw_version": {
+    "min": "2.2.0"
+  },
+  "meta": {
+    "features": ["app-entry", "iframe-route", "sso-jump", "nlu-intent", "case-match", "knowledge-quad"]
+  }
+}

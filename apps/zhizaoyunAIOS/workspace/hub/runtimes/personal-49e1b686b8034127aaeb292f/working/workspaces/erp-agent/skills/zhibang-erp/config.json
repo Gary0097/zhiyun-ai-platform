@@ -1,0 +1,12 @@
+{
+  "base_url": "http://192.167.30.5:6088",
+  "username": "admin",
+  "password": "88888888",
+  "timeout": 15,
+  "endpoints": {
+    "login": "/webapi/v3/ov1/login",
+    "list": "/webapi/v3/sales/customer/list",
+    "detail": "/webapi/v3/sales/customer/detail",
+    "add": "/webapi/v3/sales/customer/add"
+  }
+}

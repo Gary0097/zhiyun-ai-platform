@@ -1,0 +1,53 @@
+{
+  "version": 2,
+  "files": {
+    "console/default_1789714564972-21msqg5.json": {
+      "sha256": "52886725ba0ef752ef811e72f2b9334d14130a63592848281a7df31eb0f5c6cb",
+      "session_id": "1789714564972-21msqg5",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 21,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "489c5889ea5e4b509362eb53d191eee0",
+        "sync:default_1789714564972-21msqg5"
+      ]
+    },
+    "console/default_1789716920723-dhni5b3.json": {
+      "sha256": "0efe0b09b0957837e46256bad8417a8c446016f0959667aa098a71a3aec3af81",
+      "session_id": "1789716920723-dhni5b3",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 124,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "3f071d4f89954fe0aa1353219eb25366",
+        "sync:default_1789716920723-dhni5b3"
+      ]
+    },
+    "console/default_1789717039857-x7y3vxj.json": {
+      "sha256": "9551cfea9c6e3fb5468c7298c3beb28861f7eee0468af5ee8516f58bf3b54fe2",
+      "session_id": "1789717039857-x7y3vxj",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 22,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "2aa4de8c8bfc472a9adc00afd9bf89ec",
+        "sync:default_1789717039857-x7y3vxj"
+      ]
+    },
+    "console/default_1789904816181-372pju5.json": {
+      "sha256": "7182a6d982ba894b26406cfcfd9831a06a8b895eb98effb89f052f49fba1463d",
+      "session_id": "1789904816181-372pju5",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 20,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "95a7e6acc1f0461dac65977a263142f2",
+        "sync:default_1789904816181-372pju5"
+      ]
+    }
+  }
+}

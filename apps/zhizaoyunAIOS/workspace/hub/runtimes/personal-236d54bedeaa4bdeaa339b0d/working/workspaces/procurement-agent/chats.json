@@ -1,0 +1,50 @@
+{
+  "chats": [
+    {
+      "archived": false,
+      "archived_at": null,
+      "channel": "console",
+      "created_at": "2026-09-18T07:20:21.203713Z",
+      "group_id": "default",
+      "id": "4e3852a9-25e4-4cf8-84f9-967118784bff",
+      "last_finished_at": "2026-09-18T07:52:18.480987Z",
+      "meta": {},
+      "name": "New Chat",
+      "parent_session_id": null,
+      "pinned": false,
+      "root_session_id": null,
+      "session_id": "1789716019876-ip56ka6",
+      "source": "chat",
+      "status": "idle",
+      "updated_at": "2026-09-18T07:52:18.480987Z",
+      "user_id": "default"
+    }
+  ],
+  "groups": [
+    {
+      "id": "default",
+      "kind": "default",
+      "name": "Uncategorized",
+      "order": 0,
+      "pinned": false,
+      "source": "chat"
+    },
+    {
+      "id": "cron",
+      "kind": "cron",
+      "name": "Scheduled tasks",
+      "order": 1,
+      "pinned": false,
+      "source": "cron"
+    },
+    {
+      "id": "subagents",
+      "kind": "subagents",
+      "name": "Subagents",
+      "order": 2,
+      "pinned": false,
+      "source": "subagent"
+    }
+  ],
+  "version": 1
+}

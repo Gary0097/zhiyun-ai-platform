@@ -1,0 +1,4808 @@
+{
+  "data": [
+    {
+      "id": "027b804c-385f-412b-ae01-e42eaac7684a",
+      "seq_id": 100000168,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "# 金汉隆订单数据模型 · 异常处理流程自动化\n\n| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 0,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 0,
+      "end_at": 168,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680021337504570",
+            "question": "金汉隆订单数据模型中异常处理流程自动化包含哪些关键字段？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680021337510041",
+            "question": "如何根据历史案例编号和推荐沟通话术处理客户投诉与异常事件？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680021337510333",
+            "question": "在订单异常处理中，复合事件的判定标准及对应的补偿方案是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.97047+08:00",
+      "updated_at": "2026-09-18T05:20:21.337915+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "7018da2c-474d-4d74-8c41-255993e1755c",
+      "seq_id": 100000170,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0001 | 信保无合同19131 | 河北诚益诚益食品有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202450-54 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 安排工程师驻场支持 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 1,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 168,
+      "end_at": 293,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680022574187225",
+            "question": "金汉隆订单异常处理中复合事件有哪些推荐沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680022574193297",
+            "question": "河北诚益食品有限公司的延期投诉异常应如何安排工程师驻场支持？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680022574193939",
+            "question": "针对发票开具信息变更导致的订单异常，系统推荐的处理状态是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970471+08:00",
+      "updated_at": "2026-09-18T05:20:22.574492+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "c9d5f1f2-8f27-415e-a721-64d47410ffbc",
+      "seq_id": 100000172,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0002 | KL20251203004 | 浙江恒品博恩包装材料有限公司 | 付款异常 | 否 | 包装形式临时调整 | CASE-202449-13 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 延长质保1个月 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 2,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 293,
+      "end_at": 420,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680023766131636",
+            "question": "浙江恒品博恩包装材料有限公司的付款异常事件推荐什么补偿方案",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680023766134583",
+            "question": "针对包装形式临时调整导致的付款异常，系统推荐的历史案例编号是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680023766134854",
+            "question": "订单数据中EX0002号异常的当前处理状态及推荐沟通话术是什么",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970472+08:00",
+      "updated_at": "2026-09-18T05:20:23.766508+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "67043b12-43e9-45e0-9e57-811d4995c4c2",
+      "seq_id": 100000174,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0003 | KL20251213005 | marcos S.A. | 投诉 | 否 | 到货安装时间协调 | CASE-202493-68 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 3,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 420,
+      "end_at": 541,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680025426191153",
+            "question": "针对marcos S.A.到货安装时间协调投诉，推荐采用什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680025426194981",
+            "question": "处理EX0003异常时，建议通过确认替代配置来缩短多少天的交付周期？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680025426195243",
+            "question": "对于非复合事件的客户投诉，系统推荐的补偿方案通常是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970473+08:00",
+      "updated_at": "2026-09-18T05:20:25.426625+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "0953f445-54b8-4f15-ab90-39d0466abfb0",
+      "seq_id": 100000176,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0004 | 20251217 | 安徽泰启麦禾营养科技有限公司 | 延期 | 否 | 客户催交 | CASE-202500-65 | 已同步工程与跟单团队，2小时内给出书面方案。 | 优先排产 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 4,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 541,
+      "end_at": 651,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680027213825643",
+            "question": "安徽泰启麦禾营养科技有限公司的订单延期异常处理流程中推荐了什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680027213832367",
+            "question": "针对客户催交导致的订单延期，系统推荐的补偿方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680027213832638",
+            "question": "在订单数据异常处理自动化中，如何查询特定合同编号的历史案例编号？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970474+08:00",
+      "updated_at": "2026-09-18T05:20:27.214372+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "9dd357b7-b1d8-4055-aad4-42d0812e39a5",
+      "seq_id": 100000178,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0005 | KL20251226011 | 江苏合昌安润健康科技有限公司 | 付款异常 | 否 | 包装形式临时调整 | CASE-202508-84 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 优先排产 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 5,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 651,
+      "end_at": 775,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680028559045359",
+            "question": "江苏合昌安润健康科技有限公司的付款异常事件推荐沟通话术是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680028559050309",
+            "question": "针对包装形式临时调整导致的付款异常，推荐的补偿方案有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680028559050771",
+            "question": "订单数据中EX0005号异常的处理状态及历史案例编号是多少",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970475+08:00",
+      "updated_at": "2026-09-18T05:20:28.559466+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "fb1bea27-e18f-4c75-a20e-9cd007108108",
+      "seq_id": 100000179,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0006 | KL20251224013 | BG Pack GmbH | 延期+投诉 | 是 | 客户催交 | CASE-202465-94 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 补发备用配件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 6,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 775,
+      "end_at": 896,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680029727323303",
+            "question": "针对BG Pack GmbH的延期投诉复合事件，推荐采用什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680029727324757",
+            "question": "处理客户催交导致的延期投诉时，通常建议提供哪种补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680029727325018",
+            "question": "在订单异常处理中，如何识别并应对包含延期和投诉的复合事件？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970476+08:00",
+      "updated_at": "2026-09-18T05:20:29.727624+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "fe71b24e-39db-4f3c-9d88-50534d970a61",
+      "seq_id": 100000180,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0007 | kl20251214016 | duanex Co.,Ltd. | 配置变更 | 否 | 标签内容待确认 | CASE-202446-68 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 7,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 896,
+      "end_at": 1026,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680030941368454",
+            "question": "异常编号EX0007对应的客户名称和事件类型是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680030941373414",
+            "question": "针对标签内容待确认的配置变更异常，推荐沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680030941373696",
+            "question": "处理中的配置变更异常通常建议提供哪种补偿方案？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970477+08:00",
+      "updated_at": "2026-09-18T05:20:30.941808+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "f6d81735-cfab-4f8c-860b-7f531940f28d",
+      "seq_id": 100000181,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0008 | KL20251218020 | 浙江维康锦华包装材料有限公司 | 付款异常 | 否 | 客户催交 | CASE-202406-58 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 8,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 1026,
+      "end_at": 1152,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680032325747123",
+            "question": "浙江维康锦华包装材料有限公司的付款异常处理状态及推荐补偿方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680032325748587",
+            "question": "针对客户催交导致的付款异常，订单数据中推荐的沟通话术有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680032325749049",
+            "question": "历史案例编号CASE-202406-58对应的异常事件类型和处理结果是什么",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970478+08:00",
+      "updated_at": "2026-09-18T05:20:32.326063+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "cb80ddc7-46e4-4ff7-920c-7fe5bfd2139b",
+      "seq_id": 100000182,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0009 | KL20251207021 | YAM AGRO GmbH | 延期+投诉 | 是 | 标签内容待确认 | CASE-202506-45 | 已同步工程与跟单团队，2小时内给出书面方案。 | 赠送一套易损件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 9,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 1152,
+      "end_at": 1275,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680034145579795",
+            "question": "针对YAM AGRO GmbH的延期投诉复合事件，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680034145585907",
+            "question": "在订单异常处理流程中，遇到标签内容待确认导致的延期投诉应如何响应？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680034145586179",
+            "question": "历史案例编号CASE-202506-45对应的是哪类客户异常及具体的处理状态？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970479+08:00",
+      "updated_at": "2026-09-18T05:20:34.146156+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "40e5d9ff-0cba-464f-98fe-b9ee538bc39c",
+      "seq_id": 100000183,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0010 | KL20251220023 | Simon LLC | 延期+投诉 | 是 | 包装形式临时调整 | CASE-202445-95 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 延长质保1个月 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 10,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 1275,
+      "end_at": 1401,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680035696320252",
+            "question": "针对Simon LLC包装形式临时调整异常，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680035696324952",
+            "question": "在订单异常处理流程中，如何根据历史案例编号匹配推荐的沟通话术与补偿措施？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680035696325424",
+            "question": "对于涉及延期和投诉的复合事件，系统应如何生成标准化的客户回复及解决方案？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970482+08:00",
+      "updated_at": "2026-09-18T05:20:35.696668+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "bdbef265-825c-454f-8b61-f49c1335ebfb",
+      "seq_id": 100000184,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0011 | KL20260122030 | Serge LLC | 延期+投诉 | 是 | 现场调试进度反馈 | CASE-202453-15 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 优先排产 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 11,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 1401,
+      "end_at": 1524,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680037052711762",
+            "question": "Serge LLC的订单异常EX0011对应的推荐沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680037052714287",
+            "question": "针对现场调试进度反馈导致的延期投诉，系统推荐的补偿方案有哪些？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680037052714559",
+            "question": "在订单数据异常处理流程中，如何查询特定合同编号下的历史案例编号？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970484+08:00",
+      "updated_at": "2026-09-18T05:20:37.053057+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e5abf309-f3ff-45db-8b6c-facbba0cada9",
+      "seq_id": 100000185,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0012 | 信保无合同41901 | 广东锦华润泽精细化工有限公司 | 延期+投诉 | 是 | 到货安装时间协调 | CASE-202447-47 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 安排工程师驻场支持 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 12,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 1524,
+      "end_at": 1653,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680038203757831",
+            "question": "广东锦华润泽精细化工有限公司的延期投诉异常处理推荐沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680038203763663",
+            "question": "针对到货安装时间协调问题，有哪些缩短工期的替代配置建议？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680038203764075",
+            "question": "在订单异常处理中，对于复合事件通常推荐哪些补偿方案？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970485+08:00",
+      "updated_at": "2026-09-18T05:20:38.204137+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "cd9d741e-eb38-4fa4-9ed6-b79eca60ab06",
+      "seq_id": 100000186,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0013 | KL20260126032 | 广东佰特品润食品有限公司 | 延期+投诉 | 是 | 标签内容待确认 | CASE-202408-40 | 已同步工程与跟单团队，2小时内给出书面方案。 | 减免运费 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 13,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 1653,
+      "end_at": 1772,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680040182409446",
+            "question": "广东佰特品润食品有限公司的标签内容待确认异常应如何处理",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680040182415358",
+            "question": "针对订单延期投诉事件推荐哪些沟通话术和补偿方案",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680040182415840",
+            "question": "在订单异常处理流程中如何参考历史案例编号制定解决方案",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970486+08:00",
+      "updated_at": "2026-09-18T05:20:40.182914+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "b1709394-bc0c-4b15-a063-d512884514bc",
+      "seq_id": 100000187,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0014 | KV20260101033A | 广东安润品润食品有限公司 | 延期+投诉 | 是 | 现场调试进度反馈 | CASE-202451-24 | 已同步工程与跟单团队，2小时内给出书面方案。 | 补发备用配件 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 14,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 1772,
+      "end_at": 1895,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680041961340677",
+            "question": "广东安润品润食品有限公司的订单异常EX0014推荐补偿方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680041961344045",
+            "question": "针对现场调试进度反馈类投诉，历史案例CASE-202451-24的沟通话术有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680041961344497",
+            "question": "复合事件类型“延期+投诉”在订单异常处理中通常包含哪些关键信息",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970487+08:00",
+      "updated_at": "2026-09-18T05:20:41.961698+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e686a3d6-1732-4e46-8971-879f4dcc9bdf",
+      "seq_id": 100000188,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0015 | 20260120 | 河南优谷鸿辰医药科技有限公司 | 延期 | 否 | 客户催交 | CASE-202467-64 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 延长质保1个月 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 15,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 1895,
+      "end_at": 2011,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680043459178776",
+            "question": "针对河南优谷鸿辰医药科技有限公司的延期投诉，推荐采用什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680043459181031",
+            "question": "处理客户催交导致的订单延期异常时，通常建议提供哪种补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680043459181313",
+            "question": "在订单异常处理流程中，非复合事件的延期投诉应如何标准化回复？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970488+08:00",
+      "updated_at": "2026-09-18T05:20:43.459455+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "6062ba7c-79da-411b-aa07-5c2f3a129a31",
+      "seq_id": 100000189,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0016 | KL20260122035 | 广东华盛康宁食品有限公司 | 配置变更 | 否 | 包装形式临时调整 | CASE-202414-51 | 已同步工程与跟单团队，2小时内给出书面方案。 | 赠送一套易损件 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 16,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 2011,
+      "end_at": 2133,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680044964545436",
+            "question": "广东华盛康宁食品有限公司的包装形式临时调整异常应如何处理？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680044964551990",
+            "question": "针对配置变更类投诉，推荐给客户赠送什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680044964552261",
+            "question": "订单异常处理中，如何回复客户关于包装形式调整的沟通话术？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970489+08:00",
+      "updated_at": "2026-09-18T05:20:44.965025+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "30aec796-1af5-46d3-b42b-bb5d3c690604",
+      "seq_id": 100000190,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0017 | KL20260123037 | 安徽瑞丰润泽食品有限公司 | 投诉 | 否 | 到货安装时间协调 | CASE-202452-54 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 减免运费 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 17,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 2133,
+      "end_at": 2256,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680046393065122",
+            "question": "安徽瑞丰润泽食品有限公司的订单异常EX0017推荐沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680046393066827",
+            "question": "针对到货安装时间协调投诉，系统推荐的补偿方案有哪些？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680046393067098",
+            "question": "在订单异常处理流程中，如何查询特定合同编号的历史案例编号？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.97049+08:00",
+      "updated_at": "2026-09-18T05:20:46.393543+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "cddae4fa-855e-45a3-9740-f98ba8680ce9",
+      "seq_id": 100000191,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0018 | KL20260115039 | 河北合昌锦华包装材料有限公司 | 延期 | 否 | 标签内容待确认 | CASE-202436-23 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 补发备用配件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 18,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 2256,
+      "end_at": 2381,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680047659205505",
+            "question": "河北合昌锦华包装材料有限公司的标签内容待确认延期异常如何处理？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680047659206818",
+            "question": "针对标签内容待确认导致的订单延期，有哪些推荐的沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680047659207090",
+            "question": "在订单异常处理流程中，如何参考历史案例缩短标签确认类延期的处理时间？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970492+08:00",
+      "updated_at": "2026-09-18T05:20:47.659555+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "9aeed994-52c4-458e-9658-a4c8ae2ae776",
+      "seq_id": 100000192,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0019 | 20260103 | 山东新禾逸品精细化工有限公司 | 延期+投诉 | 是 | 到货安装时间协调 | CASE-202481-35 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 安排工程师驻场支持 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 19,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 2381,
+      "end_at": 2506,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680049304914142",
+            "question": "山东新禾逸品精细化工有限公司的订单异常处理推荐沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680049304919704",
+            "question": "针对到货安装时间协调导致的延期投诉，推荐的补偿方案有哪些？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680049304920226",
+            "question": "在订单异常处理流程中，如何回复客户关于延迟原因及排产调整的询问？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970494+08:00",
+      "updated_at": "2026-09-18T05:20:49.305279+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "4ec82401-d226-4786-a00b-f1306aac8a5d",
+      "seq_id": 100000194,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0020 | kl20260121043 | 河南优谷鸿辰医药科技有限公司 | 延期 | 否 | 客户催交 | CASE-202403-91 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 减免运费 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 20,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 2506,
+      "end_at": 2626,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680030756625776",
+            "question": "河南优谷鸿辰医药科技有限公司的订单延期异常处理方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680030756630385",
+            "question": "针对客户催交导致的订单延期，有哪些推荐的沟通话术和补偿措施？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680030756630667",
+            "question": "在订单异常处理中，如何通过确认替代配置来缩短交付周期？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970495+08:00",
+      "updated_at": "2026-09-18T05:20:30.756963+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "13ecc271-3b67-4994-81a6-1e8a21f99d88",
+      "seq_id": 100000195,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0021 | KL20260119044 | 浙江金瑞品润电子材料有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202449-12 | 已同步工程与跟单团队，2小时内给出书面方案。 | 延长质保1个月 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 21,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 2626,
+      "end_at": 2751,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680032070501409",
+            "question": "针对浙江金瑞品润电子材料有限公司的延期加投诉复合事件，推荐采用什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680032070502832",
+            "question": "处理发票开具信息变更导致的订单异常时，通常建议提供哪种补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680032070503134",
+            "question": "在订单异常处理流程中，对于待回访状态的复合事件应如何协调团队响应？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970496+08:00",
+      "updated_at": "2026-09-18T05:20:32.070827+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "af4264e5-16ed-4fe0-9b66-1e4ab53a677e",
+      "seq_id": 100000196,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0022 | KL20260121045 | 广东海誉源本生物科技有限公司 | 延期 | 否 | 现场调试进度反馈 | CASE-202473-88 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 22,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 2751,
+      "end_at": 2876,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680033803892539",
+            "question": "广东海誉源本生物科技有限公司的订单延期异常处理进度和补偿方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680033803898831",
+            "question": "针对现场调试进度反馈导致的延期，推荐使用的客户沟通话术有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680033803899603",
+            "question": "在订单异常处理流程中，非复合事件的延期投诉通常包含哪些关键信息",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970497+08:00",
+      "updated_at": "2026-09-18T05:20:33.80446+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "ce6c8638-8970-4c3f-9550-17f539e81ccc",
+      "seq_id": 100000197,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0023 | KL20260224048 | 广东逸品优谷健康科技有限公司 | 延期 | 否 | 标签内容待确认 | CASE-202476-81 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 23,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 2876,
+      "end_at": 3003,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680035364235366",
+            "question": "广东逸品优谷健康科技有限公司的订单延期异常处理状态是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680035364236739",
+            "question": "针对标签内容待确认导致的延期，推荐给客户什么补偿方案",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680035364236991",
+            "question": "在订单异常处理中，如何向客户反馈锁定产线资源后的进度",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970498+08:00",
+      "updated_at": "2026-09-18T05:20:35.364576+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "6c259ef1-9089-4b35-8d92-bb33f0a56005",
+      "seq_id": 100000198,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0024 | 信保无合同39085 | 浙江品润泰启医药科技有限公司 | 配置变更 | 否 | 到货安装时间协调 | CASE-202512-65 | 已同步工程与跟单团队，2小时内给出书面方案。 | 延长质保1个月 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 24,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 3003,
+      "end_at": 3124,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680036496798580",
+            "question": "针对信保无合同订单的配置变更异常，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680036496804111",
+            "question": "浙江品润泰启医药科技有限公司的到货安装时间协调异常当前处于什么处理状态？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680036496804473",
+            "question": "在订单异常处理流程中，配置变更类事件通常关联哪些历史案例编号？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970499+08:00",
+      "updated_at": "2026-09-18T05:20:36.497268+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "046017e5-fcea-48ee-9897-bb57f521ad30",
+      "seq_id": 100000199,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0025 | 20260219 | 安徽泰启麦禾营养科技有限公司 | 投诉 | 否 | 现场调试进度反馈 | CASE-202462-64 | 已同步工程与跟单团队，2小时内给出书面方案。 | 优先排产 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 25,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 3124,
+      "end_at": 3238,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680037959455408",
+            "question": "安徽泰启麦禾营养科技有限公司的现场调试投诉异常编号是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680037959460899",
+            "question": "针对EX0025号投诉事件，推荐的沟通话术和补偿方案分别是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680037959461170",
+            "question": "在订单异常处理流程中，非复合事件的现场调试进度反馈通常如何处理？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970499+08:00",
+      "updated_at": "2026-09-18T05:20:37.959864+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "9dadee0b-4a4c-4f9b-9942-e4b07e4567f4",
+      "seq_id": 100000200,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0026 | kl20260219052 | 广东和泰丰泽营养科技有限公司 | 延期+投诉 | 是 | 现场调试进度反馈 | CASE-202450-52 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 补发备用配件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 26,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 3238,
+      "end_at": 3368,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680039536228937",
+            "question": "广东和泰丰泽营养科技有限公司的订单异常EX0026推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680039536234088",
+            "question": "针对现场调试进度反馈导致的延期投诉，推荐沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680039536234339",
+            "question": "在订单异常处理中，复合事件如EX0026的状态和处理流程是怎样的？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970501+08:00",
+      "updated_at": "2026-09-18T05:20:39.53667+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "2923d9df-dd7e-4a57-a5d2-6a6cb55a74db",
+      "seq_id": 100000201,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0027 | kl20260228053 | 云南品润正合健康科技有限公司 | 付款异常 | 否 | 发票开具信息变更 | CASE-202478-94 | 已同步工程与跟单团队，2小时内给出书面方案。 | 延长质保1个月 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 27,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 3368,
+      "end_at": 3492,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680040696794623",
+            "question": "云南品润正合健康科技有限公司的付款异常处理进度和补偿方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680040696798040",
+            "question": "针对发票开具信息变更导致的付款异常，推荐的标准沟通话术有哪些？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680040696798312",
+            "question": "订单数据中异常编号EX0027对应的历史案例编号及当前状态是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970501+08:00",
+      "updated_at": "2026-09-18T05:20:40.6971+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "f586611a-bb7a-4f51-a213-76eb82328d01",
+      "seq_id": 100000202,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0028 | KV20260201057A | 广东合昌正合包装材料有限公司 | 投诉 | 否 | 发票开具信息变更 | CASE-202443-74 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 补发备用配件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 28,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 3492,
+      "end_at": 3619,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680041929390371",
+            "question": "广东合昌正合包装材料有限公司的发票开具信息变更投诉如何处理？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680041929396354",
+            "question": "针对发票开具信息变更类投诉，有哪些推荐的沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680041929396625",
+            "question": "异常编号EX0028对应的历史案例编号及当前处理状态是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970502+08:00",
+      "updated_at": "2026-09-18T05:20:41.929707+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "225f49b1-206a-400b-b8a7-d241a61c87be",
+      "seq_id": 100000203,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0029 | KL20260222058 | 江苏优谷源本健康科技有限公司 | 付款异常 | 否 | 客户催交 | CASE-202499-92 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 29,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 3619,
+      "end_at": 3741,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680043438487277",
+            "question": "江苏优谷源本健康科技有限公司的付款异常处理中推荐了什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680043438492347",
+            "question": "针对客户催交导致的付款异常，订单数据中建议采取哪种补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680043438492799",
+            "question": "在订单异常处理流程中，非复合事件的付款异常通常包含哪些关键字段？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970503+08:00",
+      "updated_at": "2026-09-18T05:20:43.438865+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "fa31d303-624e-4ac2-ad2e-aa35afc0399e",
+      "seq_id": 100000204,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0030 | KL20260221059 | BG Pack Co.,Ltd. | 投诉 | 否 | 包装形式临时调整 | CASE-202489-17 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 安排工程师驻场支持 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 30,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 3741,
+      "end_at": 3870,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "80e9795a-484f-42e9-ab1e-7324d6fcbcd3",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680045047861935",
+            "question": "针对BG Pack Co.,Ltd.包装形式临时调整投诉的推荐沟通话术是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680045047867356",
+            "question": "处理BG Pack Co.,Ltd.包装异常时推荐的补偿方案有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680045047867868",
+            "question": "订单数据中EX0030号异常的当前处理状态及历史案例参考",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970504+08:00",
+      "updated_at": "2026-09-18T05:20:45.048278+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "a036ba0b-8803-431e-a422-9989555492ba",
+      "seq_id": 100000205,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 31,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 3870,
+      "end_at": 4013,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680046180170088",
+            "question": "订单数据异常处理流程自动化文档包含哪些关键字段？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680046180173255",
+            "question": "如何根据历史案例编号和推荐沟通话术处理客户投诉？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680046180173656",
+            "question": "在订单异常处理中，复合事件与单一事件的记录方式有何区别？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970505+08:00",
+      "updated_at": "2026-09-18T05:20:46.180454+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "5e57eb9f-970c-4df4-b4c8-144c921dbbc2",
+      "seq_id": 100000206,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0031 | KV20260228060A | 河南优谷鸿辰医药科技有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202507-56 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 减免运费 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 32,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 4013,
+      "end_at": 4142,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680047749171041",
+            "question": "河南优谷鸿辰医药科技有限公司的异常编号EX0031对应的推荐补偿方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680047749176552",
+            "question": "针对发票开具信息变更导致的延期投诉，系统推荐的沟通话术有哪些内容",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680047749176994",
+            "question": "在订单异常处理流程中，如何根据历史案例编号匹配具体的沟通与补偿策略",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970508+08:00",
+      "updated_at": "2026-09-18T05:20:47.749514+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "1203f8df-ab62-40a4-8c7c-77a3323b940e",
+      "seq_id": 100000207,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0032 | KL20260213064 | 浙江康莱康莱健康科技有限公司 | 延期+投诉 | 是 | 现场调试进度反馈 | CASE-202510-10 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 优先排产 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 33,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 4142,
+      "end_at": 4270,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680048964095105",
+            "question": "浙江康莱康莱健康科技有限公司的订单异常EX0032推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680048964099774",
+            "question": "针对现场调试进度反馈类投诉，系统推荐的沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680048964100046",
+            "question": "复合事件类型的订单异常处理中，优先排产适用于哪些具体场景？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.97051+08:00",
+      "updated_at": "2026-09-18T05:20:48.964437+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e8cc2ba8-c94d-40f9-bc63-f30c7892fbb0",
+      "seq_id": 100000208,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0033 | KV20260223065A | 广东丰泽盛泽健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202418-24 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 延长质保1个月 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 34,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 4270,
+      "end_at": 4398,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680050543693974",
+            "question": "广东丰泽盛泽健康科技有限公司的订单异常EX0033处理状态是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680050543695678",
+            "question": "针对客户催交导致的延期投诉，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680050543696120",
+            "question": "在订单异常处理流程中，复合事件“延期+投诉”通常对应哪些历史案例编号？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970511+08:00",
+      "updated_at": "2026-09-18T05:20:50.544048+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "8f4accb0-f4c2-44a1-945d-843e1d8e4b2e",
+      "seq_id": 100000209,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0034 | KL20260205067 | 江苏康宁博恩健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202473-69 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 35,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 4398,
+      "end_at": 4522,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680051682805830",
+            "question": "针对江苏康宁博恩健康科技有限公司的延期投诉，推荐采用什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680051682811181",
+            "question": "处理客户催交导致的延期复合事件时，有哪些推荐的补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680051682811453",
+            "question": "在订单异常处理流程中，如何跟进状态为待回访的延期投诉案例？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970511+08:00",
+      "updated_at": "2026-09-18T05:20:51.683121+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "37c9d878-1dac-4e05-9cab-48526b8b77e4",
+      "seq_id": 100000210,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0035 | 20260221 | Afra Group LLC | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202483-51 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 减免运费 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 36,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 4522,
+      "end_at": 4644,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680053237300066",
+            "question": "Afra Group LLC的发票开具信息变更异常是如何处理的？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680053237305126",
+            "question": "针对延期加投诉复合事件，推荐什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680053237305428",
+            "question": "历史案例编号CASE-202483-51对应了哪些异常处理建议？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970512+08:00",
+      "updated_at": "2026-09-18T05:20:53.23765+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "6f3fbdaf-f647-46ab-a9f0-1b410ce69659",
+      "seq_id": 100000211,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0036 | 20260225 | 山东优谷逸品包装材料有限公司 | 投诉 | 否 | 现场调试进度反馈 | CASE-202455-10 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 优先排产 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 37,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 4644,
+      "end_at": 4764,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680054331297237",
+            "question": "山东优谷逸品包装材料有限公司的现场调试进度投诉是如何处理的？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680054331300324",
+            "question": "针对现场调试进度反馈类投诉，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680054331300575",
+            "question": "订单异常处理中，非复合事件的现场调试投诉通常采取哪些解决措施？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970513+08:00",
+      "updated_at": "2026-09-18T05:20:54.331793+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "ae4c4217-6be3-491d-b066-b496ec988ebf",
+      "seq_id": 100000212,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0037 | 信保无合同18368 | 广东康莱合昌食品有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202497-87 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 减免运费 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 38,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 4764,
+      "end_at": 4882,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680055847389990",
+            "question": "广东康莱合昌食品有限公司的延期投诉异常处理中推荐了什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680055847392196",
+            "question": "针对客户催交导致的复合事件，有哪些推荐的补偿方案可以缩短交付周期？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680055847392487",
+            "question": "在订单异常处理流程中，如何结合历史案例为延期投诉提供替代配置建议？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970514+08:00",
+      "updated_at": "2026-09-18T05:20:55.847684+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "a96be833-fc3f-42ef-9591-0862d82b31a1",
+      "seq_id": 100000213,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0038 | 信保无合同40419 | 江苏佰特诚益生物科技有限公司 | 延期+投诉 | 是 | 现场调试进度反馈 | CASE-202447-37 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 39,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 4882,
+      "end_at": 5006,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680057282029706",
+            "question": "江苏佰特诚益生物科技有限公司的订单异常EX0038推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680057282034656",
+            "question": "针对现场调试进度反馈导致的延期投诉，历史案例CASE-202447-37建议如何沟通？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680057282035068",
+            "question": "处理中的复合事件EX0038为何安排工程师驻场支持而非减免运费？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970515+08:00",
+      "updated_at": "2026-09-18T05:20:57.282415+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "8e162a74-44df-4b29-8aeb-a04f489d7ef2",
+      "seq_id": 100000214,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0039 | KL20260227076 | marcos S.A. | 延期 | 否 | 现场调试进度反馈 | CASE-202443-14 | 已同步工程与跟单团队，2小时内给出书面方案。 | 减免运费 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 40,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 5006,
+      "end_at": 5122,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679974858569508",
+            "question": "针对异常编号EX0039的延期事件，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679974858574538",
+            "question": "在订单异常处理中，如何根据历史案例编号匹配推荐的沟通与补偿策略？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679974858574800",
+            "question": "对于非复合事件的现场调试进度反馈延期，通常采取哪些自动化处理措施？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970516+08:00",
+      "updated_at": "2026-09-18T05:19:34.858953+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "c9bcb382-700b-4c90-8dc0-85437dfe39f1",
+      "seq_id": 100000215,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0040 | 20260325 | 广东丰泽维康电子材料有限公司 | 延期+投诉 | 是 | 到货安装时间协调 | CASE-202496-54 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 补发备用配件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 41,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 5122,
+      "end_at": 5246,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679976483054387",
+            "question": "广东丰泽维康电子材料有限公司的订单异常EX0040推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679976483058676",
+            "question": "针对到货安装时间协调导致的延期投诉，有哪些缩短工期的沟通建议？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679976483059268",
+            "question": "在订单异常处理中，如何结合历史相似项目案例来制定应对策略？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970517+08:00",
+      "updated_at": "2026-09-18T05:19:36.483399+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "ff4d2f70-411e-4bd4-89e9-29d58715634a",
+      "seq_id": 100000216,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0041 | KL20260325082 | 广东金瑞康莱营养科技有限公司 | 延期+投诉 | 是 | 包装形式临时调整 | CASE-202474-22 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 赠送一套易损件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 42,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 5246,
+      "end_at": 5376,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679977743538192",
+            "question": "广东金瑞康莱营养科技有限公司的包装形式临时调整异常处理结果是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679977743539786",
+            "question": "针对延期加投诉复合事件，推荐沟通话术和补偿方案有哪些最佳实践",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679977743540058",
+            "question": "订单数据中如何根据历史案例编号制定异常处理的沟通与补偿策略",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970518+08:00",
+      "updated_at": "2026-09-18T05:19:37.743807+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "d2f5a5b0-f309-45fa-ac75-3672ee8c8d92",
+      "seq_id": 100000217,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0042 | KL20260318083 | 浙江优谷佰特健康科技有限公司 | 配置变更 | 否 | 到货安装时间协调 | CASE-202422-26 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 安排工程师驻场支持 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 43,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 5376,
+      "end_at": 5508,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679979785531839",
+            "question": "浙江优谷佰特健康科技有限公司的订单异常EX0042处理状态和推荐方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679979785533152",
+            "question": "针对配置变更导致的到货安装时间协调问题，有哪些推荐的沟通话术和补偿措施？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679979785533544",
+            "question": "在订单数据异常处理流程中，如何查询特定合同编号的历史案例及当前处理进度？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.97052+08:00",
+      "updated_at": "2026-09-18T05:19:39.785886+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "354df935-80b0-4d23-80cc-43a9c6321c69",
+      "seq_id": 100000219,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0043 | KL20260312087 | duanex LLC | 延期+投诉 | 是 | 到货安装时间协调 | CASE-202435-93 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 安排工程师驻场支持 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 44,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 5508,
+      "end_at": 5637,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679981371305347",
+            "question": "异常编号EX0043对应的客户名称和合同编号是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679981371307342",
+            "question": "针对duanex LLC的延期投诉复合事件，推荐沟通话术和补偿方案有哪些？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679981371308185",
+            "question": "订单数据中状态为待回访的异常处理记录包含哪些关键信息字段？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970521+08:00",
+      "updated_at": "2026-09-18T05:19:41.371823+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "52f43b81-0c7c-4632-865a-b2aa28e25f22",
+      "seq_id": 100000221,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0044 | 信保无合同16195 | duanex Co.,Ltd. | 投诉 | 否 | 到货安装时间协调 | CASE-202443-71 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 45,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 5637,
+      "end_at": 5759,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679983101100514",
+            "question": "针对信保无合同订单的投诉事件，推荐采用何种沟通话术以快速响应？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679983101103440",
+            "question": "处理duanex Co.,Ltd.到货安装时间协调投诉时，建议提供哪些补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679983101103702",
+            "question": "在异常处理流程中，非复合事件的投诉状态通常如何界定与关闭？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970522+08:00",
+      "updated_at": "2026-09-18T05:19:43.101518+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "f847533f-4fc9-45e7-8f8e-4498267c6467",
+      "seq_id": 100000222,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0045 | KL20260419094 | 湖北诚益华盛精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202446-27 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 46,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 5759,
+      "end_at": 5885,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679984333259849",
+            "question": "湖北诚益华盛精细化工有限公司的订单异常EX0045推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679984333264078",
+            "question": "针对客户催交导致的延期投诉，历史案例中有哪些有效的沟通话术建议？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679984333264349",
+            "question": "在订单异常处理流程中，如何根据复合事件类型制定回访策略？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970524+08:00",
+      "updated_at": "2026-09-18T05:19:44.333784+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "ad762d60-fe47-4a6f-a443-53c533b2f956",
+      "seq_id": 100000223,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0046 | KL20260425095 | Afra Group Co.,Ltd. | 付款异常 | 否 | 标签内容待确认 | CASE-202430-72 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 47,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 5885,
+      "end_at": 6015,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679987272045420",
+            "question": "Afra Group Co.,Ltd.的付款异常订单EX0046推荐采用什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679987272050340",
+            "question": "针对合同KL20260425095的标签内容待确认问题，建议沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679987272050601",
+            "question": "在订单异常处理中，非复合事件的付款异常通常如何结合历史案例进行处置？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970525+08:00",
+      "updated_at": "2026-09-18T05:19:47.272565+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "62396d9d-7a2d-4303-ba82-6eb0c0cf02a9",
+      "seq_id": 100000224,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0047 | 20260410 | 江苏和泰德元营养科技有限公司 | 延期+投诉 | 是 | 标签内容待确认 | CASE-202464-90 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 48,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 6015,
+      "end_at": 6137,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679988876570740",
+            "question": "江苏和泰德元营养科技有限公司的订单异常EX0047处理状态及补偿方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679988876575359",
+            "question": "针对复合事件类型的订单延期投诉，推荐使用的沟通话术有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679988876575671",
+            "question": "在订单异常处理流程中，如何根据历史案例编号制定补偿方案",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970526+08:00",
+      "updated_at": "2026-09-18T05:19:48.877111+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "48fc0033-cafd-45b5-8b35-6a620de3763c",
+      "seq_id": 100000225,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0048 | KL20260411101 | 浙江泰启瑞丰营养科技有限公司 | 延期 | 否 | 现场调试进度反馈 | CASE-202446-75 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 减免运费 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 49,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 6137,
+      "end_at": 6259,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679990068638210",
+            "question": "浙江泰启瑞丰营养科技有限公司的订单延期异常处理方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679990068641166",
+            "question": "针对现场调试进度反馈导致的延期，推荐采用何种沟通话术和补偿措施？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679990068641648",
+            "question": "在订单异常处理流程中，非复合事件的延期投诉通常如何跟进和解决？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970529+08:00",
+      "updated_at": "2026-09-18T05:19:50.068969+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "320293fb-51f2-44a1-b1a8-fc517bfc2102",
+      "seq_id": 100000226,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0049 | 20260416 | 广东安润瑞丰精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202408-21 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 50,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 6259,
+      "end_at": 6378,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679991296981070",
+            "question": "广东安润瑞丰精细化工有限公司的复合异常事件处理方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679991296986501",
+            "question": "针对客户催交导致的延期投诉，推荐沟通话术和补偿方案有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679991296986943",
+            "question": "订单异常处理中如何区分单一事件与复合事件的应对策略",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.97053+08:00",
+      "updated_at": "2026-09-18T05:19:51.297363+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "8f59f980-6897-4fc5-a7a4-66f43bd13098",
+      "seq_id": 100000227,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0050 | KL20260403105 | 广东佰特品润食品有限公司 | 延期 | 否 | 到货安装时间协调 | CASE-202505-77 | 已同步工程与跟单团队，2小时内给出书面方案。 | 补发备用配件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 51,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 6378,
+      "end_at": 6497,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679993848628632",
+            "question": "广东佰特品润食品有限公司订单延期异常的处理方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679993848635155",
+            "question": "针对到货安装时间协调类投诉，推荐沟通话术和补偿方案有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679993848635437",
+            "question": "订单数据异常处理流程中如何查询历史案例编号",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970531+08:00",
+      "updated_at": "2026-09-18T05:19:53.849091+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "825dec30-3ef4-47b0-83cc-0e0a59073705",
+      "seq_id": 100000228,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0051 | 信保无合同81205 | 广东恒品润泽包装材料有限公司 | 配置变更 | 否 | 包装形式临时调整 | CASE-202402-56 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 赠送一套易损件 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 52,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 6497,
+      "end_at": 6623,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679995546227609",
+            "question": "广东恒品润泽包装材料有限公司的订单异常EX0051推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679995546229193",
+            "question": "针对包装形式临时调整的配置变更，历史案例CASE-202402-56建议如何沟通？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679995546229694",
+            "question": "信保无合同81205对应的异常处理状态及推荐沟通话术是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970534+08:00",
+      "updated_at": "2026-09-18T05:19:55.546497+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "c4a8c8df-0de1-4461-9296-8a28422f0058",
+      "seq_id": 100000229,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0052 | 20260426 | 四川康莱泰启电子材料有限公司 | 配置变更 | 否 | 到货安装时间协调 | CASE-202401-84 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 安排工程师驻场支持 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 53,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 6623,
+      "end_at": 6749,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679996919782202",
+            "question": "四川康莱泰启电子材料有限公司的订单异常EX0052推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679996919788034",
+            "question": "针对配置变更导致的到货安装时间协调问题，历史案例CASE-202401-84建议如何沟通？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679996919788295",
+            "question": "在订单异常处理中，对于非复合的配置变更事件通常采取哪些应对策略？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970535+08:00",
+      "updated_at": "2026-09-18T05:19:56.920099+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "9ca55308-8806-46cb-8f1f-b64d0f664c6c",
+      "seq_id": 100000231,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0053 | KL20260504112 | 浙江海誉正合生物科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202488-68 | 已同步工程与跟单团队，2小时内给出书面方案。 | 补发备用配件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 54,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 6749,
+      "end_at": 6869,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679998602286270",
+            "question": "浙江海誉正合生物科技有限公司的订单异常EX0053的具体处理状态和推荐补偿方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679998602288435",
+            "question": "针对客户催交导致的延期投诉复合事件，系统推荐的沟通话术和处理流程是怎样的？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679998602288987",
+            "question": "在订单异常处理自动化中，如何根据历史案例编号匹配并生成针对特定客户的解决方案？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970536+08:00",
+      "updated_at": "2026-09-18T05:19:58.602747+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "d688e1ab-42b3-4197-bc12-eb9561dee1aa",
+      "seq_id": 100000233,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0054 | 20260525 | 河北维康佰特电子材料有限公司 | 延期 | 否 | 发票开具信息变更 | CASE-202505-11 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 55,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 6869,
+      "end_at": 6991,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680000086502802",
+            "question": "河北维康佰特电子材料有限公司因发票信息变更导致延期，推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680000086508122",
+            "question": "针对订单EX0054的延期异常，建议采用何种沟通话术以缩短处理周期？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680000086508393",
+            "question": "在订单异常处理中，对于非复合事件的延期投诉，通常如何匹配历史案例与解决方案？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970537+08:00",
+      "updated_at": "2026-09-18T05:20:00.086924+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "38e95ab5-53e0-4da4-b754-a983568ae603",
+      "seq_id": 100000234,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0055 | 20260503 | YAM AGRO Co.,Ltd. | 延期 | 否 | 包装形式临时调整 | CASE-202438-65 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 减免运费 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 56,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 6991,
+      "end_at": 7111,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680001701152503",
+            "question": "针对YAM AGRO包装形式临时调整导致的延期，推荐什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680001701155670",
+            "question": "处理EX0055订单异常时，建议向客户提供哪种补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680001701155942",
+            "question": "在订单异常处理流程中，如何回复因排产调整导致的客户延期投诉？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970538+08:00",
+      "updated_at": "2026-09-18T05:20:01.701698+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "d44726c8-3212-4438-b8cc-15382e1d5d18",
+      "seq_id": 100000235,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0056 | 20260509 | 江苏优谷诚益电子材料有限公司 | 延期+投诉 | 是 | 标签内容待确认 | CASE-202485-86 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 安排工程师驻场支持 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 57,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 7111,
+      "end_at": 7238,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680003404317861",
+            "question": "针对江苏优谷诚益电子材料有限公司的延期加投诉复合事件，推荐什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680003404319525",
+            "question": "处理标签内容待确认导致的订单异常时，建议提供哪种补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680003404319776",
+            "question": "在订单异常处理流程中，如何回复客户关于锁定产线资源及反馈进度的询问？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970539+08:00",
+      "updated_at": "2026-09-18T05:20:03.404593+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "c4d0d22a-4877-4d27-8543-fd1bd0cc60c6",
+      "seq_id": 100000236,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0057 | KV20260508126A | 云南品润正合健康科技有限公司 | 投诉 | 否 | 到货安装时间协调 | CASE-202447-11 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 58,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 7238,
+      "end_at": 7363,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680004714597200",
+            "question": "云南品润正合健康科技有限公司的订单异常EX0057推荐什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680004714598884",
+            "question": "针对到货安装时间协调投诉，历史案例CASE-202447-11建议采取何种补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680004714599145",
+            "question": "在订单异常处理流程中，非复合事件EX0057的处理状态和响应时效是怎样的？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.97054+08:00",
+      "updated_at": "2026-09-18T05:20:04.71498+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "87c55d26-834e-4a11-b82c-13d0af6b224e",
+      "seq_id": 100000237,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0058 | kl20260513128 | 广东安润品润食品有限公司 | 延期+投诉 | 是 | 标签内容待确认 | CASE-202453-21 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 优先排产 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 59,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 7363,
+      "end_at": 7488,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789680006179705442",
+            "question": "广东安润品润食品有限公司的订单异常EX0058处理状态和推荐补偿方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680006179710192",
+            "question": "针对标签内容待确认导致的延期投诉，系统推荐的沟通话术和优先排产方案如何执行？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789680006179710473",
+            "question": "在订单数据异常处理流程中，复合事件如EX0058的历史案例编号及处理进度反馈机制是怎样的？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970541+08:00",
+      "updated_at": "2026-09-18T05:20:06.180094+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "58d90740-01a2-4220-91ce-e4cad56eeca8",
+      "seq_id": 100000238,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0059 | KL20260508133 | 广东海誉正合包装材料有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202504-82 | 已同步工程与跟单团队，2小时内给出书面方案。 | 赠送一套易损件 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 60,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 7488,
+      "end_at": 7613,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679942066314472",
+            "question": "广东海誉正合包装材料有限公司的异常EX0059推荐沟通话术是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679942066317589",
+            "question": "针对发票开具信息变更导致的延期投诉，推荐什么补偿方案",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679942066318000",
+            "question": "在订单异常处理中，如何回复客户关于工程与跟单团队同步进度的询问",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970543+08:00",
+      "updated_at": "2026-09-18T05:19:02.066689+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "381716b7-40a3-4a43-b7ce-7e974f5639fd",
+      "seq_id": 100000239,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0060 | KL20260503134 | 广东润泽泰启包装材料有限公司 | 配置变更 | 否 | 现场调试进度反馈 | CASE-202401-82 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 61,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 7613,
+      "end_at": 7740,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "3c3bb4e0-4390-4c66-bdb6-facd36655b0b",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679944455491600",
+            "question": "广东润泽泰启包装材料有限公司配置变更异常的处理结果是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679944455496611",
+            "question": "针对现场调试进度反馈的配置变更，推荐沟通话术和补偿方案有哪些？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679944455496882",
+            "question": "订单数据中EX0060号异常事件的状态及历史案例编号是多少？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970545+08:00",
+      "updated_at": "2026-09-18T05:19:04.455892+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "f104e7a8-0ba6-40b0-b140-0a77081bcfae",
+      "seq_id": 100000240,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 62,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 7597,
+      "end_at": 7740,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679943082479127",
+            "question": "订单异常处理流程自动化文档包含哪些核心字段？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679943082482625",
+            "question": "如何根据历史案例编号制定推荐沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679943082482896",
+            "question": "在订单异常记录中，是否复合事件对处理流程有何影响？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970546+08:00",
+      "updated_at": "2026-09-18T05:19:03.082849+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "190a4914-aca4-4935-ba81-1a2dee8150e6",
+      "seq_id": 100000241,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0061 | 信保无合同78205 | 广东润泽泰启包装材料有限公司 | 延期+投诉 | 是 | 包装形式临时调整 | CASE-202472-15 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 63,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 7740,
+      "end_at": 7868,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679945905656883",
+            "question": "广东润泽泰启包装材料有限公司的延期投诉异常处理中推荐什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679945905661172",
+            "question": "针对包装形式临时调整导致的复合事件，系统推荐的补偿方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679945905661444",
+            "question": "信保无合同78205对应的异常EX0061当前处于什么处理状态？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970546+08:00",
+      "updated_at": "2026-09-18T05:19:05.906324+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "3d4f2c9a-e9dc-4f49-81ad-f718cf7053e2",
+      "seq_id": 100000243,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0062 | KL20260613138 | 广东博恩维康营养科技有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202433-69 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 64,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 7868,
+      "end_at": 7995,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679947326052551",
+            "question": "广东博恩维康营养科技有限公司的发票开具信息变更异常应如何处理？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679947326058453",
+            "question": "针对发票开具信息变更导致的延期投诉，有哪些推荐的沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679947326058935",
+            "question": "在订单异常处理中，如何结合历史相似项目缩短发票变更带来的交付周期？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970547+08:00",
+      "updated_at": "2026-09-18T05:19:07.326467+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "0993184a-ad0e-4317-8995-6971519454b9",
+      "seq_id": 100000245,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0063 | kl20260628139 | 广东润泽新禾电子材料有限公司 | 付款异常 | 否 | 包装形式临时调整 | CASE-202476-62 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 65,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 7995,
+      "end_at": 8121,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679948835652640",
+            "question": "广东润泽新禾电子材料有限公司的付款异常事件推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679948835658021",
+            "question": "针对包装形式临时调整导致的付款异常，客服应使用什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679948835658303",
+            "question": "订单数据中EX0063号异常的当前处理状态和历史案例编号是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970548+08:00",
+      "updated_at": "2026-09-18T05:19:08.836075+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "909c382b-7287-49af-bc3a-ccbc4c673da2",
+      "seq_id": 100000246,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0064 | KL20260601143 | 广东丰泽维康电子材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202460-16 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 66,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 8121,
+      "end_at": 8247,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679950027065914",
+            "question": "广东丰泽维康电子材料有限公司的延期投诉异常处理方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679950027071124",
+            "question": "针对客户催交导致的复合事件，有哪些推荐的沟通话术和补偿措施？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679950027071616",
+            "question": "订单数据中EX0064号异常的当前状态及历史案例参考信息有哪些？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970549+08:00",
+      "updated_at": "2026-09-18T05:19:10.027507+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "4b858012-7ef7-4913-9fa5-ac14b4c94a76",
+      "seq_id": 100000247,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0065 | KL20260602147 | 河南优谷品润营养科技有限公司 | 配置变更 | 否 | 发票开具信息变更 | CASE-202461-14 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 67,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 8247,
+      "end_at": 8377,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679951153849213",
+            "question": "河南优谷品润营养科技有限公司配置变更异常的处理结果是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679951153852440",
+            "question": "针对发票开具信息变更的投诉，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679951153852712",
+            "question": "订单数据中EX0065号异常事件的状态及历史案例编号是多少？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.97055+08:00",
+      "updated_at": "2026-09-18T05:19:11.154227+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "140583bf-afb6-4d46-9aa9-d481dd5fb061",
+      "seq_id": 100000248,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0066 | 20260605 | 湖南金瑞海誉营养科技有限公司 | 付款异常 | 否 | 现场调试进度反馈 | CASE-202423-17 | 已同步工程与跟单团队，2小时内给出书面方案。 | 延长质保1个月 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 68,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 8377,
+      "end_at": 8496,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679952376972034",
+            "question": "湖南金瑞海誉营养科技有限公司的付款异常事件当前处理状态是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679952376975512",
+            "question": "针对现场调试进度反馈类投诉，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679952376975793",
+            "question": "订单数据中非复合事件的付款异常通常如何匹配历史案例进行处理？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970551+08:00",
+      "updated_at": "2026-09-18T05:19:12.377283+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "0274006c-3410-4486-94bc-2e6f7dae24ce",
+      "seq_id": 100000249,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0067 | 20260606 | 广东丰泽盛泽健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202412-62 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 安排工程师驻场支持 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 69,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 8496,
+      "end_at": 8620,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679953666349239",
+            "question": "广东丰泽盛泽健康科技有限公司的延期投诉异常处理方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679953666352436",
+            "question": "针对客户催交导致的复合事件，推荐哪些沟通话术和补偿措施",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679953666353058",
+            "question": "订单数据中EX0067号异常的处理状态及历史案例参考",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970552+08:00",
+      "updated_at": "2026-09-18T05:19:13.666581+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "d0223c8d-08ca-4cfc-bf55-74e4ecdd4ab5",
+      "seq_id": 100000250,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0068 | kl20260613150 | 广东金瑞新禾健康科技有限公司 | 延期+投诉 | 是 | 现场调试进度反馈 | CASE-202489-68 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 优先排产 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 70,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 8620,
+      "end_at": 8748,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679955413385771",
+            "question": "广东金瑞新禾健康科技有限公司的订单异常EX0068推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679955413391612",
+            "question": "针对现场调试进度反馈类投诉，系统推荐的沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679955413391874",
+            "question": "复合事件类型的订单异常在自动化处理流程中如何标记和响应？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970553+08:00",
+      "updated_at": "2026-09-18T05:19:15.413845+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "61a0278f-8d54-491d-8867-5fdd12848571",
+      "seq_id": 100000251,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0069 | kl20260623153 | BG Pack GmbH | 付款异常 | 否 | 标签内容待确认 | CASE-202512-42 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 71,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 8748,
+      "end_at": 8871,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679957350723895",
+            "question": "针对BG Pack GmbH的付款异常事件，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679957350729086",
+            "question": "在订单异常处理流程中，标签内容待确认类问题通常关联哪个历史案例编号？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679957350729688",
+            "question": "如何根据合同编号kl20260623153查询对应的异常处理状态及解决方案？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970554+08:00",
+      "updated_at": "2026-09-18T05:19:17.351128+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "7e86e312-8f90-4804-b11d-eb9b0cfc2342",
+      "seq_id": 100000253,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0070 | 20260611 | 安徽博恩品润健康科技有限公司 | 配置变更 | 否 | 客户催交 | CASE-202488-14 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 减免运费 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 72,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 8871,
+      "end_at": 8986,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679959025161517",
+            "question": "安徽博恩品润健康科技有限公司配置变更异常的处理状态和推荐补偿方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679959025164043",
+            "question": "针对客户催交导致的配置变更异常，有哪些推荐的沟通话术和处理措施？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679959025164915",
+            "question": "在订单异常处理流程中，如何回复因排产调整而延迟交付的客户？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970555+08:00",
+      "updated_at": "2026-09-18T05:19:19.025575+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e18b6662-1d3f-4bb1-92ce-897a58d1c55a",
+      "seq_id": 100000254,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0071 | kl20260623155 | 山东泰启泰启医药科技有限公司 | 付款异常 | 否 | 到货安装时间协调 | CASE-202459-86 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 73,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 8986,
+      "end_at": 9112,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679960275658547",
+            "question": "山东泰启医药科技有限公司订单异常EX0071的推荐沟通话术是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679960275665812",
+            "question": "针对付款异常导致的到货安装时间协调问题，有哪些推荐的补偿方案",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679960275667356",
+            "question": "在订单异常处理流程中，如何结合历史案例缩短3-5天的交付周期",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970556+08:00",
+      "updated_at": "2026-09-18T05:19:20.27608+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e4d77d20-b543-4bde-b207-b95a72a31aa2",
+      "seq_id": 100000255,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0072 | KV20260625156A | 江苏康莱康宁电子材料有限公司 | 延期 | 否 | 包装形式临时调整 | CASE-202510-16 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 74,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 9112,
+      "end_at": 9237,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679961986868873",
+            "question": "针对江苏康莱康宁电子材料有限公司的包装形式临时调整异常，推荐什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679961986870387",
+            "question": "处理EX0072延期异常时，系统建议采用哪种补偿方案以缩短交付周期？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679961986870668",
+            "question": "在订单异常处理流程中，如何参考历史案例CASE-202510-16解决包装调整问题？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970558+08:00",
+      "updated_at": "2026-09-18T05:19:21.987157+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "b402c1f1-490f-4720-9931-8b425f2309c9",
+      "seq_id": 100000257,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0073 | 20260618 | 安徽逸品博恩精细化工有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202424-87 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 减免运费 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 75,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 9237,
+      "end_at": 9359,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679963755247113",
+            "question": "安徽逸品博恩精细化工有限公司的订单异常EX0073推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679963755250921",
+            "question": "针对发票开具信息变更导致的延期投诉，历史案例CASE-202424-87建议如何沟通？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679963755251183",
+            "question": "订单数据中复合事件EX0073的处理状态和推荐沟通话术是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970559+08:00",
+      "updated_at": "2026-09-18T05:19:23.755649+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "64cd65df-5de4-46bb-bd96-de3f1b63be1d",
+      "seq_id": 100000258,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0074 | KL20260713160 | 广东和泰和泰健康科技有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202412-82 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 赠送一套易损件 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 76,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 9359,
+      "end_at": 9489,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679965289690355",
+            "question": "广东和泰健康科技有限公司发票信息变更异常的处理状态是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679965289694504",
+            "question": "针对发票开具信息变更导致的延期投诉，推荐采用什么沟通话术",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679965289694956",
+            "question": "处理EX0074号订单异常时建议提供哪种补偿方案",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.97056+08:00",
+      "updated_at": "2026-09-18T05:19:25.289968+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "be619d52-1b70-4e63-8920-a8b666c05090",
+      "seq_id": 100000259,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0075 | KL20260724162 | KV Nutrition LLC | 延期 | 否 | 发票开具信息变更 | CASE-202418-26 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 77,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 9489,
+      "end_at": 9616,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679966505977403",
+            "question": "针对KV Nutrition LLC的发票信息变更延期异常，推荐采用什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679966505982123",
+            "question": "处理EX0075号订单延期异常时，建议向客户提供哪种补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679966505982404",
+            "question": "在订单异常处理流程中，如何回复因排产调整导致的交付延迟问题？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970562+08:00",
+      "updated_at": "2026-09-18T05:19:26.506287+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "3b34c4dd-d921-439b-a6bb-c46714139034",
+      "seq_id": 100000260,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0076 | KL20260712163 | 安徽维康明硕健康科技有限公司 | 投诉 | 否 | 包装形式临时调整 | CASE-202447-77 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 补发备用配件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 78,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 9616,
+      "end_at": 9742,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679967798780198",
+            "question": "安徽维康明硕健康科技有限公司的包装形式临时调整投诉应如何处理？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679967798785128",
+            "question": "针对订单异常EX0076，推荐使用的沟通话术和补偿方案是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679967798785801",
+            "question": "在订单数据异常处理流程中，如何参考历史案例解决包装形式变更问题？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970563+08:00",
+      "updated_at": "2026-09-18T05:19:27.799187+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "f76f4343-11d1-408c-8f2c-d062927eabca",
+      "seq_id": 100000261,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0077 | KL20260713164 | 河北金瑞维康生物科技有限公司 | 延期+投诉 | 是 | 包装形式临时调整 | CASE-202439-86 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 79,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 9742,
+      "end_at": 9872,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679969567136988",
+            "question": "河北金瑞维康生物科技有限公司的订单异常EX0077处理状态及补偿方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679969567142168",
+            "question": "针对包装形式临时调整导致的延期投诉复合事件，推荐沟通话术和补偿措施有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679969567142440",
+            "question": "在订单异常处理中，如何结合历史案例解决因配置变更引发的客户投诉",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970564+08:00",
+      "updated_at": "2026-09-18T05:19:29.567505+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "41ee0704-c26f-4edb-89dd-1f56561f80a2",
+      "seq_id": 100000262,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0078 | KV20260701165A | 江苏海誉康莱包装材料有限公司 | 延期 | 否 | 发票开具信息变更 | CASE-202473-60 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 延长质保1个月 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 80,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 9872,
+      "end_at": 10001,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679932580724187",
+            "question": "江苏海誉康莱包装材料有限公司的异常编号EX0078对应的推荐沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679932580729768",
+            "question": "针对合同KV20260701165A的延期事件，系统推荐的补偿方案有哪些？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679932580730260",
+            "question": "在订单异常处理中，发票开具信息变更导致的延期通常如何回复客户？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970565+08:00",
+      "updated_at": "2026-09-18T05:18:52.58116+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "1df12dbf-b043-41bb-abdf-9e953784fdf0",
+      "seq_id": 100000263,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0079 | KV20260702169A | 广东恒品瑞丰健康科技有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202412-90 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 81,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 10001,
+      "end_at": 10133,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679933749808552",
+            "question": "广东恒品瑞丰健康科技有限公司的复合异常事件推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679933749811629",
+            "question": "针对发票开具信息变更导致的延期投诉，系统推荐的标准沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679933749811910",
+            "question": "在订单异常处理流程中，如何识别并应对“是否复合事件”为是的案例？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970566+08:00",
+      "updated_at": "2026-09-18T05:18:53.750116+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "4866790d-ff31-4226-8459-0a962540ad3a",
+      "seq_id": 100000264,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0080 | KL20260710170 | 广东锦华和泰包装材料有限公司 | 投诉 | 否 | 包装形式临时调整 | CASE-202470-74 | 已同步工程与跟单团队，2小时内给出书面方案。 | 延长质保1个月 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 82,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 10133,
+      "end_at": 10255,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679935096997100",
+            "question": "广东锦华和泰包装材料有限公司的投诉异常EX0080推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679935096998334",
+            "question": "针对包装形式临时调整的投诉，订单异常处理流程中建议的沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679935096998605",
+            "question": "查询合同KL20260710170对应的历史案例编号及当前处理状态。",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970567+08:00",
+      "updated_at": "2026-09-18T05:18:55.097237+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "666f2fa6-ad17-4033-8720-58bc3589f632",
+      "seq_id": 100000265,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0081 | kl20260717171 | 河南德元明硕电子材料有限公司 | 延期 | 否 | 到货安装时间协调 | CASE-202466-96 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 安排工程师驻场支持 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 83,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 10255,
+      "end_at": 10382,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679936230872731",
+            "question": "河南德元明硕电子材料有限公司订单延期异常的处理状态和补偿方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679936230875658",
+            "question": "针对到货安装时间协调导致的延期投诉，推荐使用的沟通话术有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679936230875929",
+            "question": "在订单异常处理流程中，如何安排工程师驻场支持以解决延期问题",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970568+08:00",
+      "updated_at": "2026-09-18T05:18:56.231193+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "d5a55eaa-e022-48ea-ad77-57df1fbb9b38",
+      "seq_id": 100000266,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0082 | 信保无合同90773 | duanex Trading | 配置变更 | 否 | 到货安装时间协调 | CASE-202424-91 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 84,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 10382,
+      "end_at": 10508,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679937691784946",
+            "question": "针对duanex Trading的配置变更异常，推荐采用什么沟通话术以缩短交付周期？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679937691788824",
+            "question": "处理信保无合同90773的到货安装时间协调问题时，建议提供何种补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679937691789096",
+            "question": "在订单异常处理流程中，如何结合历史案例解决配置变更导致的延期问题？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970569+08:00",
+      "updated_at": "2026-09-18T05:18:57.692159+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "35532533-7406-4978-85bb-725a3e26e0df",
+      "seq_id": 100000267,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0083 | KL20260706177 | 湖北丰泽华盛生物科技有限公司 | 投诉 | 否 | 标签内容待确认 | CASE-202421-36 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 补发备用配件 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 85,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 10508,
+      "end_at": 10633,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679938777857728",
+            "question": "湖北丰泽华盛生物科技有限公司的标签内容待确认投诉如何处理？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679938777862669",
+            "question": "针对标签内容待确认异常，推荐什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679938777862940",
+            "question": "订单异常处理中非复合事件的标签问题有哪些标准应对流程？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970572+08:00",
+      "updated_at": "2026-09-18T05:18:58.778341+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "1c65cd4c-4eb5-4c8d-a83a-033f73b2a623",
+      "seq_id": 100000269,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0084 | KL20260728181 | Serge LLC | 投诉 | 否 | 到货安装时间协调 | CASE-202412-61 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 延长质保1个月 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 86,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 10633,
+      "end_at": 10756,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679941525288349",
+            "question": "Serge LLC的到货安装时间协调投诉处理结果是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679941525291245",
+            "question": "针对客户催交或安装协调问题，推荐什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679941525291497",
+            "question": "订单异常EX0084的处理状态和沟通话术是怎样的？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970572+08:00",
+      "updated_at": "2026-09-18T05:19:01.52554+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "2b97d42d-0c89-4899-a549-a10b20472e84",
+      "seq_id": 100000270,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0085 | KL20260805182 | Global Nutra Trading | 配置变更 | 否 | 客户催交 | CASE-202403-11 | 已同步工程与跟单团队，2小时内给出书面方案。 | 补发备用配件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 87,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 10756,
+      "end_at": 10881,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679943340790304",
+            "question": "Global Nutra Trading订单EX0085配置变更催交的处理状态和补偿方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679943340795494",
+            "question": "针对客户催交的配置变更异常，推荐沟通话术和处理时效是怎样的",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679943340795766",
+            "question": "历史案例CASE-202403-11在订单异常处理中对应什么场景",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970573+08:00",
+      "updated_at": "2026-09-18T05:19:03.341162+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "9c1d9f70-fb8a-4fc4-9738-ebbec5ffb9c0",
+      "seq_id": 100000272,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0086 | 20260804 | 四川德元博恩食品有限公司 | 配置变更 | 否 | 包装形式临时调整 | CASE-202450-86 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 延长质保1个月 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 88,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 10881,
+      "end_at": 11004,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679944914649798",
+            "question": "四川德元博恩食品有限公司订单异常EX0086的推荐沟通话术是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679944914655749",
+            "question": "针对包装形式临时调整的配置变更异常，推荐的补偿方案有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679944914656021",
+            "question": "在订单异常处理流程中，状态为待回访的EX0086案例对应哪个历史编号",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970574+08:00",
+      "updated_at": "2026-09-18T05:19:04.915095+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "d730f1e3-644e-4f28-960a-d3a31abaae06",
+      "seq_id": 100000273,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0087 | KL20260803186 | 江苏金瑞和泰精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202448-30 | 已同步工程与跟单团队，2小时内给出书面方案。 | 优先排产 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 89,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 11004,
+      "end_at": 11122,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679946661465180",
+            "question": "针对江苏金瑞和泰精细化工有限公司的延期投诉复合事件，推荐的处理话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679946661468527",
+            "question": "在异常处理流程中，对于客户催交导致的延期投诉，通常建议采取哪种补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679946661468909",
+            "question": "如何根据历史案例编号CASE-202448-30来应对类似的订单延期与投诉复合事件？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970575+08:00",
+      "updated_at": "2026-09-18T05:19:06.661841+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "c729929f-8fcf-4fd7-8a65-f748c9881621",
+      "seq_id": 100000274,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0088 | kl20260807190 | 江苏和泰诚益食品有限公司 | 延期 | 否 | 到货安装时间协调 | CASE-202485-33 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 90,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 11122,
+      "end_at": 11248,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679948146046356",
+            "question": "针对江苏和泰诚益食品有限公司的延期异常，推荐沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679948146051687",
+            "question": "处理订单EX0088延期事件时，建议向客户提供的补偿方案有哪些？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679948146051958",
+            "question": "在订单异常处理流程中，如何回复关于到货安装时间协调的客户投诉？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970576+08:00",
+      "updated_at": "2026-09-18T05:19:08.146462+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "b762caf7-78a0-45ab-b54f-1fe1974b0fcb",
+      "seq_id": 100000275,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0089 | kl20260803191 | 河南品润诚益食品有限公司 | 配置变更 | 否 | 到货安装时间协调 | CASE-202444-28 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 补发备用配件 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 91,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 11248,
+      "end_at": 11372,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679949908038849",
+            "question": "河南品润诚益食品有限公司配置变更异常的处理状态和补偿方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679949908044159",
+            "question": "针对订单EX0089的到货安装时间协调问题，推荐使用的沟通话术有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679949908044431",
+            "question": "在订单异常处理流程中，如何回复客户关于延迟原因确认及排产调整的情况",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970577+08:00",
+      "updated_at": "2026-09-18T05:19:09.908372+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "30510ca1-72c2-4d80-8ed6-086305bf22e7",
+      "seq_id": 100000276,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0090 | KL20260828192 | 四川康宁康宁生物科技有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202449-57 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 补发备用配件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 92,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 11372,
+      "end_at": 11502,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "e9813234-8da4-4c8b-9b79-ebcc4e73166d",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679952560961336",
+            "question": "四川康宁生物科技有限公司的订单异常EX0090涉及哪些事件类型和投诉内容？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679952560963371",
+            "question": "针对发票开具信息变更导致的延期投诉，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679952560963642",
+            "question": "在订单异常处理流程中，复合事件EX0090的历史案例编号及当前状态是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970578+08:00",
+      "updated_at": "2026-09-18T05:19:12.561281+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "1d04fe18-5aa6-43c9-b3bb-dc81254e36b3",
+      "seq_id": 100000277,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 93,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 11359,
+      "end_at": 11502,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "6ffd4a8e-0ae1-4c11-90c4-aefb5d241347",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679951130648257",
+            "question": "订单异常处理流程自动化文档包含哪些关键字段？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679951130649811",
+            "question": "如何根据历史案例编号查询推荐沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679951130650103",
+            "question": "在订单异常记录中，是否复合事件字段的作用是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970579+08:00",
+      "updated_at": "2026-09-18T05:19:11.131086+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "81b1d57b-48c3-443d-a0e3-9021daf9c433",
+      "seq_id": 100000367,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0091 | 20260813 | 山东泰启安润营养科技有限公司 | 延期 | 否 | 客户催交 | CASE-202464-63 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 减免运费 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 94,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 11502,
+      "end_at": 11618,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "6ffd4a8e-0ae1-4c11-90c4-aefb5d241347",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679953629011764",
+            "question": "山东泰启安润营养科技有限公司的订单延期异常处理方案是什么",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679953629018127",
+            "question": "针对客户催交导致的延期事件，推荐的标准沟通话术有哪些",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679953629018579",
+            "question": "在订单异常处理流程中，减免运费适用于哪些类型的投诉场景",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.97058+08:00",
+      "updated_at": "2026-09-18T05:19:13.629489+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "ffc1e6f0-0f28-4042-8655-69133fd7e33f",
+      "seq_id": 100000368,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0092 | 20260816 | 云南品润正合健康科技有限公司 | 付款异常 | 否 | 现场调试进度反馈 | CASE-202402-22 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 待回访 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 95,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 11618,
+      "end_at": 11739,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "6ffd4a8e-0ae1-4c11-90c4-aefb5d241347",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679954796001858",
+            "question": "云南品润正合健康科技有限公司的付款异常处理中推荐什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679954796005997",
+            "question": "针对现场调试进度反馈导致的付款异常，有哪些推荐的补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679954796006419",
+            "question": "在订单异常处理流程中，如何结合历史案例优化交付周期？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970581+08:00",
+      "updated_at": "2026-09-18T05:19:14.796387+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "11442c1d-b9b6-4104-9632-dfe67d504f53",
+      "seq_id": 100000369,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0093 | 20260819 | 安徽鸿辰金瑞精细化工有限公司 | 付款异常 | 否 | 现场调试进度反馈 | CASE-202491-61 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 延长质保1个月 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 96,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 11739,
+      "end_at": 11861,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "6ffd4a8e-0ae1-4c11-90c4-aefb5d241347",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679956428408499",
+            "question": "安徽鸿辰金瑞精细化工有限公司的付款异常处理中推荐了什么补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679956428412448",
+            "question": "针对现场调试进度反馈导致的付款异常，客服应使用什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679956428412719",
+            "question": "订单EX0093在异常处理流程自动化系统中的当前状态是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970583+08:00",
+      "updated_at": "2026-09-18T05:19:16.428848+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "c2da92a6-d4a6-4ead-a781-2370a88383e4",
+      "seq_id": 100000370,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0094 | KV20260914198A | 湖南泰启优谷食品有限公司 | 延期+投诉 | 是 | 包装形式临时调整 | CASE-202440-15 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 处理中 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 97,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 11861,
+      "end_at": 11987,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "6ffd4a8e-0ae1-4c11-90c4-aefb5d241347",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679958043809101",
+            "question": "湖南泰启优谷食品有限公司的包装形式临时调整异常推荐什么沟通话术？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679958043810204",
+            "question": "针对延期加投诉复合事件，优先排产作为补偿方案适用于哪些场景？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679958043810465",
+            "question": "历史案例CASE-202440-15对处理包装形式临时调整有何建议？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970583+08:00",
+      "updated_at": "2026-09-18T05:19:18.044137+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "9eab6c3e-fdb6-4b4e-ba59-04cdaaa0f5e1",
+      "seq_id": 100000371,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0095 | KL20260918199 | 云南盛泽鸿辰医药科技有限公司 | 延期+投诉 | 是 | 包装形式临时调整 | CASE-202508-28 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 98,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 11987,
+      "end_at": 12118,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "6ffd4a8e-0ae1-4c11-90c4-aefb5d241347",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679971054767015",
+            "question": "云南盛泽鸿辰医药科技有限公司的订单异常EX0095处理结果是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679971054771425",
+            "question": "针对包装形式临时调整导致的延期投诉，推荐采用什么沟通话术和补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679971054771686",
+            "question": "在订单异常处理流程中，已关闭状态的复合事件通常包含哪些关键信息字段？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970585+08:00",
+      "updated_at": "2026-09-18T05:19:31.055097+08:00",
+      "deleted_at": null
+    },
+    {
+      "id": "fc38a6d7-0a03-4c58-973a-cb847ce950bd",
+      "seq_id": 100000372,
+      "tenant_id": 10000,
+      "knowledge_id": "09eb36b0-a312-42d8-a803-abd3ca968dc0",
+      "knowledge_base_id": "f9730005-3478-4100-8845-d10f762b565e",
+      "tag_id": "",
+      "content": "| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| EX0096 | 信保无合同43885 | 江苏康宁博恩健康科技有限公司 | 延期 | 否 | 现场调试进度反馈 | CASE-202444-96 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 已关闭 |\n",
+      "content_revision": 0,
+      "index_status": "ready",
+      "last_editor_id": "",
+      "chunk_index": 99,
+      "is_enabled": true,
+      "flags": 1,
+      "status": 0,
+      "start_at": 12118,
+      "end_at": 12242,
+      "pre_chunk_id": "",
+      "next_chunk_id": "",
+      "chunk_type": "text",
+      "parent_chunk_id": "6ffd4a8e-0ae1-4c11-90c4-aefb5d241347",
+      "relation_chunks": null,
+      "indirect_relation_chunks": null,
+      "metadata": {
+        "generated_questions": [
+          {
+            "id": "q1789679972769526615",
+            "question": "江苏康宁博恩健康科技有限公司的延期异常推荐沟通话术是什么？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679972769531545",
+            "question": "针对现场调试进度反馈导致的延期，有哪些推荐的补偿方案？",
+            "content_revision": 0
+          },
+          {
+            "id": "q1789679972769531817",
+            "question": "信保无合同43885对应的历史案例编号及处理状态是什么？",
+            "content_revision": 0
+          }
+        ]
+      },
+      "content_hash": "",
+      "image_info": "",
+      "created_at": "2026-09-18T05:14:54.970586+08:00",
+      "updated_at": "2026-09-18T05:19:32.769862+08:00",
+      "deleted_at": null
+    }
+  ],
+  "page": 1,
+  "page_size": 100,
+  "success": true,
+  "total": 176
+}

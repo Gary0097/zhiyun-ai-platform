@@ -1,0 +1,16 @@
+{
+  "2026-09-18": {
+    "default\u001fchinaunion\u001fqwen3.8-flash": {
+      "provider_id": "chinaunion",
+      "model_name": "qwen3.8-flash",
+      "prompt_tokens": 1190989,
+      "completion_tokens": 62792,
+      "cache_read_tokens": 1065984,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 1190989,
+      "cache_observed_calls": 39,
+      "call_count": 39,
+      "agent_id": "default"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "zhiyun-datahub-app",
+  "name": "AI数据中枢",
+  "version": "1.0.0",
+  "type": "frontend",
+  "description": "AI数据中枢入口：订单交付与生产协同 · 经营总览/智能问数/多源数据自动采集/交付风险预警(解决方案与自动联系)/指标趋势分析",
+  "author": "Zhiyun AI",
+  "entry": {
+    "frontend": "dist/index.js"
+  },
+  "dependencies": [],
+  "qwenpaw_version": {
+    "min": "2.2.0"
+  },
+  "meta": {
+    "features": ["app-entry", "iframe-route"]
+  }
+}

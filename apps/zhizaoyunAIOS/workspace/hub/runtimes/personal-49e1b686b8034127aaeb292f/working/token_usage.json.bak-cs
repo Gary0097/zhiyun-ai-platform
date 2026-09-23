@@ -1,0 +1,76 @@
+{
+  "2026-09-17": {
+    "default\u001fkilo\u001fstepfun/step-3.7-flash:free": {
+      "provider_id": "kilo",
+      "model_name": "stepfun/step-3.7-flash:free",
+      "prompt_tokens": 4661393,
+      "completion_tokens": 26320,
+      "cache_read_tokens": 4307840,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 4661393,
+      "cache_observed_calls": 69,
+      "call_count": 69,
+      "agent_id": "default"
+    },
+    "kb-qa-agent\u001fkilo\u001fstepfun/step-3.7-flash:free": {
+      "provider_id": "kilo",
+      "model_name": "stepfun/step-3.7-flash:free",
+      "prompt_tokens": 38796,
+      "completion_tokens": 852,
+      "cache_read_tokens": 13184,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 38796,
+      "cache_observed_calls": 3,
+      "call_count": 3,
+      "agent_id": "kb-qa-agent"
+    },
+    "order-parser-agent\u001fchinaunion\u001fqwen3.8-flash": {
+      "provider_id": "chinaunion",
+      "model_name": "qwen3.8-flash",
+      "prompt_tokens": 579137,
+      "completion_tokens": 10694,
+      "cache_read_tokens": 533504,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 579137,
+      "cache_observed_calls": 25,
+      "call_count": 25,
+      "agent_id": "order-parser-agent"
+    },
+    "template-adapter-agent\u001fchinaunion\u001fqwen3.8-flash": {
+      "provider_id": "chinaunion",
+      "model_name": "qwen3.8-flash",
+      "prompt_tokens": 228255,
+      "completion_tokens": 7579,
+      "cache_read_tokens": 203264,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 228255,
+      "cache_observed_calls": 13,
+      "call_count": 13,
+      "agent_id": "template-adapter-agent"
+    },
+    "datahub-agent\u001fchinaunion\u001fqwen3.8-flash": {
+      "provider_id": "chinaunion",
+      "model_name": "qwen3.8-flash",
+      "prompt_tokens": 3652320,
+      "completion_tokens": 104137,
+      "cache_read_tokens": 3342080,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 3652320,
+      "cache_observed_calls": 184,
+      "call_count": 184,
+      "agent_id": "datahub-agent"
+    },
+    "procurement-agent\u001fchinaunion\u001fqwen3.8-flash": {
+      "provider_id": "chinaunion",
+      "model_name": "qwen3.8-flash",
+      "prompt_tokens": 1417900,
+      "completion_tokens": 40836,
+      "cache_read_tokens": 1299840,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 1417900,
+      "cache_observed_calls": 81,
+      "call_count": 81,
+      "agent_id": "procurement-agent"
+    }
+  }
+}

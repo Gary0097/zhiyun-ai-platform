@@ -1,0 +1,1507 @@
+{
+  "completed_at": 1789686277.3763363,
+  "created_at": 1789685983.559793,
+  "events": [
+    {
+      "at": 1789685983.578046,
+      "event": {
+        "content": [
+          {
+            "created_at": "2026-09-17T22:59:43.578011",
+            "finished_at": null,
+            "id": "f6721e26f20d488880bb995908f931da",
+            "text": "执行每周知识库健康巡检：检查 8001 知识库五个库的文档解析状态、智能客服小智的检索命中率，输出巡检结论与需要补充的知识点清单。",
+            "type": "text"
+          }
+        ],
+        "created_at": "2026-09-17T22:59:43.578046",
+        "error": null,
+        "finished_at": null,
+        "finished_reason": null,
+        "id": "d17db6008c7e477b84849fb042a8eefc",
+        "metadata": {
+          "qwenpaw_tag": "external_user_query"
+        },
+        "name": "user",
+        "role": "user",
+        "structured_output": null,
+        "usage": null
+      }
+    },
+    {
+      "at": 1789685989.070237,
+      "event": {
+        "content": [
+          {
+            "created_at": "2026-09-17T22:59:48.251477",
+            "finished_at": null,
+            "id": "342b2739616c4d919db6f02fb2d30b32",
+            "thinking": "用户要求执行每周知识库健康巡检，检查：\n1. 8001 知识库五个库的文档解析状态\n2. 智能客服小智的检索命中率\n3. 输出巡检结论与需要补充的知识点清单\n\n这是一个需要多步骤执行的任务，我需要：\n1. 先查看当前工作目录下是否有相关的配置文件或巡检脚本\n2. 检查8001知识库的五个库的状态\n3. 检查智能客服小智的检索命中率\n4. 输出巡检报告\n\n让我先搜索相关文件和了解8001知识库的信息。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T22:59:48.653515",
+            "finished_at": null,
+            "id": "b097dccd48384aa8888e800adf5b5c02",
+            "text": "我来执行每周知识库健康巡检。首先让我查看当前工作目录和相关配置文件，了解巡检范围和8001知识库的五个库信息。",
+            "type": "text"
+          },
+          {
+            "created_at": "2026-09-17T22:59:49.068069",
+            "finished_at": null,
+            "id": "chatcmpl-tool-8a8942c7ff9e4088",
+            "input": "{\"command\": \"ls -la /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/\"}",
+            "name": "execute_shell_command",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T22:59:49.084769",
+            "finished_at": null,
+            "id": "chatcmpl-tool-8a8942c7ff9e4088",
+            "metadata": {},
+            "name": "execute_shell_command",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069079",
+                "finished_at": null,
+                "id": "e44adc2fc8434317ab9753a5441f53c8",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-8a8942c7ff9e4088')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T22:59:53.146877",
+            "finished_at": null,
+            "id": "9c7c85655b8145e99fc7682e4bafb502",
+            "thinking": "我需要先找到8001知识库的相关信息。让我查看是否有巡检相关的配置文件或历史记录，以及8001知识库的详细信息。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T22:59:53.358463",
+            "finished_at": null,
+            "id": "chatcmpl-tool-98a426bc00430198",
+            "input": "{\"max_results\": 10, \"query\": \"8001 知识库 巡检 智能客服 小智\"}",
+            "name": "memory_search",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T22:59:53.359589",
+            "finished_at": null,
+            "id": "chatcmpl-tool-bee6e5ffe53aa21d",
+            "input": "{}",
+            "name": "weknora__list_knowledge_bases",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T22:59:53.389253",
+            "finished_at": null,
+            "id": "chatcmpl-tool-98a426bc00430198",
+            "metadata": {},
+            "name": "memory_search",
+            "output": [
+              {
+                "created_at": "2026-09-17T22:59:53.388353",
+                "finished_at": null,
+                "id": "a2c53359dd5a49998e7a06f24de8e881",
+                "text": "(no memory results)",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T22:59:53.417359",
+            "finished_at": null,
+            "id": "chatcmpl-tool-bee6e5ffe53aa21d",
+            "metadata": {},
+            "name": "weknora__list_knowledge_bases",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068959",
+                "finished_at": null,
+                "id": "a03bfa43f93d4f5289eb9ee73473cfee",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-bee6e5ffe53aa21d')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T22:59:57.899784",
+            "finished_at": null,
+            "id": "435eceb54af7448b97acfa0cbc81a13c",
+            "thinking": "好的，我获取到了知识库列表。可以看到有6个知识库：\n1. 金汉隆-管理协同中心 (ID: 912d0603-241c-4c1b-89f4-a74f92e8f1c5) - 7个知识条目\n2. 金汉隆-智能采购 (ID: ef519dbf-61d3-4ce9-8215-941b54bbf6b2) - 8个知识条目\n3. 金汉隆-数据中枢 (ID: 4a945ef5-5157-41ca-b6f2-79fa1452f382) - 34个知识条目\n4. 金汉隆-订单业务 (ID: f9730005-3478-4100-8845-d10f762b565e) - 11个知识条目\n5. 售后知识库 (ID: facd1c48-1d9b-4ccf-aced-3dce4420234e) - 1个知识条目\n6. 生产知识库 (ID: 7d8ea66b-bea8-4e08-b72f-1952471a8863) - 0个知识条目\n7. 通用产品知识库 (ID: b861158f-4b89-4715-bada-01d4bed1e40b) - 19个知识条目\n\n用户提到\"8001知识库五个库\"，但我看到有7个库。可能是指8001端口相关的五个库？或者是指特定的五个库？\n\n让我搜索一下8001相关的信息，以及智能客服小智的信息。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T22:59:59.623329",
+            "finished_at": null,
+            "id": "chatcmpl-tool-885db1e205b2cd44",
+            "input": "{\"max_results\": 10, \"query\": \"8001 知识库 巡检 小智 智能客服 检索命中率\"}",
+            "name": "memory_search",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T22:59:59.633422",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b3aa0f020da2ffc2",
+            "input": "{}",
+            "name": "weknora__list_agents",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T22:59:59.657013",
+            "finished_at": null,
+            "id": "chatcmpl-tool-885db1e205b2cd44",
+            "metadata": {},
+            "name": "memory_search",
+            "output": [
+              {
+                "created_at": "2026-09-17T22:59:59.655945",
+                "finished_at": null,
+                "id": "a79c3038fc584b7c8220ea4d0f26f2fc",
+                "text": "(no memory results)",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T22:59:59.684657",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b3aa0f020da2ffc2",
+            "metadata": {
+              "qwenpaw_truncation": {
+                "0": {
+                  "excerpt_bytes": 50000,
+                  "file_path": "/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/tool_results/tool-result-dc1127193e4f4dedbb61d597d65631e1.txt",
+                  "file_size_bytes": 68281,
+                  "max_bytes": 50000,
+                  "notice": "<<<TRUNCATED>>>\nThe output above was truncated.\nThe full content is saved to the file and contains 1073 lines in total.\nThis excerpt starts at line 1 and covers the next 50000 bytes.\nIf the current content is not enough, call `read_file` with file_path=\"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/tool_results/tool-result-dc1127193e4f4dedbb61d597d65631e1.txt\" start_line=681 to read more.",
+                  "read_from": 681,
+                  "start_line": 1,
+                  "total_lines": 1073,
+                  "version": 1
+                }
+              }
+            },
+            "name": "weknora__list_agents",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068913",
+                "finished_at": null,
+                "id": "27cc9b06eb75490c8087ff7099115f18",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-b3aa0f020da2ffc2')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:05.080832",
+            "finished_at": null,
+            "id": "ac674076df9145b79d5952d4e93ab663",
+            "thinking": "我获取到了知识库列表和智能体列表。让我分析一下：\n\n知识库列表（7个）：\n1. 金汉隆-管理协同中心 - 7个知识条目\n2. 金汉隆-智能采购 - 8个知识条目\n3. 金汉隆-数据中枢 - 34个知识条目\n4. 金汉隆-订单业务 - 11个知识条目\n5. 售后知识库 - 1个知识条目\n6. 生产知识库 - 0个知识条目\n7. 通用产品知识库 - 19个知识条目\n\n智能体列表：\n- builtin-quick-answer (快速问答)\n- builtin-smart-reasoning (智能推理)\n- builtin-wiki-researcher (维基问答)\n- builtin-data-analyst (数据分析师)\n- 人员流动预测智能体\n- 员工关怀触发智能体\n- 审批路径推荐智能体\n\n用户提到\"8001知识库五个库\"，但我看到的是7个库。可能8001指的是端口号，或者是指特定的五个库。让我搜索一下是否有8001相关的配置或历史记录。\n\n另外，我需要找到\"智能客服小智\"这个智能体。在当前的智能体列表中没有看到\"小智\"。让我再搜索一下。\n\n我需要：\n1. 检查是否有8001端口相关的配置\n2. 搜索\"小智\"相关的智能体\n3. 检查各个知识库的文档解析状态\n4. 检查智能客服的检索命中率\n\n让我先搜索更多相关信息。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:00:06.476628",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a336b02054f1b89a",
+            "input": "{\"max_results\": 10, \"query\": \"小智 智能客服 8001 端口 巡检\"}",
+            "name": "memory_search",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:06.495365",
+            "finished_at": null,
+            "id": "chatcmpl-tool-980805e69a1e752e",
+            "input": "{\"command\": \"grep -r \\\"8001\\\" /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/ 2>/dev/null | head -50\"}",
+            "name": "execute_shell_command",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:06.533599",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a336b02054f1b89a",
+            "metadata": {},
+            "name": "memory_search",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:00:06.532210",
+                "finished_at": null,
+                "id": "b5dfb82090bf4e15841e5edca33887e5",
+                "text": "(no memory results)",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:06.541208",
+            "finished_at": null,
+            "id": "chatcmpl-tool-980805e69a1e752e",
+            "metadata": {},
+            "name": "execute_shell_command",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069097",
+                "finished_at": null,
+                "id": "6429195b885d465992d532a7cf769863",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-980805e69a1e752e')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:11.837170",
+            "finished_at": null,
+            "id": "382a7afe725b4f7385e4e03d020f565b",
+            "thinking": "好的，我在 jobs.json 中找到了相关的任务描述。让我读取 jobs.json 来了解更多上下文信息，然后继续执行巡检任务。\n\n从 jobs.json 中可以看到：\n- 有一个任务提到\"8001知识库与智能客服应用运行状态\"\n- 当前任务就是\"执行每周知识库健康巡检：检查 8001 知识库五个库的文档解析状态、智能客服小智的检索命中率，输出巡检结论与需要补充的知识点清单\"\n\n让我读取 jobs.json 文件，然后继续检查各个知识库的状态。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:00:12.390506",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b4fc1721472e1a2c",
+            "input": "{\"file_path\": \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/jobs.json\"}",
+            "name": "read_file",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:12.426722",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b4fc1721472e1a2c",
+            "metadata": {},
+            "name": "read_file",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069003",
+                "finished_at": null,
+                "id": "4db74e3a4b4a41b2aae8fb25980789ec",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-b4fc1721472e1a2c')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:17.632861",
+            "finished_at": null,
+            "id": "73228e8b2ce04ff782c7db5b5a956cfa",
+            "thinking": "好的，我现在了解了任务背景。这是每周知识库巡检任务，需要检查：\n1. 8001知识库五个库的文档解析状态\n2. 智能客服小智的检索命中率\n3. 输出巡检结论与需要补充的知识点清单\n\n但我目前看到的知识库列表有7个库，不是5个。可能\"8001\"是指端口号，或者是指特定的五个库。让我先检查各个知识库的详细状态，然后查找智能客服小智。\n\n我需要：\n1. 检查每个知识库的文档解析状态（查看 knowledge_count、chunk_count、processing_count 等）\n2. 查找智能客服小智（可能在 agents 列表中，或者是一个特定的智能体）\n3. 检查检索命中率（可能需要查看会话历史或检索记录）\n\n让我先详细检查每个知识库的状态。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:00:19.216556",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b5bd5472a4c35582",
+            "input": "{\"kb_id\": \"912d0603-241c-4c1b-89f4-a74f92e8f1c5\"}",
+            "name": "weknora__get_knowledge_base",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:19.502803",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a29a676e8cc7fbbf",
+            "input": "{\"kb_id\": \"ef519dbf-61d3-4ce9-8215-941b54bbf6b2\"}",
+            "name": "weknora__get_knowledge_base",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:19.743307",
+            "finished_at": null,
+            "id": "chatcmpl-tool-97b997b5a724a1b8",
+            "input": "{\"kb_id\": \"4a945ef5-5157-41ca-b6f2-79fa1452f382\"}",
+            "name": "weknora__get_knowledge_base",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:20.016093",
+            "finished_at": null,
+            "id": "chatcmpl-tool-9b28ef4632cce7d7",
+            "input": "{\"kb_id\": \"f9730005-3478-4100-8845-d10f762b565e\"}",
+            "name": "weknora__get_knowledge_base",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:20.037104",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b9508aa2d88080c5",
+            "input": "{\"kb_id\": \"facd1c48-1d9b-4ccf-aced-3dce4420234e\"}",
+            "name": "weknora__get_knowledge_base",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:20.088344",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b5bd5472a4c35582",
+            "metadata": {},
+            "name": "weknora__get_knowledge_base",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069063",
+                "finished_at": null,
+                "id": "6a79dd2dcc8443fcadf9afad47e8154a",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-b5bd5472a4c35582')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:20.110878",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a29a676e8cc7fbbf",
+            "metadata": {},
+            "name": "weknora__get_knowledge_base",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069071",
+                "finished_at": null,
+                "id": "3936c82d361f432ca9f7be5f6db0ccc7",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-a29a676e8cc7fbbf')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:20.129999",
+            "finished_at": null,
+            "id": "chatcmpl-tool-97b997b5a724a1b8",
+            "metadata": {},
+            "name": "weknora__get_knowledge_base",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069055",
+                "finished_at": null,
+                "id": "2adb82f1e4e84679a7c3a50e54cafe59",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-97b997b5a724a1b8')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:20.146969",
+            "finished_at": null,
+            "id": "chatcmpl-tool-9b28ef4632cce7d7",
+            "metadata": {},
+            "name": "weknora__get_knowledge_base",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069012",
+                "finished_at": null,
+                "id": "e0be93b3ddd24434999d9f1d818ec50b",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-9b28ef4632cce7d7')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:20.164341",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b9508aa2d88080c5",
+            "metadata": {},
+            "name": "weknora__get_knowledge_base",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069029",
+                "finished_at": null,
+                "id": "d5e8bbd3a21d45a6b29556c0b1a15d81",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-b9508aa2d88080c5')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:26.636377",
+            "finished_at": null,
+            "id": "bdb8e43c78de4582815ecdb14fc24922",
+            "thinking": "我已经获取了前5个知识库的详细信息。让我再获取剩下的两个知识库的详细信息，然后查找智能客服小智。\n\n目前获取到的5个知识库状态：\n1. 金汉隆-管理协同中心 (912d0603): knowledge_count=7, chunk_count=0, processing_count=0\n2. 金汉隆-智能采购 (ef519dbf): knowledge_count=8, chunk_count=0, processing_count=0\n3. 金汉隆-数据中枢 (4a945ef5): knowledge_count=34, chunk_count=0, processing_count=0\n4. 金汉隆-订单业务 (f9730005): knowledge_count=11, chunk_count=0, processing_count=0\n5. 售后知识库 (facd1c48): knowledge_count=1, chunk_count=0, processing_count=0\n\n还需要获取：\n6. 生产知识库 (7d8ea66b)\n7. 通用产品知识库 (b861158f)\n\n然后查找智能客服小智。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:00:27.749579",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b4c1e3ed874dc269",
+            "input": "{\"kb_id\": \"7d8ea66b-bea8-4e08-b72f-1952471a8863\"}",
+            "name": "weknora__get_knowledge_base",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:28.063937",
+            "finished_at": null,
+            "id": "chatcmpl-tool-82667917a8dd179f",
+            "input": "{\"kb_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\"}",
+            "name": "weknora__get_knowledge_base",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:28.081882",
+            "finished_at": null,
+            "id": "chatcmpl-tool-8f48f0e3367b512e",
+            "input": "{\"path\": \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default\", \"pattern\": \"小智\"}",
+            "name": "grep_search",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:28.136747",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b4c1e3ed874dc269",
+            "metadata": {},
+            "name": "weknora__get_knowledge_base",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069038",
+                "finished_at": null,
+                "id": "289f3231386e4049b6b02dc8b786d593",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-b4c1e3ed874dc269')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:28.158424",
+            "finished_at": null,
+            "id": "chatcmpl-tool-82667917a8dd179f",
+            "metadata": {},
+            "name": "weknora__get_knowledge_base",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069020",
+                "finished_at": null,
+                "id": "dd24e1208ff34a008f05ee8580d3f256",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-82667917a8dd179f')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:28.187917",
+            "finished_at": null,
+            "id": "chatcmpl-tool-8f48f0e3367b512e",
+            "metadata": {},
+            "name": "grep_search",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069046",
+                "finished_at": null,
+                "id": "ecbfaad8729e458a8a3b0a259582670a",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-8f48f0e3367b512e')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:33.661360",
+            "finished_at": null,
+            "id": "9ee2ac266015428e8b26a97e54466567",
+            "thinking": "好的，我找到了\"智能客服专员小智\"的信息。它是在 tool_results/tool-result-dc1127193e4f4dedbb61d597d65631e1.txt 文件中。\n\n现在让我：\n1. 读取这个文件来了解小智的详细配置\n2. 检查各个知识库的文档解析状态（查看每个知识库的 knowledge 列表）\n3. 检查智能客服小智的检索命中率\n\n首先让我读取小智的配置，然后检查各个知识库的文档列表。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:00:34.507327",
+            "finished_at": null,
+            "id": "chatcmpl-tool-81b15cd800ebf736",
+            "input": "{\"file_path\": \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/tool_results/tool-result-dc1127193e4f4dedbb61d597d65631e1.txt\", \"start_line\": 970, \"end_line\": 1050}",
+            "name": "read_file",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:34.535045",
+            "finished_at": null,
+            "id": "chatcmpl-tool-81b15cd800ebf736",
+            "metadata": {
+              "qwenpaw_truncation": {
+                "0": {
+                  "excerpt_bytes": 4700,
+                  "file_path": "/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/tool_results/tool-result-dc1127193e4f4dedbb61d597d65631e1.txt",
+                  "file_size_bytes": 68281,
+                  "max_bytes": 4700,
+                  "notice": "<<<TRUNCATED>>>\nThe output above was truncated.\nThe full content is saved to the file and contains 1073 lines in total.\nThis excerpt starts at line 970 and covers the next 4700 bytes.\nIf the current content is not enough, call `read_file` with file_path=\"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/tool_results/tool-result-dc1127193e4f4dedbb61d597d65631e1.txt\" start_line=1051 to read more.",
+                  "read_from": 1051,
+                  "start_line": 970,
+                  "total_lines": 1073,
+                  "version": 1
+                }
+              }
+            },
+            "name": "read_file",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068977",
+                "finished_at": null,
+                "id": "8e3d18f797f24bfdb2f119a1563cd4d7",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-81b15cd800ebf736')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:39.910941",
+            "finished_at": null,
+            "id": "2b4e33aa11644e36a7af4ec109145f44",
+            "thinking": "好的，我找到了智能客服专员小智的配置。它的 knowledge_bases 包含：\n1. b861158f-4b89-4715-bada-01d4bed1e40b (通用产品知识库) - 19个知识条目\n2. facd1c48-1d9b-4ccf-aced-3dce4420234e (售后知识库) - 1个知识条目\n3. f9730005-3478-4100-8845-d10f762b565e (金汉隆-订单业务) - 11个知识条目\n4. 7d8ea66b-bea8-4e08-b72f-1952471a8863 (生产知识库) - 0个知识条目\n\n但用户提到\"8001知识库五个库\"。从上面的配置来看，小智只关联了4个知识库。可能还有另一个知识库没有直接关联到小智？\n\n让我检查一下是否有其他知识库被遗漏。从之前的列表来看，还有：\n- 912d0603-241c-4c1b-89f4-a74f92e8f1c5 (金汉隆-管理协同中心) - 7个知识条目\n- ef519dbf-61d3-4ce9-8215-941b54bbf6b2 (金汉隆-智能采购) - 8个知识条目\n- 4a945ef5-5157-41ca-b6f2-79fa1452f382 (金汉隆-数据中枢) - 34个知识条目\n\n这三个库不在小智的 knowledge_bases 列表中。\n\n现在让我检查每个知识库的详细文档列表，以及查看是否有检索命中率的数据。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:00:41.801001",
+            "finished_at": null,
+            "id": "chatcmpl-tool-9af9a1af3a3362ad",
+            "input": "{\"kb_id\": \"912d0603-241c-4c1b-89f4-a74f92e8f1c5\", \"page\": 1, \"page_size\": 20}",
+            "name": "weknora__list_knowledge",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:41.933440",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a1d4ff1fb1e37b7c",
+            "input": "{\"kb_id\": \"ef519dbf-61d3-4ce9-8215-941b54bbf6b2\", \"page\": 1, \"page_size\": 20}",
+            "name": "weknora__list_knowledge",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:42.171073",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b17b239a60be0ccc",
+            "input": "{\"kb_id\": \"4a945ef5-5157-41ca-b6f2-79fa1452f382\", \"page\": 1, \"page_size\": 20}",
+            "name": "weknora__list_knowledge",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:42.378034",
+            "finished_at": null,
+            "id": "chatcmpl-tool-bab146f0a4b59c4a",
+            "input": "{\"kb_id\": \"f9730005-3478-4100-8845-d10f762b565e\", \"page\": 1, \"page_size\": 20}",
+            "name": "weknora__list_knowledge",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:42.407334",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a75abf3b5e8d7847",
+            "input": "{\"kb_id\": \"7d8ea66b-bea8-4e08-b72f-1952471a8863\", \"page\": 1, \"page_size\": 20}",
+            "name": "weknora__list_knowledge",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:42.452421",
+            "finished_at": null,
+            "id": "chatcmpl-tool-9af9a1af3a3362ad",
+            "metadata": {},
+            "name": "weknora__list_knowledge",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068968",
+                "finished_at": null,
+                "id": "b44aae5eb6c544b1aa4a8cd5dd1427ad",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-9af9a1af3a3362ad')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:42.473820",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a1d4ff1fb1e37b7c",
+            "metadata": {},
+            "name": "weknora__list_knowledge",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068951",
+                "finished_at": null,
+                "id": "3294194e34bc4b69915b76bb67433bc0",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-a1d4ff1fb1e37b7c')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:42.496889",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b17b239a60be0ccc",
+            "metadata": {},
+            "name": "weknora__list_knowledge",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068934",
+                "finished_at": null,
+                "id": "7961e0064ffb43948be5492a32b37ec9",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-b17b239a60be0ccc')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:42.518578",
+            "finished_at": null,
+            "id": "chatcmpl-tool-bab146f0a4b59c4a",
+            "metadata": {},
+            "name": "weknora__list_knowledge",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068943",
+                "finished_at": null,
+                "id": "964f5203d2dd47d882bcd44f21072ed8",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-bab146f0a4b59c4a')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:42.538002",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a75abf3b5e8d7847",
+            "metadata": {},
+            "name": "weknora__list_knowledge",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:00:42.536922",
+                "finished_at": null,
+                "id": "9c4d2d9491d44cb3bbf0f7082410155c",
+                "text": "{\n  \"data\": [],\n  \"page\": 1,\n  \"page_size\": 20,\n  \"success\": true,\n  \"total\": 0\n}",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:50.476925",
+            "finished_at": null,
+            "id": "fb2a347a3d9e47ffa3834f378008e724",
+            "thinking": "好的，我已经获取了各个知识库的详细文档列表。让我总结一下目前收集到的信息：\n\n知识库状态（7个库）：\n\n1. **金汉隆-管理协同中心** (912d0603)\n   - knowledge_count: 7\n   - 所有文档 parse_status: completed\n   - 文档列表：7个md文件，全部completed\n\n2. **金汉隆-智能采购** (ef519dbf)\n   - knowledge_count: 8\n   - 所有文档 parse_status: completed\n   - 文档列表：5个xlsx/csv/md文件，全部completed\n\n3. **金汉隆-数据中枢** (4a945ef5)\n   - knowledge_count: 34\n   - parse_status 分布：\n     - completed: 部分文件（如24_异常事件、查询入门_示例SQL、业务口径要点、schema说明、30_模拟配置、29_采集字段映射、28_原表审计、27_采集异常、26_采集批次、25_微信图片索引）\n     - failed: 多个文件（21_MES设备日志、20_工时与标准产出、19_人员出勤、18_物流轨迹、15_WMS出入库、14_物料需求采购、13_工序节点、字段字典.csv、23_OA表单、22_报销申请）\n   - 错误原因：EmbedBatch API error: Http Status 429 Too Many Requests\n\n4. **金汉隆-订单业务** (f9730005)\n   - knowledge_count: 11\n   - parse_status 分布：\n     - completed: 部分文件（订单数据-异常处理流程自动化、05-客服意图标签体系、03-订单业务真实数据与政策、订单处理流程说明、业务字段字典、模板规则定义）\n     - failed: 多个文件（订单数据-企业客户管理表、订单数据-合同要素提取与比对、订单数据-订单原始输入池、订单数据-机器下单表、order_model.xlsx）\n   - 错误原因：EmbedBatch API error: Http Status 429 Too Many Requests\n\n5. **售后知识库** (facd1c48)\n   - knowledge_count: 1\n   - 需要进一步查看文档状态\n\n6. **生产知识库** (7d8ea66b)\n   - knowledge_count: 0\n   - 空库\n\n7. **通用产品知识库** (b861158f)\n   - knowledge_count: 19\n   - 需要进一步查看文档状态\n\n智能客服小智关联的知识库：\n- 通用产品知识库 (b861158f) - 19个知识条目\n- 售后知识库 (facd1c48) - 1个知识条目\n- 金汉隆-订单业务 (f9730005) - 11个知识条目\n- 生产知识库 (7d8ea66b) - 0个知识条目\n\n现在让我继续获取售后知识库和通用产品知识库的详细文档列表，然后查找检索命中率的数据。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:00:53.215229",
+            "finished_at": null,
+            "id": "chatcmpl-tool-9d3edbb8c62f7714",
+            "input": "{\"kb_id\": \"facd1c48-1d9b-4ccf-aced-3dce4420234e\", \"page\": 1, \"page_size\": 20}",
+            "name": "weknora__list_knowledge",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:53.216332",
+            "finished_at": null,
+            "id": "chatcmpl-tool-ad7f629b69a6f80e",
+            "input": "{\"kb_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\", \"page\": 1, \"page_size\": 20}",
+            "name": "weknora__list_knowledge",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:00:53.321276",
+            "finished_at": null,
+            "id": "chatcmpl-tool-9d3edbb8c62f7714",
+            "metadata": {},
+            "name": "weknora__list_knowledge",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068994",
+                "finished_at": null,
+                "id": "648c578467804b80ac844529afea63ae",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-9d3edbb8c62f7714')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:00:53.352525",
+            "finished_at": null,
+            "id": "chatcmpl-tool-ad7f629b69a6f80e",
+            "metadata": {
+              "qwenpaw_truncation": {
+                "0": {
+                  "excerpt_bytes": 50000,
+                  "file_path": "/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/tool_results/tool-result-54b81310e45e4922bd091f8e38944595.txt",
+                  "file_size_bytes": 75844,
+                  "max_bytes": 50000,
+                  "notice": "<<<TRUNCATED>>>\nThe output above was truncated.\nThe full content is saved to the file and contains 1516 lines in total.\nThis excerpt starts at line 1 and covers the next 50000 bytes.\nIf the current content is not enough, call `read_file` with file_path=\"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/tool_results/tool-result-54b81310e45e4922bd091f8e38944595.txt\" start_line=961 to read more.",
+                  "read_from": 961,
+                  "start_line": 1,
+                  "total_lines": 1516,
+                  "version": 1
+                }
+              }
+            },
+            "name": "weknora__list_knowledge",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068924",
+                "finished_at": null,
+                "id": "175936a4bb624d7f8517da813fee1a08",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-ad7f629b69a6f80e')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:01:01.745937",
+            "finished_at": null,
+            "id": "179c184392004839a7652d0fa2317077",
+            "thinking": "好的，我已经获取了所有知识库的详细文档列表。现在让我总结一下收集到的信息，并尝试查找智能客服小智的检索命中率数据。\n\n知识库文档解析状态总结：\n\n1. **金汉隆-管理协同中心** (912d0603)\n   - 7个文档，全部 parse_status: completed\n   - 所有文档都成功解析\n\n2. **金汉隆-智能采购** (ef519dbf)\n   - 8个文档，全部 parse_status: completed\n   - 所有文档都成功解析\n\n3. **金汉隆-数据中枢** (4a945ef5)\n   - 34个文档\n   - completed: 部分文档（如24_异常事件、查询入门_示例SQL、业务口径要点、schema说明、30_模拟配置、29_采集字段映射、28_原表审计、27_采集异常、26_采集批次、25_微信图片索引）\n   - failed: 多个文档（21_MES设备日志、20_工时与标准产出、19_人员出勤、18_物流轨迹、15_WMS出入库、14_物料需求采购、13_工序节点、字段字典.csv、23_OA表单、22_报销申请）\n   - 错误原因：EmbedBatch API error: Http Status 429 Too Many Requests\n\n4. **金汉隆-订单业务** (f9730005)\n   - 11个文档\n   - completed: 部分文档（订单数据-异常处理流程自动化、05-客服意图标签体系、03-订单业务真实数据与政策、订单处理流程说明、业务字段字典、模板规则定义）\n   - failed: 多个文档（订单数据-企业客户管理表、订单数据-合同要素提取与比对、订单数据-订单原始输入池、订单数据-机器下单表、order_model.xlsx）\n   - 错误原因：EmbedBatch API error: Http Status 429 Too Many Requests\n\n5. **售后知识库** (facd1c48)\n   - 1个文档，parse_status: completed\n\n6. **生产知识库** (7d8ea66b)\n   - 0个文档，空库\n\n7. **通用产品知识库** (b861158f)\n   - 19个文档，全部 parse_status: completed\n   - 所有文档都成功解析\n\n智能客服小智关联的知识库：\n- 通用产品知识库 (b861158f) - 19个知识条目 - 全部completed\n- 售后知识库 (facd1c48) - 1个知识条目 - completed\n- 金汉隆-订单业务 (f9730005) - 11个知识条目 - 部分failed\n- 生产知识库 (7d8ea66b) - 0个知识条目 - 空库\n\n现在我需要查找智能客服小智的检索命中率数据。这可能需要在历史会话中搜索，或者查看是否有相关的统计数据。\n\n让我搜索一下历史记录中关于小智检索命中率的信息。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:01:04.523916",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a135587e9add2d19",
+            "input": "{\"op\": \"search\", \"query\": \"小智 检索命中率 智能客服 命中率\", \"k\": 20}",
+            "name": "recall_history",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:01:04.573218",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a135587e9add2d19",
+            "metadata": {
+              "qwenpaw_recall_page": {
+                "complete": true,
+                "cursor": null,
+                "next_cursor": null,
+                "total_rows": 0
+              }
+            },
+            "name": "recall_history",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:01:04.571926",
+                "finished_at": null,
+                "id": "56db4cb81609449eba3054b2929e2e1a",
+                "text": "0 rows for search '小智 检索命中率 智能客服 命中率' — the history genuinely holds nothing there. For a search, verify the keywords and date filters before concluding.",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:01:11.558627",
+            "finished_at": null,
+            "id": "44bfa0183f4d427789c08b6d4b27739e",
+            "thinking": "历史记录中没有找到关于小智检索命中率的信息。让我尝试搜索其他相关的关键词，或者查看是否有其他方式可以获取检索命中率的数据。\n\n让我搜索一下\"命中率\"、\"检索\"、\"客服\"等关键词。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:01:12.091262",
+            "finished_at": null,
+            "id": "chatcmpl-tool-8102720d9b957c20",
+            "input": "{\"op\": \"search\", \"query\": \"命中率 检索 客服\", \"k\": 20}",
+            "name": "recall_history",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:01:12.099031",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a42a0956b6f5c46a",
+            "input": "{\"command\": \"grep -r \\\"命中率\\\\|检索\\\\|命中\\\\|fallback\\\\|retrieval\\\" /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/ 2>/dev/null | head -30\"}",
+            "name": "execute_shell_command",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:01:12.171456",
+            "finished_at": null,
+            "id": "chatcmpl-tool-8102720d9b957c20",
+            "metadata": {
+              "qwenpaw_recall_page": {
+                "complete": true,
+                "cursor": null,
+                "next_cursor": null,
+                "total_rows": 0
+              }
+            },
+            "name": "recall_history",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:01:12.168860",
+                "finished_at": null,
+                "id": "d8b1412b51e9474d8f112707c48f9454",
+                "text": "0 rows for search '命中率 检索 客服' — the history genuinely holds nothing there. For a search, verify the keywords and date filters before concluding.",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:01:12.181519",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a42a0956b6f5c46a",
+            "metadata": {},
+            "name": "execute_shell_command",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068898",
+                "finished_at": null,
+                "id": "2e98e3b3f1cc4f9ebd43b5d6744669f4",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-a42a0956b6f5c46a')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:01:21.195111",
+            "finished_at": null,
+            "id": "65156593808a4935ab4b81f35235bc00",
+            "thinking": "我在历史记录中搜索了\"命中率 检索 客服\"等关键词，但没有找到直接关于小智检索命中率的统计数据。\n\n让我再尝试搜索一下智能客服的会话记录或者相关统计信息。也许我需要查看 sessions 目录下的小智会话记录，或者查看是否有其他方式可以获取检索命中率。\n\n让我先检查一下 sessions 目录，看看是否有小智的会话记录。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:01:21.703148",
+            "finished_at": null,
+            "id": "chatcmpl-tool-8d7f38292c62dd26",
+            "input": "{\"command\": \"ls -la /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/sessions/\"}",
+            "name": "execute_shell_command",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:01:21.721330",
+            "finished_at": null,
+            "id": "chatcmpl-tool-8d7f38292c62dd26",
+            "metadata": {},
+            "name": "execute_shell_command",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069105",
+                "finished_at": null,
+                "id": "8e97e9ed018f44319fa9e6db9baf97ad",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-8d7f38292c62dd26')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:01:29.820312",
+            "finished_at": null,
+            "id": "474f53d2f7b044bbbd9d5a5e19184cb9",
+            "thinking": "让我检查一下 console 目录下是否有智能客服小智的会话记录。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:01:30.110194",
+            "finished_at": null,
+            "id": "chatcmpl-tool-9a10fa4e7283d813",
+            "input": "{\"command\": \"ls -la /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/sessions/console/\"}",
+            "name": "execute_shell_command",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:01:30.132163",
+            "finished_at": null,
+            "id": "chatcmpl-tool-9a10fa4e7283d813",
+            "metadata": {},
+            "name": "execute_shell_command",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:01:30.131384",
+                "finished_at": null,
+                "id": "04b4945b55414498b8bce5ad2d204354",
+                "text": "total 44\ndrwxr-xr-x 2 root root  4096 Sep 17 18:12 .\ndrwxr-xr-x 3 root root  4096 Sep 17 18:54 ..\n-rw------- 1 root root 35655 Sep 17 18:12 default_1789668635100-ywrat33.json",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:01:37.266842",
+            "finished_at": null,
+            "id": "0c530843d7db40348d244154c6e62f32",
+            "thinking": "让我查看这个会话文件，看看是否有关于小智检索命中率的信息。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:01:37.672905",
+            "finished_at": null,
+            "id": "chatcmpl-tool-95e8bb4fc3515c2b",
+            "input": "{\"command\": \"grep -o \\\"命中率\\\\|检索命中\\\\|fallback\\\\|retrieval\\\\|知识库检索\\\\|匹配成功\\\\|未命中\\\" /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/sessions/console/default_1789668635100-ywrat33.json | head -20\"}",
+            "name": "execute_shell_command",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:01:37.694858",
+            "finished_at": null,
+            "id": "chatcmpl-tool-95e8bb4fc3515c2b",
+            "metadata": {},
+            "name": "execute_shell_command",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:01:37.693996",
+                "finished_at": null,
+                "id": "ce4752a4c1bd4079ad21ac742445acfb",
+                "text": "Command executed successfully (no output).",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:01:46.348881",
+            "finished_at": null,
+            "id": "e2577c52ee4d46d3a46d54e4372f35ff",
+            "thinking": "没有找到关于命中率的信息。让我尝试用 weknora 的会话列表功能查看是否有智能客服小智的会话记录，或者查看是否有其他方式可以获取检索命中率的数据。\n\n让我先列出所有的会话，看看是否有小智相关的会话。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:01:46.624829",
+            "finished_at": null,
+            "id": "chatcmpl-tool-852d21bc53809f08",
+            "input": "{\"page\": 1, \"page_size\": 50}",
+            "name": "weknora__list_sessions",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:01:46.722702",
+            "finished_at": null,
+            "id": "chatcmpl-tool-852d21bc53809f08",
+            "metadata": {},
+            "name": "weknora__list_sessions",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:01:46.721927",
+                "finished_at": null,
+                "id": "daa786f7dca443d18ae29fb565dafafb",
+                "text": "{\n  \"data\": [],\n  \"page\": 1,\n  \"page_size\": 50,\n  \"success\": true,\n  \"total\": 0\n}",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:02:09.073577",
+            "finished_at": null,
+            "id": "dee51fff73234ecea109fe2f496946e3",
+            "thinking": "WeKnora 的会话列表为空。让我尝试通过其他方式查找智能客服小智的检索命中率数据。\n\n可能的方式：\n1. 查看 history.db 数据库\n2. 查看 chats.json\n3. 查看是否有其他日志文件\n\n让我先检查一下 history.db 数据库中是否有相关的统计数据。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:02:09.585262",
+            "finished_at": null,
+            "id": "chatcmpl-tool-92f478bde7ee505e",
+            "input": "{\"command\": \"sqlite3 /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/history.db \\\".tables\\\" 2>/dev/null || echo \\\"sqlite3 not available or db locked\\\"\"}",
+            "name": "execute_shell_command",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:02:09.614512",
+            "finished_at": null,
+            "id": "chatcmpl-tool-92f478bde7ee505e",
+            "metadata": {},
+            "name": "execute_shell_command",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:02:09.612777",
+                "finished_at": null,
+                "id": "f862fb81324042deb1263132cb23d431",
+                "text": "sqlite3 not available or db locked",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:02:18.176564",
+            "finished_at": null,
+            "id": "c529586513804f14888d0057b30297f7",
+            "thinking": "sqlite3 不可用或数据库被锁定。让我尝试其他方式查找检索命中率的数据。\n\n让我查看 chats.json 文件，看看是否有相关的统计信息。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:02:18.451711",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a694a74c61234e7b",
+            "input": "{\"command\": \"grep -o \\\"小智\\\\|智能客服\\\\|命中\\\\|检索\\\\|fallback\\\\|未找到\\\\|无法回答\\\" /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/chats.json | head -30\"}",
+            "name": "execute_shell_command",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:02:18.473709",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a694a74c61234e7b",
+            "metadata": {},
+            "name": "execute_shell_command",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:02:18.472835",
+                "finished_at": null,
+                "id": "432a8fd8c0d54caa8a292720b80e4826",
+                "text": "检索\n检索\n检索\n检索\n检索\n检索\n检索",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:02:27.509701",
+            "finished_at": null,
+            "id": "d02b52adb232481c86b5f2b660c1376d",
+            "thinking": "让我查看 chats.json 中关于\"检索\"的上下文，看看是否有相关的命中率数据。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:02:27.835798",
+            "finished_at": null,
+            "id": "chatcmpl-tool-bbfc313d300846a6",
+            "input": "{\"command\": \"grep -B2 -A2 \\\"检索\\\" /root/zhiyun-ai-platform/apps/zhizaoyunAIOS/workspace/hub/runtimes/personal-49e1b686b8034127aaeb292f/working/workspaces/default/chats.json | head -40\"}",
+            "name": "execute_shell_command",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:02:27.899781",
+            "finished_at": null,
+            "id": "chatcmpl-tool-bbfc313d300846a6",
+            "metadata": {},
+            "name": "execute_shell_command",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.069088",
+                "finished_at": null,
+                "id": "8cdd187ab4d04953a6c05fec10ee0453",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-bbfc313d300846a6')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:02:35.191447",
+            "finished_at": null,
+            "id": "4182876af9e546759526a92b7921ee5a",
+            "thinking": "这些\"知识库检索质量怎么提升\"的会话记录看起来是关于如何提升检索质量的讨论，而不是实际的检索命中率统计数据。\n\n让我尝试直接与小智进行交互，测试其检索命中率。我可以向小智提问，观察其回答质量，从而评估检索命中率。\n\n但首先，让我确认一下如何与小智交互。从之前的 agent 列表中，我没有看到\"小智\"这个 agent。小智可能是一个自定义的智能体，需要通过特定的方式调用。\n\n让我重新查看 agent 列表，或者尝试通过 weknora 的 agent_chat 功能与小智交互。\n\n从之前的 tool_results 中，我看到小智的 ID 是 \"a56d60fe-1eff-4661-8a6e-d717edc86cf8\"。让我尝试用 weknora__agent_chat 与小智交互。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:02:36.220681",
+            "finished_at": null,
+            "id": "chatcmpl-tool-98594433247196f8",
+            "input": "{\"agent_id\": \"a56d60fe-1eff-4661-8a6e-d717edc86cf8\"}",
+            "name": "weknora__get_agent",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:02:36.253573",
+            "finished_at": null,
+            "id": "chatcmpl-tool-98594433247196f8",
+            "metadata": {},
+            "name": "weknora__get_agent",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.068985",
+                "finished_at": null,
+                "id": "8074c62031364820aeb158f81fa9d45d",
+                "text": "[scroll folded] old tool result content cleared; recover with recall_history(op=\"recall_tool\", tool_call_id='chatcmpl-tool-98594433247196f8')",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:02:48.003431",
+            "finished_at": null,
+            "id": "9c92769f9fdb4cdaa3343060ad030ac5",
+            "thinking": "好的，我已经获取了小智的详细信息。现在让我尝试与小智进行交互，测试其检索命中率。我可以问一些基于知识库的问题，观察其回答质量。\n\n小智关联的4个知识库：\n1. 通用产品知识库 (b861158f) - 19个知识条目 - 全部completed\n2. 售后知识库 (facd1c48) - 1个知识条目 - completed\n3. 金汉隆-订单业务 (f9730005) - 11个知识条目 - 部分failed\n4. 生产知识库 (7d8ea66b) - 0个知识条目 - 空库\n\n让我测试几个问题来评估检索命中率：\n1. 产品相关问题（测试通用产品知识库）\n2. 售后问题（测试售后知识库）\n3. 订单问题（测试订单业务知识库）\n4. 生产问题（测试生产知识库，预期会fallback）\n\n让我创建一个小智的会话并进行测试。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:02:49.082055",
+            "finished_at": null,
+            "id": "chatcmpl-tool-93c627918fb9cb38",
+            "input": "{\"kb_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\", \"description\": \"智能客服小智巡检测试会话\", \"title\": \"小智检索命中率巡检\"}",
+            "name": "weknora__create_session",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:02:49.118422",
+            "finished_at": null,
+            "id": "chatcmpl-tool-93c627918fb9cb38",
+            "metadata": {},
+            "name": "weknora__create_session",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:02:49.117298",
+                "finished_at": null,
+                "id": "74e5f332a34b4d7fbabc0934268a97f8",
+                "text": "{\n  \"data\": {\n    \"id\": \"ce7a4660-0e4c-4d01-a85c-cbd8497e12c2\",\n    \"title\": \"小智检索命中率巡检\",\n    \"description\": \"智能客服小智巡检测试会话\",\n    \"tenant_id\": 10000,\n    \"user_id\": \"api_tenant_key:10000:1\",\n    \"is_pinned\": false,\n    \"created_at\": \"2026-09-18T07:02:49.109733175+08:00\",\n    \"updated_at\": \"2026-09-18T07:02:49.109733245+08:00\",\n    \"deleted_at\": null\n  },\n  \"success\": true\n}",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:03:00.238745",
+            "finished_at": null,
+            "id": "1da918cecce7483aaaeb1d9a7dd88c19",
+            "thinking": "好的，我已经创建了一个测试会话。现在让我使用 weknora__agent_chat 与小智交互，测试其检索命中率。我需要先创建一个包含所有相关知识库的会话，或者直接与小智的 agent 交互。\n\n实际上，我应该使用 weknora__agent_chat 直接与小智交互，因为它是一个 agent。让我创建几个测试问题来评估命中率。\n\n测试问题设计：\n1. 产品咨询类：询问包装机价格（测试通用产品知识库）\n2. 售后报修类：询问设备故障处理（测试售后知识库）\n3. 订单查询类：询问订单状态（测试订单业务知识库）\n4. 生产相关：询问生产知识库内容（测试空库）\n\n让我开始测试。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:03:01.592377",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a00a2fe5b128a7d9",
+            "input": "{\"agent_id\": \"a56d60fe-1eff-4661-8a6e-d717edc86cf8\", \"knowledge_base_ids\": [\"b861158f-4b89-4715-bada-01d4bed1e40b\", \"facd1c48-1d9b-4ccf-aced-3dce4420234e\", \"f9730005-3478-4100-8845-d10f762b565e\", \"7d8ea66b-bea8-4e08-b72f-1952471a8863\"], \"query\": \"240螺杆包装机多少钱一台？\", \"session_id\": \"ce7a4660-0e4c-4d01-a85c-cbd8497e12c2\"}",
+            "name": "weknora__agent_chat",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:03:05.141312",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a00a2fe5b128a7d9",
+            "metadata": {},
+            "name": "weknora__agent_chat",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:03:05.139247",
+                "finished_at": null,
+                "id": "b9102b4132ef404385adb23fdc43e940",
+                "text": "{\n  \"answer\": \"[[产品咨询|标签]]\\n您好！关于240螺杆包装机的具体价格，知识库中未收录该型号的实时报价信息。\\n\\n根据《智能客服意图标签体系与应答规范》，产品价格需以正式报价单为准<kb doc=\\\"05-客服意图标签体系.md\\\" chunk_id=\\\"ba19a5e6-19cc-4b49-a3fd-8e2fb7800ea9\\\" kb_id=\\\"f9730005-3478-4100-8845-d10f762b565e\\\" />。建议您联系人工客服获取最新报价及选型建议：\\n- 热线：400-800-9000（工作日 9:00-18:00）\\n\\n如有其他技术参数或售后问题，欢迎随时咨询。\",\n  \"references\": [\n    {\n      \"id\": \"502fb5d4-b7ba-46ec-827f-6fb5461b4cad\",\n      \"content\": \"# Summary\\n该文档为金汉隆（KITECH）2025版“人工智能装盒线”产品宣传页，主要介绍了一套从原料处理到最终装盒的一站式智能包装解决方案。其核心内容涵盖以下关键点：\\n\\n首先，在初级小袋包装环节，系统采用人工智能包装机，具备高稳定性与精准度，支持单人操作多台设备以优化人力成本。该环节兼容多种袋型，包括背封袋、三边封袋、四边封袋、长条背封袋及插角袋，满足不同产品的封装需求。\\n\\n其次，针对气密性要求较高或追求高端形象的产品，方案提供了二次大袋包装功能。通过将小袋整齐排列进行二次封装，不仅提升了包装的严密性与档次，也为后续工序奠定了良好基础。\\n\\n再次，在理料阶段，系统能够将小袋进行定量且整齐的排列，这是实现高档大气包装效果的必要前提条件，确保了进入装盒环节的物料有序规范。\\n\\n最后，在终端装盒环节，自动化装箱能有效防止产品在运输和存储过程中受到挤压，从而提升产品整体形象并提高流通效率。该环节支持多种封盒样式，如挂耳式、插舌式、粘胶式及扣底式，以适应不同的市场包装标准。整个生产流程遵循“成料→小袋→大袋→装盒”的逻辑顺序，体现了高度自动化的作业模式。\",\n      \"knowledge_id\": \"04fc9619-f45e-4a19-adbc-c90ff7e29578\",\n      \"chunk_index\": 1,\n      \"knowledge_title\": \"金汉隆包装机画册2025版_4.pdf\",\n      \"start_at\": 0,\n      \"end_at\": 0,\n      \"seq\": 1,\n      \"score\": 1,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {\n        \"process_overrides\": \"map[asr_config:map[enabled:false language: model_id:] chunking_config:map[child_chunk_size:384 chunk_overlap:80 chunk_size:512 enable_parent_child:true parent_chunk_size:4096 separators:[\\n\\n \\n 。 ！ ？ ; ；] strategy:auto] enable_multimodel:true extract_config:map[enabled:false] graph_enabled:false parser_engine_rules:[map[engine:anydoc file_types:[pdf]]] question_generation_config:map[enabled:true question_count:3] vlm_config:map[api_key: base_url: enabled:true interface_type: model_id:a15af007-e7a6-410d-ace1-1cdb22eb8d9b model_name:]]\"\n      },\n      \"chunk_type\": \"summary\",\n      \"parent_chunk_id\": \"ff1f80d6-dfe9-43eb-84b6-a731715dfab8\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"金汉隆包装机画册2025版_4.pdf\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档为金汉隆（KITECH）2025版“人工智能装盒线”产品宣传页，主要介绍了一套从原料处理到最终装盒的一站式智能包装解决方案。其核心内容涵盖以下关键点：\\n\\n首先，在初级小袋包装环节，系统采用人工智能包装机，具备高稳定性与精准度，支持单人操作多台设备以优化人力成本。该环节兼容多种袋型，包括背封袋、三边封袋、四边封袋、长条背封袋及插角袋，满足不同产品的封装需求。\\n\\n其次，针对气密性要求较高或追求高端形象的产品，方案提供了二次大袋包装功能。通过将小袋整齐排列进行二次封装，不仅提升了包装的严密性与档次，也为后续工序奠定了良好基础。\\n\\n再次，在理料阶段，系统能够将小袋进行定量且整齐的排列，这是实现高档大气包装效果的必要前提条件，确保了进入装盒环节的物料有序规范。\\n\\n最后，在终端装盒环节，自动化装箱能有效防止产品在运输和存储过程中受到挤压，从而提升产品整体形象并提高流通效率。该环节支持多种封盒样式，如挂耳式、插舌式、粘胶式及扣底式，以适应不同的市场包装标准。整个生产流程遵循“成料→小袋→大袋→装盒”的逻辑顺序，体现了高度自动化的作业模式。\",\n      \"knowledge_base_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\"\n    },\n    {\n      \"id\": \"ba19a5e6-19cc-4b49-a3fd-8e2fb7800ea9\",\n      \"content\": \"# 智能客服意图标签体系与应答规范\\n\\n智能客服对每条客户消息进行意图识别，标签固定为以下六类，判定标准：\\n\\n## 订单查询\\n- 判定：询问订单位置/状态/进度/交期/到货时间。\\n- 示例：\\\"订单在哪？\\\"、\\\"我的货怎么还没到\\\"、\\\"SO20251221-0001 到哪了\\\"、\\\"承诺交期是哪天\\\"。\\n- 应答要点：若有系统实时数据，报当前状态、最新进展、承诺交期、系统预测完工；补充该机型历史平均交付周期。\\n\\n## 订单变更\\n- 判定：修改交期（提前/推迟）、加急、改数量、改地址。\\n- 示例：\\\"能改交期吗？\\\"、\\\"想提前一周交货\\\"。\\n- 应答要点：说明变更政策；如有实时订单数据给出可改窗口；引导创建订单变更工单。\\n\\n## 财务支持\\n- 判定：对账、账期、发票、付款/定金/尾款、收款类型。\\n- 示例：\\\"对账单怎么拉\\\"、\\\"定金比例多少\\\"、\\\"验收款怎么付\\\"。\\n- 应答要点：按真实结算方式分布回答（月结30天/验收后付款/30%定金+70%尾款等）。\\n\\n## 售后报修\\n- 判定：设备故障、报修、维修（封口不严/漏气/跑偏/切不断/计量波动/卡盒/漏液/报警等）。\\n- 应答要点：结合《售后维修案例库》给出初步判断、参考方案、建议备件，提示创建售后工单。\\n\\n## 产品咨询\\n- 判定：机型参数、价格、产能、选型、质保、换产、膜材。\\n- 应答要点：按《产品目录与选型》真实成交中位价与周期回答，价格注明以正式报价为准。\\n\\n## 投诉与建议\\n- 判定：投诉、不满、时效抱怨、改进建议。\\n- 应答要点：先致歉，说明响应机制，引导提供订单号或异常编号（EXxxxx）优先核查。\\n\\n## 应答通用规范\\n1. 专业、友好、简洁；不编造具体订单数据。\\n2. 涉及实时数据以系统注入数据为准，缺失时说明查询途径。\\n3. 无法解答时诚实说明，转人工。\",\n      \"knowledge_id\": \"143bca2f-4f5e-4426-a582-e880ae28f478\",\n      \"chunk_index\": 1,\n      \"knowledge_title\": \"05-客服意图标签体系.md\",\n      \"start_at\": 201,\n      \"end_at\": 422,\n      \"seq\": 1,\n      \"score\": 1,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"bc8f5b49-1301-476a-919e-efd557392f13\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"05-客服意图标签体系.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档详细规定了智能客服系统的意图标签体系及相应的应答规范，旨在通过标准化的分类与处理流程提升客户服务效率与准确性。系统将所有客户消息划分为六大核心意图类别，并针对每类设定了明确的判定标准与应答要点。\\n\\n首先，在订单相关服务方面，“订单查询”涵盖位置、状态及交期询问，要求客服提供实时数据、最新进展及历史平均交付周期；“订单变更”涉及修改交期、数量或地址等需求，需说明变更政策、可改窗口并引导创建工单。其次，财务与服务支持方面，“财务支持”聚焦对账、发票及付款条款，需依据真实结算方式（如月结、定金比例等）作答；“售后报修”针对设备故障与维修请求，应结合案例库提供初步判断、参考方案及备件建议，并提示创建售后工单。此外，“产品咨询”包括机型参数、价格及选型等问题，需基于产品目录的真实成交中位价与周期回答，并注明以正式报价为准；“投诉与建议”则要求先致歉，说明响应机制，并引导客户提供订单号或异常编号以便优先核查。\\n\\n最后，文档确立了通用的应答规范：客服回复须保持专业、友好且简洁，严禁编造具体订单数据。涉及实时信息时，必须以系统注入数据为准，若数据缺失需说明查询途径；对于无法解答的问题，应诚实告知并转接人工服务。这一体系确保了智能客服在处理各类业务场景时的规范性与一致性。\",\n      \"knowledge_base_id\": \"f9730005-3478-4100-8845-d10f762b565e\"\n    },\n    {\n      \"id\": \"a5b5d601-71fe-40ca-aaed-b57e16b1282a\",\n      \"content\": \"# Summary\\n该文档为一份针对多种包装机械设备的售后维修案例库，系统整理了18个典型故障案例及相关的报修派单规则、技师团队信息和常用备件清单。核心内容涵盖封口、计量、驱动、装盒及贴标等关键环节的故障诊断与处理方案。\\n\\n首先，在封口与膜材处理方面，常见问题包括240螺杆包装机因温度偏低或硅胶压板老化导致的封口漏气，以及颗粒背封包装机因膜卷不对中或色标偏差引起的跑偏褶皱。解决方案涉及更换硅胶压板、调整封口温度至165-175℃、重新对中膜卷及校准传感器。此外，高速圆角背封宠物膏体包装机存在因加热管老化和温控表漂移导致的温度失控问题，需更换加热管并校准PID参数；凝珠液体包装机则可能因模温过高和硅胶条老化导致膜破，需降温并更换配件。\\n\\n其次，在计量与传动控制方面，240螺杆包装机可能出现因螺杆磨损和物料架桥导致的计量波动，需更换螺杆并加装振动器。伺服驱动报警（如E-13过载）通常由电机过载或参数漂移引起，需复查负载并整定增益。变频器过流故障多因加减速时间设置不当或制动电阻接线松脱，通过调整参数和紧固接线解决。同步带跳齿和气缸动作迟滞分别源于皮带松弛和气路密封圈老化，需进行张紧、更换部件及检查气源。\\n\\n最后，文档明确了自动化线体的其他故障，如自动灌装旋盖装盒线的卡盒（吸盘老化）、旋盖不到位（摩擦片磨损），以及PLC通讯中断（线缆干扰）和光电检漏误报（表面污染）。报修流程要求提供机型、现象及影像资料，派单依据技能匹配、评分、负载及区域推荐技师。技师团队按华南、华东、华北、西南、华中分区，具备封口、电气、计量等不同专长。常用备件包括硅胶压板、加热管、切刀组件、传感器及各类密封件等，为快速响应维修提供了资源支持。\",\n      \"knowledge_id\": \"7b5cbba2-d8a6-495c-bb6a-d081aaf3a85a\",\n      \"chunk_index\": 13,\n      \"knowledge_title\": \"02-售后维修案例库.md\",\n      \"start_at\": 0,\n      \"end_at\": 0,\n      \"seq\": 13,\n      \"score\": 1,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"summary\",\n      \"parent_chunk_id\": \"f6c75342-1b71-4a24-ac4c-8b249390ab28\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"02-售后维修案例库.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档为一份针对多种包装机械设备的售后维修案例库，系统整理了18个典型故障案例及相关的报修派单规则、技师团队信息和常用备件清单。核心内容涵盖封口、计量、驱动、装盒及贴标等关键环节的故障诊断与处理方案。\\n\\n首先，在封口与膜材处理方面，常见问题包括240螺杆包装机因温度偏低或硅胶压板老化导致的封口漏气，以及颗粒背封包装机因膜卷不对中或色标偏差引起的跑偏褶皱。解决方案涉及更换硅胶压板、调整封口温度至165-175℃、重新对中膜卷及校准传感器。此外，高速圆角背封宠物膏体包装机存在因加热管老化和温控表漂移导致的温度失控问题，需更换加热管并校准PID参数；凝珠液体包装机则可能因模温过高和硅胶条老化导致膜破，需降温并更换配件。\\n\\n其次，在计量与传动控制方面，240螺杆包装机可能出现因螺杆磨损和物料架桥导致的计量波动，需更换螺杆并加装振动器。伺服驱动报警（如E-13过载）通常由电机过载或参数漂移引起，需复查负载并整定增益。变频器过流故障多因加减速时间设置不当或制动电阻接线松脱，通过调整参数和紧固接线解决。同步带跳齿和气缸动作迟滞分别源于皮带松弛和气路密封圈老化，需进行张紧、更换部件及检查气源。\\n\\n最后，文档明确了自动化线体的其他故障，如自动灌装旋盖装盒线的卡盒（吸盘老化）、旋盖不到位（摩擦片磨损），以及PLC通讯中断（线缆干扰）和光电检漏误报（表面污染）。报修流程要求提供机型、现象及影像资料，派单依据技能匹配、评分、负载及区域推荐技师。技师团队按华南、华东、华北、西南、华中分区，具备封口、电气、计量等不同专长。常用备件包括硅胶压板、加热管、切刀组件、传感器及各类密封件等，为快速响应维修提供了资源支持。\",\n      \"knowledge_base_id\": \"facd1c48-1d9b-4ccf-aced-3dce4420234e\"\n    },\n    {\n      \"id\": \"25e40a93-50b4-4fa9-9680-1951ccfdfd7d\",\n      \"content\": \"# 售后维修案例库（现象→原因→方案→配件）\\n\\n## 案例1：封口不严漏气（240螺杆包装机）\\n- 现象：制袋封口处漏气，封口压痕偏浅，充气包装保压不足。\\n- 原因：封口温度偏低或硅胶压板老化磨损。\\n- 方案：更换硅胶压板，封口温度调整至165-175℃，试压复检。\\n- 配件：硅胶压板160×1。\\n- 历史处理：李建国（华南），停机约 3 小时。\\n\\n## 案例2：膜材跑偏褶皱（颗粒背封包装机）\\n- 现象：制袋过程中膜材持续跑偏，袋面出现褶皱与歪袋。\\n- 原因：膜卷安装不对中，色标跟踪偏差。\\n- 方案：重新对中膜卷并校准色标传感器灵敏度。\\n- 配件：色标传感器×1。\\n- 历史处理：周敏（西南），停机约 2 小时。\\n\\n## 案例3：横封切不断（颗粒背封包装机）\\n- 现象：横封封口处切刀切断不彻底，出现连袋。\\n- 原因：切刀磨损，刀口间隙偏大。\\n- 方案：更换横封切刀组件并将间隙调整至0.02mm。\\n- 配件：横封切刀组件×1。\\n- 历史处理：李建国（华南），停机约 4 小时。\\n\\n## 案例4：计量波动大（240螺杆包装机）\\n- 现象：螺杆计量每袋波动超过±1.5g，抽检不合格。\\n- 原因：计量螺杆磨损，物料架桥。\\n- 方案：更换计量螺杆并加装料仓振动器防架桥。\\n- 配件：计量螺杆φ40×1。\\n- 历史处理：陈斌（华东），停机约 5 小时。\\n\\n## 案例5：伺服驱动报警（600六列背封螺杆包装机）\\n- 现象：运行中伺服驱动器报E-13过载报警，停机。\\n- 原因：伺服电机过载，驱动参数漂移。\\n- 方案：复查机械负载，重新整定伺服增益与过载参数。\\n- 配件：无。\\n- 历史处理：王强（华南），停机约 2 小时。\\n\\n## 案例6：泵体漏液（圆角磁力泵包装机）\\n- 现象：磁力泵泵头处渗漏液体，流量不稳。\\n- 原因：泵头机械密封老化。\\n- 方案：更换泵头机械密封，复测流量曲线。\\n- 配件：机械密封(泵头)×1。\\n- 历史处理：陈斌（华东），停机约 3 小时。\\n\\n## 案例7：装盒卡盒（自动灌装旋盖装盒线）\\n- 现象：装盒工位频繁卡盒，节拍下降约30%。\\n- 原因：真空吸盘老化吸力不足，盒子歪斜。\\n- 方案：更换真空吸盘组件并校正气路压力至0.55MPa。\\n- 配件：真空吸盘组件×2。\\n- 历史处理：赵鹏（华东），停机约 4 小时。\\n\\n## 案例8：旋盖不到位（自动灌装旋盖装盒线）\\n- 现象：旋盖工位扭矩不足，瓶盖旋紧不达标。\\n- 原因：旋盖头摩擦片磨损。\\n- 方案：更换旋盖头摩擦片并复标扭矩。\\n- 配件：无。\\n- 历史处理：赵鹏（华东），停机约 2 小时。\\n\\n## 案例9：贴标偏移（分页平面贴标机）\\n- 现象：贴标位置持续偏移2-3mm，标签起皱。\\n- 原因：标带走送辊磨损，测标电眼偏移。\\n- 方案：更换贴标标带走带辊，重校测标电眼位置。\\n- 配件：贴标标带走带辊×1。\\n- 历史处理：孙悦（华北），停机约 3 小时。\\n\\n## 案例10：凝珠膜破（凝珠液体包装机）\\n- 现象：水凝珠成型时膜材破裂，废品率升高。\\n- 原因：成型模温度过高，硅胶条老化。\\n- 方案：更换成型模硅胶条并将模温降至85℃。\\n- 配件：成型模硅胶条×2。\\n- 历史处理：周敏（西南），停机约 2 小时。\\n\\n## 案例11：封口温度失控（高速圆角背封宠物膏体包装机）\\n- 现象：封口温度波动±15℃，封口质量不稳定。\\n- 原因：加热管老化，温控表漂移。\\n- 方案：更换加热管并校准温控表PID参数。\\n- 配件：加热管220V/600W×2。\\n- 历史处理：李建国（华南），停机约 3 小时。\\n\\n## 案例12：气缸动作迟滞（自动装盒线）\\n- 现象：开盒气缸动作迟滞，节拍不稳。\\n- 原因：气路密封圈老化内漏。\\n- 方案：更换气缸密封圈组件，检查气源三联件。\\n- 配件：气缸密封圈组×1。\\n- 历史处理：周敏（西南），停机约 2 小时。\\n\\n## 案例13：光电检漏误报（高速圆角背封/三边封液体包装机）\\n- 现象：检漏光电频繁误报停机。\\n- 原因：光电开关表面积液污染。\\n- 方案：清洁光电开关加装防溅罩，重新设定灵敏度。\\n- 配件：光电开关×1。\\n- 历史处理：刘志明（华南），停机约 1.5 小时。\\n\\n## 案例14：PLC通讯中断（自动灌装旋盖装盒装盒线）\\n- 现象：线体PLC与触摸屏通讯中断，整线停机。\\n- 原因：通讯线缆干扰，接头氧化。\\n- 方案：更换屏蔽通讯线缆并重新压接端子。\\n- 配件：无。\\n- 历史处理：刘志明（华南），停机约 2 小时。\\n\\n## 案例15：变频器过流（双列背封颗粒/粉末包装机）\\n- 现象：主传动变频器启动报过流。\\n- 原因：加减速时间过短，制动电阻接线松脱。\\n- 方案：调整加减速时间至15s，紧固制动电阻接线。\\n- 配件：无。\\n- 历史处理：吴涛（华中），停机约 1.5 小时。\\n\\n## 案例16：同步带跳齿（自动装盒线）\\n- 现象：输送同步带跳齿异响，盒子移位。\\n- 原因：同步带拉伸松弛。\\n- 方案：张紧同步带并更换老化段，复校输送位置。\\n- 配件：同步带8M-1200×1。\\n- 历史处理：赵鹏（华东），停机约 3 小时。\",\n      \"knowledge_id\": \"7b5cbba2-d8a6-495c-bb6a-d081aaf3a85a\",\n      \"chunk_index\": 5,\n      \"knowledge_title\": \"02-售后维修案例库.md\",\n      \"start_at\": 1352,\n      \"end_at\": 1617,\n      \"seq\": 5,\n      \"score\": 1,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"868cad2c-e7a3-45b1-918d-2ba9544b99dd\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"02-售后维修案例库.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档为一份针对多种包装机械设备的售后维修案例库，系统整理了18个典型故障案例及相关的报修派单规则、技师团队信息和常用备件清单。核心内容涵盖封口、计量、驱动、装盒及贴标等关键环节的故障诊断与处理方案。\\n\\n首先，在封口与膜材处理方面，常见问题包括240螺杆包装机因温度偏低或硅胶压板老化导致的封口漏气，以及颗粒背封包装机因膜卷不对中或色标偏差引起的跑偏褶皱。解决方案涉及更换硅胶压板、调整封口温度至165-175℃、重新对中膜卷及校准传感器。此外，高速圆角背封宠物膏体包装机存在因加热管老化和温控表漂移导致的温度失控问题，需更换加热管并校准PID参数；凝珠液体包装机则可能因模温过高和硅胶条老化导致膜破，需降温并更换配件。\\n\\n其次，在计量与传动控制方面，240螺杆包装机可能出现因螺杆磨损和物料架桥导致的计量波动，需更换螺杆并加装振动器。伺服驱动报警（如E-13过载）通常由电机过载或参数漂移引起，需复查负载并整定增益。变频器过流故障多因加减速时间设置不当或制动电阻接线松脱，通过调整参数和紧固接线解决。同步带跳齿和气缸动作迟滞分别源于皮带松弛和气路密封圈老化，需进行张紧、更换部件及检查气源。\\n\\n最后，文档明确了自动化线体的其他故障，如自动灌装旋盖装盒线的卡盒（吸盘老化）、旋盖不到位（摩擦片磨损），以及PLC通讯中断（线缆干扰）和光电检漏误报（表面污染）。报修流程要求提供机型、现象及影像资料，派单依据技能匹配、评分、负载及区域推荐技师。技师团队按华南、华东、华北、西南、华中分区，具备封口、电气、计量等不同专长。常用备件包括硅胶压板、加热管、切刀组件、传感器及各类密封件等，为快速响应维修提供了资源支持。\",\n      \"knowledge_base_id\": \"facd1c48-1d9b-4ccf-aced-3dce4420234e\"\n    },\n    {\n      \"id\": \"6d939fe2-daa9-45c2-8d49-601345776173\",\n      \"content\": \"# Summary\\n金汉隆（KITECH）智能装备推出的“自动理料装盒装箱线”是一套一站式自动化包装解决方案，旨在通过深度定制实现从生产端到后端包装的全流程无人化操作。该方案的核心优势在于能够根据客户的具体需求，无缝连接小袋包装、中袋包装、装盒及装箱等环节，提供全伺服配置或与非标生产线对接，从而显著降低人力成本并提升生产效率，适用于现代化无人操控车间。\\n\\n在功能模块方面，该生产线涵盖了内包、排列、外包及后端四大关键环节。内包环节采用一拖四上开式自动理料线，特别适配巧克力、沙琪玛、能量棒等产品；排列环节利用有序理料机确保产品整齐美观，提升档次；外包环节配备往复式包装机，通过增加大袋包装层提供更佳的防护效果；后端则集成自动开箱、装箱及封箱功能，完成整线自动化闭环。此外，系统支持背封袋、三边封袋、四边封袋、长条背封袋及插角袋等多种袋型，具备高度的灵活性和适应性。\\n\\n生产流程设计严谨，涵盖成品材料理料、独立袋装、有序或无序理料装盒、机械手码垛装箱以及二次大袋包装等步骤。以水烟（Shisha/Hookah）自动包装线为例，其具体工艺流程包括：原料经过小袋子包装后，进行小盒折叠与封口，随后进入理料阶段，最后完成大盒的折叠与大盒封口。整体而言，该设备强调非标化定制能力，针对不同产品的属性、尺寸及包装数量进行专属设计，真正实现了劳动力的解放与包装质量的标准化提升。\",\n      \"knowledge_id\": \"8ee18364-4052-44dd-a153-ee3f12918dec\",\n      \"chunk_index\": 1,\n      \"knowledge_title\": \"金汉隆包装机画册2025版_5.pdf\",\n      \"start_at\": 0,\n      \"end_at\": 0,\n      \"seq\": 1,\n      \"score\": 1,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {\n        \"process_overrides\": \"map[asr_config:map[enabled:false language: model_id:] chunking_config:map[child_chunk_size:384 chunk_overlap:80 chunk_size:512 enable_parent_child:true parent_chunk_size:4096 separators:[\\n\\n \\n 。 ！ ？ ; ；] strategy:auto] enable_multimodel:true extract_config:map[enabled:false] graph_enabled:false parser_engine_rules:[map[engine:anydoc file_types:[pdf]]] question_generation_config:map[enabled:true question_count:3] vlm_config:map[api_key: base_url: enabled:true interface_type: model_id:a15af007-e7a6-410d-ace1-1cdb22eb8d9b model_name:]]\"\n      },\n      \"chunk_type\": \"summary\",\n      \"parent_chunk_id\": \"19602b01-bb82-4b62-97ed-7856e6ac1dd1\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"金汉隆包装机画册2025版_5.pdf\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"金汉隆（KITECH）智能装备推出的“自动理料装盒装箱线”是一套一站式自动化包装解决方案，旨在通过深度定制实现从生产端到后端包装的全流程无人化操作。该方案的核心优势在于能够根据客户的具体需求，无缝连接小袋包装、中袋包装、装盒及装箱等环节，提供全伺服配置或与非标生产线对接，从而显著降低人力成本并提升生产效率，适用于现代化无人操控车间。\\n\\n在功能模块方面，该生产线涵盖了内包、排列、外包及后端四大关键环节。内包环节采用一拖四上开式自动理料线，特别适配巧克力、沙琪玛、能量棒等产品；排列环节利用有序理料机确保产品整齐美观，提升档次；外包环节配备往复式包装机，通过增加大袋包装层提供更佳的防护效果；后端则集成自动开箱、装箱及封箱功能，完成整线自动化闭环。此外，系统支持背封袋、三边封袋、四边封袋、长条背封袋及插角袋等多种袋型，具备高度的灵活性和适应性。\\n\\n生产流程设计严谨，涵盖成品材料理料、独立袋装、有序或无序理料装盒、机械手码垛装箱以及二次大袋包装等步骤。以水烟（Shisha/Hookah）自动包装线为例，其具体工艺流程包括：原料经过小袋子包装后，进行小盒折叠与封口，随后进入理料阶段，最后完成大盒的折叠与大盒封口。整体而言，该设备强调非标化定制能力，针对不同产品的属性、尺寸及包装数量进行专属设计，真正实现了劳动力的解放与包装质量的标准化提升。\",\n      \"knowledge_base_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\"\n    }\n  ],\n  \"_debug_events\": [\n    {\n      \"type\": \"agent_query\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"tool_call\",\n      \"content\": \"Calling tool: query_understand\"\n    },\n    {\n      \"type\": \"tool_result\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"tool_call\",\n      \"content\": \"Calling tool: knowledge_search\"\n    },\n    {\n      \"type\": \"tool_result\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"references\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"[[\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"产品咨询\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"|标签]]\\n\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"您好！\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"关于240\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"螺杆包装机的具体\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"价格，知识库中\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"未收录该型号的\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"实时报价信息。\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\\n\\n根据《智能\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"客服意图标签体系\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"与应答规范\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"》，产品价格需以\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"正式报价\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"单为准\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"<kb doc=\\\"05-客服意图标签体系.md\\\" chunk_id=\\\"ba19a5e6-19cc-4b49-a3fd-8e2fb7800ea9\\\" kb_id=\\\"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"人工客服获取最新\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"报价及\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"选型建议：\\n\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"-\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" 热线：4\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"00-8\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"00-9\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"000（\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"工作日 9:\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"00-1\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"8:00\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"）\\n\\n如有其他\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"技术参数\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"或售后问题，\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"欢迎随时咨询\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"。\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"complete\",\n      \"content\": \"\"\n    }\n  ],\n  \"session_id\": \"ce7a4660-0e4c-4d01-a85c-cbd8497e12c2\"\n}",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:03:16.705314",
+            "finished_at": null,
+            "id": "4c97c7c9233c4ff4ad9cfb0c1a022cf2",
+            "thinking": "好的，我已经完成了第一个测试问题。小智的回答显示：\n- 意图标签：产品咨询\n- 回答：知识库中未收录该型号的实时报价信息，建议联系人工客服\n- 检索到的参考文档：\n  1. 金汉隆包装机画册2025版_4.pdf（关于装盒线，不直接相关）\n  2. 05-客服意图标签体系.md（关于应答规范）\n  3. 02-售后维修案例库.md（关于售后维修）\n  4. 金汉隆包装机画册2025版_5.pdf（关于装盒装箱线）\n\n虽然知识库中有《产品目录与选型.md》文件应该包含价格信息，但小智的回答是\"未收录该型号的实时报价信息\"。这说明检索可能没有命中最相关的文档，或者检索到了但不认为足够具体。\n\n让我继续测试其他问题。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:03:18.310582",
+            "finished_at": null,
+            "id": "chatcmpl-tool-98663347f10428f3",
+            "input": "{\"agent_id\": \"a56d60fe-1eff-4661-8a6e-d717edc86cf8\", \"knowledge_base_ids\": [\"b861158f-4b89-4715-bada-01d4bed1e40b\", \"facd1c48-1d9b-4ccf-aced-3dce4420234e\", \"f9730005-3478-4100-8845-d10f762b565e\", \"7d8ea66b-bea8-4e08-b72f-1952471a8863\"], \"query\": \"设备封口漏气怎么处理？\", \"session_id\": \"ce7a4660-0e4c-4d01-a85c-cbd8497e12c2\"}",
+            "name": "weknora__agent_chat",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:03:22.065743",
+            "finished_at": null,
+            "id": "chatcmpl-tool-98663347f10428f3",
+            "metadata": {},
+            "name": "weknora__agent_chat",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:03:22.064395",
+                "finished_at": null,
+                "id": "6a1e8d449fba48dd85f3481c7cc83c9e",
+                "text": "{\n  \"answer\": \"[[售后报修|标签]]\\n您好，针对240螺杆包装机封口漏气问题，参考《售后维修案例库》<kb doc=\\\"02-售后维修案例库.md\\\" chunk_id=\\\"f6c75342-1b71-4a24-ac4c-8b249390ab28\\\" kb_id=\\\"facd1c48-1d9b-4ccf-aced-3dce4420234e\\\" />：\\n\\n1. **初步判断**：封口温度偏低或硅胶压板老化磨损。\\n2. **处理方案**：更换硅胶压板，将封口温度调整至165-175℃后试压复检。\\n3. **建议备件**：硅胶压板160×1。\\n\\n您可创建售后工单安排技师上门（推荐华南李建国或西南周敏）。若为紧急故障，请拨打7×24热线 400-800-9000。\",\n  \"references\": [\n    {\n      \"id\": \"f6c75342-1b71-4a24-ac4c-8b249390ab28\",\n      \"content\": \"# 售后维修案例库（现象→原因→方案→配件）\\n\\n## 案例1：封口不严漏气（240螺杆包装机）\\n- 现象：制袋封口处漏气，封口压痕偏浅，充气包装保压不足。\\n- 原因：封口温度偏低或硅胶压板老化磨损。\\n- 方案：更换硅胶压板，封口温度调整至165-175℃，试压复检。\\n- 配件：硅胶压板160×1。\\n- 历史处理：李建国（华南），停机约 3 小时。\\n\\n## 案例2：膜材跑偏褶皱（颗粒背封包装机）\\n- 现象：制袋过程中膜材持续跑偏，袋面出现褶皱与歪袋。\\n- 原因：膜卷安装不对中，色标跟踪偏差。\\n- 方案：重新对中膜卷并校准色标传感器灵敏度。\\n- 配件：色标传感器×1。\\n- 历史处理：周敏（西南），停机约 2 小时。\\n\\n## 案例3：横封切不断（颗粒背封包装机）\\n- 现象：横封封口处切刀切断不彻底，出现连袋。\\n- 原因：切刀磨损，刀口间隙偏大。\\n- 方案：更换横封切刀组件并将间隙调整至0.02mm。\\n- 配件：横封切刀组件×1。\\n- 历史处理：李建国（华南），停机约 4 小时。\\n\\n## 案例4：计量波动大（240螺杆包装机）\\n- 现象：螺杆计量每袋波动超过±1.5g，抽检不合格。\\n- 原因：计量螺杆磨损，物料架桥。\\n- 方案：更换计量螺杆并加装料仓振动器防架桥。\\n- 配件：计量螺杆φ40×1。\\n- 历史处理：陈斌（华东），停机约 5 小时。\\n\\n## 案例5：伺服驱动报警（600六列背封螺杆包装机）\\n- 现象：运行中伺服驱动器报E-13过载报警，停机。\\n- 原因：伺服电机过载，驱动参数漂移。\\n- 方案：复查机械负载，重新整定伺服增益与过载参数。\\n- 配件：无。\\n- 历史处理：王强（华南），停机约 2 小时。\\n\\n## 案例6：泵体漏液（圆角磁力泵包装机）\\n- 现象：磁力泵泵头处渗漏液体，流量不稳。\\n- 原因：泵头机械密封老化。\\n- 方案：更换泵头机械密封，复测流量曲线。\\n- 配件：机械密封(泵头)×1。\\n- 历史处理：陈斌（华东），停机约 3 小时。\\n\\n## 案例7：装盒卡盒（自动灌装旋盖装盒线）\\n- 现象：装盒工位频繁卡盒，节拍下降约30%。\\n- 原因：真空吸盘老化吸力不足，盒子歪斜。\\n- 方案：更换真空吸盘组件并校正气路压力至0.55MPa。\\n- 配件：真空吸盘组件×2。\\n- 历史处理：赵鹏（华东），停机约 4 小时。\\n\\n## 案例8：旋盖不到位（自动灌装旋盖装盒线）\\n- 现象：旋盖工位扭矩不足，瓶盖旋紧不达标。\\n- 原因：旋盖头摩擦片磨损。\\n- 方案：更换旋盖头摩擦片并复标扭矩。\\n- 配件：无。\\n- 历史处理：赵鹏（华东），停机约 2 小时。\\n\\n## 案例9：贴标偏移（分页平面贴标机）\\n- 现象：贴标位置持续偏移2-3mm，标签起皱。\\n- 原因：标带走送辊磨损，测标电眼偏移。\\n- 方案：更换贴标标带走带辊，重校测标电眼位置。\\n- 配件：贴标标带走带辊×1。\\n- 历史处理：孙悦（华北），停机约 3 小时。\\n\\n## 案例10：凝珠膜破（凝珠液体包装机）\\n- 现象：水凝珠成型时膜材破裂，废品率升高。\\n- 原因：成型模温度过高，硅胶条老化。\\n- 方案：更换成型模硅胶条并将模温降至85℃。\\n- 配件：成型模硅胶条×2。\\n- 历史处理：周敏（西南），停机约 2 小时。\\n\\n## 案例11：封口温度失控（高速圆角背封宠物膏体包装机）\\n- 现象：封口温度波动±15℃，封口质量不稳定。\\n- 原因：加热管老化，温控表漂移。\\n- 方案：更换加热管并校准温控表PID参数。\\n- 配件：加热管220V/600W×2。\\n- 历史处理：李建国（华南），停机约 3 小时。\\n\\n## 案例12：气缸动作迟滞（自动装盒线）\\n- 现象：开盒气缸动作迟滞，节拍不稳。\\n- 原因：气路密封圈老化内漏。\\n- 方案：更换气缸密封圈组件，检查气源三联件。\\n- 配件：气缸密封圈组×1。\\n- 历史处理：周敏（西南），停机约 2 小时。\\n\\n## 案例13：光电检漏误报（高速圆角背封/三边封液体包装机）\\n- 现象：检漏光电频繁误报停机。\\n- 原因：光电开关表面积液污染。\\n- 方案：清洁光电开关加装防溅罩，重新设定灵敏度。\\n- 配件：光电开关×1。\\n- 历史处理：刘志明（华南），停机约 1.5 小时。\\n\\n## 案例14：PLC通讯中断（自动灌装旋盖装盒装盒线）\\n- 现象：线体PLC与触摸屏通讯中断，整线停机。\\n- 原因：通讯线缆干扰，接头氧化。\\n- 方案：更换屏蔽通讯线缆并重新压接端子。\\n- 配件：无。\\n- 历史处理：刘志明（华南），停机约 2 小时。\\n\\n## 案例15：变频器过流（双列背封颗粒/粉末包装机）\\n- 现象：主传动变频器启动报过流。\\n- 原因：加减速时间过短，制动电阻接线松脱。\\n- 方案：调整加减速时间至15s，紧固制动电阻接线。\\n- 配件：无。\\n- 历史处理：吴涛（华中），停机约 1.5 小时。\\n\\n## 案例16：同步带跳齿（自动装盒线）\\n- 现象：输送同步带跳齿异响，盒子移位。\\n- 原因：同步带拉伸松弛。\\n- 方案：张紧同步带并更换老化段，复校输送位置。\\n- 配件：同步带8M-1200×1。\\n- 历史处理：赵鹏（华东），停机约 3 小时。\",\n      \"knowledge_id\": \"7b5cbba2-d8a6-495c-bb6a-d081aaf3a85a\",\n      \"chunk_index\": 0,\n      \"knowledge_title\": \"02-售后维修案例库.md\",\n      \"start_at\": 0,\n      \"end_at\": 311,\n      \"seq\": 0,\n      \"score\": 0.014546654929577463,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"868cad2c-e7a3-45b1-918d-2ba9544b99dd\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"02-售后维修案例库.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档为一份针对多种包装机械设备的售后维修案例库，系统整理了18个典型故障案例及相关的报修派单规则、技师团队信息和常用备件清单。核心内容涵盖封口、计量、驱动、装盒及贴标等关键环节的故障诊断与处理方案。\\n\\n首先，在封口与膜材处理方面，常见问题包括240螺杆包装机因温度偏低或硅胶压板老化导致的封口漏气，以及颗粒背封包装机因膜卷不对中或色标偏差引起的跑偏褶皱。解决方案涉及更换硅胶压板、调整封口温度至165-175℃、重新对中膜卷及校准传感器。此外，高速圆角背封宠物膏体包装机存在因加热管老化和温控表漂移导致的温度失控问题，需更换加热管并校准PID参数；凝珠液体包装机则可能因模温过高和硅胶条老化导致膜破，需降温并更换配件。\\n\\n其次，在计量与传动控制方面，240螺杆包装机可能出现因螺杆磨损和物料架桥导致的计量波动，需更换螺杆并加装振动器。伺服驱动报警（如E-13过载）通常由电机过载或参数漂移引起，需复查负载并整定增益。变频器过流故障多因加减速时间设置不当或制动电阻接线松脱，通过调整参数和紧固接线解决。同步带跳齿和气缸动作迟滞分别源于皮带松弛和气路密封圈老化，需进行张紧、更换部件及检查气源。\\n\\n最后，文档明确了自动化线体的其他故障，如自动灌装旋盖装盒线的卡盒（吸盘老化）、旋盖不到位（摩擦片磨损），以及PLC通讯中断（线缆干扰）和光电检漏误报（表面污染）。报修流程要求提供机型、现象及影像资料，派单依据技能匹配、评分、负载及区域推荐技师。技师团队按华南、华东、华北、西南、华中分区，具备封口、电气、计量等不同专长。常用备件包括硅胶压板、加热管、切刀组件、传感器及各类密封件等，为快速响应维修提供了资源支持。\",\n      \"knowledge_base_id\": \"facd1c48-1d9b-4ccf-aced-3dce4420234e\"\n    },\n    {\n      \"id\": \"1511f2c8-4bee-4471-a6b7-b1ef6893b34f\",\n      \"content\": \"# 智能客服意图标签体系与应答规范\\n\\n智能客服对每条客户消息进行意图识别，标签固定为以下六类，判定标准：\\n\\n## 订单查询\\n- 判定：询问订单位置/状态/进度/交期/到货时间。\\n- 示例：\\\"订单在哪？\\\"、\\\"我的货怎么还没到\\\"、\\\"SO20251221-0001 到哪了\\\"、\\\"承诺交期是哪天\\\"。\\n- 应答要点：若有系统实时数据，报当前状态、最新进展、承诺交期、系统预测完工；补充该机型历史平均交付周期。\\n\\n## 订单变更\\n- 判定：修改交期（提前/推迟）、加急、改数量、改地址。\\n- 示例：\\\"能改交期吗？\\\"、\\\"想提前一周交货\\\"。\\n- 应答要点：说明变更政策；如有实时订单数据给出可改窗口；引导创建订单变更工单。\\n\\n## 财务支持\\n- 判定：对账、账期、发票、付款/定金/尾款、收款类型。\\n- 示例：\\\"对账单怎么拉\\\"、\\\"定金比例多少\\\"、\\\"验收款怎么付\\\"。\\n- 应答要点：按真实结算方式分布回答（月结30天/验收后付款/30%定金+70%尾款等）。\\n\\n## 售后报修\\n- 判定：设备故障、报修、维修（封口不严/漏气/跑偏/切不断/计量波动/卡盒/漏液/报警等）。\\n- 应答要点：结合《售后维修案例库》给出初步判断、参考方案、建议备件，提示创建售后工单。\\n\\n## 产品咨询\\n- 判定：机型参数、价格、产能、选型、质保、换产、膜材。\\n- 应答要点：按《产品目录与选型》真实成交中位价与周期回答，价格注明以正式报价为准。\\n\\n## 投诉与建议\\n- 判定：投诉、不满、时效抱怨、改进建议。\\n- 应答要点：先致歉，说明响应机制，引导提供订单号或异常编号（EXxxxx）优先核查。\\n\\n## 应答通用规范\\n1. 专业、友好、简洁；不编造具体订单数据。\\n2. 涉及实时数据以系统注入数据为准，缺失时说明查询途径。\\n3. 无法解答时诚实说明，转人工。\",\n      \"knowledge_id\": \"143bca2f-4f5e-4426-a582-e880ae28f478\",\n      \"chunk_index\": 2,\n      \"knowledge_title\": \"05-客服意图标签体系.md\",\n      \"start_at\": 422,\n      \"end_at\": 681,\n      \"seq\": 2,\n      \"score\": 0.013832695462001093,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"bc8f5b49-1301-476a-919e-efd557392f13\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"05-客服意图标签体系.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档详细规定了智能客服系统的意图标签体系及相应的应答规范，旨在通过标准化的分类与处理流程提升客户服务效率与准确性。系统将所有客户消息划分为六大核心意图类别，并针对每类设定了明确的判定标准与应答要点。\\n\\n首先，在订单相关服务方面，“订单查询”涵盖位置、状态及交期询问，要求客服提供实时数据、最新进展及历史平均交付周期；“订单变更”涉及修改交期、数量或地址等需求，需说明变更政策、可改窗口并引导创建工单。其次，财务与服务支持方面，“财务支持”聚焦对账、发票及付款条款，需依据真实结算方式（如月结、定金比例等）作答；“售后报修”针对设备故障与维修请求，应结合案例库提供初步判断、参考方案及备件建议，并提示创建售后工单。此外，“产品咨询”包括机型参数、价格及选型等问题，需基于产品目录的真实成交中位价与周期回答，并注明以正式报价为准；“投诉与建议”则要求先致歉，说明响应机制，并引导客户提供订单号或异常编号以便优先核查。\\n\\n最后，文档确立了通用的应答规范：客服回复须保持专业、友好且简洁，严禁编造具体订单数据。涉及实时信息时，必须以系统注入数据为准，若数据缺失需说明查询途径；对于无法解答的问题，应诚实告知并转接人工服务。这一体系确保了智能客服在处理各类业务场景时的规范性与一致性。\",\n      \"knowledge_base_id\": \"f9730005-3478-4100-8845-d10f762b565e\"\n    },\n    {\n      \"id\": \"402483ab-3dfe-488d-812b-04b336570120\",\n      \"content\": \"## 案例17：加热管不升温（凝珠液体包装机）\\n- 现象：开机后横封加热管不升温。\\n- 原因：加热管烧毁，固态继电器失效。\\n- 方案：更换加热管与固态继电器，复测温升曲线。\\n- 配件：加热管220V/600W×1。\\n- 历史处理：吴涛（华中），停机约 2 小时。\\n\\n## 案例18：真空度不足（自动装盒线）\\n- 现象：取盒真空度不足，掉盒频发。\\n- 原因：真空发生器滤芯堵塞。\\n- 方案：更换真空发生器滤芯，检查管路密封。\\n- 配件：无。\\n- 历史处理：孙悦（华北），停机约 1 小时。\\n\\n## 报修与派单规则\\n- 报修请提供：机型、故障现象、现场照片/视频。\\n- 派单按技能匹配+评分+负载+区域推荐技师。\\n\\n## 技师团队：李建国（华南·封口,制袋,切刀，4.8分）；王强（华南·伺服,电气,驱动，4.9分）；刘志明（华南·电气,PLC,传感器，4.7分）；陈斌（华东·计量,螺杆,泵阀，4.6分）；赵鹏（华东·装盒线,自动化线体，4.9分）；孙悦（华北·贴标,视觉,保养，4.5分）；周敏（西南·封口,气路,膜材，4.4分）；吴涛（华中·电气,变频,接线，4.6分）\\n\\n## 常用备件价格：硅胶压板160 ¥制袋；加热管220V/600W ¥制袋；横封切刀组件 ¥制袋；色标传感器 ¥制袋；真空吸盘组件 ¥装盒；机械密封(泵头) ¥灌装；计量螺杆φ40 ¥计量；伺服电机750W ¥电气；摆线膜卷轴 ¥制袋；成型模硅胶条 ¥制袋\",\n      \"knowledge_id\": \"7b5cbba2-d8a6-495c-bb6a-d081aaf3a85a\",\n      \"chunk_index\": 11,\n      \"knowledge_title\": \"02-售后维修案例库.md\",\n      \"start_at\": 2440,\n      \"end_at\": 2622,\n      \"seq\": 11,\n      \"score\": 0.01217195456325891,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"a90611fb-12f6-43a9-9595-2b92b4dc6f57\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"02-售后维修案例库.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档为一份针对多种包装机械设备的售后维修案例库，系统整理了18个典型故障案例及相关的报修派单规则、技师团队信息和常用备件清单。核心内容涵盖封口、计量、驱动、装盒及贴标等关键环节的故障诊断与处理方案。\\n\\n首先，在封口与膜材处理方面，常见问题包括240螺杆包装机因温度偏低或硅胶压板老化导致的封口漏气，以及颗粒背封包装机因膜卷不对中或色标偏差引起的跑偏褶皱。解决方案涉及更换硅胶压板、调整封口温度至165-175℃、重新对中膜卷及校准传感器。此外，高速圆角背封宠物膏体包装机存在因加热管老化和温控表漂移导致的温度失控问题，需更换加热管并校准PID参数；凝珠液体包装机则可能因模温过高和硅胶条老化导致膜破，需降温并更换配件。\\n\\n其次，在计量与传动控制方面，240螺杆包装机可能出现因螺杆磨损和物料架桥导致的计量波动，需更换螺杆并加装振动器。伺服驱动报警（如E-13过载）通常由电机过载或参数漂移引起，需复查负载并整定增益。变频器过流故障多因加减速时间设置不当或制动电阻接线松脱，通过调整参数和紧固接线解决。同步带跳齿和气缸动作迟滞分别源于皮带松弛和气路密封圈老化，需进行张紧、更换部件及检查气源。\\n\\n最后，文档明确了自动化线体的其他故障，如自动灌装旋盖装盒线的卡盒（吸盘老化）、旋盖不到位（摩擦片磨损），以及PLC通讯中断（线缆干扰）和光电检漏误报（表面污染）。报修流程要求提供机型、现象及影像资料，派单依据技能匹配、评分、负载及区域推荐技师。技师团队按华南、华东、华北、西南、华中分区，具备封口、电气、计量等不同专长。常用备件包括硅胶压板、加热管、切刀组件、传感器及各类密封件等，为快速响应维修提供了资源支持。\",\n      \"knowledge_base_id\": \"facd1c48-1d9b-4ccf-aced-3dce4420234e\"\n    }\n  ],\n  \"_debug_events\": [\n    {\n      \"type\": \"agent_query\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"tool_call\",\n      \"content\": \"Calling tool: query_understand\"\n    },\n    {\n      \"type\": \"tool_result\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"tool_call\",\n      \"content\": \"Calling tool: knowledge_search\"\n    },\n    {\n      \"type\": \"tool_result\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"references\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"[[\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"售后报修|\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"标签]]\\n您好\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"，针对\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"240螺杆\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"包装机封口漏气\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"问题，参考《\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"售后维修案例\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"库》\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"<kb doc=\\\"02-售后维修案例库.md\\\" chunk_id=\\\"f6c75342-1b71-4a24-ac4c-8b249390ab28\\\" kb_id=\\\"f\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"1. **初步\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"判断**：封口\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"温度偏低或硅胶\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"压板老化磨损\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"。\\n2.\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" **处理方案**\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"：更换\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"硅胶压板，\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"将封口温度\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"调整至16\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"5-17\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"5℃后试\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"压复检。\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\\n3. **\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"建议备件**：\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"硅胶压板1\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"60×1\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"。\\n\\n您可创建\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"售后工单安排\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"技师上门（推荐\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"华南李建国或\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"西南周敏）。\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"若为紧急故障\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"，请拨打7×\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"24热线\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" 400\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"-\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"800-\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"9000\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"。\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"complete\",\n      \"content\": \"\"\n    }\n  ],\n  \"session_id\": \"ce7a4660-0e4c-4d01-a85c-cbd8497e12c2\"\n}",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:03:34.518431",
+            "finished_at": null,
+            "id": "6cec19cdc6014a07a5ba0d506729d1f4",
+            "thinking": "很好，第二个测试问题得到了很好的回答。小智正确识别了\"售后报修\"意图，并从《售后维修案例库》中找到了匹配的内容，给出了具体的原因、方案和备件建议。\n\n现在让我继续测试订单查询类和生产相关类的问题。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:03:35.681895",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b37bb9e8fbd83fb9",
+            "input": "{\"agent_id\": \"a56d60fe-1eff-4661-8a6e-d717edc86cf8\", \"knowledge_base_ids\": [\"b861158f-4b89-4715-bada-01d4bed1e40b\", \"facd1c48-1d9b-4ccf-aced-3dce4420234e\", \"f9730005-3478-4100-8845-d10f762b565e\", \"7d8ea66b-bea8-4e08-b72f-1952471a8863\"], \"query\": \"最近订单交期一般多久？\", \"session_id\": \"ce7a4660-0e4c-4d01-a85c-cbd8497e12c2\"}",
+            "name": "weknora__agent_chat",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:03:40.329187",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b37bb9e8fbd83fb9",
+            "metadata": {},
+            "name": "weknora__agent_chat",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:03:40.327294",
+                "finished_at": null,
+                "id": "06d7d0ae4df0461eb92028d23428269b",
+                "text": "{\n  \"answer\": \"[[订单查询|标签]]\\n您好！根据历史真实数据，全部订单从成交到承诺交期的中位数为 45 天（最短 15 天 / 最长 75 天）<kb doc=\\\"03-订单业务真实数据与政策.md\\\" chunk_id=\\\"f5c10139-6b8c-4e85-ba07-10a1cdf96581\\\" kb_id=\\\"f9730005-3478-4100-8845-d10f762b565e\\\" />。\\n\\n具体机型交付周期参考：\\n- **240螺杆包装机**等小立式机型：平均约 45 天<kb doc=\\\"01-产品目录与选型.md\\\" chunk_id=\\\"a1bee434-fb20-44e7-94be-574bd03eea91\\\" kb_id=\\\"b861158f-4b89-4715-bada-01d4bed1e40b\\\" />。\\n- **600六列背封螺杆包装机**等多列机：平均约 30 天<kb doc=\\\"01-产品目录与选型.md\\\" chunk_id=\\\"a1bee434-fb20-44e7-94be-574bd03eea91\\\" kb_id=\\\"b861158f-4b89-4715-bada-01d4bed1e40b\\\" />。\\n- **整线设备**：通常需 40-50 天<kb doc=\\\"01-产品目录与选型.md\\\" chunk_id=\\\"a1bee434-fb20-44e7-94be-574bd03eea91\\\" kb_id=\\\"b861158f-4b89-4715-bada-01d4bed1e40b\\\" />。\\n\\n实际交期受电气件采购等因素影响，建议提供销售订单号（如 SO20251221-0001）以查询实时进度<kb doc=\\\"03-订单业务真实数据与政策.md\\\" chunk_id=\\\"f5c10139-6b8c-4e85-ba07-10a1cdf96581\\\" kb_id=\\\"f9730005-3478-4100-8845-d10f762b565e\\\" />。\",\n  \"references\": [\n    {\n      \"id\": \"f5c10139-6b8c-4e85-ba07-10a1cdf96581\",\n      \"content\": \"# 订单业务数据与交付政策（基于真实数据）\\n\\n统计区间 2025-12 至 2026-09：销售订单 800 笔，合同总金额约 14,299.4 万元。\\n\\n## 月度业绩（真实）\\n| 月份 | 订单数 | 机器订单 | 合同金额 | 出口金额 | 复购率 | 高风险单 |\\n|---|---|---|---|---|---|---|\\n| 2025-12 | 26 | 13 | ¥5,782,400 | ¥1,460,523 | 11.5% | 10 |\\n| 2026-01 | 20 | 12 | ¥6,080,000 | ¥1,114,808 | 10.0% | 11 |\\n| 2026-02 | 31 | 17 | ¥5,237,371 | ¥723,575 | 19.4% | 17 |\\n| 2026-03 | 14 | 11 | ¥5,362,012 | ¥1,908,542 | 14.3% | 2 |\\n| 2026-04 | 19 | 11 | ¥4,533,528 | ¥872,397 | 26.3% | 8 |\\n| 2026-05 | 25 | 19 | ¥6,847,969 | ¥206,243 | 44.0% | 9 |\\n| 2026-06 | 24 | 15 | ¥6,290,357 | ¥1,557,741 | 41.7% | 11 |\\n| 2026-07 | 22 | 14 | ¥6,360,727 | ¥1,787,553 | 68.2% | 10 |\\n| 2026-08 | 16 | 14 | ¥5,989,854 | ¥186,606 | 56.2% | 7 |\\n| 2026-09 | 24 | 16 | ¥6,850,000 | ¥1,319,426 | 50.0% | 11 |\\n\\n## 结算方式（按真实订单分布）\\n- 月结30天：215 单\\n- 验收后付款：205 单\\n- 30%定金+70%尾款：191 单\\n- 30%定金+70%发货前付清：47 单\\n- 全款发货：41 单\\n- 30%预付款+40%到货+30%验收：38 单\\n- 50%定金+50%验收后7天内付清：38 单\\n- 月结45天：25 单\\n\\n## 区域分布（按真实订单）\\n广东 191单、江苏 91单、安徽 62单、阿联酋 46单、浙江 44单、山东 43单、河南 41单、河北 37单、湖北 37单、云南 36单、湖南 29单、印度尼西亚 25单\\n\\n## 订单来源（真实）\\nPDF订单 278单、合同扫描件 247单、微信截图订单 220单、邮件附件订单 55单\\n\\n## 订单状态与交付周期\\n- 状态流转：待确认 → 生产中 → 质检中 → 已发货 → 已交付。\\n- 全部订单成交→承诺交期：中位 45 天（最短 15 / 最长 75 天，样本 800）。\\n- 各机型平均交付周期见《产品目录与选型》。\\n- 系统预测完工与承诺交期存在偏差时标记高风险；常见风险原因：电气件交期偏长等。\\n- 订单查询请提供销售订单号（形如 SO20251221-0001）或合同编号。\\n\\n| 月份 | 订单数 | 机器订单 | 合同金额 | 出口金额 | 复购率 | 高风险单 |\\n|---|---|---|---|---|---|---|\\n| 2026-09 | 24 | 16 | ¥6,850,000 | ¥1,319,426 | 50.0% | 11 |\\n\\n## 结算方式（按真实订单分布）\\n- 月结30天：215 单\\n- 验收后付款：205 单\\n- 30%定金+70%尾款：191 单\\n- 30%定金+70%发货前付清：47 单\\n- 全款发货：41 单\\n- 30%预付款+40%到货+30%验收：38 单\\n- 50%定金+50%验收后7天内付清：38 单\\n- 月结45天：25 单\\n\\n\",\n      \"knowledge_id\": \"06f80655-ac05-4045-afe2-5bffbeb145d9\",\n      \"chunk_index\": 3,\n      \"knowledge_title\": \"03-订单业务真实数据与政策.md\",\n      \"start_at\": 704,\n      \"end_at\": 930,\n      \"seq\": 3,\n      \"score\": 0.01528532608695652,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"4fe1a027-fb40-40e7-97b2-7fbdbc6faf9a\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"03-订单业务真实数据与政策.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档详细记录了2025年12月至2026年9月期间的订单业务数据及交付政策。统计区间内共完成销售订单800笔，合同总金额约为1.43亿元。月度数据显示，各月订单数量在14至31笔之间波动，其中2026年2月订单量最高（31笔），3月最低（14笔）。值得注意的是，复购率呈现显著上升趋势，从初期的10%-11%逐步攀升至后期的50%-68%，表明客户粘性增强；同时，高风险订单数量在各月间存在差异，主要与电气件交期偏长等因素有关。\\n\\n在结算方式上，业务采用多元化策略以平衡现金流与风险。“月结30天”为最普遍的结算模式，涉及215单；其次是“验收后付款”（205单）和“30%定金+70%尾款”（191单）。其他如全款发货、分阶段付款等模式占比相对较小，反映了不同客户群体的信用状况与合作深度。\\n\\n区域分布方面，国内市场需求占据主导地位，广东省以191单位居首位，江苏、安徽紧随其后。海外市场主要集中在阿联酋（46单）和印度尼西亚（25单）。订单来源渠道多样，包括PDF订单、合同扫描件、微信截图及邮件附件，其中PDF和扫描件为主要录入形式。\\n\\n关于交付管理，订单状态遵循“待确认-生产中-质检中-已发货-已交付”的标准流转路径。全部订单从成交到承诺交期的中位数为45天，最短15天，最长75天。系统通过对比预测完工时间与承诺交期来识别高风险订单，并建议查询时提供标准格式的销售订单号或合同编号以便追踪。\",\n      \"knowledge_base_id\": \"f9730005-3478-4100-8845-d10f762b565e\"\n    },\n    {\n      \"id\": \"bc863f3c-ed01-4ffa-8f2b-54c7751d05d1\",\n      \"content\": \"# 智能订单处理流程说明（演示）\\n\\n## 一、流程总览\\n\\n```\\n客户发来订单（微信截图 / PDF / 邮件附件 / 合同扫描件）\\n        ↓\\n① 订单语义解析智能体：OCR + 语义提取 → 品名 / 数量 / 交期 / 客户\\n        ↓\\n② 生成标准化工单：补齐客户信息 → 生成 SO / MO 编号\\n        ↓\\n③ 模板适配智能体：订单判类（食品/医药/宠物/制造/电子/化工）→ 匹配模板（XX模板VN）\\n        ↓\\n④ 输出：标准化工单 + 字段映射表（下游排产/采购使用）\\n```\\n\\n## 二、输入形态\\n\\n- 微信截图为最主要来源（占输入池 622/800）\\n- PDF 订单、邮件附件、合同扫描件次之\\n\\n## 三、关键规则\\n\\n- 编号规则：SO/MO + 接收日期（YYYYMMDD）+ 序号（4 位）\\n- 交期统一格式：YYYY-MM-DD\\n- 判类与模板匹配规则见《模板规则定义》\\n\",\n      \"knowledge_id\": \"61ab7b1b-43d1-4d43-9384-e9874c355850\",\n      \"chunk_index\": 1,\n      \"knowledge_title\": \"订单处理流程说明.md\",\n      \"start_at\": 266,\n      \"end_at\": 418,\n      \"seq\": 1,\n      \"score\": 0.014623655913978493,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {\n        \"process_overrides\": \"map[asr_config:map[enabled:false language: model_id:] chunking_config:map[child_chunk_size:384 chunk_overlap:80 chunk_size:512 enable_parent_child:true parent_chunk_size:4096 separators:[\\n\\n \\n 。 ！ ？ ; ；] strategy:auto] enable_multimodel:false extract_config:map[enabled:false] graph_enabled:false parser_engine_rules:[map[engine:builtin file_types:[md markdown]]] question_generation_config:map[enabled:true question_count:3] vlm_config:map[api_key: base_url: enabled:false interface_type: model_id: model_name:]]\"\n      },\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"f93e7140-213e-4dcb-bfd2-81261dd4110f\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"订单处理流程说明.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档详细说明了智能订单处理流程的运作机制，旨在将非结构化的客户订单转化为标准化的生产工单。整个流程主要包含四个核心阶段：首先，通过“订单语义解析智能体”利用OCR技术和语义提取算法，从原始输入中识别并提取品名、数量、交期及客户信息等关键要素；其次，系统基于提取的信息生成标准化工单，自动补齐缺失的客户资料，并按照特定规则生成SO或MO编号；接着，“模板适配智能体”对订单进行行业分类（涵盖食品、医药、宠物、制造、电子及化工等领域），并据此匹配相应的业务模板；最后，输出包含标准化工单及字段映射表的最终结果，供下游排产和采购环节直接使用。\\n\\n在数据输入方面，微信截图是目前最主要的订单来源，占据了输入池中的绝大多数比例（622/800），而PDF订单、邮件附件以及合同扫描件则作为次要来源存在。为了确保数据处理的一致性和规范性，文档明确了若干关键规则：编号生成遵循“SO/MO + 接收日期（YYYYMMDD）+ 4位序号”的组合逻辑；所有交期信息必须统一格式化为“YYYY-MM-DD”；此外，具体的订单判类标准与模板匹配细节需参照《模板规则定义》执行。这一自动化流程显著提升了从多源异构数据中提取结构化信息的效率，实现了订单处理的标准化与智能化。\",\n      \"knowledge_base_id\": \"f9730005-3478-4100-8845-d10f762b565e\"\n    },\n    {\n      \"id\": \"ba19a5e6-19cc-4b49-a3fd-8e2fb7800ea9\",\n      \"content\": \"# 智能客服意图标签体系与应答规范\\n\\n智能客服对每条客户消息进行意图识别，标签固定为以下六类，判定标准：\\n\\n## 订单查询\\n- 判定：询问订单位置/状态/进度/交期/到货时间。\\n- 示例：\\\"订单在哪？\\\"、\\\"我的货怎么还没到\\\"、\\\"SO20251221-0001 到哪了\\\"、\\\"承诺交期是哪天\\\"。\\n- 应答要点：若有系统实时数据，报当前状态、最新进展、承诺交期、系统预测完工；补充该机型历史平均交付周期。\\n\\n## 订单变更\\n- 判定：修改交期（提前/推迟）、加急、改数量、改地址。\\n- 示例：\\\"能改交期吗？\\\"、\\\"想提前一周交货\\\"。\\n- 应答要点：说明变更政策；如有实时订单数据给出可改窗口；引导创建订单变更工单。\\n\\n## 财务支持\\n- 判定：对账、账期、发票、付款/定金/尾款、收款类型。\\n- 示例：\\\"对账单怎么拉\\\"、\\\"定金比例多少\\\"、\\\"验收款怎么付\\\"。\\n- 应答要点：按真实结算方式分布回答（月结30天/验收后付款/30%定金+70%尾款等）。\\n\\n## 售后报修\\n- 判定：设备故障、报修、维修（封口不严/漏气/跑偏/切不断/计量波动/卡盒/漏液/报警等）。\\n- 应答要点：结合《售后维修案例库》给出初步判断、参考方案、建议备件，提示创建售后工单。\\n\\n## 产品咨询\\n- 判定：机型参数、价格、产能、选型、质保、换产、膜材。\\n- 应答要点：按《产品目录与选型》真实成交中位价与周期回答，价格注明以正式报价为准。\\n\\n## 投诉与建议\\n- 判定：投诉、不满、时效抱怨、改进建议。\\n- 应答要点：先致歉，说明响应机制，引导提供订单号或异常编号（EXxxxx）优先核查。\\n\\n## 应答通用规范\\n1. 专业、友好、简洁；不编造具体订单数据。\\n2. 涉及实时数据以系统注入数据为准，缺失时说明查询途径。\\n3. 无法解答时诚实说明，转人工。\",\n      \"knowledge_id\": \"143bca2f-4f5e-4426-a582-e880ae28f478\",\n      \"chunk_index\": 1,\n      \"knowledge_title\": \"05-客服意图标签体系.md\",\n      \"start_at\": 201,\n      \"end_at\": 422,\n      \"seq\": 1,\n      \"score\": 0.01419776119402985,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"bc8f5b49-1301-476a-919e-efd557392f13\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"05-客服意图标签体系.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档详细规定了智能客服系统的意图标签体系及相应的应答规范，旨在通过标准化的分类与处理流程提升客户服务效率与准确性。系统将所有客户消息划分为六大核心意图类别，并针对每类设定了明确的判定标准与应答要点。\\n\\n首先，在订单相关服务方面，“订单查询”涵盖位置、状态及交期询问，要求客服提供实时数据、最新进展及历史平均交付周期；“订单变更”涉及修改交期、数量或地址等需求，需说明变更政策、可改窗口并引导创建工单。其次，财务与服务支持方面，“财务支持”聚焦对账、发票及付款条款，需依据真实结算方式（如月结、定金比例等）作答；“售后报修”针对设备故障与维修请求，应结合案例库提供初步判断、参考方案及备件建议，并提示创建售后工单。此外，“产品咨询”包括机型参数、价格及选型等问题，需基于产品目录的真实成交中位价与周期回答，并注明以正式报价为准；“投诉与建议”则要求先致歉，说明响应机制，并引导客户提供订单号或异常编号以便优先核查。\\n\\n最后，文档确立了通用的应答规范：客服回复须保持专业、友好且简洁，严禁编造具体订单数据。涉及实时信息时，必须以系统注入数据为准，若数据缺失需说明查询途径；对于无法解答的问题，应诚实告知并转接人工服务。这一体系确保了智能客服在处理各类业务场景时的规范性与一致性。\",\n      \"knowledge_base_id\": \"f9730005-3478-4100-8845-d10f762b565e\"\n    },\n    {\n      \"id\": \"a1bee434-fb20-44e7-94be-574bd03eea91\",\n      \"content\": \"# 产品目录与商务参考（基于真实销售订单 2025.12-2026.09）\\n\\n公司为包装机械制造企业，统计期内共成交 800 笔销售订单，覆盖 220 家企业客户。主力机型如下（价格为成交中位价，周期为成交到承诺交期中位天数）：\\n\\n| 机型 | 类别 | 成交单数 | 成交中位价 | 平均交付周期 |\\n|---|---|---|---|---|\\n| 240螺杆包装机 | 小立式 | 124 | ¥76,943 | 45 天 |\\n| 颗粒背封包装机 | 小立式 | 103 | ¥68,915 | 45 天 |\\n| 高速圆角背封宠物膏体包装机 | 小立式 | 92 | ¥92,070 | 50 天 |\\n| 600六列背封螺杆包装机 | 多列机 | 85 | ¥60,578 | 30 天 |\\n| 圆角磁力泵包装机 | 小立式 | 84 | ¥63,540 | 45 天 |\\n| 自动灌装旋盖装盒线 | 整线 | 75 | ¥62,392 | 45 天 |\\n| 自产圆角磁力泵包装机 | 给袋式 | 22 | ¥359,483 | 35 天 |\\n| 自动装盒线 | 整线 | 14 | ¥417,172 | 40 天 |\\n| 凝珠液体包装机 | 灌装机 | 13 | ¥492,319 | 40 天 |\\n| 高速圆角背封/三边封液体包装机 | 小立式 | 10 | ¥471,030 | 35 天 |\\n| 双列背封颗粒/粉末包装机 | 多列机 | 10 | ¥259,452 | 40 天 |\\n| 口服液自动灌装旋盖装盒线 | 整线 | 8 | ¥370,919 | 50 天 |\\n\\n## 机型选型参考\\n- 螺杆类（240螺杆包装机、600六列背封螺杆包装机）：适合颗粒/粉末产品，多列机产能更高。\\n- 磁力泵/液体类（圆角磁力泵包装机、凝珠液体包装机、高速圆角背封液体包装机）：适合液体/膏体/凝珠。\\n- 整线（自动灌装旋盖装盒线、自动装盒线）：灌装+旋盖+装盒一体化，交付周期相对更长。\\n- 报价以销售工程师正式报价单为准；表中价格为历史成交中位价仅作参考。\\n\\n| 机型 | 类别 | 成交单数 | 成交中位价 | 平均交付周期 |\\n|---|---|---|---|---|\\n| 高速圆角背封/三边封液体包装机 | 小立式 | 10 | ¥471,030 | 35 天 |\\n| 双列背封颗粒/粉末包装机 | 多列机 | 10 | ¥259,452 | 40 天 |\\n| 口服液自动灌装旋盖装盒线 | 整线 | 8 | ¥370,919 | 50 天 |\\n\\n\",\n      \"knowledge_id\": \"3f4d9fb7-e13d-4a3b-9704-5ee6b9d627ee\",\n      \"chunk_index\": 2,\n      \"knowledge_title\": \"01-产品目录与选型.md\",\n      \"start_at\": 553,\n      \"end_at\": 693,\n      \"seq\": 2,\n      \"score\": 0.010606060606060605,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"bcdd7083-6f8e-46be-9d03-f0129226e30f\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"01-产品目录与选型.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档为一家包装机械制造企业的产品目录与商务参考，基于2025年12月至2026年9月期间的800笔真实销售订单数据编制，覆盖220家企业客户。文档核心内容围绕主力机型的成交统计、价格分布及选型建议展开。\\n\\n首先，文档详细列出了各类主力机型的关键指标，包括成交单数、成交中位价及平均交付周期。其中，小立式包装机是成交最活跃的类别，如“240螺杆包装机”和“颗粒背封包装机”分别成交124单和103单，中位价在7万元左右，交付周期均为45天；而“高速圆角背封宠物膏体包装机”虽单价较高（约9.2万元），但仍有92单的成交量。多列机方面，“600六列背封螺杆包装机”以较低的单价（约6万元）和较短的交付周期（30天）获得了85单的成交。值得注意的是，部分高端或整线设备虽然成交单数较少，但单价显著更高，例如“凝珠液体包装机”中位价接近50万元，“自动装盒线”超过41万元，“自产圆角磁力泵包装机”约为36万元，这类设备的交付周期通常在35至40天之间。\\n\\n其次，文档提供了具体的机型选型参考指南。针对颗粒或粉末类产品，推荐选用螺杆类包装机，其中多列机具备更高的产能优势；对于液体、膏体或凝珠类产品，则建议选择磁力泵或专用液体包装机。若客户需要灌装、旋盖及装盒的一体化解决方案，应优先考虑整线设备，但需注意其交付周期相对较长。最后，文档特别强调，表中所示价格仅为历史成交中位价，仅供商务参考，实际交易报价需以销售工程师出具的正式报价单为准。\",\n      \"knowledge_base_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\"\n    },\n    {\n      \"id\": \"e8cc2ba8-c94d-40f9-bc63-f30c7892fbb0\",\n      \"content\": \"| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\\n| EX0031 | KV20260228060A | 河南优谷鸿辰医药科技有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202507-56 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 减免运费 | 待回访 |\\n| EX0032 | KL20260213064 | 浙江康莱康莱健康科技有限公司 | 延期+投诉 | 是 | 现场调试进度反馈 | CASE-202510-10 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 优先排产 | 处理中 |\\n| EX0033 | KV20260223065A | 广东丰泽盛泽健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202418-24 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 延长质保1个月 | 已关闭 |\\n| EX0034 | KL20260205067 | 江苏康宁博恩健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202473-69 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 待回访 |\\n| EX0035 | 20260221 | Afra Group LLC | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202483-51 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 减免运费 | 已关闭 |\\n| EX0036 | 20260225 | 山东优谷逸品包装材料有限公司 | 投诉 | 否 | 现场调试进度反馈 | CASE-202455-10 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 优先排产 | 已关闭 |\\n| EX0037 | 信保无合同18368 | 广东康莱合昌食品有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202497-87 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 减免运费 | 已关闭 |\\n| EX0038 | 信保无合同40419 | 江苏佰特诚益生物科技有限公司 | 延期+投诉 | 是 | 现场调试进度反馈 | CASE-202447-37 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 处理中 |\\n| EX0039 | KL20260227076 | marcos S.A. | 延期 | 否 | 现场调试进度反馈 | CASE-202443-14 | 已同步工程与跟单团队，2小时内给出书面方案。 | 减免运费 | 已关闭 |\\n| EX0040 | 20260325 | 广东丰泽维康电子材料有限公司 | 延期+投诉 | 是 | 到货安装时间协调 | CASE-202496-54 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 补发备用配件 | 处理中 |\\n| EX0041 | KL20260325082 | 广东金瑞康莱营养科技有限公司 | 延期+投诉 | 是 | 包装形式临时调整 | CASE-202474-22 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 赠送一套易损件 | 已关闭 |\\n| EX0042 | KL20260318083 | 浙江优谷佰特健康科技有限公司 | 配置变更 | 否 | 到货安装时间协调 | CASE-202422-26 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 安排工程师驻场支持 | 已关闭 |\\n| EX0043 | KL20260312087 | duanex LLC | 延期+投诉 | 是 | 到货安装时间协调 | CASE-202435-93 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 安排工程师驻场支持 | 待回访 |\\n| EX0044 | 信保无合同16195 | duanex Co.,Ltd. | 投诉 | 否 | 到货安装时间协调 | CASE-202443-71 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 已关闭 |\\n| EX0045 | KL20260419094 | 湖北诚益华盛精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202446-27 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 待回访 |\\n| EX0046 | KL20260425095 | Afra Group Co.,Ltd. | 付款异常 | 否 | 标签内容待确认 | CASE-202430-72 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 待回访 |\\n| EX0047 | 20260410 | 江苏和泰德元营养科技有限公司 | 延期+投诉 | 是 | 标签内容待确认 | CASE-202464-90 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 已关闭 |\\n| EX0048 | KL20260411101 | 浙江泰启瑞丰营养科技有限公司 | 延期 | 否 | 现场调试进度反馈 | CASE-202446-75 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 减免运费 | 处理中 |\\n| EX0049 | 20260416 | 广东安润瑞丰精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202408-21 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 已关闭 |\\n| EX0050 | KL20260403105 | 广东佰特品润食品有限公司 | 延期 | 否 | 到货安装时间协调 | CASE-202505-77 | 已同步工程与跟单团队，2小时内给出书面方案。 | 补发备用配件 | 已关闭 |\\n| EX0051 | 信保无合同81205 | 广东恒品润泽包装材料有限公司 | 配置变更 | 否 | 包装形式临时调整 | CASE-202402-56 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 赠送一套易损件 | 待回访 |\\n| EX0052 | 20260426 | 四川康莱泰启电子材料有限公司 | 配置变更 | 否 | 到货安装时间协调 | CASE-202401-84 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 安排工程师驻场支持 | 待回访 |\\n| EX0053 | KL20260504112 | 浙江海誉正合生物科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202488-68 | 已同步工程与跟单团队，2小时内给出书面方案。 | 补发备用配件 | 处理中 |\\n| EX0054 | 20260525 | 河北维康佰特电子材料有限公司 | 延期 | 否 | 发票开具信息变更 | CASE-202505-11 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 待回访 |\\n| EX0055 | 20260503 | YAM AGRO Co.,Ltd. | 延期 | 否 | 包装形式临时调整 | CASE-202438-65 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 减免运费 | 待回访 |\\n| EX0056 | 20260509 | 江苏优谷诚益电子材料有限公司 | 延期+投诉 | 是 | 标签内容待确认 | CASE-202485-86 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 安排工程师驻场支持 | 处理中 |\\n| EX0057 | KV20260508126A | 云南品润正合健康科技有限公司 | 投诉 | 否 | 到货安装时间协调 | CASE-202447-11 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 处理中 |\\n| EX0058 | kl20260513128 | 广东安润品润食品有限公司 | 延期+投诉 | 是 | 标签内容待确认 | CASE-202453-21 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 优先排产 | 待回访 |\\n| EX0059 | KL20260508133 | 广东海誉正合包装材料有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202504-82 | 已同步工程与跟单团队，2小时内给出书面方案。 | 赠送一套易损件 | 待回访 |\\n| EX0060 | KL20260503134 | 广东润泽泰启包装材料有限公司 | 配置变更 | 否 | 现场调试进度反馈 | CASE-202401-82 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 已关闭 |\\n\\n| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\\n| EX0033 | KV20260223065A | 广东丰泽盛泽健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202418-24 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 延长质保1个月 | 已关闭 |\\n\",\n      \"knowledge_id\": \"09eb36b0-a312-42d8-a803-abd3ca968dc0\",\n      \"chunk_index\": 34,\n      \"knowledge_title\": \"订单数据-异常处理流程自动化.md\",\n      \"start_at\": 4270,\n      \"end_at\": 4398,\n      \"seq\": 34,\n      \"score\": 0.0049180327868852455,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"3c3bb4e0-4390-4c66-bdb6-facd36655b0b\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"订单数据-异常处理流程自动化.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档展示了金汉隆订单数据模型中的异常处理流程自动化机制，核心内容是一份包含数十条记录的异常事件明细表。表格详细列出了每个异常事件的编号、关联合同号、客户名称（涵盖国内食品、医药、包装企业及海外公司）、事件类型、是否复合事件、具体投诉或异常内容、对应的历史案例编号、系统推荐的沟通话术及补偿方案，以及当前的处理状态。\\n\\n主要关键信息点如下：\\n1. **异常类型多样化**：记录的事件类型主要包括“延期”、“投诉”、“付款异常”和“配置变更”，其中大量条目被标记为“延期+投诉”的复合事件，表明此类情况在业务中较为常见且需重点处理。\\n2. **具体问题场景**：投诉或异常内容涉及发票开具信息变更、包装形式临时调整、到货安装时间协调、客户催交、标签内容待确认以及现场调试进度反馈等实际业务痛点。\\n3. **标准化应对策略**：系统根据历史案例自动推荐标准化的沟通话术，如“已调整排产并安排专人跟进”、“锁定产线资源”或“同步工程与跟单团队给出书面方案”。同时，提供具体的补偿方案建议，包括优先排产、延长质保、赠送易损件、补发备用配件、减免运费或安排工程师驻场支持。\\n4. **流程状态管理**：每条记录均标注了当前状态，分为“处理中”、“待回访”和“已关闭”，体现了异常处理的全生命周期跟踪。部分后期记录显示针对“客户催交”类复合事件，统一采用“优先排产”作为补偿方案，并由项目负责人跟进。\\n\\n总体而言，该文档通过结构化的数据模型，实现了从异常识别、历史案例匹配到沟通与补偿方案推荐的自动化闭环管理，旨在提升对客户投诉和订单异常的响应效率与服务规范性。\",\n      \"knowledge_base_id\": \"f9730005-3478-4100-8845-d10f762b565e\"\n    }\n  ],\n  \"_debug_events\": [\n    {\n      \"type\": \"agent_query\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"tool_call\",\n      \"content\": \"Calling tool: query_understand\"\n    },\n    {\n      \"type\": \"tool_result\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"tool_call\",\n      \"content\": \"Calling tool: knowledge_search\"\n    },\n    {\n      \"type\": \"tool_result\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"references\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"[[\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"订单查询|标签\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"]]\\n您好！\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"根据历史\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"真实数据，全部\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"订单\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"从成交到承诺\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"交期的中位\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"数为 45\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" 天（最短\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" 15\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" 天 / \"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"最长 7\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"5 天）\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"<kb doc=\\\"03-订单业务真实数据与政策.md\\\" chunk_id=\\\"f5c10139-6b8c-4e85-ba07-10a1cdf96581\\\" kb_i\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\\n\\n具体机型交付\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"周期参考：\\n\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"- **\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"240螺杆\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"包装机**等小\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"立式机型：\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"平均约 4\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"5 \"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"天\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"<kb doc=\\\"01-产品目录与选型.md\\\" chunk_id=\\\"a1bee434-fb20-44e7-94be-574bd03eea91\\\" kb_id=\\\"b\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"。\\n- **\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"600六\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"列背封螺杆\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"包装机**等多列\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"机：平均\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"约 30\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" 天\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"<kb doc=\\\"01-产品目录与选型.md\\\" chunk_id=\\\"a1bee434-fb20-44e7-94be-574bd03eea91\\\" kb_id=\\\"b\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" **整线设备\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"**：通常需\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" 40-\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"50 天\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"<kb doc=\\\"01-产品目录与选型.md\\\" chunk_id=\\\"a1bee434-fb20-44e7-94be-574bd03eea91\\\" kb_id=\\\"b\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\\n\\n实际交期受\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"电气件采购等因素\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"影响，建议提供\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"销售订单号（\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"如\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" SO202\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"5122\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"1-\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"0001\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"）以查询实时\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"进度\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"<kb doc=\\\"03-订单业务真实数据与政策.md\\\" chunk_id=\\\"f5c10139-6b8c-4e85-ba07-10a1cdf96581\\\" kb_i\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"complete\",\n      \"content\": \"\"\n    }\n  ],\n  \"session_id\": \"ce7a4660-0e4c-4d01-a85c-cbd8497e12c2\"\n}",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:03:49.560306",
+            "finished_at": null,
+            "id": "4de9306d6a1045e38139a9df9c8e4bec",
+            "thinking": "很好，第三个测试问题也得到了很好的回答。小智正确识别了\"订单查询\"意图，并从《订单业务真实数据与政策.md》和《产品目录与选型.md》中找到了相关的数据，给出了准确的回答。\n\n现在让我测试最后一个问题，关于生产知识库（空库）的问题，预期会fallback。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:03:50.457518",
+            "finished_at": null,
+            "id": "chatcmpl-tool-922a4ff066110ea1",
+            "input": "{\"agent_id\": \"a56d60fe-1eff-4661-8a6e-d717edc86cf8\", \"knowledge_base_ids\": [\"b861158f-4b89-4715-bada-01d4bed1e40b\", \"facd1c48-1d9b-4ccf-aced-3dce4420234e\", \"f9730005-3478-4100-8845-d10f762b565e\", \"7d8ea66b-bea8-4e08-b72f-1952471a8863\"], \"query\": \"生产知识库有哪些内容？\", \"session_id\": \"ce7a4660-0e4c-4d01-a85c-cbd8497e12c2\"}",
+            "name": "weknora__agent_chat",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:04:04.022404",
+            "finished_at": null,
+            "id": "chatcmpl-tool-922a4ff066110ea1",
+            "metadata": {},
+            "name": "weknora__agent_chat",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:04.021043",
+                "finished_at": null,
+                "id": "a94fb9c1d2294a4c82a014c89dc14ae7",
+                "text": "{\n  \"answer\": \"[[产品咨询|标签]]\\n您好！知识库中未收录“240螺杆包装机”的具体价格，需以正式报价单为准。\\n\\n关于设备选型与参数，可参考《金汉隆包装机画册》中的给袋式包装机系列<kb doc=\\\"金汉隆包装机画册2025版_16.pdf\\\" chunk_id=\\\"e5228834-e2ce-4434-be03-a5afce008c32\\\" kb_id=\\\"b861158f-4b89-4715-bada-01d4bed1e40b\\\" />：\\n- **旋转给袋式**：型号200/250/350，包装速度10-70包/分钟。\\n- **水平给袋式**：型号180/210/260，包装速度20-35包/分钟。\\n\\n![金汉隆包装机画册2025版_16_page_1.jpg](resource://Y-d0TriMUiA0C7uBGzNA4A)\\n\\n如需获取240螺杆机型的精准报价或技术参数，建议联系人工客服（400-800-9000）或提供具体需求以便转接销售专员。\",\n  \"references\": [\n    {\n      \"id\": \"1d4623a9-6488-4a5c-b3eb-a480e28c750b\",\n      \"content\": \"# 订单业务数据与交付政策（基于真实数据）\\n\\n统计区间 2025-12 至 2026-09：销售订单 800 笔，合同总金额约 14,299.4 万元。\\n\\n## 月度业绩（真实）\\n| 月份 | 订单数 | 机器订单 | 合同金额 | 出口金额 | 复购率 | 高风险单 |\\n|---|---|---|---|---|---|---|\\n| 2025-12 | 26 | 13 | ¥5,782,400 | ¥1,460,523 | 11.5% | 10 |\\n| 2026-01 | 20 | 12 | ¥6,080,000 | ¥1,114,808 | 10.0% | 11 |\\n| 2026-02 | 31 | 17 | ¥5,237,371 | ¥723,575 | 19.4% | 17 |\\n| 2026-03 | 14 | 11 | ¥5,362,012 | ¥1,908,542 | 14.3% | 2 |\\n| 2026-04 | 19 | 11 | ¥4,533,528 | ¥872,397 | 26.3% | 8 |\\n| 2026-05 | 25 | 19 | ¥6,847,969 | ¥206,243 | 44.0% | 9 |\\n| 2026-06 | 24 | 15 | ¥6,290,357 | ¥1,557,741 | 41.7% | 11 |\\n| 2026-07 | 22 | 14 | ¥6,360,727 | ¥1,787,553 | 68.2% | 10 |\\n| 2026-08 | 16 | 14 | ¥5,989,854 | ¥186,606 | 56.2% | 7 |\\n| 2026-09 | 24 | 16 | ¥6,850,000 | ¥1,319,426 | 50.0% | 11 |\\n\\n## 结算方式（按真实订单分布）\\n- 月结30天：215 单\\n- 验收后付款：205 单\\n- 30%定金+70%尾款：191 单\\n- 30%定金+70%发货前付清：47 单\\n- 全款发货：41 单\\n- 30%预付款+40%到货+30%验收：38 单\\n- 50%定金+50%验收后7天内付清：38 单\\n- 月结45天：25 单\\n\\n## 区域分布（按真实订单）\\n广东 191单、江苏 91单、安徽 62单、阿联酋 46单、浙江 44单、山东 43单、河南 41单、河北 37单、湖北 37单、云南 36单、湖南 29单、印度尼西亚 25单\\n\\n## 订单来源（真实）\\nPDF订单 278单、合同扫描件 247单、微信截图订单 220单、邮件附件订单 55单\\n\\n## 订单状态与交付周期\\n- 状态流转：待确认 → 生产中 → 质检中 → 已发货 → 已交付。\\n- 全部订单成交→承诺交期：中位 45 天（最短 15 / 最长 75 天，样本 800）。\\n- 各机型平均交付周期见《产品目录与选型》。\\n- 系统预测完工与承诺交期存在偏差时标记高风险；常见风险原因：电气件交期偏长等。\\n- 订单查询请提供销售订单号（形如 SO20251221-0001）或合同编号。\",\n      \"knowledge_id\": \"06f80655-ac05-4045-afe2-5bffbeb145d9\",\n      \"chunk_index\": 4,\n      \"knowledge_title\": \"03-订单业务真实数据与政策.md\",\n      \"start_at\": 930,\n      \"end_at\": 1293,\n      \"seq\": 4,\n      \"score\": 1,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"4fe1a027-fb40-40e7-97b2-7fbdbc6faf9a\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"03-订单业务真实数据与政策.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档详细记录了2025年12月至2026年9月期间的订单业务数据及交付政策。统计区间内共完成销售订单800笔，合同总金额约为1.43亿元。月度数据显示，各月订单数量在14至31笔之间波动，其中2026年2月订单量最高（31笔），3月最低（14笔）。值得注意的是，复购率呈现显著上升趋势，从初期的10%-11%逐步攀升至后期的50%-68%，表明客户粘性增强；同时，高风险订单数量在各月间存在差异，主要与电气件交期偏长等因素有关。\\n\\n在结算方式上，业务采用多元化策略以平衡现金流与风险。“月结30天”为最普遍的结算模式，涉及215单；其次是“验收后付款”（205单）和“30%定金+70%尾款”（191单）。其他如全款发货、分阶段付款等模式占比相对较小，反映了不同客户群体的信用状况与合作深度。\\n\\n区域分布方面，国内市场需求占据主导地位，广东省以191单位居首位，江苏、安徽紧随其后。海外市场主要集中在阿联酋（46单）和印度尼西亚（25单）。订单来源渠道多样，包括PDF订单、合同扫描件、微信截图及邮件附件，其中PDF和扫描件为主要录入形式。\\n\\n关于交付管理，订单状态遵循“待确认-生产中-质检中-已发货-已交付”的标准流转路径。全部订单从成交到承诺交期的中位数为45天，最短15天，最长75天。系统通过对比预测完工时间与承诺交期来识别高风险订单，并建议查询时提供标准格式的销售订单号或合同编号以便追踪。\",\n      \"knowledge_base_id\": \"f9730005-3478-4100-8845-d10f762b565e\"\n    },\n    {\n      \"id\": \"f104e7a8-0ba6-40b0-b140-0a77081bcfae\",\n      \"content\": \"| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\\n| EX0061 | 信保无合同78205 | 广东润泽泰启包装材料有限公司 | 延期+投诉 | 是 | 包装形式临时调整 | CASE-202472-15 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 处理中 |\\n| EX0062 | KL20260613138 | 广东博恩维康营养科技有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202433-69 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 待回访 |\\n| EX0063 | kl20260628139 | 广东润泽新禾电子材料有限公司 | 付款异常 | 否 | 包装形式临时调整 | CASE-202476-62 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 待回访 |\\n| EX0064 | KL20260601143 | 广东丰泽维康电子材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202460-16 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 待回访 |\\n| EX0065 | KL20260602147 | 河南优谷品润营养科技有限公司 | 配置变更 | 否 | 发票开具信息变更 | CASE-202461-14 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 已关闭 |\\n| EX0066 | 20260605 | 湖南金瑞海誉营养科技有限公司 | 付款异常 | 否 | 现场调试进度反馈 | CASE-202423-17 | 已同步工程与跟单团队，2小时内给出书面方案。 | 延长质保1个月 | 处理中 |\\n| EX0067 | 20260606 | 广东丰泽盛泽健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202412-62 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 安排工程师驻场支持 | 待回访 |\\n| EX0068 | kl20260613150 | 广东金瑞新禾健康科技有限公司 | 延期+投诉 | 是 | 现场调试进度反馈 | CASE-202489-68 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 优先排产 | 已关闭 |\\n| EX0069 | kl20260623153 | BG Pack GmbH | 付款异常 | 否 | 标签内容待确认 | CASE-202512-42 | 已同步工程与跟单团队，2小时内给出书面方案。 | 安排工程师驻场支持 | 已关闭 |\\n| EX0070 | 20260611 | 安徽博恩品润健康科技有限公司 | 配置变更 | 否 | 客户催交 | CASE-202488-14 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 减免运费 | 待回访 |\\n| EX0071 | kl20260623155 | 山东泰启泰启医药科技有限公司 | 付款异常 | 否 | 到货安装时间协调 | CASE-202459-86 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 处理中 |\\n| EX0072 | KV20260625156A | 江苏康莱康宁电子材料有限公司 | 延期 | 否 | 包装形式临时调整 | CASE-202510-16 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 优先排产 | 待回访 |\\n| EX0073 | 20260618 | 安徽逸品博恩精细化工有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202424-87 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 减免运费 | 处理中 |\\n| EX0074 | KL20260713160 | 广东和泰和泰健康科技有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202412-82 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 赠送一套易损件 | 待回访 |\\n| EX0075 | KL20260724162 | KV Nutrition LLC | 延期 | 否 | 发票开具信息变更 | CASE-202418-26 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 赠送一套易损件 | 处理中 |\\n| EX0076 | KL20260712163 | 安徽维康明硕健康科技有限公司 | 投诉 | 否 | 包装形式临时调整 | CASE-202447-77 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 补发备用配件 | 处理中 |\\n| EX0077 | KL20260713164 | 河北金瑞维康生物科技有限公司 | 延期+投诉 | 是 | 包装形式临时调整 | CASE-202439-86 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 已关闭 |\\n| EX0078 | KV20260701165A | 江苏海誉康莱包装材料有限公司 | 延期 | 否 | 发票开具信息变更 | CASE-202473-60 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 延长质保1个月 | 处理中 |\\n| EX0079 | KV20260702169A | 广东恒品瑞丰健康科技有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202412-90 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 处理中 |\\n| EX0080 | KL20260710170 | 广东锦华和泰包装材料有限公司 | 投诉 | 否 | 包装形式临时调整 | CASE-202470-74 | 已同步工程与跟单团队，2小时内给出书面方案。 | 延长质保1个月 | 处理中 |\\n| EX0081 | kl20260717171 | 河南德元明硕电子材料有限公司 | 延期 | 否 | 到货安装时间协调 | CASE-202466-96 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 安排工程师驻场支持 | 已关闭 |\\n| EX0082 | 信保无合同90773 | duanex Trading | 配置变更 | 否 | 到货安装时间协调 | CASE-202424-91 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 延长质保1个月 | 已关闭 |\\n| EX0083 | KL20260706177 | 湖北丰泽华盛生物科技有限公司 | 投诉 | 否 | 标签内容待确认 | CASE-202421-36 | 结合历史相似项目，建议先确认替代配置，可缩短3-5天。 | 补发备用配件 | 待回访 |\\n| EX0084 | KL20260728181 | Serge LLC | 投诉 | 否 | 到货安装时间协调 | CASE-202412-61 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 延长质保1个月 | 已关闭 |\\n| EX0085 | KL20260805182 | Global Nutra Trading | 配置变更 | 否 | 客户催交 | CASE-202403-11 | 已同步工程与跟单团队，2小时内给出书面方案。 | 补发备用配件 | 处理中 |\\n| EX0086 | 20260804 | 四川德元博恩食品有限公司 | 配置变更 | 否 | 包装形式临时调整 | CASE-202450-86 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 延长质保1个月 | 待回访 |\\n| EX0087 | KL20260803186 | 江苏金瑞和泰精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-202448-30 | 已同步工程与跟单团队，2小时内给出书面方案。 | 优先排产 | 待回访 |\\n| EX0088 | kl20260807190 | 江苏和泰诚益食品有限公司 | 延期 | 否 | 到货安装时间协调 | CASE-202485-33 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 赠送一套易损件 | 待回访 |\\n| EX0089 | kl20260803191 | 河南品润诚益食品有限公司 | 配置变更 | 否 | 到货安装时间协调 | CASE-202444-28 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 补发备用配件 | 处理中 |\\n| EX0090 | KL20260828192 | 四川康宁康宁生物科技有限公司 | 延期+投诉 | 是 | 发票开具信息变更 | CASE-202449-57 | 您好，当前已为您锁定产线资源，今天18点前反馈节点进度。 | 补发备用配件 | 已关闭 |\\n\\n| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\\n| EX0089 | kl20260803191 | 河南品润诚益食品有限公司 | 配置变更 | 否 | 到货安装时间协调 | CASE-202444-28 | 目前延迟原因已确认，我们已调整排产并安排专人跟进。 | 补发备用配件 | 处理中 |\\n\",\n      \"knowledge_id\": \"09eb36b0-a312-42d8-a803-abd3ca968dc0\",\n      \"chunk_index\": 62,\n      \"knowledge_title\": \"订单数据-异常处理流程自动化.md\",\n      \"start_at\": 7597,\n      \"end_at\": 7740,\n      \"seq\": 62,\n      \"score\": 1,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"e9813234-8da4-4c8b-9b79-ebcc4e73166d\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"订单数据-异常处理流程自动化.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档展示了金汉隆订单数据模型中的异常处理流程自动化机制，核心内容是一份包含数十条记录的异常事件明细表。表格详细列出了每个异常事件的编号、关联合同号、客户名称（涵盖国内食品、医药、包装企业及海外公司）、事件类型、是否复合事件、具体投诉或异常内容、对应的历史案例编号、系统推荐的沟通话术及补偿方案，以及当前的处理状态。\\n\\n主要关键信息点如下：\\n1. **异常类型多样化**：记录的事件类型主要包括“延期”、“投诉”、“付款异常”和“配置变更”，其中大量条目被标记为“延期+投诉”的复合事件，表明此类情况在业务中较为常见且需重点处理。\\n2. **具体问题场景**：投诉或异常内容涉及发票开具信息变更、包装形式临时调整、到货安装时间协调、客户催交、标签内容待确认以及现场调试进度反馈等实际业务痛点。\\n3. **标准化应对策略**：系统根据历史案例自动推荐标准化的沟通话术，如“已调整排产并安排专人跟进”、“锁定产线资源”或“同步工程与跟单团队给出书面方案”。同时，提供具体的补偿方案建议，包括优先排产、延长质保、赠送易损件、补发备用配件、减免运费或安排工程师驻场支持。\\n4. **流程状态管理**：每条记录均标注了当前状态，分为“处理中”、“待回访”和“已关闭”，体现了异常处理的全生命周期跟踪。部分后期记录显示针对“客户催交”类复合事件，统一采用“优先排产”作为补偿方案，并由项目负责人跟进。\\n\\n总体而言，该文档通过结构化的数据模型，实现了从异常识别、历史案例匹配到沟通与补偿方案推荐的自动化闭环管理，旨在提升对客户投诉和订单异常的响应效率与服务规范性。\",\n      \"knowledge_base_id\": \"f9730005-3478-4100-8845-d10f762b565e\"\n    },\n    {\n      \"id\": \"09302aac-efb3-49bc-b142-54c55f5c6af3\",\n      \"content\": \"| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\\n| EX00390 | KL202607230390 | 广东海誉康莱包装材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-390 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00398 | KL202609180398 | duanex Trading | 延期+投诉 | 是 | 客户催交 | CASE-398 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00406 | KL202601310406 | 浙江丰泽博恩精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-406 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00409 | KL202604170409 | 广东丰泽维康电子材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-409 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00413 | KL202603010413 | 江苏优谷源本健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-413 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00425 | KL202605310425 | 河南德元明硕电子材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-425 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00441 | KL202602170441 | 广东合昌正合包装材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-441 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00448 | KL202607020448 | Serge LLC | 延期+投诉 | 是 | 客户催交 | CASE-448 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00458 | KL202512130458 | 湖北诚益华盛精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-458 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00483 | KL202609230483 | 安徽和泰鸿辰健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-483 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00514 | KL202606030514 | 江苏诚益金瑞包装材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-514 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00524 | KL202605080524 | 江苏力行诚益食品有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-524 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00533 | KL202604290533 | 安徽明硕合昌医药科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-533 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00538 | KL202602040538 | 江苏诚益金瑞包装材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-538 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00539 | KL202606220539 | YAM AGRO Co.,Ltd. | 延期+投诉 | 是 | 客户催交 | CASE-539 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00545 | KL202605210545 | KL Joy Trading LLC | 延期+投诉 | 是 | 客户催交 | CASE-545 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00556 | KL202609020556 | 浙江海誉康宁包装材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-556 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00559 | KL202512080559 | 湖南瑞丰锦华食品有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-559 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00573 | KL202609140573 | 广东金瑞康宁精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-573 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00576 | KL202608270576 | 广东海誉康莱包装材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-576 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00580 | KL202608070580 | Global Nutra Co.,Ltd. | 延期+投诉 | 是 | 客户催交 | CASE-580 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00587 | KL202512250587 | 广东海誉源本生物科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-587 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00590 | KL202607300590 | YAM AGRO FZE | 延期+投诉 | 是 | 客户催交 | CASE-590 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00608 | KL202608290608 | KV Nutrition Trading | 延期+投诉 | 是 | 客户催交 | CASE-608 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00638 | KL202607080638 | 安徽瑞丰正合包装材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-638 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00639 | KL202607280639 | 云南丰泽和泰精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-639 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00649 | KL202607240649 | 湖南金瑞海誉营养科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-649 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00661 | KL202607020661 | 山东合昌海誉生物科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-661 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00669 | KL202608070669 | 安徽博恩品润健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-669 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00673 | KL202606270673 | Serge Co.,Ltd. | 延期+投诉 | 是 | 客户催交 | CASE-673 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00683 | KL202605030683 | 云南润泽逸品生物科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-683 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00684 | KL202609120684 | 安徽德元瑞丰营养科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-684 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00685 | KL202512210685 | 广东康莱合昌食品有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-685 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00690 | KL202602120690 | marcos S.A. | 延期+投诉 | 是 | 客户催交 | CASE-690 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00697 | KL202512200697 | 江苏康宁合昌营养科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-697 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n\\n| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\\n| EX00458 | KL202512130458 | 湖北诚益华盛精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-458 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n\",\n      \"knowledge_id\": \"09eb36b0-a312-42d8-a803-abd3ca968dc0\",\n      \"chunk_index\": 135,\n      \"knowledge_title\": \"订单数据-异常处理流程自动化.md\",\n      \"start_at\": 16083,\n      \"end_at\": 16190,\n      \"seq\": 135,\n      \"score\": 1,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"a13e2b65-6354-489e-875b-ff855fccae8b\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"订单数据-异常处理流程自动化.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档展示了金汉隆订单数据模型中的异常处理流程自动化机制，核心内容是一份包含数十条记录的异常事件明细表。表格详细列出了每个异常事件的编号、关联合同号、客户名称（涵盖国内食品、医药、包装企业及海外公司）、事件类型、是否复合事件、具体投诉或异常内容、对应的历史案例编号、系统推荐的沟通话术及补偿方案，以及当前的处理状态。\\n\\n主要关键信息点如下：\\n1. **异常类型多样化**：记录的事件类型主要包括“延期”、“投诉”、“付款异常”和“配置变更”，其中大量条目被标记为“延期+投诉”的复合事件，表明此类情况在业务中较为常见且需重点处理。\\n2. **具体问题场景**：投诉或异常内容涉及发票开具信息变更、包装形式临时调整、到货安装时间协调、客户催交、标签内容待确认以及现场调试进度反馈等实际业务痛点。\\n3. **标准化应对策略**：系统根据历史案例自动推荐标准化的沟通话术，如“已调整排产并安排专人跟进”、“锁定产线资源”或“同步工程与跟单团队给出书面方案”。同时，提供具体的补偿方案建议，包括优先排产、延长质保、赠送易损件、补发备用配件、减免运费或安排工程师驻场支持。\\n4. **流程状态管理**：每条记录均标注了当前状态，分为“处理中”、“待回访”和“已关闭”，体现了异常处理的全生命周期跟踪。部分后期记录显示针对“客户催交”类复合事件，统一采用“优先排产”作为补偿方案，并由项目负责人跟进。\\n\\n总体而言，该文档通过结构化的数据模型，实现了从异常识别、历史案例匹配到沟通与补偿方案推荐的自动化闭环管理，旨在提升对客户投诉和订单异常的响应效率与服务规范性。\",\n      \"knowledge_base_id\": \"f9730005-3478-4100-8845-d10f762b565e\"\n    },\n    {\n      \"id\": \"ec7375ab-e75c-43da-a8b2-791450c815b9\",\n      \"content\": \"| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\\n| EX00710 | KL202512100710 | 江苏诚益金瑞包装材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-710 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00715 | KL202605190715 | 江苏诚益逸品包装材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-715 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00722 | KL202607120722 | 云南丰泽和泰精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-722 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00726 | KL202604250726 | 浙江品润泰启医药科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-726 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00735 | KL202601200735 | BG Pack FZE | 延期+投诉 | 是 | 客户催交 | CASE-735 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00740 | KL202602040740 | 江苏源本品润健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-740 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00752 | KL202608080752 | Serge Trading | 延期+投诉 | 是 | 客户催交 | CASE-752 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00759 | KL202607130759 | 安徽泰启麦禾营养科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-759 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00760 | KL202608220760 | YAM AGRO Trading | 延期+投诉 | 是 | 客户催交 | CASE-760 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00764 | KL202605290764 | 广东华盛新禾健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-764 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00766 | KL202605210766 | 广东盛泽华盛包装材料有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-766 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00769 | KL202609290769 | 河南锦华鸿辰健康科技有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-769 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n| EX00779 | KL202607120779 | 安徽康莱逸品食品有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-779 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n\\n| 异常编号 | 合同编号 | 客户名称 | 事件类型 | 是否复合事件 | 投诉/异常内容 | 历史案例编号 | 推荐沟通话术 | 推荐补偿方案 | 状态 |\\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\\n| EX00722 | KL202607120722 | 云南丰泽和泰精细化工有限公司 | 延期+投诉 | 是 | 客户催交 | CASE-722 | 已安排项目负责人跟进并反馈节点 | 优先排产 | 处理中 |\\n\",\n      \"knowledge_id\": \"09eb36b0-a312-42d8-a803-abd3ca968dc0\",\n      \"chunk_index\": 165,\n      \"knowledge_title\": \"订单数据-异常处理流程自动化.md\",\n      \"start_at\": 19195,\n      \"end_at\": 19302,\n      \"seq\": 165,\n      \"score\": 1,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {},\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"56c52a55-f5d8-46e6-bfef-76e38fa7bb92\",\n      \"image_info\": \"\",\n      \"knowledge_filename\": \"订单数据-异常处理流程自动化.md\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档展示了金汉隆订单数据模型中的异常处理流程自动化机制，核心内容是一份包含数十条记录的异常事件明细表。表格详细列出了每个异常事件的编号、关联合同号、客户名称（涵盖国内食品、医药、包装企业及海外公司）、事件类型、是否复合事件、具体投诉或异常内容、对应的历史案例编号、系统推荐的沟通话术及补偿方案，以及当前的处理状态。\\n\\n主要关键信息点如下：\\n1. **异常类型多样化**：记录的事件类型主要包括“延期”、“投诉”、“付款异常”和“配置变更”，其中大量条目被标记为“延期+投诉”的复合事件，表明此类情况在业务中较为常见且需重点处理。\\n2. **具体问题场景**：投诉或异常内容涉及发票开具信息变更、包装形式临时调整、到货安装时间协调、客户催交、标签内容待确认以及现场调试进度反馈等实际业务痛点。\\n3. **标准化应对策略**：系统根据历史案例自动推荐标准化的沟通话术，如“已调整排产并安排专人跟进”、“锁定产线资源”或“同步工程与跟单团队给出书面方案”。同时，提供具体的补偿方案建议，包括优先排产、延长质保、赠送易损件、补发备用配件、减免运费或安排工程师驻场支持。\\n4. **流程状态管理**：每条记录均标注了当前状态，分为“处理中”、“待回访”和“已关闭”，体现了异常处理的全生命周期跟踪。部分后期记录显示针对“客户催交”类复合事件，统一采用“优先排产”作为补偿方案，并由项目负责人跟进。\\n\\n总体而言，该文档通过结构化的数据模型，实现了从异常识别、历史案例匹配到沟通与补偿方案推荐的自动化闭环管理，旨在提升对客户投诉和订单异常的响应效率与服务规范性。\",\n      \"knowledge_base_id\": \"f9730005-3478-4100-8845-d10f762b565e\"\n    },\n    {\n      \"id\": \"e5228834-e2ce-4434-be03-a5afce008c32\",\n      \"content\": \"![金汉隆包装机画册2025版_16_page_1.jpg](resource://Y-d0TriMUiA0C7uBGzNA4A)\",\n      \"knowledge_id\": \"49e5452b-adf2-47fe-a1c8-856d5b29749b\",\n      \"chunk_index\": 0,\n      \"knowledge_title\": \"金汉隆包装机画册2025版_16.pdf\",\n      \"start_at\": 0,\n      \"end_at\": 65,\n      \"seq\": 0,\n      \"score\": 1,\n      \"match_type\": 0,\n      \"sub_chunk_id\": null,\n      \"metadata\": {\n        \"process_overrides\": \"map[asr_config:map[enabled:false language: model_id:] chunking_config:map[child_chunk_size:384 chunk_overlap:80 chunk_size:512 enable_parent_child:true parent_chunk_size:4096 separators:[\\n\\n \\n 。 ！ ？ ; ；] strategy:auto] enable_multimodel:true extract_config:map[enabled:false] graph_enabled:false parser_engine_rules:[map[engine:anydoc file_types:[pdf]]] question_generation_config:map[enabled:true question_count:3] vlm_config:map[api_key: base_url: enabled:true interface_type: model_id:a15af007-e7a6-410d-ace1-1cdb22eb8d9b model_name:]]\"\n      },\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"\",\n      \"image_info\": \"[{\\\"url\\\":\\\"resource://Y-d0TriMUiA0C7uBGzNA4A\\\",\\\"original_url\\\":\\\"resource://Y-d0TriMUiA0C7uBGzNA4A\\\",\\\"start_pos\\\":0,\\\"end_pos\\\":0,\\\"caption\\\":\\\"该图片为KITECH（金汉隆）品牌的产品手册双页，主要介绍两款给袋式包装机：左侧为“旋转给袋式包装机”，右侧为“水平给袋式包装机”。每款机器均配有实物图片、中英文机器描述（功能特点）以及技术规格表（含型号、计量范围、袋子尺寸、包装速度、控制系统、袋型材质等参数），右页还展示了三种包装成品袋样品。\\\",\\\"ocr_text\\\":\\\"# 旋转给袋式包装机\\\\nRotary bag packaging machine\\\\n\\\\n## 【 机器描述 】\\\\n\\\\n1、封口纹路平整美观无皱褶，摆上货架上档次；\\\\n\\\\n2、伺服控制双皮带拉膜，拉膜快速又精准，误差小于1mm；\\\\n\\\\n3、上料、计量、包装、输送一体完成，可实现生产前端到包装后端的无缝连接；\\\\n\\\\n4、可满足插角袋、四边烫、拉链袋等各种高端袋形的定制包装，满足您产品的高端定位需求。\\\\n\\\\n## 【 MACHINE DESCRIPTION 】\\\\n\\\\n1. The sealing line is smooth and beautiful without wrinkles, and it is placed on the shelf in high-grade;\\\\n\\\\n2. Servo control double belts to pull the film, the film is pulled quickly and accurately, and the error is less than 1mm;\\\\n\\\\n3. The feeding, metering, packaging and conveying are integrated, which can realize the seamless connection from the front end of the production to the back end of the packaging;\\\\n\\\\n4. It can meet various high-end bag-shaped customized packaging such as gusset bags, four-side ironing, zipper bags, etc., to meet the high-end positioning needs of your products;\\\\n\\\\n## 【 技术规格 / TECHNICAL SPECIFICATIONS 】\\\\n\\\\n| 型 号 Model | 200 | 250 | 350 |\\\\n| --- | --- | --- | --- |\\\\n| 计量范围 Filling range | 1-1000g | 1-2000g | 1-5000g |\\\\n| 袋子宽度 Bag width | 120-200mm | 120-250mm | 120-350mm |\\\\n| 袋子长度 Bag length | 80-450mm |  |  |\\\\n| 包装速度 Packing speed | 10-70包/分钟 Bags/min（具体视物料而定）(It depends on the material) |  |  |\\\\n| 包装精度 Packing accuracy | ±0.2-3g |  |  |\\\\n| 控制系统 Control system | 伺服控制器+彩色触摸屏 Servo controller + color touch screen |  |  |\\\\n| 袋 型 Pouch type | 自立袋、四边封袋、拉链袋、手提袋、纸袋等各种预制袋 Various prefabricated bags such as stand up bags, four-side sealing bags, zipper bags, handbags, paper bags, etc. |  |  |\\\\n| 袋子材质 Pouch material | PP,PE,PVC,PS,EVA,PET,PVDC+PVC,OPP+CPP |  |  |\\\\n| 电 源 Power supply | 380V,50/60Hz,3.6kw | 耗气量 Air consumption | 1.0m³/min |\\\\n| 选配装置 Optional device | 开拉链装置 Zipper opening device | 排气装置 Exhaust device | 打码机 Date coading / 喷码机 Inkjet printer |\\\\n\\\\n---\\\\n\\\\n# 水平给袋式包装机\\\\nHorizontal premade bag packaging machine\\\\n\\\\n## 【 机器描述 】\\\\n\\\\n1. 整机采用全伺服控制系统，机器运行平稳、动作精准、性能稳定，包装效率高，维修保养方便；\\\\n\\\\n2. 设备配件采用国内/国际名牌电气元件，并经过多年市场实践检验，确保性能更稳定、耐用；\\\\n\\\\n3. 采用不锈钢板金加工组装，运行动作平稳；而且核心部件经特殊优化设计，包装速度快；\\\\n\\\\n4. 计量泵下料系统，性能稳定，效率高；\\\\n\\\\n5. 可选配各种打码、喷码、排气、冲孔系统。\\\\n\\\\n## 【 MACHINE DESCRIPTION 】\\\\n\\\\n1. The whole machine adopts a full servo control system, runs smoothly, accuraies movement, stable performance, high packaging efficiency, and convenient for maintenance;\\\\n\\\\n2. The equipment accessories adopt domestic /international famous brand electrical components, and they have been tested by many years of market practice to ensure more stable performance and durability;\\\\n\\\\n3. Machine uses stainless steel after assembly, the operation is smooth; and the core components are specially optimized and designed, what's more the packaging speed is fast;\\\\n\\\\n4. The metering pump feeding system has stable performance and high efficiency;\\\\n\\\\n5. Optional parts: various coding, sprade coding, exhaustion, and punching systems.\\\\n\\\\n## 【 技术规格 / TECHNICAL SPECIFICATIONS 】\\\\n\\\\n| 型 号 Model | 180 | 210 | 260 |\\\\n| --- | --- | --- | --- |\\\\n| 计量范围 Filling range | 1-500g | 1-1000g | 1-1500g |\\\\n| 袋子宽度 Bag width | 80-180mm | 80-210mm | 80-260mm |\\\\n| 袋子长度 Bag length | 80-280mm |  |  |\\\\n| 包装速度 Packing speed | 20-35包/分钟 Bags/min（具体视物料而定）(It depends on the material) |  |  |\\\\n| 包装精度 Packing accuracy | ±0.2-3g |  |  |\\\\n| 控制系统 Control system | 伺服控制器+彩色触摸屏 Servo controller + color touch screen |  |  |\\\\n| 袋 型 Pouch type | 自立袋、四边封袋、拉链袋、手提袋、纸袋等各种预制袋 Various prefabricated bags such as stand up bags, four-side sealing bags, zipper bags, handbags, paper bags, etc. |  |  |\\\\n| 袋子材质 Pouch material | PP,PE,PVC,PS,EVA,PET,PVDC+PVC,OPP+CPP |  |  |\\\\n| 电 源 Power supply | 380V,50/60Hz,3.2kw | 耗气量 Air consumption | 0.6m³/min |\\\\n| 选配装置 Optional device | 开拉链装置 Zipper opening device | 排气装置 Exhaust device | 打码机 Date coading / 喷码机 Inkjet printer |\\\"}]\",\n      \"knowledge_filename\": \"金汉隆包装机画册2025版_16.pdf\",\n      \"knowledge_source\": \"\",\n      \"knowledge_channel\": \"\",\n      \"knowledge_description\": \"该文档为KITECH（金汉隆）品牌2025版产品手册的一部分，重点介绍了两款给袋式包装机：旋转给袋式包装机和水平给袋式包装机。\\n\\n**旋转给袋式包装机**的主要特点包括封口纹路平整美观、采用伺服控制双皮带拉膜技术（误差小于1mm）、实现上料至输送的一体化无缝连接，以及支持插角袋、四边烫、拉链袋等高端定制包装。其技术规格涵盖三种型号（200、250、350），计量范围从1-1000g到1-5000g不等，袋子宽度在120-350mm之间，包装速度可达每分钟10-70包（视物料而定）。控制系统采用伺服控制器加彩色触摸屏，适用于自立袋、四边封袋等多种预制袋型及PP、PE等材料。电源要求为380V, 50/60Hz, 3.6kw，耗气量为1.0m³/min，并可选配开拉链装置、排气装置及打码机等设备。\\n\\n**水平给袋式包装机**则强调全伺服控制系统带来的平稳运行与高效能，使用国内外知名品牌电气元件确保耐用性，核心部件经过优化设计以提升包装速度。此外，它还配备了性能稳定的计量泵下料系统，并可灵活选配各种附加功能如打码、喷码、排气和冲孔系统。此机型提供180、210、260三个型号，对应不同的计量范围（1-500g至1-1500g）\",\n      \"knowledge_base_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\"\n    }\n  ],\n  \"_debug_events\": [\n    {\n      \"type\": \"agent_query\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"tool_call\",\n      \"content\": \"Calling tool: query_understand\"\n    },\n    {\n      \"type\": \"tool_result\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"tool_call\",\n      \"content\": \"Calling tool: knowledge_search\"\n    },\n    {\n      \"type\": \"tool_result\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"references\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"[[\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"产品咨询|标签\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"]]\\n您好！\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"知识库\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"中未收录“\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"240螺杆\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"包装机”的具体价格\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"，需以正式\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"报价单\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"为准。\\n\\n关于\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"设备选型与参数\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"，可参考《\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"金汉隆包装机\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"画册》中的给\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"袋式包装机系列\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"<kb doc=\\\"金汉隆包装机画册2025版_16.pdf\\\" chunk_id=\\\"e5228834-e2ce-4434-be03-a5afce008c32\\\" k\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" **旋转给袋\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"式**：型号\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"200/\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"250/\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"3\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"50，包装\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"速度10-\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"70包/\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"分钟。\\n-\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \" **水平\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"给袋式**\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"：型号18\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"0/21\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"0/26\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"0，包装速度\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"20-3\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"5包/分钟\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"。\\n\\n![金\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"汉隆包装机画册\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"2025\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"版_16\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"_page_1.jpg\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"](\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"resource://Y-d0TriMUiA0C7uBGzNA4A)\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\\n\\n如需获取2\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"40螺杆机\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"型的精准\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"报价或技术参数，\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"建议\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"联系人工客服（\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"400-\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"800-\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"9000\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"）或提供具体\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"需求\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"以便转接销售\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"专员。\"\n    },\n    {\n      \"type\": \"answer\",\n      \"content\": \"\"\n    },\n    {\n      \"type\": \"complete\",\n      \"content\": \"\"\n    }\n  ],\n  \"session_id\": \"ce7a4660-0e4c-4d01-a85c-cbd8497e12c2\"\n}",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:04:12.466082",
+            "finished_at": null,
+            "id": "0496730f88d14e829278602c5d10bb20",
+            "thinking": "这个测试问题有点偏差，我问的是\"生产知识库有哪些内容？\"，但小智的回答是关于\"240螺杆包装机\"的价格和给袋式包装机的信息。这说明：\n1. 小智的意图识别可能有偏差（识别为\"产品咨询\"而不是\"产品咨询\"关于生产知识库）\n2. 小智没有准确理解\"生产知识库\"这个特定术语\n3. 生产知识库是空的（0个文档），所以无法提供相关内容\n\n让我总结一下目前的巡检结果：\n\n**知识库文档解析状态：**\n\n1. **金汉隆-管理协同中心** (912d0603) - 7个文档，全部completed ✅\n2. **金汉隆-智能采购** (ef519dbf) - 8个文档，全部completed ✅\n3. **金汉隆-数据中枢** (4a945ef5) - 34个文档，部分failed ❌\n   - failed原因：EmbedBatch API error: Http Status 429 Too Many Requests\n4. **金汉隆-订单业务** (f9730005) - 11个文档，部分failed ❌\n   - failed原因：EmbedBatch API error: Http Status 429 Too Many Requests\n5. **售后知识库** (facd1c48) - 1个文档，completed ✅\n6. **生产知识库** (7d8ea66b) - 0个文档，空库 ⚠️\n7. **通用产品知识库** (b861158f) - 19个文档，全部completed ✅\n\n**智能客服小智的检索命中率测试：**\n\n测试1：产品咨询（240螺杆包装机价格）\n- 意图识别：产品咨询 ✅\n- 检索命中：部分命中，但未找到具体价格信息\n- 回答质量：未命中具体产品价格，建议转人工\n\n测试2：售后报修（设备封口漏气）\n- 意图识别：售后报修 ✅\n- 检索命中：高命中，找到《售后维修案例库》相关内容\n- 回答质量：给出具体原因、方案和备件建议 ✅\n\n测试3：订单查询（交期多久）\n- 意图识别：订单查询 ✅\n- 检索命中：高命中，找到《订单业务真实数据与政策》和《产品目录与选型》\n- 回答质量：给出准确的历史数据和中位交付周期 ✅\n\n测试4：生产知识库（空库测试）\n- 意图识别：产品咨询（偏差）\n- 检索命中：命中其他知识库内容，未命中生产知识库（因空库）\n- 回答质量：未准确理解问题意图\n\n**检索命中率评估：**\n- 售后报修类：命中率高（1/1）\n- 订单查询类：命中率高（1/1）\n- 产品咨询类：命中率中等（0/1，因知识库未收录具体价格）\n- 生产知识库类：无法命中（空库）\n\n现在让我继续检查是否有更多的知识库需要补充，并生成巡检报告。让我再检查一下知识库中是否有需要补充的知识点。\n\n根据测试结果，我需要补充的知识点：\n1. 240螺杆包装机的具体价格信息（产品目录中有机型但无具体价格）\n2. 生产知识库需要补充内容（目前为空）\n\n让我再检查一下《产品目录与选型.md》文件，看看是否确实缺少价格信息。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:04:16.017858",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a764bf9c2198584d",
+            "input": "{\"knowledge_id\": \"3f4d9fb7-e13d-4a3b-9704-5ee6b9d627ee\"}",
+            "name": "weknora__get_knowledge",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:04:16.051432",
+            "finished_at": null,
+            "id": "chatcmpl-tool-a764bf9c2198584d",
+            "metadata": {},
+            "name": "weknora__get_knowledge",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:16.049998",
+                "finished_at": null,
+                "id": "efd141d7fc744e4698747a4473221e90",
+                "text": "{\n  \"data\": {\n    \"id\": \"3f4d9fb7-e13d-4a3b-9704-5ee6b9d627ee\",\n    \"tenant_id\": 10000,\n    \"knowledge_base_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\",\n    \"tags\": null,\n    \"type\": \"file\",\n    \"title\": \"01-产品目录与选型.md\",\n    \"description\": \"该文档为一家包装机械制造企业的产品目录与商务参考，基于2025年12月至2026年9月期间的800笔真实销售订单数据编制，覆盖220家企业客户。文档核心内容围绕主力机型的成交统计、价格分布及选型建议展开。\\n\\n首先，文档详细列出了各类主力机型的关键指标，包括成交单数、成交中位价及平均交付周期。其中，小立式包装机是成交最活跃的类别，如“240螺杆包装机”和“颗粒背封包装机”分别成交124单和103单，中位价在7万元左右，交付周期均为45天；而“高速圆角背封宠物膏体包装机”虽单价较高（约9.2万元），但仍有92单的成交量。多列机方面，“600六列背封螺杆包装机”以较低的单价（约6万元）和较短的交付周期（30天）获得了85单的成交。值得注意的是，部分高端或整线设备虽然成交单数较少，但单价显著更高，例如“凝珠液体包装机”中位价接近50万元，“自动装盒线”超过41万元，“自产圆角磁力泵包装机”约为36万元，这类设备的交付周期通常在35至40天之间。\\n\\n其次，文档提供了具体的机型选型参考指南。针对颗粒或粉末类产品，推荐选用螺杆类包装机，其中多列机具备更高的产能优势；对于液体、膏体或凝珠类产品，则建议选择磁力泵或专用液体包装机。若客户需要灌装、旋盖及装盒的一体化解决方案，应优先考虑整线设备，但需注意其交付周期相对较长。最后，文档特别强调，表中所示价格仅为历史成交中位价，仅供商务参考，实际交易报价需以销售工程师出具的正式报价单为准。\",\n    \"source\": \"\",\n    \"channel\": \"web\",\n    \"parse_status\": \"completed\",\n    \"pending_subtasks_count\": 0,\n    \"summary_status\": \"completed\",\n    \"enable_status\": \"enabled\",\n    \"embedding_model_id\": \"67b042dc-67bc-4caa-b058-10210065324b\",\n    \"file_name\": \"01-产品目录与选型.md\",\n    \"folder_path\": \"\",\n    \"file_type\": \"md\",\n    \"file_size\": 1757,\n    \"file_hash\": \"7d992c09f1c204eba8cd34172af1015c\",\n    \"file_path\": \"resource://jQB7479Hc36EJvQkjqKkqQ\",\n    \"storage_size\": 20146,\n    \"metadata\": null,\n    \"custom_metadata\": {},\n    \"last_faq_import_result\": null,\n    \"created_at\": \"2026-09-18T04:54:38.548322+08:00\",\n    \"updated_at\": \"2026-09-18T04:54:45.99103+08:00\",\n    \"processed_at\": \"2026-09-18T04:54:45.99103+08:00\",\n    \"error_message\": \"\",\n    \"deleted_at\": null,\n    \"knowledge_base_name\": \"\"\n  },\n  \"success\": true\n}",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:04:23.400743",
+            "finished_at": null,
+            "id": "44314239130740f29de18616fb7a8e54",
+            "thinking": "我已经获取了《产品目录与选型.md》的详细信息。从描述中可以看到，文档确实包含了240螺杆包装机的成交中位价（约7.6万元），但是小智在回答中却说\"未收录该型号的实时报价信息\"。\n\n这可能是因为：\n1. 小智的检索没有找到这个具体的信息\n2. 小智的回答策略是\"无法解答时诚实说明，转人工\"\n3. 小智可能认为这个价格信息不是\"实时报价\"，而是历史成交中位价\n\n让我再检查一下《产品目录与选型.md》的详细内容，看看240螺杆包装机的具体价格信息。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:04:24.136990",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b00cba1399dbcf3b",
+            "input": "{\"knowledge_id\": \"3f4d9fb7-e13d-4a3b-9704-5ee6b9d627ee\", \"page\": 1, \"page_size\": 20}",
+            "name": "weknora__list_chunks",
+            "state": "finished",
+            "suggested_rules": [],
+            "type": "tool_call"
+          },
+          {
+            "created_at": "2026-09-17T23:04:24.177039",
+            "finished_at": null,
+            "id": "chatcmpl-tool-b00cba1399dbcf3b",
+            "metadata": {},
+            "name": "weknora__list_chunks",
+            "output": [
+              {
+                "created_at": "2026-09-17T23:04:24.176056",
+                "finished_at": null,
+                "id": "6a323779eb6445ad81397945400a7157",
+                "text": "{\n  \"data\": [\n    {\n      \"id\": \"2cf6e6e6-6063-4519-93f9-d8b9cac66a33\",\n      \"seq_id\": 100000139,\n      \"tenant_id\": 10000,\n      \"knowledge_id\": \"3f4d9fb7-e13d-4a3b-9704-5ee6b9d627ee\",\n      \"knowledge_base_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\",\n      \"tag_id\": \"\",\n      \"content\": \"# 产品目录与商务参考（基于真实销售订单 2025.12-2026.09）\\n\\n公司为包装机械制造企业，统计期内共成交 800 笔销售订单，覆盖 220 家企业客户。主力机型如下（价格为成交中位价，周期为成交到承诺交期中位天数）：\\n\\n| 机型 | 类别 | 成交单数 | 成交中位价 | 平均交付周期 |\\n|---|---|---|---|---|\\n| 240螺杆包装机 | 小立式 | 124 | ¥76,943 | 45 天 |\\n| 颗粒背封包装机 | 小立式 | 103 | ¥68,915 | 45 天 |\\n| 高速圆角背封宠物膏体包装机 | 小立式 | 92 | ¥92,070 | 50 天 |\\n\",\n      \"content_revision\": 0,\n      \"index_status\": \"ready\",\n      \"last_editor_id\": \"\",\n      \"chunk_index\": 0,\n      \"is_enabled\": true,\n      \"flags\": 1,\n      \"status\": 0,\n      \"start_at\": 0,\n      \"end_at\": 303,\n      \"pre_chunk_id\": \"\",\n      \"next_chunk_id\": \"\",\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"bcdd7083-6f8e-46be-9d03-f0129226e30f\",\n      \"relation_chunks\": null,\n      \"indirect_relation_chunks\": null,\n      \"metadata\": {\n        \"generated_questions\": [\n          {\n            \"id\": \"q1789678481475774984\",\n            \"question\": \"包装机械企业主力机型有哪些及各自成交数据如何\",\n            \"content_revision\": 0\n          },\n          {\n            \"id\": \"q1789678481475778522\",\n            \"question\": \"螺杆包装机和颗粒背封包装机的价格与交付周期对比\",\n            \"content_revision\": 0\n          },\n          {\n            \"id\": \"q1789678481475778793\",\n            \"question\": \"高速圆角背封宠物膏体包装机的市场表现及选型参考\",\n            \"content_revision\": 0\n          }\n        ]\n      },\n      \"content_hash\": \"\",\n      \"image_info\": \"\",\n      \"created_at\": \"2026-09-18T04:54:38.71966+08:00\",\n      \"updated_at\": \"2026-09-18T04:54:41.476096+08:00\",\n      \"deleted_at\": null\n    },\n    {\n      \"id\": \"1d920fcf-28a4-4d85-9e08-bf4fea5b708a\",\n      \"seq_id\": 100000141,\n      \"tenant_id\": 10000,\n      \"knowledge_id\": \"3f4d9fb7-e13d-4a3b-9704-5ee6b9d627ee\",\n      \"knowledge_base_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\",\n      \"tag_id\": \"\",\n      \"content\": \"| 机型 | 类别 | 成交单数 | 成交中位价 | 平均交付周期 |\\n|---|---|---|---|---|\\n| 600六列背封螺杆包装机 | 多列机 | 85 | ¥60,578 | 30 天 |\\n| 圆角磁力泵包装机 | 小立式 | 84 | ¥63,540 | 45 天 |\\n| 自动灌装旋盖装盒线 | 整线 | 75 | ¥62,392 | 45 天 |\\n| 自产圆角磁力泵包装机 | 给袋式 | 22 | ¥359,483 | 35 天 |\\n| 自动装盒线 | 整线 | 14 | ¥417,172 | 40 天 |\\n| 凝珠液体包装机 | 灌装机 | 13 | ¥492,319 | 40 天 |\\n\",\n      \"content_revision\": 0,\n      \"index_status\": \"ready\",\n      \"last_editor_id\": \"\",\n      \"chunk_index\": 1,\n      \"is_enabled\": true,\n      \"flags\": 1,\n      \"status\": 0,\n      \"start_at\": 303,\n      \"end_at\": 553,\n      \"pre_chunk_id\": \"\",\n      \"next_chunk_id\": \"\",\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"bcdd7083-6f8e-46be-9d03-f0129226e30f\",\n      \"relation_chunks\": null,\n      \"indirect_relation_chunks\": null,\n      \"metadata\": {\n        \"generated_questions\": [\n          {\n            \"id\": \"q1789678483080458274\",\n            \"question\": \"六列背封螺杆包装机和圆角磁力泵包装机的成交数据对比\",\n            \"content_revision\": 0\n          },\n          {\n            \"id\": \"q1789678483080459588\",\n            \"question\": \"自动灌装旋盖装盒线与自产圆角磁力泵包装机的价格及交付周期差异\",\n            \"content_revision\": 0\n          },\n          {\n            \"id\": \"q1789678483080459859\",\n            \"question\": \"凝珠液体包装机在灌装机类别中的市场表现如何\",\n            \"content_revision\": 0\n          }\n        ]\n      },\n      \"content_hash\": \"\",\n      \"image_info\": \"\",\n      \"created_at\": \"2026-09-18T04:54:38.719661+08:00\",\n      \"updated_at\": \"2026-09-18T04:54:43.080618+08:00\",\n      \"deleted_at\": null\n    },\n    {\n      \"id\": \"a1bee434-fb20-44e7-94be-574bd03eea91\",\n      \"seq_id\": 100000144,\n      \"tenant_id\": 10000,\n      \"knowledge_id\": \"3f4d9fb7-e13d-4a3b-9704-5ee6b9d627ee\",\n      \"knowledge_base_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\",\n      \"tag_id\": \"\",\n      \"content\": \"| 机型 | 类别 | 成交单数 | 成交中位价 | 平均交付周期 |\\n|---|---|---|---|---|\\n| 高速圆角背封/三边封液体包装机 | 小立式 | 10 | ¥471,030 | 35 天 |\\n| 双列背封颗粒/粉末包装机 | 多列机 | 10 | ¥259,452 | 40 天 |\\n| 口服液自动灌装旋盖装盒线 | 整线 | 8 | ¥370,919 | 50 天 |\\n\\n\",\n      \"content_revision\": 0,\n      \"index_status\": \"ready\",\n      \"last_editor_id\": \"\",\n      \"chunk_index\": 2,\n      \"is_enabled\": true,\n      \"flags\": 1,\n      \"status\": 0,\n      \"start_at\": 553,\n      \"end_at\": 693,\n      \"pre_chunk_id\": \"\",\n      \"next_chunk_id\": \"\",\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"bcdd7083-6f8e-46be-9d03-f0129226e30f\",\n      \"relation_chunks\": null,\n      \"indirect_relation_chunks\": null,\n      \"metadata\": {\n        \"generated_questions\": [\n          {\n            \"id\": \"q1789678484254752959\",\n            \"question\": \"高速圆角背封液体包装机的成交中位价和交付周期是多少？\",\n            \"content_revision\": 0\n          },\n          {\n            \"id\": \"q1789678484254758600\",\n            \"question\": \"双列背封颗粒粉末包装机属于哪类机型，其历史成交价参考如何？\",\n            \"content_revision\": 0\n          },\n          {\n            \"id\": \"q1789678484254758862\",\n            \"question\": \"口服液自动灌装旋盖装盒线的平均交付周期及价格区间是怎样的？\",\n            \"content_revision\": 0\n          }\n        ]\n      },\n      \"content_hash\": \"\",\n      \"image_info\": \"\",\n      \"created_at\": \"2026-09-18T04:54:38.719662+08:00\",\n      \"updated_at\": \"2026-09-18T04:54:44.255104+08:00\",\n      \"deleted_at\": null\n    },\n    {\n      \"id\": \"ccd48e31-58db-4d75-a1a2-87abbb3bea97\",\n      \"seq_id\": 100000146,\n      \"tenant_id\": 10000,\n      \"knowledge_id\": \"3f4d9fb7-e13d-4a3b-9704-5ee6b9d627ee\",\n      \"knowledge_base_id\": \"b861158f-4b89-4715-bada-01d4bed1e40b\",\n      \"tag_id\": \"\",\n      \"content\": \"## 机型选型参考\\n- 螺杆类（240螺杆包装机、600六列背封螺杆包装机）：适合颗粒/粉末产品，多列机产能更高。\\n- 磁力泵/液体类（圆角磁力泵包装机、凝珠液体包装机、高速圆角背封液体包装机）：适合液体/膏体/凝珠。\\n- 整线（自动灌装旋盖装盒线、自动装盒线）：灌装+旋盖+装盒一体化，交付周期相对更长。\\n- 报价以销售工程师正式报价单为准；表中价格为历史成交中位价仅作参考。\",\n      \"content_revision\": 0,\n      \"index_status\": \"ready\",\n      \"last_editor_id\": \"\",\n      \"chunk_index\": 3,\n      \"is_enabled\": true,\n      \"flags\": 1,\n      \"status\": 0,\n      \"start_at\": 693,\n      \"end_at\": 882,\n      \"pre_chunk_id\": \"\",\n      \"next_chunk_id\": \"\",\n      \"chunk_type\": \"text\",\n      \"parent_chunk_id\": \"bcdd7083-6f8e-46be-9d03-f0129226e30f\",\n      \"relation_chunks\": null,\n      \"indirect_relation_chunks\": null,\n      \"metadata\": {\n        \"generated_questions\": [\n          {\n            \"id\": \"q1789678485276498912\",\n            \"question\": \"包装机螺杆类和液体类分别适合什么产品？\",\n            \"content_revision\": 0\n          },\n          {\n            \"id\": \"q1789678485276504133\",\n            \"question\": \"自动灌装旋盖装盒线相比单机有什么优势？\",\n            \"content_revision\": 0\n          },\n          {\n            \"id\": \"q1789678485276504394\",\n            \"question\": \"如何根据产品类型选择合适的包装机机型？\",\n            \"content_revision\": 0\n          }\n        ]\n      },\n      \"content_hash\": \"\",\n      \"image_info\": \"\",\n      \"created_at\": \"2026-09-18T04:54:38.719665+08:00\",\n      \"updated_at\": \"2026-09-18T04:54:45.276948+08:00\",\n      \"deleted_at\": null\n    }\n  ],\n  \"page\": 1,\n  \"page_size\": 20,\n  \"success\": true,\n  \"total\": 4\n}",
+                "type": "text"
+              }
+            ],
+            "state": "success",
+            "type": "tool_result"
+          },
+          {
+            "created_at": "2026-09-17T23:04:30.820756",
+            "finished_at": null,
+            "id": "d06971dbdd8f43cea42f004fe6fb169d",
+            "thinking": "好的，我已经确认了《产品目录与选型.md》中确实包含了240螺杆包装机的成交中位价（¥76,943）。但小智在回答中却说\"未收录该型号的实时报价信息\"。这说明小智的检索或回答策略有问题。\n\n让我总结一下巡检结果，然后生成巡检报告。\n\n**知识库文档解析状态总结：**\n\n1. **金汉隆-管理协同中心** (912d0603)\n   - 7个文档，全部completed ✅\n   - 健康状态：良好\n\n2. **金汉隆-智能采购** (ef519dbf)\n   - 8个文档，全部completed ✅\n   - 健康状态：良好\n\n3. **金汉隆-数据中枢** (4a945ef5)\n   - 34个文档，部分failed ❌\n   - failed文档：21_MES设备日志、20_工时与标准产出、19_人员出勤、18_物流轨迹、15_WMS出入库、14_物料需求采购、13_工序节点、字段字典.csv、23_OA表单、22_报销申请\n   - 错误原因：EmbedBatch API error: Http Status 429 Too Many Requests\n   - 健康状态：较差\n\n4. **金汉隆-订单业务** (f9730005)\n   - 11个文档，部分failed ❌\n   - failed文档：订单数据-企业客户管理表、订单数据-合同要素提取与比对、订单数据-订单原始输入池、订单数据-机器下单表、order_model.xlsx\n   - 错误原因：EmbedBatch API error: Http Status 429 Too Many Requests\n   - 健康状态：较差\n\n5. **售后知识库** (facd1c48)\n   - 1个文档，completed ✅\n   - 健康状态：良好\n\n6. **生产知识库** (7d8ea66b)\n   - 0个文档，空库 ⚠️\n   - 健康状态：需补充内容\n\n7. **通用产品知识库** (b861158f)\n   - 19个文档，全部completed ✅\n   - 健康状态：良好\n\n**智能客服小智的检索命中率测试：**\n\n测试结果：\n1. 产品咨询（240螺杆包装机价格）- 未命中具体价格，fallback到人工\n2. 售后报修（设备封口漏气）- 命中，给出具体方案 ✅\n3. 订单查询（交期多久）- 命中，给出准确数据 ✅\n4. 生产知识库查询 - 意图识别偏差，命中其他知识库内容\n\n**检索命中率评估：**\n- 售后报修类：命中率高（1/1）\n- 订单查询类：命中率高（1/1）\n- 产品咨询类：命中率中等（0/1，因未返回具体价格）\n- 生产知识库类：无法命中（空库）\n\n**需要补充的知识点清单：**\n1. 《产品目录与选型.md》中240螺杆包装机的具体价格信息需要补充到小智的回答逻辑中\n2. 生产知识库需要补充生产相关的文档内容\n3. 金汉隆-数据中枢和金汉隆-订单业务中failed的文档需要重新解析\n\n现在让我生成巡检报告。",
+            "type": "thinking"
+          },
+          {
+            "created_at": "2026-09-17T23:04:33.507013",
+            "finished_at": null,
+            "id": "192932edfdc040f8bd1aa35817ba6a8f",
+            "text": "根据巡检，我已检查 7 个知识库的文档解析状态，并对智能客服小智做了 4 类检索命中率抽检。以下是巡检结论与需要补充的知识点清单。\n\n## 一、8001 环境知识库文档解析状态\n\n| 知识库 | 知识条目 | 文档解析状态 | 健康结论 |\n|---|---|---|---|\n| 金汉隆-管理协同中心 | 7 | 全部 completed | ✅ 良好 |\n| 金汉隆-智能采购 | 8 | 全部 completed | ✅ 良好 |\n| 金汉隆-数据中枢 | 34 | 10 个 failed | ⚠️ 较差 |\n| 金汉隆-订单业务 | 11 | 5 个 failed | ⚠️ 较差 |\n| 售后知识库 | 1 | completed | ✅ 良好 |\n| 生产知识库 | 0 | 空库 | ⚠️ 需补充 |\n| 通用产品知识库 | 19 | 全部 completed | ✅ 良好 |\n\n**failed 根因**：`金汉隆-数据中枢` 与 `金汉隆-订单业务` 中多个文档因 `EmbedBatch API error: Http Status 429 Too Many Requests` 解析失败，涉及 MES 设备日志、WMS 出入库、工序节点、订单原始输入池等 15 个文档。\n\n## 二、智能客服小智检索命中率巡检\n\n小智当前绑定 4 个知识库：通用产品知识库、售后知识库、金汉隆-订单业务、生产知识库。以下为 4 类问题抽检结果：\n\n| 测试场景 | 意图识别 | 命中情况 | 结论 |\n|---|---|---|---|\n| 产品咨询：240螺杆包装机价格 | 产品咨询 ✅ | 未命中具体价格，fallback 转人工 | ⚠️ 命中率低 |\n| 售后报修：设备封口漏气处理 | 售后报修 ✅ | 命中《售后维修案例库》，给出原因/方案/备件 | ✅ 命中率高 |\n| 订单查询：最近订单交期 | 订单查询 ✅ | 命中《订单业务真实数据与政策》与《产品目录与选型》，给出中位交付周期 | ✅ 命中率高 |\n| 生产知识库内容查询 | 产品咨询（偏差） | 空库无内容，返回其他库无关结果 | ❌ 命中失败 |\n\n**检索命中率评估**：\n- 售后报修类：命中率高（1/1）\n- 订单查询类：命中率高（1/1）\n- 产品咨询类：命中率中等（0/1，知识库虽有历史成交中位价，但小智未正确返回）\n- 生产知识库类：命中失败（空库）\n\n## 三、需要补充的知识点清单\n\n1. **产品价格召回优化**：通用产品知识库中的《01-产品目录与选型.md》已包含 240 螺杆包装机成交中位价 ¥76,943，但小智未在价格咨询时正确召回，需优化检索策略或补充更明确的价格问答对。\n2. **生产知识库内容补充**：生产知识库当前为空，需补充生产相关的 SOP、排产规则、产能数据等文档，否则无法支撑生产类咨询。\n3. **failed 文档重解析**：`金汉隆-数据中枢` 与 `金汉隆-订单业务` 中因 429 失败的 15 个文档需重新触发解析，确保数据中枢与订单业务知识完整性。\n\n---\n\n⟦ 模型完成8001环境知识库健康巡检｜状态：已完成7个库解析状态+小智4类命中率抽检；下一步：补充生产知识库内容并重跑failed文档解析；锚点：金汉隆-数据中枢/订单业务failed、小智命中率、生产知识库空库 ⟧",
+            "type": "text"
+          }
+        ],
+        "created_at": "2026-09-17T22:59:49.070237",
+        "error": null,
+        "finished_at": "2026-09-17T23:04:37.345279",
+        "finished_reason": null,
+        "id": "86a4a191ab8847bfb68fa91f9574a356",
+        "metadata": {},
+        "name": "Default Agent",
+        "role": "assistant",
+        "structured_output": null,
+        "usage": {
+          "cache_creation_input_tokens": 0,
+          "cache_input_tokens": 1888512,
+          "input_tokens": 2073258,
+          "output_tokens": 10188
+        }
+      }
+    }
+  ],
+  "meta": {
+    "dispatch_channel": "console",
+    "job_id": "37ed15b6-6c69-48be-8a1d-6d8d4c4412ac",
+    "job_name": "每周知识库巡检",
+    "silent": false,
+    "target_session_id": "",
+    "target_user_id": "default",
+    "task_type": "agent"
+  },
+  "run_id": "6a287799-0e63-4331-a949-e57eb0e9ef3c",
+  "status": "success"
+}

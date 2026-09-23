@@ -1,0 +1,127 @@
+version: '2.0'
+execution_level: smart
+audit_level: all
+env_blacklist:
+- OPENAI_API_KEY
+- ANTHROPIC_API_KEY
+- AWS_SECRET_ACCESS_KEY
+- AWS_ACCESS_KEY_ID
+user_rules:
+- match: Read(WORKSPACE_DIR/**)
+  action: allow
+  reason: File read within workspace
+- match: Write(WORKSPACE_DIR/**)
+  action: allow
+  reason: File write within workspace
+- match: Edit(WORKSPACE_DIR/**)
+  action: allow
+  reason: File edit within workspace
+- match: Append(WORKSPACE_DIR/**)
+  action: allow
+  reason: File append within workspace
+- match: Grep(WORKSPACE_DIR/**)
+  action: allow
+  reason: Content search within workspace
+- match: Glob(WORKSPACE_DIR/**)
+  action: allow
+  reason: File listing within workspace
+- match: ViewImage(WORKSPACE_DIR/**)
+  action: allow
+  reason: Image view within workspace
+- match: ViewVideo(WORKSPACE_DIR/**)
+  action: allow
+  reason: Video view within workspace
+- match: SendFileToUser(WORKSPACE_DIR/**)
+  action: allow
+  reason: File send within workspace
+- match: DesktopScreenshot(WORKSPACE_DIR/**)
+  action: allow
+  reason: File send within workspace
+- match: '*(/tmp/**)'
+  action: allow
+  reason: Scratch directory access for tmp
+- match: '*(WORKSPACE_DIR/**)'
+  action: allow
+  reason: Coding project dir
+- match: Bash(gh)
+  action: allow
+  reason: GitHub CLI operations
+- match: Bash(gh *)
+  action: allow
+  reason: GitHub CLI operations
+- match: Read(**)
+  action: allow
+  reason: Read-only file access (global)
+- match: Grep(**)
+  action: allow
+  reason: Content search (global)
+- match: Glob(**)
+  action: allow
+  reason: File listing (global)
+- match: SendFileToUser(**)
+  action: allow
+  reason: File send to user (global)
+- match: WebSearch(**)
+  action: allow
+  reason: Allow web search
+- match: WebFetch(**)
+  action: allow
+  reason: Allow web fetch
+- match: ViewImage(**)
+  action: allow
+  reason: Image view (global)
+- match: ViewVideo(**)
+  action: allow
+  reason: Video view (global)
+- match: AstSearch(**)
+  action: allow
+  reason: AST search (global)
+- match: Browser(**)
+  action: allow
+  reason: Allow all browser access
+applied_migrations:
+- '*(/tmp/**)'
+- '*(CODING_PROJECT_DIR/**)'
+- Append(WORKSPACE_DIR/**)
+- AstSearch(**)
+- Bash(gh *)
+- Bash(gh)
+- Browser(**)
+- DesktopScreenshot(WORKSPACE_DIR/**)
+- Edit(WORKSPACE_DIR/**)
+- Glob(**)
+- Glob(WORKSPACE_DIR/**)
+- Grep(**)
+- Grep(WORKSPACE_DIR/**)
+- Read(**)
+- Read(WORKSPACE_DIR/**)
+- SendFileToUser(**)
+- SendFileToUser(WORKSPACE_DIR/**)
+- ViewImage(**)
+- ViewImage(WORKSPACE_DIR/**)
+- ViewVideo(**)
+- ViewVideo(WORKSPACE_DIR/**)
+- WebFetch(**)
+- WebSearch(**)
+- Write(WORKSPACE_DIR/**)
+sensitive_paths:
+- ~/.ssh/
+- ~/.aws/
+- ~/.gnupg/
+- ~/.kube/
+- ~/.config/gcloud/
+- ~/.azure/
+- ~/.docker/config.json
+- ~/.env
+- ~/.git-credentials
+- ~/.netrc
+- ~/.npmrc
+- ~/.pypirc
+shell_evasion_checks:
+  command_substitution: true
+  obfuscated_flags: true
+  backslash_escaped_whitespace: true
+  backslash_escaped_operators: true
+  newlines: true
+  comment_quote_desync: true
+  quoted_newline: true

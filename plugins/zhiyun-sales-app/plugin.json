@@ -1,0 +1,21 @@
+{
+  "id": "zhiyun-sales-app",
+  "name": "智能销售分析",
+  "version": "1.0.0",
+  "type": "frontend",
+  "description": "智能销售分析入口：销售BI智能分析 / 智能客户关系管理 / 销售业绩贡献归因，支持数据导入智能分析",
+  "author": "Zhiyun AI",
+  "entry": {
+    "frontend": "dist/index.js"
+  },
+  "dependencies": [],
+  "qwenpaw_version": {
+    "min": "2.2.0"
+  },
+  "meta": {
+    "features": [
+      "app-entry",
+      "iframe-route"
+    ]
+  }
+}

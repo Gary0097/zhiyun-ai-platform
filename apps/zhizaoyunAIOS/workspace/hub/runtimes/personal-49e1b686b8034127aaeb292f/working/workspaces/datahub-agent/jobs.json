@@ -1,0 +1,58 @@
+{
+  "jobs": [
+    {
+      "dispatch": {
+        "channel": "console",
+        "meta": {},
+        "mode": "stream",
+        "silent": false,
+        "target": {
+          "session_id": "1789682339613-crrkgef",
+          "user_id": "default"
+        },
+        "type": "channel"
+      },
+      "enabled": true,
+      "id": "685f812b-86c5-49c4-9154-bbb902878404",
+      "meta": {},
+      "name": "每日经营简报（北京时间 08:00）",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "现在是每日 08:00 经营简报时间（北京时间）。请执行：\n1. 在 datahub/ 工作区运行 python3 datahub/scripts/daily_brief.py 生成前一自然日的经营简报。脚本会从计算副本读取数据、写入 datahub/output/，并通过包内 Mock 推送接口发送到 WB_MANAGEMENT（幂等键 daily-brief-<日期>，重复运行不会重复发送）。\n2. 汇报简报要点：全量交付单数、新增异常工单、日末未关闭异常工单、报销笔数与金额、当前未交付与逾期情况、WC02 人效变化；注明数据来源与快照口径（configuration.snapshot_at）。\n3. 若脚本报错或数字异常，说明原因并给出人工复核建议，不要编造。\n\n注意：所有发送只允许走 Mock 接口；不要写回企业系统。",
+                "type": "text"
+              }
+            ],
+            "role": "user",
+            "type": "message"
+          }
+        ],
+        "session_id": "1789682339613-crrkgef",
+        "user_id": "default"
+      },
+      "runtime": {
+        "max_concurrency": 1,
+        "misfire_grace_seconds": 600,
+        "share_session": true,
+        "timeout_seconds": 900,
+        "tool_safety": false
+      },
+      "save_result_to_inbox": true,
+      "schedule": {
+        "cron": "0 8 * * *",
+        "repeat_count": null,
+        "repeat_end_type": null,
+        "repeat_every_days": null,
+        "repeat_until": null,
+        "run_at": null,
+        "timezone": "Asia/Shanghai",
+        "type": "cron"
+      },
+      "task_type": "agent",
+      "text": null
+    }
+  ],
+  "version": 2
+}

@@ -1,0 +1,38 @@
+date: '2026-09-18'
+topic_count: 3
+diversity_days: 7
+topics:
+- title: 补货建议与断料缺口处置
+  reason: 用户按快照反复驱动 SKU 下单数量、交期与缺口处置决策，且逾期建议与耗尽日会持续影响后续补货。
+  evidence: 12 SKU 中 6 项低于安全库存，今日应下单 5 项共 940 件，5 条建议下单日逾期且仍缺 7~18 天。
+  keywords:
+  - 补货建议
+  - ROP
+  - 安全库存
+  - 交期缺口
+  - 加急
+  paths:
+  - memory/2026-09-18/replenishment-advice-supplier-shortlist.md
+- title: 钣金件供应商准入与新供应商开发
+  reason: 钣金件是唯一无法自动下单的品类，涉及人工特批、来料检验加严和新供应商开发，是需要跨日跟进的开放问题。
+  evidence: M09 的 9 家在供供应商全未达准时率≥0.70 且合格率≥0.965，最优 S018 合格率仅 0.9107。
+  keywords:
+  - 钣金件
+  - 供应商准入
+  - 合格率
+  - 准时率
+  - 新供应商开发
+  paths:
+  - memory/2026-09-18/replenishment-advice-supplier-shortlist.md
+- title: 采购比价与压价谈判
+  reason: 价格校验触发的溢价与可省金额直接对应成本决策，用户后续可能逐 SKU 复核目标价或改选货源。
+  evidence: M03 主荐 S010 溢价 20.1%，改 S030 可省 8227 元；M07 主荐 S030 溢价 14.2%，S048 价格竞争力
+    1.0。
+  keywords:
+  - 比价
+  - 价格校验
+  - 溢价
+  - 压价
+  - 备选货源
+  paths:
+  - memory/2026-09-18/replenishment-advice-supplier-shortlist.md

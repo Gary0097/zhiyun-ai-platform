@@ -1,0 +1,86 @@
+[
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789757351.2981687,
+    "event_type": "cron_result",
+    "id": "0f10d11d-0243-48ff-bf89-04bae7b57c6c",
+    "payload": {
+      "job_id": "d6005a8c-52ea-405b-ab26-77c1860497db",
+      "job_name": "运维-打包Windows迁移包",
+      "run_id": "124db1ee-9c66-47a9-b3ea-e1ff4883fa0a",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "d6005a8c-52ea-405b-ab26-77c1860497db",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 运维-打包Windows迁移包"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789757289.2629042,
+    "event_type": "cron_result",
+    "id": "4ff73ee9-3afd-4e93-afac-10f786bd51d1",
+    "payload": {
+      "job_id": "d6005a8c-52ea-405b-ab26-77c1860497db",
+      "job_name": "运维-打包Windows迁移包",
+      "run_id": "87f6b30c-c1fb-4817-a7ab-a5bceebae435",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "manual"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "d6005a8c-52ea-405b-ab26-77c1860497db",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 运维-打包Windows迁移包"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789756708.8310926,
+    "event_type": "cron_result",
+    "id": "4f0810b7-f087-4cc0-b8a3-5d08050f8308",
+    "payload": {
+      "job_id": "fb32a946-4007-4c2b-850f-c723f29329f8",
+      "job_name": "运维-重跑Windows迁移包导出",
+      "run_id": "8a612a4a-ad46-4982-869b-49c738545493",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "scheduled"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "fb32a946-4007-4c2b-850f-c723f29329f8",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 运维-重跑Windows迁移包导出"
+  },
+  {
+    "agent_id": "default",
+    "body": "Agent cron task finished successfully.",
+    "created_at": 1789756638.9810913,
+    "event_type": "cron_result",
+    "id": "afb68927-f2a9-463e-b080-52c12e523d10",
+    "payload": {
+      "job_id": "fb32a946-4007-4c2b-850f-c723f29329f8",
+      "job_name": "运维-重跑Windows迁移包导出",
+      "run_id": "267b87ea-eb43-4670-bbb0-a6d0c252e6ec",
+      "save_result_to_inbox": true,
+      "task_type": "agent",
+      "trigger": "manual"
+    },
+    "read": false,
+    "severity": "info",
+    "source_id": "fb32a946-4007-4c2b-850f-c723f29329f8",
+    "source_type": "cron",
+    "status": "success",
+    "title": "Cron result: 运维-重跑Windows迁移包导出"
+  }
+]

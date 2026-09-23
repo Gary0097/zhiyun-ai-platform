@@ -1,0 +1,60 @@
+{
+  "trace": "Traceback (most recent call last):\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/runtime/runtime.py\", line 106, in run\n    ctx.agent = await builder.build(ctx)\n                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/runtime/builder.py\", line 433, in build\n    model, _formatter = await run_sync_io(\n                        ^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/utils/io_utils.py\", line 136, in run_sync_io\n    return await _wait_for_task_completion(task)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/utils/io_utils.py\", line 100, in _wait_for_task_completion\n    await asyncio.shield(task)\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/cache/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/cache/python/cpython-3.12.14-linux-x86_64-gnu/lib/python3.12/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/runtime/builder.py\", line 604, in build_model\n    model, formatter = create_model_and_formatter(\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/zhiyun-ai-platform/apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/lib/python3.12/site-packages/qwenpaw/agents/model_factory.py\", line 2194, in create_model_and_formatter\n    raise ProviderError(\nqwenpaw.exceptions.ProviderError: Provider 'chinaunion' not found.\n",
+  "exception_type": "ProviderError",
+  "exception_message": "Provider 'chinaunion' not found.",
+  "request_info": {
+    "session_id": "1789676584874-yi86vyy",
+    "user_id": "default",
+    "channel": "console"
+  },
+  "request": {
+    "input": [
+      {
+        "id": "88162fe780024d9287c1f099fda67d88",
+        "type": "message",
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "delta": false,
+            "index": null,
+            "status": "created",
+            "object": "content",
+            "msg_id": null,
+            "text": "请调用知识库检索工具查一下：益生菌颗粒 应该适配哪个模板？用一句话回答。"
+          }
+        ],
+        "status": "in_progress",
+        "metadata": {
+          "qwenpaw_client_message_id": "20d6fb3b-5b38-4578-8c78-bca45f526e3a"
+        }
+      }
+    ],
+    "session_id": "1789676584874-yi86vyy",
+    "user_id": "default",
+    "stream": true,
+    "metadata": null,
+    "channel": "console",
+    "channel_meta": {
+      "session_id": "1789676584874-yi86vyy",
+      "user_id": "default",
+      "request_context": {
+        "source": "console_chat",
+        "agent_id": "order-parser-agent",
+        "chat_id": "96504146-66ae-446d-b7db-a54db0978d6f",
+        "sdk_session_id": "1789676584874-yi86vyy",
+        "approval_level": "AUTO"
+      },
+      "bot_prefix": ""
+    },
+    "request_context": {
+      "source": "console_chat",
+      "agent_id": "order-parser-agent",
+      "chat_id": "96504146-66ae-446d-b7db-a54db0978d6f",
+      "sdk_session_id": "1789676584874-yi86vyy",
+      "approval_level": "AUTO"
+    }
+  },
+  "agent_state": null,
+  "ts_utc": "2026-09-17T20:24:08Z"
+}

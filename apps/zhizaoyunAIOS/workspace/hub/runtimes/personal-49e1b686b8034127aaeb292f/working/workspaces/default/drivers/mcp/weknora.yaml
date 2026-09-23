@@ -1,0 +1,22 @@
+name: weknora
+protocol: mcp
+endpoint:
+  transport: streamable_http
+  url: http://127.0.0.1:18090/mcp
+  headers:
+    Authorization:
+      source: credential
+      credential: static
+      field: authorization
+credentials:
+  static:
+    kind: static
+    ref: mcp/weknora
+config:
+  display_name: weknora
+  description: ''
+  tools: null
+enabled: true
+policy:
+  default_effect: allow
+  rules: []

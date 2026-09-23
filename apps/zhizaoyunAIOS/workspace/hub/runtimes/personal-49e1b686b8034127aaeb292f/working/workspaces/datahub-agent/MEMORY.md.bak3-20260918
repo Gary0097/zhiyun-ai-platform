@@ -1,0 +1,39 @@
+---
+summary: "数据中枢智能体长期记忆"
+---
+
+# MEMORY
+
+## 固定事实
+
+- 快照时间：2026-09-18 08:00 +08:00（从 configuration.snapshot_at 读取）。
+- 计算副本：`datahub/agent_data.sqlite`（只读）。知识库：《金汉隆-数据中枢》id=4a945ef5-5157-41ca-b6f2-79fa1452f382。
+- Mock 推送：http://127.0.0.1:18765/api/mock/wechat/push（MOCK_MANAGEMENT，幂等）。
+
+## 工具设置
+
+- query.py：只读 SQL；calc.py：均值/斜率/变化率；kb_search.py：知识库问数；collect.py：采集演练。
+- 所有输出文件写入 `datahub/output/`。
+
+## 经验
+
+- **WMS 去重不能只信 flow_id**：坏样本 BAD-WMS-NEG / BAD-WMS-UNIT 把 flow_id 改写成 BAD-*，但 `payload.source_record_id` 仍是已入库的 WMS0000002 / WMS0000001 → 属"冲突重发"。去重须同时校验 payload.source_record_id + 业务指纹 (so_no,mo_no,item,lot,event_time,qty,uom)，命中即隔离，永不覆盖已入库值。
+- **WMS 符号契约**：原始流 qty 恒为非负（5418 条实测 0 负值），正负号由 direction 决定；库内 signed_quantity 才带符号（采购入库/成品入库为正，领料/损耗/销售出库/外购转成品为负）。
+- **单位域只有 台/套/件/批**（wms_transactions 5418 条）；"公斤"等质量单位无换算系数，禁止折算入库，跨产品折算只用"标准工时产出"。
+- **MES 三字段自洽**：clean 源 9127 条中 start>end=0、end-start≠duration_sec*1000 为 0、快照后事件=0 → duration_sec 可信，可用 `end = start + duration_sec*1000` 确定性修复倒置件；修复后仍要按 mes_event_id 比对既有事件，命中即幂等忽略。
+- **ERP 源字段语义**：`raw/erp/work_orders.json` 的 `billNo` 就是工单号（MO…，769 条无重复、saleNo 无空），不是销售订单号；saleNo/sku 分别须命中 orders(800)/products(16)。
+- **OA 契约**：form_id 形如 `OA-REIMxxxxx`，submitted_at 必为带时区 ISO8601（840 条无 date-only），必填 form_type/applicant_employee_id/status/form_payload；金额在 form_payload.金额。
+- 2026-09-18 处置 9 条坏样本：1 维持幂等忽略、2 驳回（BAD-MES-TIME 与 MES000001 同源损坏重发；BAD-MES-FUTURE 所属工单 2026-01-06 已全量签收）、6 进人工复核清单；对干净表影响 0（8 张表 BAD-* 扫描 0 命中）。产物：`datahub/output/bad_cases_review_20260918.md` / `.csv`。
+- **微信截图核对走视觉直读，不必装 OCR**：环境无 tesseract/pytesseract/easyocr，但模型多模态可用，`view_image` 直接读 `datahub/raw/wechat/CHAT_*.png` 即可；数量等关键字段有疑义时用 PIL `crop+resize` 放大再读一遍（本次靠这步确认 009/010 的"3"非误读）。
+- **`source_documents` 是图片↔订单号的权威台账**：DOC001-012 已预绑定 sales_order_id 且 `ingestion_status='待识别'`，所以"截图找不到订单"这类风险可先排除；核对时以它为准做 1:1 映射，不要靠订单号字符串自己猜（注意 SO…-0210 是 4 位、SO…-00671 是 5 位，两种位数并存）。
+- **截图 vs ERP 核对要分三层**：①截图与 ERP 差异（数量/交期）→ 人工复核；②ERP 自身风险标记 `source_risk_flag/reason` → 与①独立列，别混为一谈；③ERP 内部自洽性（`work_orders.planned_finish_at` > `orders.promised_delivery_at`）→ 截图完全一致的单也可能有，必须单独查。
+- **自产 BOM 恒为 M001×1 + M002×1 + M003×2 = 4 套/台**（12 个自产 SKU、1727 个"订单×物料"组合 min=max）；唯一例外 SO20260906-0201（P003，1 台）整条 M002 采购行+领料行都缺 → 属漏建单不是漏领，勿静默补齐。
+- **外购链路 4 步**：采购入库(M004,+) → 外购转成品(M004,−) → 成品入库(P0xx,+) → 销售出库；实测"转成品→成品入库"滞后 **6~33 天**（180 单），故 <6 天未入库属正常，≥6 天仍无入库才是缺口。快照时 9 单转出未转入（30 件），其中 3 单超窗。
+- **WMS 不变量（已验证全通过，可作为回归基线）**：批次级（item+lot 按 occurred_at 累计）余额从不转负；reference_id 前缀 PO-M*=采购行 / QC*=质检 / SH-M*=运单且 1:1；采购入库时间 1916 条与 procurement_lines.actual_receipt_at 逐条相等；运单量=销售出库量、订单量=工单计划量、成品入库量=质检合格量均 0 差异。
+- **质检 defective_quantity 语义分歧**：704 条"合格"全部 accepted+defective=inspected；56 条"不合格"恒为 accepted=0、defective=1、inspected=2~5 → 抽样不良数 vs 批内不良数不能同时成立，未给口径前不得用 accepted 反推批次合格率。
+- **ERP 自带 source_risk_flag 抓不到"计划内部矛盾"**：123 张工单 planned_finish_at > 承诺交期（最大超 20.6 天，集中 P010/P011 整线 160h/套），多数 flag='否'；另有 393 节点 planned_end 晚于承诺。查矛盾必须独立算，不能只筛 flag。
+- 2026-09-18 库存/数量/时间矛盾体检产物：`datahub/output/inventory_qty_time_conflicts_20260918.md` + `inventory_qty_time_review_20260918.csv`（204 行复核清单）。
+- **判断"是否重复新建"看 orders 唯一性 + 同客户同产品多单**：800 行 DISTINCT=800 即无重复；同 (customer_id,product_id) 的其他在效单是独立订单不是重复单，只作并单建议。
+- **日报"同一天触发两次"的真相与闸门（2026-09-18 修复）**：`jobs.json` 只有 1 个日报 job（cron `0 8 * * *` / Asia/Shanghai），`jobs_history/<job>.json` 里那两次是 **06:22 trigger=manual（我验证脚本时手动触发）+ 08:00 trigger=scheduled** —— 不是 cron 重复注册。旧 `daily_brief.py` 自身无幂等，去重全靠 Mock 服务端 `idempotency_key`（实测同键第二次返回 `duplicate_ignored`，微信侧不会重复，但挡不住重复计算、覆盖 md、会话里再播一份正文）。现改为三层闸门：①`datahub/output/.daily_brief_<YYYYMMDD>.claim`（O_CREAT|O_EXCL 原子认领，命中即 `skipped=already_generated`，不重算/不覆盖/不推送）②`datahub/output/daily_brief_ledger.jsonl` 发送账本（push_status ∈ saved_to_local_outbox/sent/queued/duplicate_ignored 视为已发）③Mock 服务端幂等键。推送失败会自动 release claim 允许当日重试；`--force` 强制重发、`--status` 只查状态。验证：同 report_date 连跑 3 次 → 第 2、3 次跳过且 md mtime 不变；A 失败释放/B 重试/C force 穿透/D force 后再跳过 全通过，数字与 08:00 那次逐项一致（2 单/9/20/2 笔 3943.27/89 单含 12 逾期/769-680/WC02 -30.58%）。脚本副本 `datahub/scripts/` 与 `skills/datahub/scripts/` 是两个独立文件，改一处必须同步另一处。
+- **验证日报别用手动触发 job**：会污染 `jobs_history` 并让会话里出现两份正文。改用 `python3 datahub/scripts/daily_brief.py --no-push` 或 `--status` 直接查。
+- **交付风险红黄绿（需求2）已固化为 `datahub/scripts/delivery_risk.py`**（副本同步 `skills/datahub/scripts/`，SKILL.md 工具表已加行）。敞口口径：769 已生效单中未全量签收者 = **89 单（在途 22 + 未发货 67）**；在途 22 含 1 单分批发货余量未发（SO20260814-0189）。评分=经验延期概率：在途用「同线路历史在途天数 > 承诺−发货」，未发货用「SHIP计划完成+线路在途P50」的残差经验分布（历史 680 单标定，残差 P50 自产+2.58/外购+1.89 天）；Beta(1,1) 平滑 (k+1)/(n+2)，桶样本 <`risk_min_samples=5` 逐级回退并在"依据"列标注。**关键设计：条件化只升级不降级**——已出现延误物流事件/异常的订单改用条件分布（历史 724 已签收运单：有延误事件均值 12.6 天 vs 无 5.3 天；签收前无异常残差 −2.9 天 vs 有 +3.7 天），暂无信号的仍用全量分布，否则对未走完的订单是幸存者偏差。2026-09-18 结果：红-延期事实 12 / 红 18 / 黄 12 / 绿 47；敞口 139台·33套·40件·3批、合同金额 15,840,496.11 元。**未发货红黄 31 单里 14 单是"SHIP 节点计划本身就晚于承诺"（排期冲突，非执行慢），3 单计划日已过仍未发货，14 单计划可行但缓冲被历史平均延迟吃掉**——这三档必须分开报，处置人不同。产物：`datahub/output/delivery_risk_20260918.md` / `.csv`（44 列，含 P50/P90、buffer、样本量、依据）。

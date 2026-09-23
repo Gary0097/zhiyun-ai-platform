@@ -1,0 +1,96 @@
+{
+  "schema_version": "workspace-skill-manifest.v1",
+  "version": 1789776001071,
+  "skills": {
+    "file_reader": {
+      "enabled": true,
+      "channels": [
+        "all"
+      ],
+      "preload": false,
+      "source": "builtin",
+      "metadata": {
+        "name": "file_reader",
+        "description": "Read and summarize text-based file types only. Prefer read_file for text formats; use execute_shell_command for type detection when needed. PDF/Office/images/archives are handled by other skills.",
+        "version_text": "1.2",
+        "emoji": "📄",
+        "commit_text": "",
+        "source": "builtin",
+        "protected": false,
+        "requirements": {
+          "require_bins": [],
+          "require_envs": [],
+          "require_mcps": []
+        },
+        "updated_at": "2026-09-17T17:05:22.963592Z"
+      },
+      "requirements": {
+        "require_bins": [],
+        "require_envs": [],
+        "require_mcps": []
+      },
+      "updated_at": "2026-09-17T17:05:22.963592Z",
+      "config": {}
+    },
+    "pdf": {
+      "enabled": true,
+      "channels": [
+        "all"
+      ],
+      "preload": false,
+      "source": "builtin",
+      "metadata": {
+        "name": "pdf",
+        "description": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.",
+        "version_text": "1.1",
+        "emoji": "",
+        "commit_text": "",
+        "source": "builtin",
+        "protected": false,
+        "requirements": {
+          "require_bins": [],
+          "require_envs": [],
+          "require_mcps": []
+        },
+        "updated_at": "2026-09-17T17:05:22.961592Z"
+      },
+      "requirements": {
+        "require_bins": [],
+        "require_envs": [],
+        "require_mcps": []
+      },
+      "updated_at": "2026-09-17T17:05:22.961592Z",
+      "config": {}
+    },
+    "datahub": {
+      "enabled": true,
+      "channels": [
+        "all"
+      ],
+      "preload": false,
+      "source": "customized",
+      "metadata": {
+        "name": "datahub",
+        "description": "金汉隆AI数据中枢技能。用于订单进度看板、交付风险预警、多源数据采集、跨部门融合指标、每日08点简报、关键指标趋势分析六类数据分析任务。双通道协作：kb_search.py 检索《金汉隆-数据中枢》知识库（口径/字段/事实），query.py 与 calc.py 对计算副本 agent_data.sqlite 做只读SQL聚合与统计回归。Use for Jinhuanlong data-hub analytics: order progress board, delivery risk early-warning, multi-source collection, cross-department metrics, daily brief, KPI trends.",
+        "version_text": "1.0",
+        "emoji": "📊",
+        "commit_text": "",
+        "source": "customized",
+        "protected": false,
+        "requirements": {
+          "require_bins": [],
+          "require_envs": [],
+          "require_mcps": []
+        },
+        "updated_at": "2026-09-18T06:00:06.710697Z"
+      },
+      "requirements": {
+        "require_bins": [],
+        "require_envs": [],
+        "require_mcps": []
+      },
+      "updated_at": "2026-09-18T06:00:06.710697Z",
+      "config": {}
+    }
+  }
+}

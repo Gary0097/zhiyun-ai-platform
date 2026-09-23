@@ -1,0 +1,30 @@
+{
+  "2026-09-17": {
+    "default\u001fkilo\u001fstepfun/step-3.7-flash:free": {
+      "provider_id": "kilo",
+      "model_name": "stepfun/step-3.7-flash:free",
+      "prompt_tokens": 102958,
+      "completion_tokens": 9972,
+      "cache_read_tokens": 59648,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 102958,
+      "cache_observed_calls": 18,
+      "call_count": 18,
+      "agent_id": "default"
+    }
+  },
+  "2026-09-18": {
+    "default\u001fkilo\u001fstepfun/step-3.7-flash:free": {
+      "provider_id": "kilo",
+      "model_name": "stepfun/step-3.7-flash:free",
+      "prompt_tokens": 394608,
+      "completion_tokens": 10001,
+      "cache_read_tokens": 333952,
+      "cache_write_tokens": 0,
+      "cache_eligible_input_tokens": 394608,
+      "cache_observed_calls": 32,
+      "call_count": 32,
+      "agent_id": "default"
+    }
+  }
+}

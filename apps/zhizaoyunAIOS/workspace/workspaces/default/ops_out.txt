@@ -1,0 +1,22 @@
+  导出 paperless_paperless_db
+  导出 paperless_paperless_redis
+  导出 cservice_cservice_data
+  导出 app_order_center_data
+[6/6] 品牌补丁（console 入口注入脚本 + 资产）...
+完成。包体量：
+1.1G	/export/zhiyun-windows-bundle
+171M	/export/zhiyun-windows-bundle/aios-data
+198M	/export/zhiyun-windows-bundle/aios-platform
+578M	/export/zhiyun-windows-bundle/apps
+28K	/export/zhiyun-windows-bundle/patches
+127M	/export/zhiyun-windows-bundle/volumes
+---VOL---
+app_order_center_data.tgz
+cservice_cservice_data.tgz
+paperless_paperless_db.tgz
+paperless_paperless_redis.tgz
+weknora_data-files.tgz
+weknora_postgres-data.tgz
+weknora_qdrant_data.tgz
+---SIZE---
+1.1G	/export/zhiyun-windows-bundle

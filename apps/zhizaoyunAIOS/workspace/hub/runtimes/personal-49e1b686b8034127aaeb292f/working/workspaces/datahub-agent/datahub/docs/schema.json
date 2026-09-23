@@ -1,0 +1,1476 @@
+{
+  "snapshot_at": "2026-09-18T08:00:00+08:00",
+  "all_data_is_mock": true,
+  "tables": {
+    "customers": {
+      "sheet": "01客户主数据",
+      "description": "沿用原表的客户与销售归属，不生成真实联系方式",
+      "pk": [
+        "customer_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "customer_id",
+        "customer_name",
+        "province",
+        "city",
+        "industry",
+        "customer_tier",
+        "sales_owner"
+      ],
+      "types": {
+        "customer_id": "TEXT",
+        "customer_name": "TEXT",
+        "province": "TEXT",
+        "city": "TEXT",
+        "industry": "TEXT",
+        "customer_tier": "TEXT",
+        "sales_owner": "TEXT"
+      }
+    },
+    "products": {
+      "sheet": "02产品SKU",
+      "description": "设备/配件SKU；客户包装物另存orders.packaged_goods",
+      "pk": [
+        "product_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "product_id",
+        "product_name",
+        "product_family",
+        "unit",
+        "output_basis",
+        "standard_hours_per_unit"
+      ],
+      "types": {
+        "product_id": "TEXT",
+        "product_name": "TEXT",
+        "product_family": "TEXT",
+        "unit": "TEXT",
+        "output_basis": "TEXT",
+        "standard_hours_per_unit": "REAL"
+      }
+    },
+    "departments": {
+      "sheet": "03部门",
+      "description": "部门主数据",
+      "pk": [
+        "department_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "department_id",
+        "department_name"
+      ],
+      "types": {
+        "department_id": "TEXT",
+        "department_name": "TEXT"
+      }
+    },
+    "workcenters": {
+      "sheet": "04工作中心",
+      "description": "加工与装配四个工作中心",
+      "pk": [
+        "workcenter_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "department_id": [
+          "departments",
+          "department_id"
+        ]
+      },
+      "fields": [
+        "workcenter_id",
+        "workcenter_name",
+        "department_id"
+      ],
+      "types": {
+        "workcenter_id": "TEXT",
+        "workcenter_name": "TEXT",
+        "department_id": "TEXT"
+      }
+    },
+    "employees": {
+      "sheet": "05员工",
+      "description": "员工及小时人工成本；姓名已脱敏",
+      "pk": [
+        "employee_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "department_id": [
+          "departments",
+          "department_id"
+        ],
+        "workcenter_id": [
+          "workcenters",
+          "workcenter_id"
+        ]
+      },
+      "fields": [
+        "employee_id",
+        "employee_name",
+        "department_id",
+        "workcenter_id",
+        "hourly_rate",
+        "employment_start"
+      ],
+      "types": {
+        "employee_id": "TEXT",
+        "employee_name": "TEXT",
+        "department_id": "TEXT",
+        "workcenter_id": "TEXT",
+        "hourly_rate": "REAL",
+        "employment_start": "DATE"
+      }
+    },
+    "equipment": {
+      "sheet": "06设备",
+      "description": "设备及运行费用率",
+      "pk": [
+        "equipment_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "workcenter_id": [
+          "workcenters",
+          "workcenter_id"
+        ]
+      },
+      "fields": [
+        "equipment_id",
+        "equipment_name",
+        "workcenter_id",
+        "rated_power_kw",
+        "overhead_rate_per_hour"
+      ],
+      "types": {
+        "equipment_id": "TEXT",
+        "equipment_name": "TEXT",
+        "workcenter_id": "TEXT",
+        "rated_power_kw": "INTEGER",
+        "overhead_rate_per_hour": "INTEGER"
+      }
+    },
+    "materials": {
+      "sheet": "07物料",
+      "description": "标准套包，测试期初各批次库存为0",
+      "pk": [
+        "material_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "material_id",
+        "material_name",
+        "unit"
+      ],
+      "types": {
+        "material_id": "TEXT",
+        "material_name": "TEXT",
+        "unit": "TEXT"
+      }
+    },
+    "warehouses": {
+      "sheet": "08仓库",
+      "description": "原料与成品仓库",
+      "pk": [
+        "warehouse_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "warehouse_id",
+        "warehouse_name",
+        "warehouse_type"
+      ],
+      "types": {
+        "warehouse_id": "TEXT",
+        "warehouse_name": "TEXT",
+        "warehouse_type": "TEXT"
+      }
+    },
+    "suppliers": {
+      "sheet": "09供应商",
+      "description": "供应商为本次新生成实体",
+      "pk": [
+        "supplier_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "supplier_id",
+        "supplier_name",
+        "material_specialty",
+        "standard_lead_days"
+      ],
+      "types": {
+        "supplier_id": "TEXT",
+        "supplier_name": "TEXT",
+        "material_specialty": "TEXT",
+        "standard_lead_days": "INTEGER"
+      }
+    },
+    "routes": {
+      "sheet": "10物流路线",
+      "description": "时效基线，参考承运商承诺",
+      "pk": [
+        "route_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "route_id",
+        "route_name",
+        "baseline_transit_days",
+        "transport_mode"
+      ],
+      "types": {
+        "route_id": "TEXT",
+        "route_name": "TEXT",
+        "baseline_transit_days": "INTEGER",
+        "transport_mode": "TEXT"
+      }
+    },
+    "orders": {
+      "sheet": "11销售订单",
+      "description": "保留800笔源订单；31笔为快照之后的未来样本",
+      "pk": [
+        "sales_order_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "customer_id": [
+          "customers",
+          "customer_id"
+        ],
+        "product_id": [
+          "products",
+          "product_id"
+        ],
+        "route_id": [
+          "routes",
+          "route_id"
+        ]
+      },
+      "fields": [
+        "sales_order_id",
+        "order_line_id",
+        "work_order_id",
+        "contract_no",
+        "customer_id",
+        "product_id",
+        "packaged_goods",
+        "quantity",
+        "unit",
+        "contract_amount",
+        "created_at",
+        "promised_delivery_at",
+        "delivery_basis",
+        "route_id",
+        "fulfillment_mode",
+        "order_source",
+        "source_risk_flag",
+        "source_risk_reason",
+        "sales_owner",
+        "source_sheet",
+        "source_row",
+        "is_effective",
+        "data_origin",
+        "snapshot_at"
+      ],
+      "types": {
+        "sales_order_id": "TEXT",
+        "order_line_id": "TEXT",
+        "work_order_id": "TEXT",
+        "contract_no": "TEXT",
+        "customer_id": "TEXT",
+        "product_id": "TEXT",
+        "packaged_goods": "TEXT",
+        "quantity": "INTEGER",
+        "unit": "TEXT",
+        "contract_amount": "REAL",
+        "created_at": "TIMESTAMP",
+        "promised_delivery_at": "TIMESTAMP",
+        "delivery_basis": "TEXT",
+        "route_id": "TEXT",
+        "fulfillment_mode": "TEXT",
+        "order_source": "TEXT",
+        "source_risk_flag": "TEXT",
+        "source_risk_reason": "TEXT",
+        "sales_owner": "TEXT",
+        "source_sheet": "TEXT",
+        "source_row": "INTEGER",
+        "is_effective": "INTEGER",
+        "data_origin": "TEXT",
+        "snapshot_at": "TIMESTAMP"
+      }
+    },
+    "work_orders": {
+      "sheet": "12ERP工单",
+      "description": "仅769笔已生效订单拥有执行工单",
+      "pk": [
+        "work_order_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ],
+        "product_id": [
+          "products",
+          "product_id"
+        ],
+        "assigned_workcenter_id": [
+          "workcenters",
+          "workcenter_id"
+        ]
+      },
+      "fields": [
+        "work_order_id",
+        "sales_order_id",
+        "order_line_id",
+        "product_id",
+        "planned_quantity",
+        "unit",
+        "fulfillment_mode",
+        "released_at",
+        "planned_finish_at",
+        "assigned_workcenter_id",
+        "source_system"
+      ],
+      "types": {
+        "work_order_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "order_line_id": "TEXT",
+        "product_id": "TEXT",
+        "planned_quantity": "INTEGER",
+        "unit": "TEXT",
+        "fulfillment_mode": "TEXT",
+        "released_at": "TIMESTAMP",
+        "planned_finish_at": "TIMESTAMP",
+        "assigned_workcenter_id": "TEXT",
+        "source_system": "TEXT"
+      }
+    },
+    "stage_nodes": {
+      "sheet": "13工序节点",
+      "description": "计划、加工/采购、装配、质检、发货；未发生实际时间留NULL",
+      "pk": [
+        "stage_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "work_order_id": [
+          "work_orders",
+          "work_order_id"
+        ],
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ],
+        "department_id": [
+          "departments",
+          "department_id"
+        ],
+        "workcenter_id": [
+          "workcenters",
+          "workcenter_id"
+        ],
+        "owner_employee_id": [
+          "employees",
+          "employee_id"
+        ]
+      },
+      "fields": [
+        "stage_id",
+        "work_order_id",
+        "sales_order_id",
+        "stage_code",
+        "stage_name",
+        "sequence",
+        "department_id",
+        "workcenter_id",
+        "planned_start_at",
+        "planned_end_at",
+        "actual_start_at",
+        "actual_end_at",
+        "stage_status",
+        "owner_employee_id",
+        "updated_at"
+      ],
+      "types": {
+        "stage_id": "TEXT",
+        "work_order_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "stage_code": "TEXT",
+        "stage_name": "TEXT",
+        "sequence": "INTEGER",
+        "department_id": "TEXT",
+        "workcenter_id": "TEXT",
+        "planned_start_at": "TIMESTAMP",
+        "planned_end_at": "TIMESTAMP",
+        "actual_start_at": "TIMESTAMP",
+        "actual_end_at": "TIMESTAMP",
+        "stage_status": "TEXT",
+        "owner_employee_id": "TEXT",
+        "updated_at": "TIMESTAMP"
+      }
+    },
+    "procurement_lines": {
+      "sheet": "14物料需求采购",
+      "description": "订单物料需求、采购承诺、供应商ETA和实际到货",
+      "pk": [
+        "purchase_line_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ],
+        "work_order_id": [
+          "work_orders",
+          "work_order_id"
+        ],
+        "material_id": [
+          "materials",
+          "material_id"
+        ],
+        "supplier_id": [
+          "suppliers",
+          "supplier_id"
+        ]
+      },
+      "fields": [
+        "purchase_line_id",
+        "sales_order_id",
+        "work_order_id",
+        "material_id",
+        "supplier_id",
+        "required_quantity",
+        "ordered_quantity",
+        "promised_receipt_at",
+        "supplier_confirmed_eta",
+        "ordered_at",
+        "actual_receipt_at",
+        "unit_cost",
+        "unit"
+      ],
+      "types": {
+        "purchase_line_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "work_order_id": "TEXT",
+        "material_id": "TEXT",
+        "supplier_id": "TEXT",
+        "required_quantity": "INTEGER",
+        "ordered_quantity": "INTEGER",
+        "promised_receipt_at": "TIMESTAMP",
+        "supplier_confirmed_eta": "TIMESTAMP",
+        "ordered_at": "TIMESTAMP",
+        "actual_receipt_at": "TIMESTAMP",
+        "unit_cost": "REAL",
+        "unit": "TEXT"
+      }
+    },
+    "wms_transactions": {
+      "sheet": "15WMS出入库",
+      "description": "库存按带符号数量累计；损耗出库与生产领料不重复计费",
+      "pk": [
+        "transaction_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ],
+        "work_order_id": [
+          "work_orders",
+          "work_order_id"
+        ],
+        "material_id": [
+          "materials",
+          "material_id"
+        ],
+        "product_id": [
+          "products",
+          "product_id"
+        ],
+        "warehouse_id": [
+          "warehouses",
+          "warehouse_id"
+        ]
+      },
+      "fields": [
+        "transaction_id",
+        "sales_order_id",
+        "work_order_id",
+        "material_id",
+        "product_id",
+        "warehouse_id",
+        "lot_id",
+        "movement_type",
+        "signed_quantity",
+        "unit",
+        "unit_cost",
+        "occurred_at",
+        "reference_id"
+      ],
+      "types": {
+        "transaction_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "work_order_id": "TEXT",
+        "material_id": "TEXT",
+        "product_id": "TEXT",
+        "warehouse_id": "TEXT",
+        "lot_id": "TEXT",
+        "movement_type": "TEXT",
+        "signed_quantity": "INTEGER",
+        "unit": "TEXT",
+        "unit_cost": "REAL",
+        "occurred_at": "TIMESTAMP",
+        "reference_id": "TEXT"
+      }
+    },
+    "quality_inspections": {
+      "sheet": "16质检与返工",
+      "description": "返工前的不合格检验不算生产完成；最终合格对应成品入库",
+      "pk": [
+        "inspection_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ],
+        "work_order_id": [
+          "work_orders",
+          "work_order_id"
+        ],
+        "product_id": [
+          "products",
+          "product_id"
+        ],
+        "inspector_employee_id": [
+          "employees",
+          "employee_id"
+        ]
+      },
+      "fields": [
+        "inspection_id",
+        "sales_order_id",
+        "work_order_id",
+        "product_id",
+        "inspection_type",
+        "inspected_quantity",
+        "accepted_quantity",
+        "defective_quantity",
+        "result",
+        "defect_code",
+        "defect_description",
+        "inspected_at",
+        "inspector_employee_id"
+      ],
+      "types": {
+        "inspection_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "work_order_id": "TEXT",
+        "product_id": "TEXT",
+        "inspection_type": "TEXT",
+        "inspected_quantity": "INTEGER",
+        "accepted_quantity": "INTEGER",
+        "defective_quantity": "INTEGER",
+        "result": "TEXT",
+        "defect_code": "TEXT",
+        "defect_description": "TEXT",
+        "inspected_at": "TIMESTAMP",
+        "inspector_employee_id": "TEXT"
+      }
+    },
+    "shipments": {
+      "sheet": "17物流运单",
+      "description": "支持分批发货；签收为空表示尚未观察到签收",
+      "pk": [
+        "shipment_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ],
+        "work_order_id": [
+          "work_orders",
+          "work_order_id"
+        ],
+        "route_id": [
+          "routes",
+          "route_id"
+        ]
+      },
+      "fields": [
+        "shipment_id",
+        "sales_order_id",
+        "work_order_id",
+        "route_id",
+        "carrier",
+        "tracking_no",
+        "quantity",
+        "unit",
+        "dispatched_at",
+        "carrier_promised_at",
+        "received_at",
+        "freight_cost",
+        "status"
+      ],
+      "types": {
+        "shipment_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "work_order_id": "TEXT",
+        "route_id": "TEXT",
+        "carrier": "TEXT",
+        "tracking_no": "TEXT",
+        "quantity": "INTEGER",
+        "unit": "TEXT",
+        "dispatched_at": "TIMESTAMP",
+        "carrier_promised_at": "TIMESTAMP",
+        "received_at": "TIMESTAMP",
+        "freight_cost": "INTEGER",
+        "status": "TEXT"
+      }
+    },
+    "logistics_events": {
+      "sheet": "18物流轨迹",
+      "description": "已揽收、运输中、延误、签收等观测事件",
+      "pk": [
+        "logistics_event_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "shipment_id": [
+          "shipments",
+          "shipment_id"
+        ]
+      },
+      "fields": [
+        "logistics_event_id",
+        "shipment_id",
+        "event_at",
+        "event_status",
+        "event_description"
+      ],
+      "types": {
+        "logistics_event_id": "TEXT",
+        "shipment_id": "TEXT",
+        "event_at": "TIMESTAMP",
+        "event_status": "TEXT",
+        "event_description": "TEXT"
+      }
+    },
+    "attendance": {
+      "sheet": "19人员出勤",
+      "description": "周一至周六；按人员/日期记录，避免只数报工人员造成分母偏差",
+      "pk": [
+        "attendance_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "employee_id": [
+          "employees",
+          "employee_id"
+        ],
+        "department_id": [
+          "departments",
+          "department_id"
+        ],
+        "workcenter_id": [
+          "workcenters",
+          "workcenter_id"
+        ]
+      },
+      "fields": [
+        "attendance_id",
+        "work_date",
+        "employee_id",
+        "department_id",
+        "workcenter_id",
+        "scheduled_hours",
+        "paid_hours",
+        "attendance_status"
+      ],
+      "types": {
+        "attendance_id": "TEXT",
+        "work_date": "DATE",
+        "employee_id": "TEXT",
+        "department_id": "TEXT",
+        "workcenter_id": "TEXT",
+        "scheduled_hours": "INTEGER",
+        "paid_hours": "INTEGER",
+        "attendance_status": "TEXT"
+      }
+    },
+    "labor_logs": {
+      "sheet": "20工时与标准产出",
+      "description": "人时与标准工时产出；不是设备运行时长，也不是设备台数",
+      "pk": [
+        "labor_log_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ],
+        "work_order_id": [
+          "work_orders",
+          "work_order_id"
+        ],
+        "employee_id": [
+          "employees",
+          "employee_id"
+        ],
+        "department_id": [
+          "departments",
+          "department_id"
+        ],
+        "workcenter_id": [
+          "workcenters",
+          "workcenter_id"
+        ]
+      },
+      "fields": [
+        "labor_log_id",
+        "work_date",
+        "sales_order_id",
+        "work_order_id",
+        "employee_id",
+        "department_id",
+        "workcenter_id",
+        "stage_code",
+        "actual_hours",
+        "earned_standard_hours",
+        "hourly_rate",
+        "standard_value_rate",
+        "reported_at",
+        "approved"
+      ],
+      "types": {
+        "labor_log_id": "TEXT",
+        "work_date": "DATE",
+        "sales_order_id": "TEXT",
+        "work_order_id": "TEXT",
+        "employee_id": "TEXT",
+        "department_id": "TEXT",
+        "workcenter_id": "TEXT",
+        "stage_code": "TEXT",
+        "actual_hours": "REAL",
+        "earned_standard_hours": "REAL",
+        "hourly_rate": "REAL",
+        "standard_value_rate": "REAL",
+        "reported_at": "TIMESTAMP",
+        "approved": "INTEGER"
+      }
+    },
+    "mes_events": {
+      "sheet": "21MES设备日志",
+      "description": "运行/停机区间；各设备区间无重叠，实际事件不越过快照",
+      "pk": [
+        "mes_event_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "equipment_id": [
+          "equipment",
+          "equipment_id"
+        ],
+        "workcenter_id": [
+          "workcenters",
+          "workcenter_id"
+        ],
+        "work_order_id": [
+          "work_orders",
+          "work_order_id"
+        ],
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ]
+      },
+      "fields": [
+        "mes_event_id",
+        "equipment_id",
+        "workcenter_id",
+        "work_order_id",
+        "sales_order_id",
+        "event_type",
+        "start_at",
+        "end_at",
+        "duration_minutes",
+        "alarm_code",
+        "energy_kwh"
+      ],
+      "types": {
+        "mes_event_id": "TEXT",
+        "equipment_id": "TEXT",
+        "workcenter_id": "TEXT",
+        "work_order_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "event_type": "TEXT",
+        "start_at": "TIMESTAMP",
+        "end_at": "TIMESTAMP",
+        "duration_minutes": "REAL",
+        "alarm_code": "TEXT",
+        "energy_kwh": "REAL"
+      }
+    },
+    "expenses": {
+      "sheet": "22报销申请",
+      "description": "提交计数以expense_id去重；关联订单可为空",
+      "pk": [
+        "expense_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "employee_id": [
+          "employees",
+          "employee_id"
+        ],
+        "department_id": [
+          "departments",
+          "department_id"
+        ],
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ]
+      },
+      "fields": [
+        "expense_id",
+        "employee_id",
+        "department_id",
+        "sales_order_id",
+        "expense_type",
+        "amount",
+        "currency",
+        "submitted_at",
+        "approved_at",
+        "paid_at",
+        "status",
+        "invoice_no"
+      ],
+      "types": {
+        "expense_id": "TEXT",
+        "employee_id": "TEXT",
+        "department_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "expense_type": "TEXT",
+        "amount": "REAL",
+        "currency": "TEXT",
+        "submitted_at": "TIMESTAMP",
+        "approved_at": "TIMESTAMP",
+        "paid_at": "TIMESTAMP",
+        "status": "TEXT",
+        "invoice_no": "TEXT"
+      }
+    },
+    "oa_forms": {
+      "sheet": "23OA表单",
+      "description": "报销/请假/加班/采购表单；JSON载荷",
+      "pk": [
+        "form_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "applicant_employee_id": [
+          "employees",
+          "employee_id"
+        ]
+      },
+      "fields": [
+        "form_id",
+        "form_type",
+        "applicant_employee_id",
+        "submitted_at",
+        "status",
+        "related_record_id",
+        "form_payload"
+      ],
+      "types": {
+        "form_id": "TEXT",
+        "form_type": "TEXT",
+        "applicant_employee_id": "TEXT",
+        "submitted_at": "TIMESTAMP",
+        "status": "TEXT",
+        "related_record_id": "TEXT",
+        "form_payload": "TEXT"
+      }
+    },
+    "exceptions": {
+      "sheet": "24异常事件",
+      "description": "异常事件数≠异常工单数；按日期去重和开放区间统计",
+      "pk": [
+        "exception_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ],
+        "work_order_id": [
+          "work_orders",
+          "work_order_id"
+        ]
+      },
+      "fields": [
+        "exception_id",
+        "sales_order_id",
+        "work_order_id",
+        "exception_type",
+        "severity",
+        "opened_at",
+        "closed_at",
+        "status",
+        "reason",
+        "source_record_id"
+      ],
+      "types": {
+        "exception_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "work_order_id": "TEXT",
+        "exception_type": "TEXT",
+        "severity": "TEXT",
+        "opened_at": "TIMESTAMP",
+        "closed_at": "TIMESTAMP",
+        "status": "TEXT",
+        "reason": "TEXT",
+        "source_record_id": "TEXT"
+      }
+    },
+    "source_documents": {
+      "sheet": "25微信图片索引",
+      "description": "12张真实存在的模拟截图；识别答案在evaluation，不在本表",
+      "pk": [
+        "document_id"
+      ],
+      "layer": "clean",
+      "fks": {
+        "sales_order_id": [
+          "orders",
+          "sales_order_id"
+        ]
+      },
+      "fields": [
+        "document_id",
+        "sales_order_id",
+        "source_system",
+        "file_path",
+        "file_type",
+        "received_at",
+        "message_id",
+        "ingestion_status"
+      ],
+      "types": {
+        "document_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "source_system": "TEXT",
+        "file_path": "TEXT",
+        "file_type": "TEXT",
+        "received_at": "TIMESTAMP",
+        "message_id": "TEXT",
+        "ingestion_status": "TEXT"
+      }
+    },
+    "ingestion_runs": {
+      "sheet": "26采集批次",
+      "description": "采集批次及待识别状态",
+      "pk": [
+        "run_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "run_id",
+        "source_system",
+        "run_at",
+        "input_record_count",
+        "loaded_record_count",
+        "quarantined_record_count",
+        "run_status",
+        "sync_mode",
+        "watermark",
+        "note"
+      ],
+      "types": {
+        "run_id": "TEXT",
+        "source_system": "TEXT",
+        "run_at": "TIMESTAMP",
+        "input_record_count": "INTEGER",
+        "loaded_record_count": "INTEGER",
+        "quarantined_record_count": "INTEGER",
+        "run_status": "TEXT",
+        "sync_mode": "TEXT",
+        "watermark": "TIMESTAMP",
+        "note": "TEXT"
+      }
+    },
+    "quality_issues": {
+      "sheet": "27采集异常",
+      "description": "9个刻意加入的采集错误/重复案例；坏数据不在干净事实表",
+      "pk": [
+        "issue_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "issue_id",
+        "source_system",
+        "source_record_id",
+        "rule_id",
+        "handling",
+        "status",
+        "detected_at"
+      ],
+      "types": {
+        "issue_id": "TEXT",
+        "source_system": "TEXT",
+        "source_record_id": "TEXT",
+        "rule_id": "TEXT",
+        "handling": "TEXT",
+        "status": "TEXT",
+        "detected_at": "TIMESTAMP"
+      }
+    },
+    "source_audit": {
+      "sheet": "28原表审计",
+      "description": "原始汇总过期、合同号重复、未来样本等处理记录",
+      "pk": [
+        "issue_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "issue_id",
+        "severity",
+        "source_object",
+        "rule_id",
+        "issue_description",
+        "handling",
+        "affected_rows"
+      ],
+      "types": {
+        "issue_id": "TEXT",
+        "severity": "TEXT",
+        "source_object": "TEXT",
+        "rule_id": "TEXT",
+        "issue_description": "TEXT",
+        "handling": "TEXT",
+        "affected_rows": "INTEGER"
+      }
+    },
+    "source_mappings": {
+      "sheet": "29采集字段映射",
+      "description": "字段、时间戳、秒/分钟/小时、方向符号标准化",
+      "pk": [
+        "mapping_id"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "mapping_id",
+        "source_system",
+        "source_field",
+        "target_table",
+        "target_field",
+        "transform_rule"
+      ],
+      "types": {
+        "mapping_id": "TEXT",
+        "source_system": "TEXT",
+        "source_field": "TEXT",
+        "target_table": "TEXT",
+        "target_field": "TEXT",
+        "transform_rule": "TEXT"
+      }
+    },
+    "configuration": {
+      "sheet": "30采集配置",
+      "description": "时间锚点、统计口径、阈值与日历",
+      "pk": [
+        "config_key"
+      ],
+      "layer": "clean",
+      "fks": {},
+      "fields": [
+        "config_key",
+        "config_value",
+        "description"
+      ],
+      "types": {
+        "config_key": "TEXT",
+        "config_value": "TEXT",
+        "description": "TEXT"
+      }
+    },
+    "order_progress": {
+      "sheet": "参考01订单状态",
+      "description": "参考答案：按底层节点与全量签收数量计算，不作为原始事实",
+      "pk": [
+        "sales_order_id"
+      ],
+      "layer": "mart",
+      "fks": {},
+      "fields": [
+        "sales_order_id",
+        "work_order_id",
+        "customer_id",
+        "order_status",
+        "current_stage_code",
+        "ordered_quantity",
+        "completed_quantity",
+        "shipped_quantity",
+        "received_quantity",
+        "fulfillment_rate",
+        "unit",
+        "overdue_open_nodes",
+        "is_delivery_overdue",
+        "delivered_at",
+        "snapshot_at"
+      ],
+      "types": {
+        "sales_order_id": "TEXT",
+        "work_order_id": "TEXT",
+        "customer_id": "TEXT",
+        "order_status": "TEXT",
+        "current_stage_code": "TEXT",
+        "ordered_quantity": "INTEGER",
+        "completed_quantity": "INTEGER",
+        "shipped_quantity": "INTEGER",
+        "received_quantity": "INTEGER",
+        "fulfillment_rate": "REAL",
+        "unit": "TEXT",
+        "overdue_open_nodes": "INTEGER",
+        "is_delivery_overdue": "INTEGER",
+        "delivered_at": "TIMESTAMP",
+        "snapshot_at": "TIMESTAMP"
+      }
+    },
+    "cycle_samples": {
+      "sheet": "参考02历史周期",
+      "description": "参考历史已完工样本，生产周期和签收延期标签均仅用已观测数据",
+      "pk": [
+        "cycle_sample_id"
+      ],
+      "layer": "mart",
+      "fks": {},
+      "fields": [
+        "cycle_sample_id",
+        "sales_order_id",
+        "product_id",
+        "product_family",
+        "quantity_bucket",
+        "fulfillment_mode",
+        "production_start_at",
+        "production_end_at",
+        "production_cycle_days",
+        "delivery_delay_days",
+        "label_observed_at"
+      ],
+      "types": {
+        "cycle_sample_id": "TEXT",
+        "sales_order_id": "TEXT",
+        "product_id": "TEXT",
+        "product_family": "TEXT",
+        "quantity_bucket": "TEXT",
+        "fulfillment_mode": "TEXT",
+        "production_start_at": "TIMESTAMP",
+        "production_end_at": "TIMESTAMP",
+        "production_cycle_days": "REAL",
+        "delivery_delay_days": "REAL",
+        "label_observed_at": "TIMESTAMP"
+      }
+    },
+    "order_cost": {
+      "sheet": "参考03订单成本",
+      "description": "参考：截至快照已发生的累计成本；不是项目利润预测",
+      "pk": [
+        "sales_order_id"
+      ],
+      "layer": "mart",
+      "fks": {},
+      "fields": [
+        "sales_order_id",
+        "work_order_id",
+        "contract_amount",
+        "material_consumption_cost",
+        "material_loss_cost",
+        "allocated_labor_cost",
+        "machine_overhead_cost",
+        "freight_cost",
+        "observed_total_cost",
+        "cost_basis",
+        "snapshot_at"
+      ],
+      "types": {
+        "sales_order_id": "TEXT",
+        "work_order_id": "TEXT",
+        "contract_amount": "REAL",
+        "material_consumption_cost": "REAL",
+        "material_loss_cost": "REAL",
+        "allocated_labor_cost": "REAL",
+        "machine_overhead_cost": "REAL",
+        "freight_cost": "INTEGER",
+        "observed_total_cost": "REAL",
+        "cost_basis": "TEXT",
+        "snapshot_at": "TIMESTAMP"
+      }
+    },
+    "daily_operations": {
+      "sheet": "参考04部门日指标",
+      "description": "参考：人效、作业折算产值、损耗与产能利用率",
+      "pk": [
+        "metric_date",
+        "workcenter_id"
+      ],
+      "layer": "mart",
+      "fks": {},
+      "fields": [
+        "metric_date",
+        "department_id",
+        "workcenter_id",
+        "active_order_count",
+        "present_staff_count",
+        "scheduled_paid_hours",
+        "actual_labor_hours",
+        "earned_standard_hours",
+        "labor_productivity",
+        "capacity_utilization",
+        "earned_management_value",
+        "allocated_labor_cost",
+        "idle_labor_cost",
+        "downtime_minutes",
+        "material_consumption_cost",
+        "material_loss_cost",
+        "material_loss_rate"
+      ],
+      "types": {
+        "metric_date": "DATE",
+        "department_id": "TEXT",
+        "workcenter_id": "TEXT",
+        "active_order_count": "INTEGER",
+        "present_staff_count": "INTEGER",
+        "scheduled_paid_hours": "INTEGER",
+        "actual_labor_hours": "REAL",
+        "earned_standard_hours": "REAL",
+        "labor_productivity": "REAL",
+        "capacity_utilization": "REAL",
+        "earned_management_value": "REAL",
+        "allocated_labor_cost": "REAL",
+        "idle_labor_cost": "REAL",
+        "downtime_minutes": "REAL",
+        "material_consumption_cost": "REAL",
+        "material_loss_cost": "REAL",
+        "material_loss_rate": "REAL"
+      }
+    },
+    "daily_enterprise": {
+      "sheet": "参考05企业日指标",
+      "description": "参考：完整自然日经营指标；台/套/件/批分开",
+      "pk": [
+        "metric_date"
+      ],
+      "layer": "mart",
+      "fks": {},
+      "fields": [
+        "metric_date",
+        "new_order_count",
+        "completed_order_count",
+        "production_completed_order_count",
+        "finished_machines",
+        "finished_lines",
+        "finished_parts",
+        "finished_batches",
+        "new_abnormal_work_order_count",
+        "open_abnormal_work_order_count",
+        "reimbursement_submission_count",
+        "reimbursement_submitted_amount",
+        "actual_labor_hours",
+        "earned_standard_hours",
+        "labor_productivity",
+        "material_loss_cost",
+        "finished_contract_value"
+      ],
+      "types": {
+        "metric_date": "DATE",
+        "new_order_count": "INTEGER",
+        "completed_order_count": "INTEGER",
+        "production_completed_order_count": "INTEGER",
+        "finished_machines": "INTEGER",
+        "finished_lines": "INTEGER",
+        "finished_parts": "INTEGER",
+        "finished_batches": "INTEGER",
+        "new_abnormal_work_order_count": "INTEGER",
+        "open_abnormal_work_order_count": "INTEGER",
+        "reimbursement_submission_count": "INTEGER",
+        "reimbursement_submitted_amount": "REAL",
+        "actual_labor_hours": "REAL",
+        "earned_standard_hours": "REAL",
+        "labor_productivity": "REAL",
+        "material_loss_cost": "REAL",
+        "finished_contract_value": "REAL"
+      }
+    },
+    "risk_reference": {
+      "sheet": "参考06交付风险",
+      "description": "验收参考：未校准经验抽样概率；不是实际模型效果证明",
+      "pk": [
+        "sales_order_id"
+      ],
+      "layer": "evaluation",
+      "fks": {},
+      "fields": [
+        "sales_order_id",
+        "snapshot_at",
+        "delay_probability",
+        "risk_level",
+        "is_already_overdue",
+        "prediction_type",
+        "estimated_delivery_p50",
+        "estimated_delivery_p90",
+        "comparable_cycle_sample_count",
+        "route_sample_count",
+        "cohort_rule",
+        "used_tail_extrapolation",
+        "shortage_wait_days",
+        "evidence",
+        "model_version"
+      ],
+      "types": {
+        "sales_order_id": "TEXT",
+        "snapshot_at": "TIMESTAMP",
+        "delay_probability": "REAL",
+        "risk_level": "TEXT",
+        "is_already_overdue": "INTEGER",
+        "prediction_type": "TEXT",
+        "estimated_delivery_p50": "TIMESTAMP",
+        "estimated_delivery_p90": "TIMESTAMP",
+        "comparable_cycle_sample_count": "INTEGER",
+        "route_sample_count": "INTEGER",
+        "cohort_rule": "TEXT",
+        "used_tail_extrapolation": "INTEGER",
+        "shortage_wait_days": "REAL",
+        "evidence": "TEXT",
+        "model_version": "TEXT"
+      }
+    },
+    "trend_reference": {
+      "sheet": "参考07趋势分析",
+      "description": "验收参考：7点移动均值+14点线性回归",
+      "pk": [
+        "trend_id"
+      ],
+      "layer": "evaluation",
+      "fks": {},
+      "fields": [
+        "trend_id",
+        "entity_type",
+        "entity_id",
+        "metric_name",
+        "unit",
+        "window_end",
+        "recent_7_mean",
+        "previous_7_mean",
+        "change_rate",
+        "slope_14",
+        "is_declining",
+        "method",
+        "sample_count"
+      ],
+      "types": {
+        "trend_id": "TEXT",
+        "entity_type": "TEXT",
+        "entity_id": "TEXT",
+        "metric_name": "TEXT",
+        "unit": "TEXT",
+        "window_end": "DATE",
+        "recent_7_mean": "REAL",
+        "previous_7_mean": "REAL",
+        "change_rate": "REAL",
+        "slope_14": "REAL",
+        "is_declining": "INTEGER",
+        "method": "TEXT",
+        "sample_count": "INTEGER"
+      }
+    },
+    "brief_reference": {
+      "sheet": "参考08每日简报",
+      "description": "验收参考：仅生成文本与本地Mock收件组，不真实推送",
+      "pk": [
+        "brief_id"
+      ],
+      "layer": "evaluation",
+      "fks": {},
+      "fields": [
+        "brief_id",
+        "scheduled_at",
+        "metric_date",
+        "completed_order_count",
+        "new_abnormal_work_order_count",
+        "open_abnormal_work_order_count",
+        "reimbursement_submission_count",
+        "reimbursement_submitted_amount",
+        "delivery_red_count",
+        "recipient_group",
+        "delivery_status",
+        "idempotency_key",
+        "content"
+      ],
+      "types": {
+        "brief_id": "TEXT",
+        "scheduled_at": "TIMESTAMP",
+        "metric_date": "DATE",
+        "completed_order_count": "INTEGER",
+        "new_abnormal_work_order_count": "INTEGER",
+        "open_abnormal_work_order_count": "INTEGER",
+        "reimbursement_submission_count": "INTEGER",
+        "reimbursement_submitted_amount": "REAL",
+        "delivery_red_count": "INTEGER",
+        "recipient_group": "TEXT",
+        "delivery_status": "TEXT",
+        "idempotency_key": "TEXT",
+        "content": "TEXT"
+      }
+    },
+    "test_cases": {
+      "sheet": "参考09验收用例",
+      "description": "18条测试提示、期望答案及证据位置；不要喂给盲测智能体",
+      "pk": [
+        "case_id"
+      ],
+      "layer": "evaluation",
+      "fks": {},
+      "fields": [
+        "case_id",
+        "requirement",
+        "prompt",
+        "expected_result",
+        "evidence_tables"
+      ],
+      "types": {
+        "case_id": "TEXT",
+        "requirement": "TEXT",
+        "prompt": "TEXT",
+        "expected_result": "TEXT",
+        "evidence_tables": "TEXT"
+      }
+    }
+  }
+}

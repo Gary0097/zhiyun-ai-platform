@@ -1,0 +1,18 @@
+{
+  "id": "zhiyun-contract-app",
+  "name": "合同管理系统",
+  "version": "1.0.0",
+  "type": "frontend",
+  "description": "合同管理应用入口：从控制台一键打开 Paperless 合同管理系统（Hub 免密自动登录）",
+  "author": "Zhiyun AI",
+  "entry": {
+    "frontend": "dist/index.js"
+  },
+  "dependencies": [],
+  "qwenpaw_version": {
+    "min": "2.2.0"
+  },
+  "meta": {
+    "features": ["app-entry", "iframe-route", "sso-jump"]
+  }
+}

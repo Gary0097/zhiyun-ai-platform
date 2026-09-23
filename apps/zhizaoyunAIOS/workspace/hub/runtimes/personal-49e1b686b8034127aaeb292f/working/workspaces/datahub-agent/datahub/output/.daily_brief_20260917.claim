@@ -1,0 +1,1 @@
+{"idempotency_key": "daily-brief-20260917", "claimed_at": "2026-09-18T08:04:55+08:00", "backfilled": true, "note": "旧脚本无本地认领；06:19 manual + 08:00 scheduled 两次触发，Mock 消息号 WBMSG-c490b11a12a5", "pid": 961, "host": "cometflux"}

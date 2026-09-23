@@ -1,0 +1,18 @@
+{
+  "id": "zhiyun-finance-app",
+  "name": "财务智能化中枢",
+  "version": "1.0.0",
+  "type": "frontend",
+  "description": "财务智能化中枢入口：从控制台一键打开财务流程自动化系统（智能报销审核 / 数据分析看板 / 成本预测模型，免登录）",
+  "author": "Zhiyun AI",
+  "entry": {
+    "frontend": "dist/index.js"
+  },
+  "dependencies": [],
+  "qwenpaw_version": {
+    "min": "2.2.0"
+  },
+  "meta": {
+    "features": ["app-entry", "iframe-route"]
+  }
+}

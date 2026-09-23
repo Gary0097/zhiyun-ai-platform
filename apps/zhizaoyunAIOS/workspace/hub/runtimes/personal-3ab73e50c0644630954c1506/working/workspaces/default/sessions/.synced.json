@@ -1,0 +1,71 @@
+{
+  "version": 2,
+  "files": {
+    "console/default_1787647082000-a6ee13.json": {
+      "sha256": "782c0872c64763c844e3979e8daf239a7237ba64d88d905c31839a81ce4c2480",
+      "session_id": "1787647082000-a6ee13",
+      "messages": 6,
+      "aged_out": 0,
+      "rows_processed": 6,
+      "rows_inserted": 6,
+      "legacy_session_ids_checked": [
+        "sync:default_1787647082000-a6ee13"
+      ]
+    },
+    "console/default_1788616342000-c2553e.json": {
+      "sha256": "ff55cd2f5664d9e4d6285d017a8a40ee75518a77331a2cc129e16207234d3bd5",
+      "session_id": "1788616342000-c2553e",
+      "messages": 6,
+      "aged_out": 0,
+      "rows_processed": 6,
+      "rows_inserted": 6,
+      "legacy_session_ids_checked": [
+        "sync:default_1788616342000-c2553e"
+      ]
+    },
+    "console/default_1789139459000-2284c1.json": {
+      "sha256": "9216e1488b0c3b596aa6082c325868e8aca8de999cb4087ce961cb6c2b6478f0",
+      "session_id": "1789139459000-2284c1",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 4,
+      "rows_inserted": 4,
+      "legacy_session_ids_checked": [
+        "sync:default_1789139459000-2284c1"
+      ]
+    },
+    "console/default_1789320622000-ed2acc.json": {
+      "sha256": "bfd5e121b57041f91ac9de550da3ce68070a9b6b48e0418c1c40144ac00f4b6f",
+      "session_id": "1789320622000-ed2acc",
+      "messages": 6,
+      "aged_out": 0,
+      "rows_processed": 6,
+      "rows_inserted": 6,
+      "legacy_session_ids_checked": [
+        "sync:default_1789320622000-ed2acc"
+      ]
+    },
+    "console/default_1789662238000-b89043.json": {
+      "sha256": "ec6ebc47543d13348cca2e14bd210d4b4791131d8b216d6b81ac205f1643b8ca",
+      "session_id": "1789662238000-b89043",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 4,
+      "rows_inserted": 4,
+      "legacy_session_ids_checked": [
+        "sync:default_1789662238000-b89043"
+      ]
+    },
+    "console/default_1789742128000-97e45b.json": {
+      "sha256": "bc848f6f4b0af0a7c5a06afbd636fa044799e28dd28daba4a519e5b2db2263dc",
+      "session_id": "1789742128000-97e45b",
+      "messages": 6,
+      "aged_out": 0,
+      "rows_processed": 6,
+      "rows_inserted": 6,
+      "legacy_session_ids_checked": [
+        "sync:default_1789742128000-97e45b"
+      ]
+    }
+  }
+}

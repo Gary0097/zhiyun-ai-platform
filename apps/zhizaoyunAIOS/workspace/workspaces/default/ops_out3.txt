@@ -1,0 +1,4 @@
+ls: cannot access '/export/zhiyun-windows-bundle/deploy.ps1': No such file or directory
+ls: cannot access '/export/zhiyun-windows-bundle/README-WINDOWS.md': No such file or directory
+total 4.0K
+drwxr-xr-x 7 root root 4.0K Sep 18 19:09 zhiyun-windows-bundle

@@ -1,0 +1,1516 @@
+{
+  "data": [
+    {
+      "id": "3f4d9fb7-e13d-4a3b-9704-5ee6b9d627ee",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "01-产品目录与选型.md",
+      "description": "该文档为一家包装机械制造企业的产品目录与商务参考，基于2025年12月至2026年9月期间的800笔真实销售订单数据编制，覆盖220家企业客户。文档核心内容围绕主力机型的成交统计、价格分布及选型建议展开。\n\n首先，文档详细列出了各类主力机型的关键指标，包括成交单数、成交中位价及平均交付周期。其中，小立式包装机是成交最活跃的类别，如“240螺杆包装机”和“颗粒背封包装机”分别成交124单和103单，中位价在7万元左右，交付周期均为45天；而“高速圆角背封宠物膏体包装机”虽单价较高（约9.2万元），但仍有92单的成交量。多列机方面，“600六列背封螺杆包装机”以较低的单价（约6万元）和较短的交付周期（30天）获得了85单的成交。值得注意的是，部分高端或整线设备虽然成交单数较少，但单价显著更高，例如“凝珠液体包装机”中位价接近50万元，“自动装盒线”超过41万元，“自产圆角磁力泵包装机”约为36万元，这类设备的交付周期通常在35至40天之间。\n\n其次，文档提供了具体的机型选型参考指南。针对颗粒或粉末类产品，推荐选用螺杆类包装机，其中多列机具备更高的产能优势；对于液体、膏体或凝珠类产品，则建议选择磁力泵或专用液体包装机。若客户需要灌装、旋盖及装盒的一体化解决方案，应优先考虑整线设备，但需注意其交付周期相对较长。最后，文档特别强调，表中所示价格仅为历史成交中位价，仅供商务参考，实际交易报价需以销售工程师出具的正式报价单为准。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "01-产品目录与选型.md",
+      "folder_path": "",
+      "file_type": "md",
+      "file_size": 1757,
+      "file_hash": "7d992c09f1c204eba8cd34172af1015c",
+      "file_path": "resource://jQB7479Hc36EJvQkjqKkqQ",
+      "storage_size": 20146,
+      "metadata": null,
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T04:54:38.548322+08:00",
+      "updated_at": "2026-09-18T04:54:45.99103+08:00",
+      "processed_at": "2026-09-18T04:54:45.99103+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "018333ba-5260-4574-8715-a59730a72ddf",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_9.pdf",
+      "description": "该文档为金汉隆（KITECH）品牌2025版产品宣传册的一部分，重点介绍了两款高速液体及酱料包装设备：伺服转子泵液体包装机和小立式酱料高速包装机。\n\n首先，**伺服转子泵液体包装机**采用纯电驱动技术，摒弃了传统气动结构，有效解决了维修困难和结构复杂的问题。其核心优势在于智能化操作与高效能表现：90%的机械调节（如重量调整）可通过触摸屏完成；包装速度显著提升，常规速度达80-100包/分钟，最高可达140-150包/分钟，相当于三台普通机器的产能，且运行噪音更低。该设备适用性广泛，能够处理纯水剂、奶油及拉丝蜜等粘稠物料，并配备一体式加热管和防水热电偶以确保安全可靠。技术参数显示，其计量范围为0.1-5g，精度±0.5g，支持三边封袋型，功率2.5kw。\n\n其次，**小立式酱料高速包装机**主打高性价比与高精度，宣称在数万元价位内实现行业领先性能。该设备采用机械传动式自动流体泵，通过自主研发的高精度球阀实现连续开合，避免了传统气缸驱动的启停停顿，从而提升速度至60-100包/分钟，精度同样保持在±0.5g。其关键部件如齿轮、轴承和弹簧均采用高硬度合金材料并经严格淬火处理，确保高速运行下的稳定性与耐用性。此外，设备搭载历经三年研发的专用控制程序，配合原装进口法国施耐德电器，实现了快速计算与灵敏反应。机身由304不锈钢焊接而成，结构稳固，振动小。其计量范围较宽，为0.1-10g，膜宽适应50-100mm，制袋长度不超过150mm。\n\n总体而言，这两款设备均体现了金汉隆在液体包装领域的技术创新，通过电动化、智能化及高强度材料应用，显著提升了包装速度、精度及设备寿命。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_9.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1690183,
+      "file_hash": "1529c217a660ea31dd5fd03a62a911b7",
+      "file_path": "resource://EPDOncDhtffPXiXZelRmvg",
+      "storage_size": 4648,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:19.369694+08:00",
+      "updated_at": "2026-09-18T01:58:52.337508+08:00",
+      "processed_at": "2026-09-18T01:58:52.337508+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "45953083-cc2a-46a0-9e2a-263fc8eed52a",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_8.pdf",
+      "description": "该文档为金汉隆（KITECH）2025版产品手册中关于茶包包装设备的介绍，重点展示了“夹板式热封茶包包装机”与“袋泡茶尼龙三角/四角包内外袋包装机”两款设备的技术特性与应用场景。\n\n首先，夹板式热封茶包包装机专为茶叶、药用茶及保健茶等小而轻的颗粒物设计，支持纸或尼龙滤袋配合吊牌线绳及外信封的包装形式。在硬件配置上，其接触部件均采用304不锈钢制造，符合食品SC和药品GMP认证标准；控制系统配备国际知名品牌PLC及彩色触摸屏，实现全自动化操作。此外，该机器搭载标准变频器，具备不停机自动调速功能，并能有效防止过流、过压及过载，确保电路稳定与长寿命。其技术参数显示，计量范围为1-10g/包，采用量杯计量方式，包装速度可达30-40包/分钟，适用于三边封袋型。\n\n其次，袋泡茶尼龙三角/四角包内外袋包装机核心优势在于自主研发并经十年优化的超声波技术。该技术具有频率高、发波稳定、封合快速牢固等特点，适配尼龙、无纺布等多种包材。其超声波换能器采用原装进口压电陶瓷晶片，耐高温、防腐蚀且发热量小；钢模则经过严格淬火及电镀硬铬处理，具备超强耐磨性。该设备的一大亮点是无需更换模具即可通过一键切换实现三角包、背封及三边封三种袋型的转换，极大提升了生产灵活性。同时，它可无缝连接外袋或大袋包装机，满足多样化包装需求。其包装容量误差控制在±0.1克以内，包装速度提升至35-55袋/分钟，整机重量700kg，尺寸为2000*1200*2850mm。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_8.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1720771,
+      "file_hash": "2d21b60f28eb69de7c94d397ec159fb4",
+      "file_path": "resource://ilPh-C3np3-EtbwI2uJtvQ",
+      "storage_size": 4648,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:18.511903+08:00",
+      "updated_at": "2026-09-18T01:59:07.020763+08:00",
+      "processed_at": "2026-09-18T01:59:07.020763+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "2f577599-b985-4f60-82aa-425dbc3e56e6",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_7.pdf",
+      "description": "该文档为KITECH（金汉隆）品牌2025版产品宣传册的一部分，重点介绍了两款挂耳咖啡自动包装机：夹板式热封挂耳咖啡包装机和超声波量杯挂耳咖啡包装机。\n\n首先，关于**夹板式热封挂耳咖啡包装机**，其核心特点在于符合食品SC认证和药品GMP标准的304不锈钢接触部件，采用国际知名品牌PLC和彩色触摸屏实现全自动控制，并配备变频器以支持不停机调速及电路保护。该设备适用于咖啡粉、碎茶等颗粒物的纸质滴漏袋包装（含外袋）。技术规格显示，其计量范围为8-15g/包，采用量杯计量方式，包装速度为30-40包/分钟，袋型为三边封。机器功率为2.5Kw，重量350kg，尺寸为L1200*W900*H1900mm。\n\n其次，**超声波量杯挂耳咖啡包装机**主打自主研发的超声波封口技术，经过十年优化，具有高频稳定、封口快且牢固的特点，适配尼龙、无纺布及玉米纤维等多种材料。其换能器采用原装进口压电陶瓷芯片，钢模经淬火和电镀硬铬处理，具备高硬度和耐磨性，并提供一年保修及终身技术支持。该机型可与外袋或大袋包装机无缝连接，适用于碎茶、花茶小颗粒等的滤袋包装。在参数上，其计量范围同为8-15g/包，但采用螺杆上料方式，包装速度同样为30-40包/分钟。相比前者，该机型功率更高（3.7Kw），重量更重（560kg），尺寸更大（L1350*W850*H2200mm），且外袋尺寸规格略有不同。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_7.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1724221,
+      "file_hash": "1d88f14fda15d0ff8f1b02d096e59214",
+      "file_path": "resource://ZAbXjJQSrjDgqKwamnxwWw",
+      "storage_size": 4648,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:17.494685+08:00",
+      "updated_at": "2026-09-18T01:58:50.278882+08:00",
+      "processed_at": "2026-09-18T01:58:50.278882+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "ee60e385-5646-4fc1-9ee6-8e88a87c9c88",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_6.pdf",
+      "description": "该文档为金汉隆（KITECH）2025版产品手册的跨页内容，主要介绍了两款包装设备：水烟包装机和蜂蜜勺子灌装机。\n\n**水烟包装机**部分详细列出了其机器描述和技术规格。在机器特性方面，接触物料部位采用304不锈钢，符合食品SC认证和药品GMP认证要求；标配国际知名品牌PLC以实现全自动控制；配备彩色触控屏简化操作；并配有变频器，支持不停机自动调速及电路保护功能。技术规格表中提供了两种型号（100型和160型），最大包装速度均为70包/分钟。两者的计量范围分别为最大100ml和500ml，卷膜宽度、制袋长度和宽度等参数也各有不同。电源统一为220V, 50/60Hz, 1.2kw。可选配置包括日期打码机、充气装置和打孔装置。\n\n**蜂蜜勺子灌装机**被描述为一款小型全自动设备，具有功能全面、占用空间小的特点。它采用触控式智能操作面板和PLC控制系统，封口膜具备独立温度控制功能。整机由不锈钢和铝合金制造，坚固且永不生锈，成品可自动整列输出。技术规格显示，其灌装范围为5-50g（可根据客户需求定制），封杯速度为800-1500个/小时，灌装精度达到±1%。勺子尺寸需根据客户提供的样品定做，勺子和膜材质分别涉及预成型PP和PET/AI/PE层压膜。机器尺寸为L1200*W1200*H1600(mm)，料桶容量为20-30L，电压同样为220v, 50/60Hz。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_6.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1327856,
+      "file_hash": "cd3b58f2e836efe7457f102c776e3115",
+      "file_path": "resource://wroCEVRSzzkjbYGpgZbrQA",
+      "storage_size": 4648,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:16.476339+08:00",
+      "updated_at": "2026-09-18T01:58:45.336687+08:00",
+      "processed_at": "2026-09-18T01:58:45.336687+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "8ee18364-4052-44dd-a153-ee3f12918dec",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_5.pdf",
+      "description": "金汉隆（KITECH）智能装备推出的“自动理料装盒装箱线”是一套一站式自动化包装解决方案，旨在通过深度定制实现从生产端到后端包装的全流程无人化操作。该方案的核心优势在于能够根据客户的具体需求，无缝连接小袋包装、中袋包装、装盒及装箱等环节，提供全伺服配置或与非标生产线对接，从而显著降低人力成本并提升生产效率，适用于现代化无人操控车间。\n\n在功能模块方面，该生产线涵盖了内包、排列、外包及后端四大关键环节。内包环节采用一拖四上开式自动理料线，特别适配巧克力、沙琪玛、能量棒等产品；排列环节利用有序理料机确保产品整齐美观，提升档次；外包环节配备往复式包装机，通过增加大袋包装层提供更佳的防护效果；后端则集成自动开箱、装箱及封箱功能，完成整线自动化闭环。此外，系统支持背封袋、三边封袋、四边封袋、长条背封袋及插角袋等多种袋型，具备高度的灵活性和适应性。\n\n生产流程设计严谨，涵盖成品材料理料、独立袋装、有序或无序理料装盒、机械手码垛装箱以及二次大袋包装等步骤。以水烟（Shisha/Hookah）自动包装线为例，其具体工艺流程包括：原料经过小袋子包装后，进行小盒折叠与封口，随后进入理料阶段，最后完成大盒的折叠与大盒封口。整体而言，该设备强调非标化定制能力，针对不同产品的属性、尺寸及包装数量进行专属设计，真正实现了劳动力的解放与包装质量的标准化提升。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_5.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1563583,
+      "file_hash": "c14f5f779d69fae9bb4ff74cdd159fd7",
+      "file_path": "resource://8ez03Pjl4eF0WDaMTx9ToA",
+      "storage_size": 4648,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:15.666012+08:00",
+      "updated_at": "2026-09-18T01:58:57.445493+08:00",
+      "processed_at": "2026-09-18T01:58:57.445493+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "04fc9619-f45e-4a19-adbc-c90ff7e29578",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_4.pdf",
+      "description": "该文档为金汉隆（KITECH）2025版“人工智能装盒线”产品宣传页，主要介绍了一套从原料处理到最终装盒的一站式智能包装解决方案。其核心内容涵盖以下关键点：\n\n首先，在初级小袋包装环节，系统采用人工智能包装机，具备高稳定性与精准度，支持单人操作多台设备以优化人力成本。该环节兼容多种袋型，包括背封袋、三边封袋、四边封袋、长条背封袋及插角袋，满足不同产品的封装需求。\n\n其次，针对气密性要求较高或追求高端形象的产品，方案提供了二次大袋包装功能。通过将小袋整齐排列进行二次封装，不仅提升了包装的严密性与档次，也为后续工序奠定了良好基础。\n\n再次，在理料阶段，系统能够将小袋进行定量且整齐的排列，这是实现高档大气包装效果的必要前提条件，确保了进入装盒环节的物料有序规范。\n\n最后，在终端装盒环节，自动化装箱能有效防止产品在运输和存储过程中受到挤压，从而提升产品整体形象并提高流通效率。该环节支持多种封盒样式，如挂耳式、插舌式、粘胶式及扣底式，以适应不同的市场包装标准。整个生产流程遵循“成料→小袋→大袋→装盒”的逻辑顺序，体现了高度自动化的作业模式。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_4.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1532867,
+      "file_hash": "af398ea05b18fcd5b5e045c1bd9bc8c0",
+      "file_path": "resource://Dm7wdQuou4BsfCykfSMnWQ",
+      "storage_size": 4648,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:14.643112+08:00",
+      "updated_at": "2026-09-18T01:58:46.586823+08:00",
+      "processed_at": "2026-09-18T01:58:46.586823+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "09aafd69-2992-41ad-8d2f-ac80f7f98b95",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_3.pdf",
+      "description": "该文档为金汉隆（KITECH）“人工智能数袋线”全自动包装生产线的产品宣传资料，重点介绍了其技术架构、经济效益及适用范围。\n\n首先，在系统构成方面，该生产线集成了真空上料、称重反馈系统、爬坡皮带、给袋式主机及自动装大袋等核心模块。其中，称重反馈系统被视为智能控制的核心技术，确保每一袋产品的精准度；自动装大袋功能则在保证高精度的前提下，有效降低了物料损耗并减少了人工需求。此外，该系统支持连接一拖N的真空上料机，单个进料口最多可供应20台小袋主机，具备连接简单和全自动化控制的特点，适用于无人操控车间或旅游观光车间。\n\n其次，在经济效益与人力成本方面，文档强调了一条人工智能数袋线仅需2-3名操作人员即可运行。与传统人工装袋方式相比，以8台小袋主机的配置为例，该生产线至少能节省10至15个人工岗位，每年可节约超过20万元人民币的人工成本。除去小袋主机本身的投入，数袋线的额外投资预计可在一年内通过效率提升和损耗降低收回成本，从而产生实质性的利润增长。\n\n最后，在应用范围上，该设备适用于食品、药品及调味品的高品质包装。具体可处理的物料包括复合麦片、燕麦片、各类粉剂、水果粒、坚果、奶精、糖、玉米片、脱水蔬菜及肉粒、多种谷物（如小米、藜麦、荞麦）等。在袋型适配方面，支持背封袋、三边封袋、四边封袋、长条背封袋及插角袋等多种包装形式，并能完成粉末、颗粒及液体成品的包装展示。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_3.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1424347,
+      "file_hash": "0550324ebc2712eddfd138cce7653f03",
+      "file_path": "resource://G74KqxpL8IJsCDjprMqdag",
+      "storage_size": 4648,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:13.652858+08:00",
+      "updated_at": "2026-09-18T01:58:47.234642+08:00",
+      "processed_at": "2026-09-18T01:58:47.234642+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "a6d55333-2e1a-4d8a-972c-16293dc96dfd",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_2.pdf",
+      "description": "广东金汉隆智能装备科技有限公司（KITECH）是一家成立15年的国家高新技术企业，拥有3个工厂及上百项专利技术。公司经过长期的技术沉淀与无数次优化，掌握了包括人工智能控制、高速控制以及多种理料技术（如有序、无序、散乱、皮带式及转盘式理料）在内的核心技术。这些技术突破代表了行业前沿水平，使得公司的单机设备运行简单稳定，整线设备则具备高速高效的特点。\n\n在业务领域，金汉隆专注于自动包装线及全自动袋装装盒装箱线，其技术积累在行业内名列前茅。公司接受客户的深度定制需求，是少数能够掌握核心技术并提供精准整线包装方案的工厂之一。通过提供定制化解决方案，金汉隆旨在帮助客户大幅节省人工成本并提升生产效益。此外，公司已获得实用新型专利证书、发明专利证书、ISO9001质量管理体系认证以及AAA级信用单位等多项资质认证，体现了其在技术研发、质量管理及企业信誉方面的综合实力。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_2.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 2305046,
+      "file_hash": "1f21c8ba0553516fe6da489a8eed4252",
+      "file_path": "resource://-nTjnEqSVe5mw-x3FFR6rw",
+      "storage_size": 4648,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:12.690305+08:00",
+      "updated_at": "2026-09-18T01:58:37.699482+08:00",
+      "processed_at": "2026-09-18T01:58:37.699482+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "0fb7c6cb-463d-4e73-963e-7de6b11eca12",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_18.pdf",
+      "description": "该文档为金汉隆（KITECH）2025版包装设备产品手册，重点介绍了全伺服高速热收缩包装机、桌面型灌装机及桌面型旋盖机三款工业包装解决方案。\n\n首先，全伺服高速热收缩包装机采用彩色触摸屏控制与三伺服电机驱动，具备高稳定性与低故障率。其核心优势包括防切安全离合装置、高感度光电眼色标跟踪以及独立的温度PID控制，确保封切位置精准并适应多种包膜材质。此外，该机器配备定位停机功能以避免粘刀和浪费包膜，并通过增加废料回收装置，较传统对折膜包装机节省约20%-30%的材料。技术规格方面，提供120至240五种型号，最大膜宽≤590mm，包装速度根据型号不同在30-150包/分钟之间变化，支持PVC、POF等热收缩膜，主机功率4.75KW，收缩机功率13.5KW。\n\n其次，桌面型灌装机是一款基于伺服转子泵的自动定量灌装设备，专为入门级小工厂和小作坊设计，具有操作简单和高性价比的特点。该机器兼容多种形状和规格的瓶子，灌装范围覆盖50ml至5000ml，速度可达1200-1500瓶/小时（以300ml为例）。其关键部件如PLC控制器、触摸屏选用汇川或雷赛品牌，气动元件来自AIRTAC或SMC，电气元件采用施耐德等知名品牌。为确保卫生与安全，机器外罩使用304#不锈钢，而料槽、灌装嘴及接触液体部位则采用316#不锈钢及食品级PP材料。\n\n最后，文档简要介绍了桌面型旋盖机，该设备采用人工放盖方式，通过抓旋式结构进行作业，运行速度与上述灌装机相匹配，同样达到1200-1500瓶/小时，适用于小型生产线的配套使用。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_18.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1579382,
+      "file_hash": "405fa28002a3d94b345e79ca1a774b93",
+      "file_path": "resource://nKAgalZyPtqVqcZZkUrjTA",
+      "storage_size": 4650,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:11.381964+08:00",
+      "updated_at": "2026-09-18T01:59:17.029618+08:00",
+      "processed_at": "2026-09-18T01:59:17.029618+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "f3cb4cd2-40f2-459d-b5eb-ee79527fb680",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_17.pdf",
+      "description": "该文档为金汉隆（KITECH）品牌2025版产品手册的一部分，主要介绍了两款包装设备：自动装盒机和糖果高速包装机。\n\n首先，关于**自动装盒机**，其核心特点包括采用双链条设计以支持在一定范围内调整盒子的长宽高尺寸；具备连续式入盒功能，运行高速稳定，速度可达80-150盒/分钟；同时支持插盒和粘盒工艺，并可定制加挂钩。技术规格方面，型号80的包装速度为20-80盒/分钟，适用盒子范围从最小喷胶盒45x12x12mm到最大盒子260x180x100mm。推荐材质为白卡纸或灰底白，厚度350-450g，要求压痕0.4mm以上且预折120度以上。机器电源为220V，功率3kw，重量1800kg，尺寸为L4000*W1579*H1620mm。调节范围根据小、中、大三种盒型分别设定了具体的长宽高调整上限。\n\n其次，**糖果高速包装机**强调自主研发程序历经8年优化，控制精准且运行稳定。关键部件如齿轮、轴承等采用优质合金材料特殊处理，确保高速运转不变形。该机器具备双接膜及自动接膜功能，实现不停机换膜，效率高损耗低。采用三伺服控制，噪音小，最高速度达1200包/分钟（小糖果约1000袋/分钟），并可连接自动下料斗。技术规格显示，其包装速度范围为500-1200包/分钟，袋型为背封，适合圆球、扁圆等规则产品。最大膜宽120mm，不同刀数对应不同的袋长范围（如两刀100-130mm）。卷膜要求PET+CPP材质，厚度4-4.5C。机器功率4.5kw，重量800kg，尺寸为L2400*W1340*H1550mm。在调试符合要求的情况下，成品漏气率可控制在1%以下。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_17.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1525650,
+      "file_hash": "6ad12951f394442eced19d9ddf6eaaea",
+      "file_path": "resource://4tGDJqZa69EmWPJeWdWOXQ",
+      "storage_size": 4650,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:10.427889+08:00",
+      "updated_at": "2026-09-18T01:58:50.910046+08:00",
+      "processed_at": "2026-09-18T01:58:50.910046+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "49e5452b-adf2-47fe-a1c8-856d5b29749b",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_16.pdf",
+      "description": "该文档为KITECH（金汉隆）品牌2025版产品手册的一部分，重点介绍了两款给袋式包装机：旋转给袋式包装机和水平给袋式包装机。\n\n**旋转给袋式包装机**的主要特点包括封口纹路平整美观、采用伺服控制双皮带拉膜技术（误差小于1mm）、实现上料至输送的一体化无缝连接，以及支持插角袋、四边烫、拉链袋等高端定制包装。其技术规格涵盖三种型号（200、250、350），计量范围从1-1000g到1-5000g不等，袋子宽度在120-350mm之间，包装速度可达每分钟10-70包（视物料而定）。控制系统采用伺服控制器加彩色触摸屏，适用于自立袋、四边封袋等多种预制袋型及PP、PE等材料。电源要求为380V, 50/60Hz, 3.6kw，耗气量为1.0m³/min，并可选配开拉链装置、排气装置及打码机等设备。\n\n**水平给袋式包装机**则强调全伺服控制系统带来的平稳运行与高效能，使用国内外知名品牌电气元件确保耐用性，核心部件经过优化设计以提升包装速度。此外，它还配备了性能稳定的计量泵下料系统，并可灵活选配各种附加功能如打码、喷码、排气和冲孔系统。此机型提供180、210、260三个型号，对应不同的计量范围（1-500g至1-1500g）",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_16.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1529599,
+      "file_hash": "dea339af8a132c5538d43f8de235a95f",
+      "file_path": "resource://cdV-hsXHE1FP8JBsDzXHyA",
+      "storage_size": 4650,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:09.345383+08:00",
+      "updated_at": "2026-09-18T01:59:02.617471+08:00",
+      "processed_at": "2026-09-18T01:59:02.617471+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "64ba7522-9175-454a-af63-cc1adbf6f662",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_15.pdf",
+      "description": "金汉隆（KITECH）2025版包装机械产品手册重点介绍了两款核心设备：线性称重系统包装机与迷你给袋式包装机，旨在为不同规模的生产需求提供细分领域的一站式包装解决方案。\n\n首先，**线性称重系统包装机**主打高端定制与高精度控制。其技术特点包括封口纹路平整美观、采用伺服控制双皮带拉膜技术（误差小于1mm），以及实现上料、计量、包装、输送一体化的无缝连接流程。该机型支持插角袋、四边烫、拉链袋等多种高端袋型。在规格方面，手册列出了从320XD到1050XD共五种型号，最大计量范围覆盖500g至15000g，包装速度可达每分钟80包。电源功率随型号增大从2kw增至4.6kw，并可选配插角装置、打孔装置、打码贴标机、重量选别秤及金属探测仪等辅助设备。\n\n其次，**迷你给袋式包装机**专为小型作坊或初创企业设计，具有机身小巧、运行平稳、维护方便等特点。整机采用不锈钢组装，核心部件经过优化以提升封装速度，且电气元件选用知名品牌以确保耐用性。该机型适用于自立袋、四边封袋、拉链袋、手提袋及纸袋等多种预制袋，兼容PP、PE、PVC等多种材质。其标准型号150的计量范围≤100g（视颗粒大小而定），袋子宽度70-150mm，长度100-250mm，包装速度为每分钟15-20包。此外，该设备支持定制螺杆、液泵、振动盘等供料方式，并可加装开拉链、排气、打码及喷码等选配装置。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_15.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1508370,
+      "file_hash": "ab44a150f80085658159c8ce37573837",
+      "file_path": "resource://yPw-2I-4x4kQ_hghg8kJGQ",
+      "storage_size": 4650,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:08.241578+08:00",
+      "updated_at": "2026-09-18T01:58:44.069332+08:00",
+      "processed_at": "2026-09-18T01:58:44.069332+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "a11bf7a2-ff38-453d-b859-478496e42c49",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_14.pdf",
+      "description": "该文档为金汉隆（KITECH）品牌2025版产品宣传册的第23至24页，重点介绍了两款全自动包装设备：“大立式全自动包装机”与“多头组合称量全自动包装机”。这两款机器在功能描述上具有高度一致性，均强调封口纹路平整美观、采用伺服控制双皮带拉膜技术（误差小于1mm），并实现了上料、计量、包装及输送的一体化作业，能够支持插角袋、四边烫、拉链袋等多种高端定制袋型。\n\n两者的主要区别在于适用物料类型及计量单位：大立式包装机适用于液体或半流体，计量范围以毫升（ml）为单位；而多头组合称量包装机适用于固体颗粒或粉末，计量范围以克（g）为单位。两款机型均提供从320到1050的五种型号规格，包装速度可达每分钟1至80包。随着型号增大，其最大卷膜宽度、制袋尺寸及电源功率需求也相应提升。例如，最小型号（320/320CD）最大计量分别为500ml和500g，功率为2kw；最大型号（1050/1050CD）最大计量分别达到15000ml和15000g，功率增至4.6kw。此外，两款设备均可选配插角装置、打孔装置、打码贴标机、重量选别秤及金属探测仪等辅助配置，以满足不同生产线的个性化需求。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_14.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1443977,
+      "file_hash": "24362719ee1ec8cc8dfb490e25f7bce4",
+      "file_path": "resource://F5vYDj_aNLDT-LgKaPY0Ag",
+      "storage_size": 4650,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:07.101567+08:00",
+      "updated_at": "2026-09-18T01:58:39.188533+08:00",
+      "processed_at": "2026-09-18T01:58:39.188533+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "582e1321-c132-48b3-8066-2ccd24e3dcee",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_13.pdf",
+      "description": "该文档为KITECH（金汉隆）品牌包装机的产品手册，重点介绍了“多列螺杆包装机”和“大立式量杯高速包装机”两款设备的技术特性与规格参数。\n\n首先，关于**多列螺杆包装机**，其机身采用食品级不锈钢方管与板材焊接而成，结构稳固。该机型具备以下核心优势：\n1.  **高精度运行**：采用德国进口数控机床一体成型的固定翻领机构，配合高灵敏光纤自动纠偏系统，确保包膜运行稳定、分切精准及纵封美观。\n2.  **灵活定制与便捷性**：支持圆角或异形冲刀定制；部件无需拆卸即可直接打包发货，开箱通电即用，简化售后流程。\n3.  **紧凑高效**：占地面积小，相当于单列机尺寸，但配置原装进口电器，操作简便且寿命长。\n4.  **技术参数**：提供420-4K和420-6K两种型号，包装速度均为20-50包/分钟，袋长范围30-140mm，功率分别为2.0kw和2.2kw。\n\n其次，关于**大立式量杯高速包装机**，这是一款经过多年研发与市场验证的高性能设备，主要特点包括：\n1.  **高速结构设计**：主机采用往复式拉袋技术，实现边拉袋边下料，利用时间差显著提升速度；配备双头量杯交错下料功能，最快可达85包/分钟。\n2.  **优质配置与材料**：使用日本三菱PLC、台湾威纶触摸屏及东元伺服控制系统；机身符合食品卫生标准的304不锈钢制成，关键部件如齿轮、轴承等采用高品质合金淬火处理，耐磨损、噪音低。\n3.  **市场认可度**：累计销量超200台且零退货，证明了其稳定性与客户满意度。\n4.  **技术参数**：计量范围为1-50g，包装速度60-80包/分钟，适用背封袋，制袋尺寸长50-400mm、宽60-195mm，功率3.8kw，机器重量1000kg。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_13.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1817357,
+      "file_hash": "401e000eee7d76f94d6c054ce4ae2035",
+      "file_path": "resource://R2okWrWg4ytwVWyoHLPgcg",
+      "storage_size": 4650,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:06.027752+08:00",
+      "updated_at": "2026-09-18T01:59:07.235261+08:00",
+      "processed_at": "2026-09-18T01:59:07.235261+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "4f061541-601e-460b-8536-0372f9863980",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_12.pdf",
+      "description": "该文档为KITECH（金汉隆）品牌2025版产品手册的部分内容，主要介绍了两款包装设备：咖啡胶囊灌装封口机和保鲜膜包装机。\n\n首先，关于**咖啡胶囊灌装封口机**，其技术流程包括自动落杯、伺服螺杆灌装、自动放片膜、两次封口以及机械爬杯出杯。在封口部分，该机器采用铜制材料进行双次封口以确保密封性，封口温度可在0-400度之间调整，且每个封口铜头具备单独温控功能。技术规格方面，该机器的生产能力为每小时5400至6000盒，使用380V 50HZ电源，电机功率1.0kw，加热功率6.0KW，最大耗气量为0.45m³/m，机器尺寸约为3200*950*1800MM，重量800KG。\n\n其次，关于**保鲜膜包装机**，文档详细列出了其七大优势特点：一是高效包装，平均每分钟15包，效率约为人工的3倍；二是一机多用，集成自动包装、称重和打印标签功能以节省资金；三是包装效果好，比手工更牢固美观统一，有助于提升品牌价值；四是耗材选择广泛，适用于PVC/PE等各种保鲜膜，可带托盘或不带托盘包装，适应圆形、六角形等多种形状托盘；五是高端选材，整机采用不锈钢制造，适用于高湿度等腐蚀性环境；六是操作简单舒适，界面设计符合中国用户习惯，噪音低并经过特殊静音处理；七是工艺精湛，整体焊接工艺使设备稳定性优于国外同类设备。该机器适用于水果、蔬菜、熟食等带托盘的包装。技术规格显示，其包装速度为15包/分钟，适用产品长度为80-350mm，宽度为80-270mm，高度为10-170mm，重量范围为40g-3kg，保鲜膜宽度为350-500mm。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_12.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1324468,
+      "file_hash": "41be6b85cf5a9e80bd3420b6191f5baf",
+      "file_path": "resource://aqGnhWURjJHolACSxZF8YQ",
+      "storage_size": 4650,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:04.726398+08:00",
+      "updated_at": "2026-09-18T01:58:42.30617+08:00",
+      "processed_at": "2026-09-18T01:58:42.30617+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "985422f4-28ce-4381-8935-07438abcd257",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_11.pdf",
+      "description": "该文档为KITECH（金汉隆）品牌2025版产品宣传册的一部分，主要介绍了两款自动包装设备：“小立式圆角包装机”和“异形袋自动包装机”。\n\n首先，**小立式圆角包装机**定位为高端定制机型，其核心优势在于袋形坚挺圆润、封口平整美观。在技术配置上，该设备采用法国施耐德原装进口组件以确保运行稳定，机架由304不锈钢焊接而成，具备高稳固性和耐用性。作为行业早期进入圆角异形袋领域的厂家，其独家研发的控制软件经过十年优化。此外，设备支持定制冲压模具以形成特定圆弧形状，并可根据物料属性设计斜角及易撕口。为保证效果，需使用耐高温复合膜（如PE+AL+PET）。其技术参数显示：计量范围为1-40ml，包装速度为20-35包/分钟，精度±0.5g，支持背封、三边封或四边封袋型，功率2.5kw，机器重量450kg。\n\n其次，**异形袋自动包装机**适用于香水、化妆品、果汁、蜂蜜等粉状、颗粒及液体的个性化包装。该设备实现了从灌装、计量、制袋到封口、切割及热压批号的全自动化流程。其特点包括智能控制系统，支持多语言界面，一人可监控多台设备以节省人工；全气动控制使得操作简便且易损件少；配备脚轮便于移动。通过更换不同模具可实现多种袋型生产，并设有废边回收装置以提升效率。其技术参数显示：计量范围为1-30g，包装速度为20-25包/分钟，精度±0.5g，仅支持四边封袋型，膜宽范围较广（30-220mm），功率同为2.5kw，但机器更轻便，重250kg。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_11.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1939073,
+      "file_hash": "d3028a545fa477f19c767e44bb79db31",
+      "file_path": "resource://Jp_bY6UYQ-72O4uv3uuYgA",
+      "storage_size": 4650,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:03.63026+08:00",
+      "updated_at": "2026-09-18T01:58:37.034624+08:00",
+      "processed_at": "2026-09-18T01:58:37.034624+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "3c75ad01-43d7-4a9a-a1c2-2d58b351eedd",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_10.pdf",
+      "description": "该文档为KITECH（金汉隆）品牌2025版产品宣传册的一部分，重点介绍了两款立式高速包装机：“小立式摇摆头高速包装机”和“小立式高速圆角包装机”。\n\n首先，“小立式摇摆头高速包装机”主打高精度与高速度。其核心优势在于行业独创的摇摆头计量装置，配合手工打磨的高精度量杯，可实现±0.05克的极高精度及高达100包/分钟的包装速度。设备采用高硬度合金齿轮与轴承，确保高速运行下的稳定性与耐用性；量杯位于成型器正上方以优化下料并防止物料粘连。此外，该机型历经三年研发的操作程序是其实现高速的关键，电气系统采用日本三菱和法国施耐德原装进口部件，机架由304不锈钢焊接而成，技术规格显示其计量范围为0.1-5g，功率2.5kw。\n\n其次，“小立式高速圆角包装机”定位为高端定制机型，专为提升产品外观质感设计。其袋形坚挺圆润、封口平整美观，通过伺服拉膜技术和定制冲刀模具，实现了传统机型无法达到的圆弧形状袋型。相比传统20-30包/分钟的速度，该机型可达60-70包/分钟。整机配置德国西门子进口电器，同样采用稳固的304不锈钢机架。其计量范围为1-20g，机器重量450kg，尺寸较大，适用于对包装美观度有较高要求的高端产品。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_10.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1735587,
+      "file_hash": "729bdb6e36aa8af9bc71a2e6ff663d10",
+      "file_path": "resource://pTNWL2uynZEvyWKHrkO_fw",
+      "storage_size": 4650,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:02.326558+08:00",
+      "updated_at": "2026-09-18T01:58:48.607103+08:00",
+      "processed_at": "2026-09-18T01:58:48.607103+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    },
+    {
+      "id": "aba7ed4b-0eec-485d-b27a-450767bb1070",
+      "tenant_id": 10000,
+      "knowledge_base_id": "b861158f-4b89-4715-bada-01d4bed1e40b",
+      "tags": null,
+      "type": "file",
+      "title": "金汉隆包装机画册2025版_1.pdf",
+      "description": "广东金汉隆智能装备科技有限公司（KITECH）的产品宣传册封面及封底展示了该公司在智能包装设备领域的品牌形象与核心业务。作为“细分领域一站式包装方案领导品牌”，金汉隆致力于提供从原料处理到最终装盒的全流程自动化包装解决方案，其典型工艺流程包括原料→小袋→大袋→装盒四个阶段。\n\n宣传册右侧封面通过三维渲染图直观呈现了自动化包装生产线的整体布局，并辅以清晰的流程示意图，突出了公司在系统集成方面的技术实力。同时，封面显著位置列出了多项国际质量认证标志，包括SGS、IAF、TS 16949、NQA以及ISO 9001，彰显了企业在质量管理和技术标准方面符合国际规范。左侧封底以世界地图为背景，强调其全球化视野与市场定位，并印有公司全称、英文标识及详细地址信息（佛山市南海区桂城街道泰山路5号润慧科技园）。\n\n此外，文档特别注明机器技术参数处于持续优化和升级过程中，提示用户以实际产品为准，体现了企业对技术创新和产品迭代的重视。整体设计风格采用白绿配色，简洁明快，有效传达了智能、环保及专业的企业形象。",
+      "source": "",
+      "channel": "web",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "completed",
+      "enable_status": "enabled",
+      "embedding_model_id": "67b042dc-67bc-4caa-b058-10210065324b",
+      "file_name": "金汉隆包装机画册2025版_1.pdf",
+      "folder_path": "金汉隆包装机画册2025版",
+      "file_type": "pdf",
+      "file_size": 1183519,
+      "file_hash": "5fad5820ae1aba00885f8471356bbac0",
+      "file_path": "resource://kTKe3zXdZ3z-x5_FnvemiA",
+      "storage_size": 4648,
+      "metadata": {
+        "process_overrides": {
+          "asr_config": {
+            "enabled": false,
+            "language": "",
+            "model_id": ""
+          },
+          "vlm_config": {
+            "api_key": "",
+            "enabled": true,
+            "base_url": "",
+            "model_id": "a15af007-e7a6-410d-ace1-1cdb22eb8d9b",
+            "model_name": "",
+            "interface_type": ""
+          },
+          "graph_enabled": false,
+          "extract_config": {
+            "enabled": false
+          },
+          "chunking_config": {
+            "strategy": "auto",
+            "chunk_size": 512,
+            "separators": [
+              "\n\n",
+              "\n",
+              "。",
+              "！",
+              "？",
+              ";",
+              "；"
+            ],
+            "chunk_overlap": 80,
+            "child_chunk_size": 384,
+            "parent_chunk_size": 4096,
+            "enable_parent_child": true
+          },
+          "enable_multimodel": true,
+          "parser_engine_rules": [
+            {
+              "engine": "anydoc",
+              "file_types": [
+                "pdf"
+              ]
+            }
+          ],
+          "question_generation_config": {
+            "enabled": true,
+            "question_count": 3
+          }
+        }
+      },
+      "custom_metadata": {},
+      "last_faq_import_result": null,
+      "created_at": "2026-09-18T01:58:00.854514+08:00",
+      "updated_at": "2026-09-18T01:58:23.560527+08:00",
+      "processed_at": "2026-09-18T01:58:23.560527+08:00",
+      "error_message": "",
+      "deleted_at": null,
+      "knowledge_base_name": ""
+    }
+  ],
+  "page": 1,
+  "page_size": 20,
+  "success": true,
+  "total": 19
+}

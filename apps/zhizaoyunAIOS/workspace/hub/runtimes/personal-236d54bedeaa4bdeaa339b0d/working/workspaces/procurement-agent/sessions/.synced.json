@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "files": {
+    "console/default_1789716019876-ip56ka6.json": {
+      "sha256": "f0669cbd92b56fa39ca7e5aead73abd5276ff93c9390a229bea796f2baeb3823",
+      "session_id": "1789716019876-ip56ka6",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 17,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "a81d0dd854114c41ad54d4d95ea6d1ec",
+        "sync:default_1789716019876-ip56ka6"
+      ]
+    }
+  }
+}

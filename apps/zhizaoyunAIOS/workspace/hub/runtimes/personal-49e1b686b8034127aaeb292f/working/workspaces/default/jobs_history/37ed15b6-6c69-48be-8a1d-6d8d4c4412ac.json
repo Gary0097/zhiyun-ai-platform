@@ -1,0 +1,14 @@
+[
+  {
+    "error": "ContextWindowUnfitError('CONTEXT_UNFIT: context compaction could not fit the active request into the model input window (283416 > 126976 tokens). Reduce the request/tool set, start a new turn, or switch to a model with a larger context window.')",
+    "run_at": "2026-09-21T10:00:24.682739+08:00",
+    "status": "error",
+    "trigger": "scheduled"
+  },
+  {
+    "error": null,
+    "run_at": "2026-09-18T07:04:37.404940+08:00",
+    "status": "success",
+    "trigger": "manual"
+  }
+]

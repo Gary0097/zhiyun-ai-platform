@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "files": {
+    "console/default_1789693785692-nocodej.json": {
+      "sha256": "f1ba0fe6cf5bf7defddee670113cacce1b8c5ff89d4ea6a73e16264186aa92d2",
+      "session_id": "1789693785692-nocodej",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 9,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "d0b9103fdb034a89a91066da34adbc18",
+        "sync:default_1789693785692-nocodej"
+      ]
+    },
+    "console/default_cron--d6005a8c-52ea-405b-ab26-77c1860497db.json": {
+      "sha256": "82a8a346d669f1d5a5832844e690d4ab47e5c031ed690310ec1f671add8a251c",
+      "session_id": "cron:d6005a8c-52ea-405b-ab26-77c1860497db",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 18,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "ac93331e7dd64f9d81b704120eead227",
+        "sync:default_cron--d6005a8c-52ea-405b-ab26-77c1860497db"
+      ]
+    },
+    "console/default_cron--fb32a946-4007-4c2b-850f-c723f29329f8.json": {
+      "sha256": "0e2f7fe27aebefd887112971f49bae1429fae5db0b99c2dd8103af0b044b186e",
+      "session_id": "cron:fb32a946-4007-4c2b-850f-c723f29329f8",
+      "messages": 4,
+      "aged_out": 0,
+      "rows_processed": 16,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "8c22c3776fd94ec399fa3fa1ec9bd168",
+        "sync:default_cron--fb32a946-4007-4c2b-850f-c723f29329f8"
+      ]
+    }
+  }
+}

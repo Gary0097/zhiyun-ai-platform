@@ -1,0 +1,32 @@
+[
+  {
+    "error": null,
+    "run_at": "2026-09-21T09:31:50.752142+08:00",
+    "status": "success",
+    "trigger": "scheduled"
+  },
+  {
+    "error": null,
+    "run_at": "2026-09-20T09:30:20.013999+08:00",
+    "status": "success",
+    "trigger": "scheduled"
+  },
+  {
+    "error": null,
+    "run_at": "2026-09-19T09:33:54.907097+08:00",
+    "status": "success",
+    "trigger": "scheduled"
+  },
+  {
+    "error": null,
+    "run_at": "2026-09-18T09:30:10.477807+08:00",
+    "status": "success",
+    "trigger": "scheduled"
+  },
+  {
+    "error": "TimeoutError()",
+    "run_at": "2026-09-18T07:04:43.642783+08:00",
+    "status": "error",
+    "trigger": "manual"
+  }
+]

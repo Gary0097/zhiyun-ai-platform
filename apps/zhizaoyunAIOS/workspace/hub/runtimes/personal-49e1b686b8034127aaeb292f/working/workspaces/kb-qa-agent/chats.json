@@ -1,0 +1,50 @@
+{
+  "chats": [
+    {
+      "archived": false,
+      "archived_at": null,
+      "channel": "console",
+      "created_at": "2026-09-17T18:56:52.835369Z",
+      "group_id": "default",
+      "id": "d7604c62-25e4-4b50-972c-931fe06a24ca",
+      "last_finished_at": "2026-09-17T18:57:21.973414Z",
+      "meta": {},
+      "name": "帮我问一下知识库：金",
+      "parent_session_id": null,
+      "pinned": false,
+      "root_session_id": null,
+      "session_id": "1789671411331-1t9mnxt",
+      "source": "chat",
+      "status": "idle",
+      "updated_at": "2026-09-17T18:57:21.973414Z",
+      "user_id": "default"
+    }
+  ],
+  "groups": [
+    {
+      "id": "default",
+      "kind": "default",
+      "name": "Uncategorized",
+      "order": 0,
+      "pinned": false,
+      "source": "chat"
+    },
+    {
+      "id": "cron",
+      "kind": "cron",
+      "name": "Scheduled tasks",
+      "order": 1,
+      "pinned": false,
+      "source": "cron"
+    },
+    {
+      "id": "subagents",
+      "kind": "subagents",
+      "name": "Subagents",
+      "order": 2,
+      "pinned": false,
+      "source": "subagent"
+    }
+  ],
+  "version": 1
+}

@@ -1,0 +1,1360 @@
+{
+ "2026-06-16": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 762718,
+   "completion_tokens": 61864,
+   "cache_read_tokens": 607859,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 762718,
+   "cache_observed_calls": 74,
+   "call_count": 74,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-17": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 438987,
+   "completion_tokens": 49106,
+   "cache_read_tokens": 357536,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 438987,
+   "cache_observed_calls": 43,
+   "call_count": 43,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-18": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 547109,
+   "completion_tokens": 34526,
+   "cache_read_tokens": 402952,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 547109,
+   "cache_observed_calls": 61,
+   "call_count": 61,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-19": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 463202,
+   "completion_tokens": 52886,
+   "cache_read_tokens": 340259,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 463202,
+   "cache_observed_calls": 62,
+   "call_count": 62,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-20": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 75016,
+   "completion_tokens": 3992,
+   "cache_read_tokens": 66069,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 75016,
+   "cache_observed_calls": 8,
+   "call_count": 8,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-21": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 119262,
+   "completion_tokens": 14131,
+   "cache_read_tokens": 89992,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 119262,
+   "cache_observed_calls": 13,
+   "call_count": 13,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-22": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 414495,
+   "completion_tokens": 30060,
+   "cache_read_tokens": 372175,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 414495,
+   "cache_observed_calls": 45,
+   "call_count": 45,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-23": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 420128,
+   "completion_tokens": 31426,
+   "cache_read_tokens": 342266,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 420128,
+   "cache_observed_calls": 38,
+   "call_count": 38,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-24": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 585000,
+   "completion_tokens": 26728,
+   "cache_read_tokens": 459385,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 585000,
+   "cache_observed_calls": 52,
+   "call_count": 52,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-25": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 239712,
+   "completion_tokens": 16929,
+   "cache_read_tokens": 212295,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 239712,
+   "cache_observed_calls": 33,
+   "call_count": 33,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-26": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 690912,
+   "completion_tokens": 71640,
+   "cache_read_tokens": 532449,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 690912,
+   "cache_observed_calls": 72,
+   "call_count": 72,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-27": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 77147,
+   "completion_tokens": 4893,
+   "cache_read_tokens": 68234,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 77147,
+   "cache_observed_calls": 7,
+   "call_count": 7,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-28": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 104767,
+   "completion_tokens": 16380,
+   "cache_read_tokens": 76390,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 104767,
+   "cache_observed_calls": 13,
+   "call_count": 13,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-29": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 743140,
+   "completion_tokens": 47523,
+   "cache_read_tokens": 609066,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 743140,
+   "cache_observed_calls": 73,
+   "call_count": 73,
+   "agent_id": "default"
+  }
+ },
+ "2026-06-30": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 499620,
+   "completion_tokens": 51810,
+   "cache_read_tokens": 418966,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 499620,
+   "cache_observed_calls": 66,
+   "call_count": 66,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-01": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 263004,
+   "completion_tokens": 35588,
+   "cache_read_tokens": 211190,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 263004,
+   "cache_observed_calls": 28,
+   "call_count": 28,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-02": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 765609,
+   "completion_tokens": 54538,
+   "cache_read_tokens": 632565,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 765609,
+   "cache_observed_calls": 67,
+   "call_count": 67,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-03": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 540072,
+   "completion_tokens": 65208,
+   "cache_read_tokens": 417166,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 540072,
+   "cache_observed_calls": 52,
+   "call_count": 52,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-04": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 102033,
+   "completion_tokens": 9621,
+   "cache_read_tokens": 78079,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 102033,
+   "cache_observed_calls": 9,
+   "call_count": 9,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-05": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 96408,
+   "completion_tokens": 10197,
+   "cache_read_tokens": 78967,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 96408,
+   "cache_observed_calls": 9,
+   "call_count": 9,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-06": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 384218,
+   "completion_tokens": 44878,
+   "cache_read_tokens": 329665,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 384218,
+   "cache_observed_calls": 38,
+   "call_count": 38,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-07": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 573999,
+   "completion_tokens": 41318,
+   "cache_read_tokens": 455263,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 573999,
+   "cache_observed_calls": 73,
+   "call_count": 73,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-08": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 400440,
+   "completion_tokens": 30960,
+   "cache_read_tokens": 315627,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 400440,
+   "cache_observed_calls": 40,
+   "call_count": 40,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-09": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 366912,
+   "completion_tokens": 23829,
+   "cache_read_tokens": 322740,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 366912,
+   "cache_observed_calls": 39,
+   "call_count": 39,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-10": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 280672,
+   "completion_tokens": 33516,
+   "cache_read_tokens": 206703,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 280672,
+   "cache_observed_calls": 28,
+   "call_count": 28,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-11": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 108320,
+   "completion_tokens": 12520,
+   "cache_read_tokens": 83114,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 108320,
+   "cache_observed_calls": 10,
+   "call_count": 10,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-12": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 115980,
+   "completion_tokens": 15600,
+   "cache_read_tokens": 89448,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 115980,
+   "cache_observed_calls": 12,
+   "call_count": 12,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-13": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 537240,
+   "completion_tokens": 46140,
+   "cache_read_tokens": 420932,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 537240,
+   "cache_observed_calls": 60,
+   "call_count": 60,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-14": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 609273,
+   "completion_tokens": 73836,
+   "cache_read_tokens": 532380,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 609273,
+   "cache_observed_calls": 63,
+   "call_count": 63,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-15": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 230811,
+   "completion_tokens": 20561,
+   "cache_read_tokens": 187678,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 230811,
+   "cache_observed_calls": 29,
+   "call_count": 29,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-16": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 416130,
+   "completion_tokens": 63030,
+   "cache_read_tokens": 349203,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 416130,
+   "cache_observed_calls": 55,
+   "call_count": 55,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-17": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 359316,
+   "completion_tokens": 43776,
+   "cache_read_tokens": 289159,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 359316,
+   "cache_observed_calls": 36,
+   "call_count": 36,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-18": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 108340,
+   "completion_tokens": 11600,
+   "cache_read_tokens": 84017,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 108340,
+   "cache_observed_calls": 10,
+   "call_count": 10,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-19": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 112460,
+   "completion_tokens": 7450,
+   "cache_read_tokens": 84658,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 112460,
+   "cache_observed_calls": 10,
+   "call_count": 10,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-20": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 572400,
+   "completion_tokens": 83808,
+   "cache_read_tokens": 455536,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 572400,
+   "cache_observed_calls": 72,
+   "call_count": 72,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-21": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 408320,
+   "completion_tokens": 66165,
+   "cache_read_tokens": 317267,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 408320,
+   "cache_observed_calls": 55,
+   "call_count": 55,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-22": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 615580,
+   "completion_tokens": 34090,
+   "cache_read_tokens": 528495,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 615580,
+   "cache_observed_calls": 70,
+   "call_count": 70,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-23": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 282360,
+   "completion_tokens": 37620,
+   "cache_read_tokens": 207857,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 282360,
+   "cache_observed_calls": 30,
+   "call_count": 30,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-24": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 730145,
+   "completion_tokens": 75140,
+   "cache_read_tokens": 648382,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 730145,
+   "cache_observed_calls": 65,
+   "call_count": 65,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-25": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 66304,
+   "completion_tokens": 6320,
+   "cache_read_tokens": 57638,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 66304,
+   "cache_observed_calls": 8,
+   "call_count": 8,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-26": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 108948,
+   "completion_tokens": 8892,
+   "cache_read_tokens": 80459,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 108948,
+   "cache_observed_calls": 12,
+   "call_count": 12,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-27": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 454649,
+   "completion_tokens": 48749,
+   "cache_read_tokens": 330237,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 454649,
+   "cache_observed_calls": 41,
+   "call_count": 41,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-28": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 290466,
+   "completion_tokens": 22473,
+   "cache_read_tokens": 237506,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 290466,
+   "cache_observed_calls": 33,
+   "call_count": 33,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-29": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 744577,
+   "completion_tokens": 83141,
+   "cache_read_tokens": 624614,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 744577,
+   "cache_observed_calls": 71,
+   "call_count": 71,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-30": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 402731,
+   "completion_tokens": 57526,
+   "cache_read_tokens": 330491,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 402731,
+   "cache_observed_calls": 49,
+   "call_count": 49,
+   "agent_id": "default"
+  }
+ },
+ "2026-07-31": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 545292,
+   "completion_tokens": 37128,
+   "cache_read_tokens": 463381,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 545292,
+   "cache_observed_calls": 68,
+   "call_count": 68,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-01": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 86712,
+   "completion_tokens": 6664,
+   "cache_read_tokens": 65089,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 86712,
+   "cache_observed_calls": 8,
+   "call_count": 8,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-02": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 126399,
+   "completion_tokens": 5902,
+   "cache_read_tokens": 113620,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 126399,
+   "cache_observed_calls": 13,
+   "call_count": 13,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-03": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 563730,
+   "completion_tokens": 66309,
+   "cache_read_tokens": 488854,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 563730,
+   "cache_observed_calls": 69,
+   "call_count": 69,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-04": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 263398,
+   "completion_tokens": 27336,
+   "cache_read_tokens": 220154,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 263398,
+   "cache_observed_calls": 34,
+   "call_count": 34,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-05": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 624085,
+   "completion_tokens": 45375,
+   "cache_read_tokens": 463627,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 624085,
+   "cache_observed_calls": 55,
+   "call_count": 55,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-06": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 771273,
+   "completion_tokens": 86265,
+   "cache_read_tokens": 571876,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 771273,
+   "cache_observed_calls": 71,
+   "call_count": 71,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-07": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 739335,
+   "completion_tokens": 48990,
+   "cache_read_tokens": 620989,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 739335,
+   "cache_observed_calls": 69,
+   "call_count": 69,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-08": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 43896,
+   "completion_tokens": 6012,
+   "cache_read_tokens": 36662,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 43896,
+   "cache_observed_calls": 6,
+   "call_count": 6,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-09": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 98001,
+   "completion_tokens": 9801,
+   "cache_read_tokens": 73548,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 98001,
+   "cache_observed_calls": 9,
+   "call_count": 9,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-10": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 490360,
+   "completion_tokens": 51566,
+   "cache_read_tokens": 389404,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 490360,
+   "cache_observed_calls": 46,
+   "call_count": 46,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-11": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 655232,
+   "completion_tokens": 47360,
+   "cache_read_tokens": 502201,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 655232,
+   "cache_observed_calls": 64,
+   "call_count": 64,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-12": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 322770,
+   "completion_tokens": 40866,
+   "cache_read_tokens": 246540,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 322770,
+   "cache_observed_calls": 42,
+   "call_count": 42,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-13": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 529045,
+   "completion_tokens": 76010,
+   "cache_read_tokens": 425542,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 529045,
+   "cache_observed_calls": 55,
+   "call_count": 55,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-14": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 523565,
+   "completion_tokens": 61593,
+   "cache_read_tokens": 429042,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 523565,
+   "cache_observed_calls": 49,
+   "call_count": 49,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-15": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 68058,
+   "completion_tokens": 10827,
+   "cache_read_tokens": 49939,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 68058,
+   "cache_observed_calls": 9,
+   "call_count": 9,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-16": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 105072,
+   "completion_tokens": 13486,
+   "cache_read_tokens": 83541,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 105072,
+   "cache_observed_calls": 11,
+   "call_count": 11,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-17": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 481114,
+   "completion_tokens": 39790,
+   "cache_read_tokens": 355134,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 481114,
+   "cache_observed_calls": 46,
+   "call_count": 46,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-18": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 433356,
+   "completion_tokens": 37708,
+   "cache_read_tokens": 384401,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 433356,
+   "cache_observed_calls": 44,
+   "call_count": 44,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-19": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 596442,
+   "completion_tokens": 52008,
+   "cache_read_tokens": 475441,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 596442,
+   "cache_observed_calls": 66,
+   "call_count": 66,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-20": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 422527,
+   "completion_tokens": 56595,
+   "cache_read_tokens": 358215,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 422527,
+   "cache_observed_calls": 49,
+   "call_count": 49,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-21": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 739002,
+   "completion_tokens": 49434,
+   "cache_read_tokens": 638175,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 739002,
+   "cache_observed_calls": 66,
+   "call_count": 66,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-22": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 96239,
+   "completion_tokens": 16783,
+   "cache_read_tokens": 75473,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 96239,
+   "cache_observed_calls": 13,
+   "call_count": 13,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-23": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 149310,
+   "completion_tokens": 10360,
+   "cache_read_tokens": 131707,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 149310,
+   "cache_observed_calls": 14,
+   "call_count": 14,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-24": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 679616,
+   "completion_tokens": 86592,
+   "cache_read_tokens": 584880,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 679616,
+   "cache_observed_calls": 64,
+   "call_count": 64,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-25": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 546998,
+   "completion_tokens": 65308,
+   "cache_read_tokens": 455229,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 546998,
+   "cache_observed_calls": 58,
+   "call_count": 58,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-26": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 389324,
+   "completion_tokens": 51376,
+   "cache_read_tokens": 307765,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 389324,
+   "cache_observed_calls": 52,
+   "call_count": 52,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-27": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 459315,
+   "completion_tokens": 29087,
+   "cache_read_tokens": 353860,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 459315,
+   "cache_observed_calls": 59,
+   "call_count": 59,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-28": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 389336,
+   "completion_tokens": 39196,
+   "cache_read_tokens": 290138,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 389336,
+   "cache_observed_calls": 41,
+   "call_count": 41,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-29": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 90101,
+   "completion_tokens": 11264,
+   "cache_read_tokens": 67370,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 90101,
+   "cache_observed_calls": 11,
+   "call_count": 11,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-30": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 136178,
+   "completion_tokens": 18592,
+   "cache_read_tokens": 102438,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 136178,
+   "cache_observed_calls": 14,
+   "call_count": 14,
+   "agent_id": "default"
+  }
+ },
+ "2026-08-31": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 269808,
+   "completion_tokens": 31086,
+   "cache_read_tokens": 234569,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 269808,
+   "cache_observed_calls": 33,
+   "call_count": 33,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-01": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 375920,
+   "completion_tokens": 30340,
+   "cache_read_tokens": 288669,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 375920,
+   "cache_observed_calls": 37,
+   "call_count": 37,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-02": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 343312,
+   "completion_tokens": 47816,
+   "cache_read_tokens": 252686,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 343312,
+   "cache_observed_calls": 43,
+   "call_count": 43,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-03": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 247648,
+   "completion_tokens": 38880,
+   "cache_read_tokens": 208097,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 247648,
+   "cache_observed_calls": 32,
+   "call_count": 32,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-04": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 574550,
+   "completion_tokens": 64100,
+   "cache_read_tokens": 458633,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 574550,
+   "cache_observed_calls": 50,
+   "call_count": 50,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-05": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 94545,
+   "completion_tokens": 14905,
+   "cache_read_tokens": 71475,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 94545,
+   "cache_observed_calls": 11,
+   "call_count": 11,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-06": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 87720,
+   "completion_tokens": 9536,
+   "cache_read_tokens": 66923,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 87720,
+   "cache_observed_calls": 8,
+   "call_count": 8,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-07": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 423058,
+   "completion_tokens": 19240,
+   "cache_read_tokens": 341717,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 423058,
+   "cache_observed_calls": 37,
+   "call_count": 37,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-08": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 268719,
+   "completion_tokens": 42306,
+   "cache_read_tokens": 226872,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 268719,
+   "cache_observed_calls": 33,
+   "call_count": 33,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-09": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 372144,
+   "completion_tokens": 41568,
+   "cache_read_tokens": 279957,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 372144,
+   "cache_observed_calls": 48,
+   "call_count": 48,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-10": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 485010,
+   "completion_tokens": 28170,
+   "cache_read_tokens": 410783,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 485010,
+   "cache_observed_calls": 45,
+   "call_count": 45,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-11": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 459960,
+   "completion_tokens": 46140,
+   "cache_read_tokens": 348114,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 459960,
+   "cache_observed_calls": 60,
+   "call_count": 60,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-12": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 59773,
+   "completion_tokens": 6531,
+   "cache_read_tokens": 51619,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 59773,
+   "cache_observed_calls": 7,
+   "call_count": 7,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-13": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 65304,
+   "completion_tokens": 5049,
+   "cache_read_tokens": 54635,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 65304,
+   "cache_observed_calls": 9,
+   "call_count": 9,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-14": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 575900,
+   "completion_tokens": 51870,
+   "cache_read_tokens": 426681,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 575900,
+   "cache_observed_calls": 65,
+   "call_count": 65,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-15": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 242340,
+   "completion_tokens": 24640,
+   "cache_read_tokens": 206275,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 242340,
+   "cache_observed_calls": 28,
+   "call_count": 28,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-16": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 449108,
+   "completion_tokens": 51448,
+   "cache_read_tokens": 393254,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 449108,
+   "cache_observed_calls": 59,
+   "call_count": 59,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-17": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 305536,
+   "completion_tokens": 33015,
+   "cache_read_tokens": 244388,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 305536,
+   "cache_observed_calls": 31,
+   "call_count": 31,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-18": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 567971,
+   "completion_tokens": 39345,
+   "cache_read_tokens": 443281,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 567971,
+   "cache_observed_calls": 61,
+   "call_count": 61,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-19": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 87496,
+   "completion_tokens": 7608,
+   "cache_read_tokens": 75229,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 87496,
+   "cache_observed_calls": 8,
+   "call_count": 8,
+   "agent_id": "default"
+  }
+ },
+ "2026-09-20": {
+  "default\u001fchinaunion\u001fqwen3.8-flash": {
+   "provider_id": "chinaunion",
+   "model_name": "qwen3.8-flash",
+   "prompt_tokens": 60208,
+   "completion_tokens": 5160,
+   "cache_read_tokens": 49429,
+   "cache_write_tokens": 0,
+   "cache_eligible_input_tokens": 60208,
+   "cache_observed_calls": 8,
+   "call_count": 8,
+   "agent_id": "default"
+  }
+ }
+}

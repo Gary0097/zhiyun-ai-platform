@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "files": {
+    "console/default_1789675294206-ydpvh7y.json": {
+      "sha256": "1ebaf6e3f519c5f5ba60d0b1f524d512f25aeb985bc9eadfd7dd33a30b79dd2d",
+      "session_id": "1789675294206-ydpvh7y",
+      "messages": 2,
+      "aged_out": 0,
+      "rows_processed": 14,
+      "rows_inserted": 0,
+      "legacy_session_ids_checked": [
+        "70d8eb16090f46a2994b699dcb48338f",
+        "sync:default_1789675294206-ydpvh7y"
+      ]
+    }
+  }
+}

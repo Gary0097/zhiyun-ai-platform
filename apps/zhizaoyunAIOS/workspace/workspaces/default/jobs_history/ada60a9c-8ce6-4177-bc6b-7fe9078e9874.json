@@ -1,0 +1,20 @@
+[
+  {
+    "error": "missed scheduled run at 2026-09-18T19:14:52+00:00: late by 370284s, grace=600s",
+    "run_at": "2026-09-23T02:06:16.561632Z",
+    "status": "skipped",
+    "trigger": "scheduled"
+  },
+  {
+    "error": "StreamIdleTimeoutError('LLM stream for kilo:stepfun/step-3.7-flash:free produced no content for 30s. Set QWENPAW_LLM_STREAM_IDLE_TIMEOUT to adjust this timeout')",
+    "run_at": "2026-09-18T19:15:55.608790Z",
+    "status": "error",
+    "trigger": "scheduled"
+  },
+  {
+    "error": "StreamIdleTimeoutError('LLM stream for kilo:stepfun/step-3.7-flash:free produced no content for 30s. Set QWENPAW_LLM_STREAM_IDLE_TIMEOUT to adjust this timeout')",
+    "run_at": "2026-09-18T19:15:18.905816Z",
+    "status": "error",
+    "trigger": "manual"
+  }
+]
