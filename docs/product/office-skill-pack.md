@@ -133,6 +133,9 @@ rapidocr-onnxruntime），由 `apps/zhizaoyunAIOS/scripts/ensure-office-deps.mjs
 
 ## 3. 一键完整下载使用
 
+> **免 Git 推荐**：[Releases `aios-office-v1.4.0`](https://github.com/Gary0097/zhiyun-ai-platform/releases/tag/aios-office-v1.4.0)
+> ——发布 zip 含完整办公版（技能包+预装依赖清单+文档），下载解压后运行 `install-oneclick` 即用。
+
 办公版完整内容都在 `aios-office` 分支上，两种一键方式任选：
 
 ```cmd

@@ -16,13 +16,15 @@ OCR（office-ocr）、文件读取（office-file-reader）、电脑操作（offi
 
 一键完整下载使用（详见 [`docs/product/office-skill-pack.md`](docs/product/office-skill-pack.md)）：
 
+- **免 Git 一键完整下载（推荐）**：[Releases `aios-office-v1.4.0`](https://github.com/Gary0097/zhiyun-ai-platform/releases/tag/aios-office-v1.4.0)——下载 zip 解压后运行 `install-oneclick.cmd`（Linux 为 `install-oneclick.sh`），办公技能包与依赖随首次启动自动预置。
+
 ```cmd
 git clone -b aios-office https://github.com/Gary0097/zhiyun-ai-platform.git
 cd zhiyun-ai-platform
 install-oneclick.cmd
 ```
 
-免 Git 用户：下载 `https://github.com/Gary0097/zhiyun-ai-platform/archive/refs/heads/aios-office.zip`，
+免 Git 用户也可下载 `https://github.com/Gary0097/zhiyun-ai-platform/archive/refs/heads/aios-office.zip`，
 解压后运行 `install-oneclick.cmd`（Linux 为 `install-oneclick.sh`）。
 
 ## 品牌层插件（#126）
