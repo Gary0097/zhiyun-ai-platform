@@ -1,7 +1,7 @@
 {
   "name": "aios-office-pack",
   "display_name": "智造云 AIOS 办公专属默认技能包",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "参考 ZCode 办公模式并桥接 ZCode 官方办公技能的智造云 AIOS 完全体办公技能包：PPT、Excel、Word、PDF、OCR、文件读取、电脑操作、浏览器操控、搜图、查资料、制作内容十一项默认启用；常用依赖启动期预装；技能描述按 token 预算精简（每轮固定注入减半以上）；文件卡片下载 404 修复与启动提速（补丁快跳 + 插件安装门控）随分支内置。",
   "source": "aios-office 分支 skills/office",
   "provisioned_by": "apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs",
@@ -19,5 +19,6 @@
     "office-research",
     "office-content"
   ],
-  "zcode_bridge": "apps/zhizaoyunAIOS/scripts/link-zcode-skills.mjs（本机装有 ZCode 时自动注册外部技能根）"
+  "zcode_bridge": "apps/zhizaoyunAIOS/scripts/link-zcode-skills.mjs（本机装有 ZCode 时自动注册外部技能根）",
+  "office_prompt": "default 工作区预置 OFFICE.md 办公回复规范并精简 system_prompt_files（每轮注入省约 1900 字符，输出纪律降低输出 token）"
 }

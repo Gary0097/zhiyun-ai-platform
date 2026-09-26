@@ -153,7 +153,36 @@ try {
   const check = spawnSync(process.execPath, [join(scriptsRoot, 'provision-office-skills.mjs'), '--check'], { encoding: 'utf8' })
   assert.equal(check.status, 0, check.stderr || '--check 必须通过')
 
-  console.log('办公技能包预置测试通过：首装/幂等/用户保护/版本升级/新工作区/启动挂接/CLI 校验。')
+  // ---------- 9) 办公回复规范 OFFICE.md 与注入列表精简（v1.3.0） ----------
+  const promptWorkspace = join(temp, 'prompt-ws')
+  const promptDefault = join(promptWorkspace, 'workspaces', 'default')
+  mkdirSync(promptDefault, { recursive: true })
+  writeFileSync(join(promptDefault, 'agent.json'), JSON.stringify({
+    system_prompt_files: ['AGENTS.md', 'SOUL.md', 'PROFILE.md'],
+    persona_extra: '用户的其他配置',
+  }))
+  const pr1 = provisionOfficeSkills({ workspace: promptWorkspace, packRoot, log: quiet })
+  assert.ok(existsSync(join(promptDefault, 'OFFICE.md')), 'default 工作区应写入 OFFICE.md')
+  const officeMd = readFileSync(join(promptDefault, 'OFFICE.md'), 'utf8')
+  assert.ok(officeMd.includes('回复精炼') && officeMd.includes('绝不覆盖用户原件'), 'OFFICE.md 应含回复与交付纪律')
+  assert.ok(officeMd.length <= 600, 'OFFICE.md 必须精简（≤600 字符，每轮注入成本）')
+  const agentCfg = JSON.parse(readFileSync(join(promptDefault, 'agent.json'), 'utf8'))
+  assert.deepEqual(agentCfg.system_prompt_files, ['OFFICE.md', 'SOUL.md', 'PROFILE.md'], '默认三件套应替换为 OFFICE 注入列表')
+  assert.equal(agentCfg.persona_extra, '用户的其他配置', 'agent.json 其他字段必须保留')
+  // 幂等：重跑不变
+  provisionOfficeSkills({ workspace: promptWorkspace, packRoot, log: quiet })
+  assert.equal(readFileSync(join(promptDefault, 'agent.json'), 'utf8'), JSON.stringify(agentCfg, null, 2) + '\n', '注入列表重跑不漂移')
+  // 用户自定义注入列表：不动
+  agentCfg.system_prompt_files = ['MY.md']
+  writeFileSync(join(promptDefault, 'agent.json'), JSON.stringify(agentCfg))
+  provisionOfficeSkills({ workspace: promptWorkspace, packRoot, log: quiet })
+  assert.deepEqual(JSON.parse(readFileSync(join(promptDefault, 'agent.json'), 'utf8')).system_prompt_files, ['MY.md'], '用户自定义列表不得被改')
+  // 用户修改 OFFICE.md：保留现场
+  writeFileSync(join(promptDefault, 'OFFICE.md'), officeMd + '\n<!-- 用户批注 -->\n')
+  provisionOfficeSkills({ workspace: promptWorkspace, packRoot, log: quiet })
+  assert.ok(readFileSync(join(promptDefault, 'OFFICE.md'), 'utf8').includes('用户批注'), '用户修改的 OFFICE.md 必须保留')
+
+  console.log('办公技能包预置测试通过：首装/幂等/用户保护/版本升级/新工作区/启动挂接/CLI 校验/办公回复规范。')
 } finally {
   assert.ok(temp.includes(join('aios-office-pack-')))
   rmSync(temp, { recursive: true, force: true })

@@ -1,8 +1,24 @@
 # AIOS 办公专属默认技能包（aios-office 分支）
 
-> 版本：1.2.0 ｜ 分支：`aios-office` ｜ 参考 ZCode 办公模式设计，桥接 ZCode 官方办公技能
+> 版本：1.3.0 ｜ 分支：`aios-office` ｜ 参考 ZCode 办公模式设计，桥接 ZCode 官方办公技能
 
-## 0. v1.2.0：完全体 Harness（对标 WorkBuddy/Kimi，token 更省、效果更强）
+## 0. 版本演进：完全体 Harness（对标 WorkBuddy/Kimi，token 更省、效果更强）
+
+### v1.3.0：办公回复规范（输出纪律 = 最大头的 token 节省）
+
+- **检索开箱即用**（源码核实+实测）：`web_search` 默认走 Tavily **keyless**
+  （免 Key，实测可达），`web_fetch` 纯 HTTP 直抓——查资料/搜图链路零配置可用；
+  需更稳可配 anysearch（匿名免费额度 + 自动注册，控制台工具设置）。
+- **OFFICE.md 办公回复规范**：在 default 工作区预置 375 字符的精炼规范
+  （安全三行 + 回复精炼 + 文件交付 + 事实纪律 + 能力路由），并把
+  `system_prompt_files` 固定为 OFFICE.md+SOUL.md+PROFILE.md——实测 default
+  工作区原本没有任何工作区注入，现在以约 250 token/轮的固定成本换
+  「先结论、不复述、单条 ≤300 字、细节写文件」的**输出纪律**（输出 token
+  通常数倍于输入，这是最大头的节省）；若日后经模板新建 agent，注入上限
+  约 2400 字符 < 泛用默认 4300。用户自定义注入列表或修改 OFFICE.md 一律
+  保留现场。真实运行时渲染验证：仅 `# OFFICE.md` 注入、375 字符。
+
+### v1.2.0：完全体基座
 
 - **token 优化**：QwenPaw 技能注入机制为渐进式披露——每轮固定注入的只有
   `name + description + dir`（preload=false 时正文不进上下文，按需经 Skill 工具

@@ -18,6 +18,65 @@ const WORKSPACE_MANIFEST_SCHEMA = 'workspace-skill-manifest.v1'
 const POOL_MANIFEST_SCHEMA = 'skill-pool-manifest.v1'
 const INSTALLED_FROM = 'office-pack'
 
+// ---------- 办公回复规范（v1.3.0：每轮系统提示词瘦身 + 输出纪律） ----------
+// QwenPaw 默认每轮注入 AGENTS.md+SOUL.md+PROFILE.md（约 4300 字符）。办公版用
+// 精简 OFFICE.md（含安全三行与回复/交付纪律）替换泛用的 AGENTS.md，保留
+// SOUL.md（人格）与 PROFILE.md（用户资料）：每轮省约 1900 字符，且"先结论、
+// 不复述、控制长度"直接压缩输出 token。仅当注入列表为默认三件套时替换，
+// 用户自定义过一律不动；OFFICE.md 被用户改过后同样保留现场。
+const OFFICE_PROMPT_FILE = 'OFFICE.md'
+const DEFAULT_PROMPT_FILES = ['AGENTS.md', 'SOUL.md', 'PROFILE.md']
+const OFFICE_PROMPT_TARGET = ['OFFICE.md', 'SOUL.md', 'PROFILE.md']
+const OFFICE_PROMPT = [
+  '# 智造云 AIOS 办公助手',
+  '',
+  '- 安全：绝不泄露私密数据与凭据；破坏性命令、发送类操作先确认；删除优先可恢复方式。',
+  '- 回复精炼：先给结论或交付物，再给必要说明；不复述问题，不写客套话；并列信息用表格/列表；单条回复默认不超过 300 字，深度细节写进文件交付。',
+  '- 文件产出：保存到工作区文件目录，命名「主题_v1.扩展名」；改稿递增版本，绝不覆盖用户原件；交付时说明文件名与位置。',
+  '- 事实纪律：数据与结论须来自用户材料或检索结果并注明来源；查不到就明说，不编造。',
+  '- 能力路由：办公任务优先调用 office-* 技能（PPT/Excel/Word/PDF/OCR/文件读取/电脑操作/浏览器/搜图/查资料/内容编排）；需要深度工作流时可用技能池中的 ZCode 技能（pptx/xlsx/docx/pdf 等）。',
+  '',
+].join('\n')
+
+function ensureOfficePrompt (targetDir, targetState, log) {
+  const changed = { file: false, config: false }
+  const officeMd = join(targetDir, OFFICE_PROMPT_FILE)
+  const promptHash = createHash('sha256').update(OFFICE_PROMPT).digest('hex')
+  if (!existsSync(officeMd)) {
+    writeFileSync(officeMd, OFFICE_PROMPT, 'utf8')
+    targetState[OFFICE_PROMPT_FILE] = promptHash
+    changed.file = true
+  } else {
+    const current = readFileSync(officeMd, 'utf8')
+    if (current === OFFICE_PROMPT) {
+      targetState[OFFICE_PROMPT_FILE] = promptHash
+    } else if (targetState[OFFICE_PROMPT_FILE] && targetState[OFFICE_PROMPT_FILE] === createHash('sha256').update(current).digest('hex')) {
+      // 我们预置且用户未改动 → 允许随包升级
+      writeFileSync(officeMd, OFFICE_PROMPT, 'utf8')
+      targetState[OFFICE_PROMPT_FILE] = promptHash
+      changed.file = true
+    } else {
+      log(`  [office] ${OFFICE_PROMPT_FILE} 已被用户修改，保留现场`)
+    }
+  }
+  const agentJsonPath = join(targetDir, 'agent.json')
+  if (existsSync(agentJsonPath)) {
+    const agent = safeJson(agentJsonPath, null)
+    if (agent && typeof agent === 'object') {
+      const spf = agent.system_prompt_files
+      const isDefaultList = spf === undefined || JSON.stringify(spf) === JSON.stringify(DEFAULT_PROMPT_FILES)
+      if (isDefaultList) {
+        agent.system_prompt_files = [...OFFICE_PROMPT_TARGET]
+        writeJsonAtomic(agentJsonPath, agent)
+        changed.config = true
+      } else if (JSON.stringify(spf) !== JSON.stringify(OFFICE_PROMPT_TARGET)) {
+        log('  [office] system_prompt_files 已被用户自定义，不修改注入列表')
+      }
+    }
+  }
+  return changed
+}
+
 // ---------- 基础文件操作（不用 fs.cpSync：见 ensure-workspace.mjs 的
 // 中文路径原生崩溃记录；同因禁止符号链接） ----------
 function copyTree (source, target) {
@@ -260,6 +319,12 @@ export function provisionOfficeSkills ({ workspace, packRoot, log = console.log 
       writeJsonAtomic(join(target.dir, 'skill.json'), manifest)
     }
     result.targets.push(stateKey)
+    // 办公回复规范：仅 default 工作区（用户对话的办公助手）
+    if (target.kind === 'workspace' && target.label === 'default') {
+      const promptChanged = ensureOfficePrompt(target.dir, targetState, log)
+      if (promptChanged.file) log('  [office] 办公回复规范 OFFICE.md 已写入 default 工作区（375 字符：安全/精炼/交付/事实纪律）')
+      if (promptChanged.config) log('  [office] system_prompt_files → OFFICE.md+SOUL.md+PROFILE.md（避免泛用 AGENTS.md 全文注入）')
+    }
   }
 
   state.pack_version = pack.version

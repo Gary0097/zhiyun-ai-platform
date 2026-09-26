@@ -147,5 +147,8 @@ assert.ok(patchSrc.includes('%2525'), 'patch-console-ui must carry the file-prev
 assert.ok(patchSrc.includes('.aios-console-patch.sig'), 'patch-console-ui must implement the content-signature fast skip (启动提速)')
 const startSrc = readFileSync(join(scripts, 'start.mjs'), 'utf8')
 assert.ok(startSrc.includes('.brand-plugin.version'), 'start.mjs must version-gate the brand plugin install (启动提速)')
+const provisionerSrc = readFileSync(join(scripts, 'provision-office-skills.mjs'), 'utf8')
+assert.ok(provisionerSrc.includes('OFFICE.md') && provisionerSrc.includes('system_prompt_files'),
+  'provisioner must provision the compact OFFICE.md reply discipline and slim the default system_prompt_files')
 
 console.log('智造云 AIOS 2.2.1 发布门禁通过：QwenPaw 2.2.1 唯一运行时、原生登录、跨平台入口（单机 8088 + Hub 8000）、控制台品牌化、办公完全体（11 项默认启用 + 依赖预装 + ZCode 桥接 + token 预算 + 文件下载修复 + 启动提速）均正常。')
