@@ -1,8 +1,21 @@
 # AIOS 办公专属默认技能包（aios-office 分支）
 
-> 版本：1.3.0 ｜ 分支：`aios-office` ｜ 参考 ZCode 办公模式设计，桥接 ZCode 官方办公技能
+> 版本：1.5.0 ｜ 分支：`aios-office` ｜ 参考 ZCode 办公模式设计，桥接 ZCode 官方办公技能
 
 ## 0. 版本演进：完全体 Harness（对标 WorkBuddy/Kimi，token 更省、效果更强）
+
+### v1.5.0：办公版体检（安装后自检与售后排查）
+
+- `check-office-pack.mjs` 一条命令审计 9 项关键状态：技能包清单/各工作区
+  预置与启用/技能池/依赖导入/OFFICE.md 与注入列表/ZCode 桥接/文件下载修复；
+  每项失败给修复指引，支持 `--json` 机读输出；已内置到 `check-ai-os.cmd/.sh`。
+  本机实测 9/9 通过。
+- 配套发布：GitHub Release `aios-office-v1.4.0`（zip + sha256，免 Git 一键下载）。
+
+### v1.4.0：发布物
+
+- GitHub Release `aios-office-v1.4.0`：`zhiyun-ai-os-v1.4.0-online-installer.zip`
+  （10.7MB，含完整办公版）+ SHA256 校验；README/docs 提供免 Git 下载入口。
 
 ### v1.3.0：办公回复规范（输出纪律 = 最大头的 token 节省）
 
