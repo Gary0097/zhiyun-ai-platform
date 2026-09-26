@@ -1,0 +1,18 @@
+{
+  "name": "aios-office-pack",
+  "display_name": "智造云 AIOS 办公专属默认技能包",
+  "version": "1.0.0",
+  "description": "参考 ZCode 办公模式为智造云 AIOS 预置的办公专属默认技能包：PPT、Excel、Word、电脑操作、浏览器操控、搜图、查资料、制作内容八项能力，随启动器自动预置到技能池与全部工作区并默认启用。",
+  "source": "aios-office 分支 skills/office",
+  "provisioned_by": "apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs",
+  "skills": [
+    "office-ppt",
+    "office-excel",
+    "office-word",
+    "office-computer",
+    "office-browser",
+    "office-image-search",
+    "office-research",
+    "office-content"
+  ]
+}

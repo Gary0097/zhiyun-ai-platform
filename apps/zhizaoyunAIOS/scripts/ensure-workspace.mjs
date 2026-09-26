@@ -3,7 +3,7 @@
 // zhiyun-auth 的 users.json/token_secret；仅保留运行必需的基础目录。
 import { mkdirSync, existsSync, renameSync, readdirSync, copyFileSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
 const appRoot = join(scriptsRoot, '..')
@@ -87,3 +87,17 @@ if (existsSync(join(brandSrc, 'plugin.json'))) {
 }
 
 console.log('Workspace 目录结构已就绪。')
+
+// 办公专属默认技能包预置（aios-office 分支）：把仓库 skills/office 同步到
+// 技能池与全部智能体工作区并默认启用。动态导入 + 存在性检查：技能包或脚本
+// 缺失（如测试单文件拷贝、裁剪安装）时静默跳过；预置失败不阻断启动。
+const officeProvisioner = join(scriptsRoot, 'provision-office-skills.mjs')
+const officePackRoot = join(appRoot, '..', '..', 'skills', 'office')
+if (existsSync(officeProvisioner) && existsSync(join(officePackRoot, 'office-pack.json'))) {
+  try {
+    const { provisionOfficeSkills } = await import(pathToFileURL(officeProvisioner).href)
+    provisionOfficeSkills({ workspace, packRoot: officePackRoot })
+  } catch (e) {
+    console.warn('办公技能包预置失败（不影响启动，可重跑 start-ai-os 重试）：', e.message)
+  }
+}

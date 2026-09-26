@@ -4,6 +4,26 @@
 
 > 产品定义：[`docs/product/PRD-V7.0-AIOS-2.2.0.md`](docs/product/PRD-V7.0-AIOS-2.2.0.md)
 
+## AIOS 办公版（aios-office 分支）
+
+`aios-office` 是独立办公分支：在标准形态之上预置**办公专属默认技能包**（参考 ZCode 办公模式），
+启动即默认启用，无需手动配置——
+
+**PPT（office-ppt）、EXCEL（office-excel）、WORD（office-word）、电脑操作（office-computer）、
+浏览器操控（office-browser）、搜图（office-image-search）、查资料（office-research）、
+制作内容（office-content）**。
+
+一键完整下载使用（详见 [`docs/product/office-skill-pack.md`](docs/product/office-skill-pack.md)）：
+
+```cmd
+git clone -b aios-office https://github.com/Gary0097/zhiyun-ai-platform.git
+cd zhiyun-ai-platform
+install-oneclick.cmd
+```
+
+免 Git 用户：下载 `https://github.com/Gary0097/zhiyun-ai-platform/archive/refs/heads/aios-office.zip`，
+解压后运行 `install-oneclick.cmd`（Linux 为 `install-oneclick.sh`）。
+
 ## 品牌层插件（#126）
 
 品牌化的主体已迁移为官方前端扩展插件 `plugins/aios-brand`（顶栏 Logo 槽位、帮助中心路由与菜单、蓝绿主题、隐藏外链入口），

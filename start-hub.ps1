@@ -23,6 +23,10 @@ if (Test-Path -LiteralPath (Join-Path $Cache 'OFFLINE-PACKAGE')) { $SetupArgs +=
 if ($LASTEXITCODE -ne 0) { throw "Hub setup failed ($LASTEXITCODE)." }
 & node (Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\scripts\hub-config.mjs')
 if ($LASTEXITCODE -ne 0) { throw 'Hub configuration failed.' }
+# 办公专属默认技能包预置（aios-office 分支）：与单机模式共用同一工作区；
+# 预置失败仅告警，不阻断 Hub 启动（QWENPAW_WORKING_DIR 已在上方设置）
+& node (Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\scripts\provision-office-skills.mjs')
+if ($LASTEXITCODE -ne 0) { Write-Host '[WARN] 办公技能包预置失败（不影响 Hub 启动）。' }
 $HubBin = Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\runtime\qwenpaw-hub\venv\Scripts'
 $HubHost = & (Join-Path $HubBin 'python.exe') (Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\scripts\hub-bind-host.py')
 if ($LASTEXITCODE -ne 0) { throw 'Cannot read Hub administrator state; no server was started.' }
