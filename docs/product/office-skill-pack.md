@@ -1,18 +1,22 @@
 # AIOS 办公专属默认技能包（aios-office 分支）
 
-> 版本：1.0.0 ｜ 分支：`aios-office` ｜ 参考 ZCode 办公模式设计
+> 版本：1.1.0 ｜ 分支：`aios-office` ｜ 参考 ZCode 办公模式设计
 
 ## 1. 这是什么
 
 `aios-office` 分支在智造云 AIOS 2.2.1 标准形态之上，预置了一套**办公专属默认技能包**：
-用户完成一键安装并启动后，8 项办公能力已进入技能池与全部智能体工作区，并**默认启用**，
-无需在控制台手动导入或开启。
+用户完成一键安装并启动后，11 项办公能力已进入技能池与全部智能体工作区，并**默认启用**，
+无需在控制台手动导入或开启。常用 Python 依赖（文档读写/PDF/OCR）也由启动器**预装**到
+项目运行环境，技能执行不再临时 `pip install` 浪费时间。
 
 | 技能 | 能力 | 说明 |
 | --- | --- | --- |
 | `office-ppt` | PPT | 幻灯片制作/编辑/美化/导出与视觉校对（python-pptx 工作流） |
-| `office-excel` | EXCEL | 表格读写/清洗/公式/图表/格式互转（openpyxl 工作流） |
+| `office-excel` | EXCEL | 表格读写/清洗/公式/图表/格式互转（openpyxl/pandas 工作流） |
 | `office-word` | WORD | 文档生成/编辑/样式体系/公文模板/导出 PDF（python-docx 工作流） |
+| `office-pdf` | PDF | PDF 识别（文本/表格/图片提取）、合并拆分/加密/水印、生成与转换 |
+| `office-ocr` | OCR | 扫描件/图片文字识别；复杂版面走 MinerU 云端（免费额度）/MCP，本地 RapidOCR 兜底 |
+| `office-file-reader` | 文件读取 | 任意文件读取分流入口（编码检测、大文件分段、类型路由） |
 | `office-computer` | 电脑操作 | 文件批量整理、重命名、格式转换、系统配置与排查（shell/PowerShell） |
 | `office-browser` | 浏览器操控 | 网页浏览、自动填表、抓取、截图验证（内置 browser 工具，感知→操作→验证） |
 | `office-image-search` | 搜图 | 图源检索、授权确认、下载校验、素材清单交付 |
@@ -20,20 +24,46 @@
 | `office-content` | 制作内容 | 方案/文案/汇报材料的全流程编排，调度上述技能取数、找图、成稿 |
 
 技能之间互为引用（如 `office-content` 编排 `office-research` 取数、`office-image-search`
-配图、`office-word`/`office-ppt` 成稿），与 QwenPaw 内置技能（pptx/docx/xlsx/pdf/browser 等）
+配图、`office-word`/`office-ppt` 成稿；`office-file-reader` 把文件分流到
+`office-pdf`/`office-ocr` 与各文档技能），与 QwenPaw 内置技能（pptx/docx/xlsx/pdf/browser 等）
 **名称不冲突**：内置技能按原样可用，办公技能包在其之上提供办公场景的工作流与规范。
+
+### 依赖预装（解决执行期临时装包慢）
+
+`skills/office/requirements-office.txt` 声明常用办公依赖（python-docx、openpyxl、
+python-pptx、pdfplumber、pypdf、fpdf2、Pillow、chardet、markdownify、pandas、
+rapidocr-onnxruntime），由 `apps/zhizaoyunAIOS/scripts/ensure-office-deps.mjs` 在
+**启动期幂等安装**到项目 venv：
+
+- 标记文件 `<runtime>/office-deps.ok` 记录清单内容哈希，未变化时启动开销 <50ms；
+- 清单变化或有包缺失时自动用 uv 补装（一次性，约 1–3 分钟），复验通过才落标记；
+- 运行环境尚未安装时优雅跳过（首次 setup 后的下次启动自动补装）；
+- 安装失败只告警、不阻断启动（技能文档内保留按需安装兜底）；
+- 离线安装包（OFFLINE-PACKAGE）优先走 uv `--offline` 本地缓存。
+
+### OCR 路线（office-ocr 技能内置，按优先级自动选择）
+
+1. **文档解析 MCP 工具**：控制台配置了 MinerU MCP 等文档解析服务时直接调用（零安装）；
+2. **MinerU 云端 API**（复杂版面首选）：`pip install "mineru>=4"` 仅装轻量 CLI，
+   `MINERU_API_KEY`（mineru.net 注册申请，注册送免费额度），`mineru parse 文件 --remote`
+   （文件上传云端，需用户同意；`mineru usage --json` 查额度）；
+3. **本地 RapidOCR**（默认兜底）：已预装 `rapidocr_onnxruntime`，离线可用，零等待；
+4. 本地 MinerU 完整版（`mineru[core]`，含模型重依赖）：仅在用户明确要求时安装。
 
 ## 2. 预置机制
 
 技能包源文件位于仓库 `skills/office/`（随分支分发，打包发布时自动进入安装包）。
-启动链路在服务拉起前调用 `apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs`：
+启动链路在服务拉起前完成两件事：
 
-- **单机模式**：`start-ai-os.cmd/.sh` → `ensure-workspace.mjs` 末尾动态调用预置脚本；
-- **Hub 多用户模式**：`start-hub.ps1/.sh` 在 hub-config 之后调用预置脚本（同一工作区）。
+1. **技能预置**：`apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs`
+   - **单机模式**：`start-ai-os.cmd/.sh` → `ensure-workspace.mjs` 末尾动态调用预置脚本；
+   - **Hub 多用户模式**：`start-hub.ps1/.sh` 在 hub-config 之后调用预置脚本（同一工作区）。
+2. **依赖预装**：`ensure-office-deps.mjs`（由 `ensure-workspace.mjs` 一并调用）把
+   `requirements-office.txt` 幂等安装到项目 venv（见上文"依赖预装"）。
 
 预置动作（幂等，每次启动执行）：
 
-1. 读取 `skills/office/office-pack.json` 清单，校验 8 个技能目录与 `SKILL.md`
+1. 读取 `skills/office/office-pack.json` 清单，校验 11 个技能目录与 `SKILL.md`
    frontmatter（name 与目录一致、description 非空）；
 2. 把技能目录复制到 `$QWENPAW_WORKING_DIR/skill_pool/`（技能池，全部工作区可复用），
    并以 `skill-pool-manifest.v1` 格式登记池清单条目；
@@ -68,7 +98,7 @@ install-oneclick.cmd
 解压后运行 `install-oneclick.cmd`（Linux 运行 `install-oneclick.sh`）。
 
 一键安装完成并启动后：打开 http://127.0.0.1:8088 → 注册首个账号 → 配置模型供应商 →
-对话即可直接使用（控制台「工作区 → 技能」可见 8 项 office-* 技能，默认启用）。
+对话即可直接使用（控制台「工作区 → 技能」可见 11 项 office-* 技能，默认启用）。
 团队多用户：管理员运行 `start-hub.cmd`，员工工作区同样自动预置。
 
 仅重新预置技能包（改包后不重启服务时手动执行）：
@@ -82,7 +112,7 @@ node apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs --check   # 只校�
 
 发布门禁 `node scripts/verify-release.mjs` 在 aios-office 分支上额外覆盖：
 
-- `skills/office/office-pack.json` 存在且声明 8 项技能，各技能 `SKILL.md` 齐全；
+- `skills/office/office-pack.json` 存在且声明 11 项技能，各技能 `SKILL.md` 齐全；
 - `provision-office-skills.mjs --check`（frontmatter 合法性）；
 - `test-provision-office-skills.mjs`：首装（池+工作区+默认启用）、幂等重跑、
   用户自建同名技能保护（conflict）、用户修改保护（user-modified）、

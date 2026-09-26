@@ -9,9 +9,10 @@
 `aios-office` 是独立办公分支：在标准形态之上预置**办公专属默认技能包**（参考 ZCode 办公模式），
 启动即默认启用，无需手动配置——
 
-**PPT（office-ppt）、EXCEL（office-excel）、WORD（office-word）、电脑操作（office-computer）、
+**PPT（office-ppt）、EXCEL（office-excel）、WORD（office-word）、PDF 识别（office-pdf）、
+OCR（office-ocr）、文件读取（office-file-reader）、电脑操作（office-computer）、
 浏览器操控（office-browser）、搜图（office-image-search）、查资料（office-research）、
-制作内容（office-content）**。
+制作内容（office-content）**；常用 Python 依赖（文档/PDF/OCR）由启动器预装，执行期不再临时安装。
 
 一键完整下载使用（详见 [`docs/product/office-skill-pack.md`](docs/product/office-skill-pack.md)）：
 

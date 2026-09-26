@@ -36,7 +36,8 @@ metadata:
    每个需求给出 3–5 个候选缩略图链接让用户挑（不要只给一张就让用户接受）。
 2. **下载**：下载原图到工作区 `图片素材_<主题>/` 目录，命名
    `主题_序号_来源.png|jpg`；禁止把缩略图当原图用。
-3. **校验**（shell + Python/Pillow，缺失则 `pip install Pillow`）：
+3. **校验**（shell + Python/Pillow；Pillow 已随办公技能包预装，缺失才
+   `pip install Pillow`）：
    ```bash
    python -c "from PIL import Image; im=Image.open('图.png'); print(im.size, im.mode)"
    ```

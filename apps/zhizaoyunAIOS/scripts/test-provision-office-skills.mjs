@@ -19,10 +19,11 @@ try {
   // ---------- 0) 技能包本体 ----------
   const pack = loadOfficePack(packRoot)
   assert.equal(pack.manifest.name, 'aios-office-pack')
-  assert.equal(pack.skills.length, 8, '办公技能包必须包含 8 项技能')
+  assert.equal(pack.skills.length, 11, '办公技能包必须包含 11 项技能')
   assert.deepEqual(pack.skills.map(s => s.dir).sort(),
-    ['office-browser', 'office-computer', 'office-content', 'office-excel', 'office-image-search', 'office-ppt', 'office-research', 'office-word'],
-    '八项能力清单必须与文档一致')
+    ['office-browser', 'office-computer', 'office-content', 'office-excel', 'office-file-reader',
+      'office-image-search', 'office-ocr', 'office-pdf', 'office-ppt', 'office-research', 'office-word'],
+    '十一项能力清单必须与文档一致')
 
   // ---------- frontmatter 解析 ----------
   assert.equal(parseSkillFrontmatter('---\nname: a\ndescription: "d"\n---\n# x').name, 'a')
@@ -40,7 +41,7 @@ try {
     skills: { 'my-own-skill': { enabled: true, channels: ['console'] } },
   }))
   const first = provisionOfficeSkills({ workspace, packRoot, log: quiet })
-  assert.equal(first.installed, 16, '8 技能 × (技能池 + default 工作区) 全部新装')
+  assert.equal(first.installed, 22, '11 技能 × (技能池 + default 工作区) 全部新装')
   for (const dir of pack.skills.map(s => s.dir)) {
     assert.ok(existsSync(join(workspace, 'skill_pool', dir, 'SKILL.md')), `池缺少 ${dir}`)
     assert.ok(existsSync(join(workspace, 'workspaces', 'default', 'skills', dir, 'SKILL.md')), `工作区缺少 ${dir}`)
@@ -61,7 +62,7 @@ try {
   const second = provisionOfficeSkills({ workspace, packRoot, log: quiet })
   assert.equal(second.installed, 0)
   assert.equal(second.updated, 0)
-  assert.equal(second.unchanged, 16, '重跑全部无变化')
+  assert.equal(second.unchanged, 22, '重跑全部无变化')
   assert.equal(second.skipped.length, 0)
   assert.equal(JSON.parse(readFileSync(join(workspace, 'skill_pool', 'skill.json'), 'utf8')).version, poolVersionBefore, '池清单未被重写')
   assert.equal(JSON.parse(readFileSync(join(workspace, 'workspaces', 'default', 'skill.json'), 'utf8')).version, wsVersionBefore, '工作区清单未被重写')

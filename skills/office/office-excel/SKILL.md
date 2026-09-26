@@ -9,11 +9,13 @@ metadata:
 
 # 办公技能 · Excel 表格
 
-## 1. 环境自检
+## 1. 环境自检（办公版已预装，直接用）
+
+openpyxl / pandas 已由启动器预装，不要在对话中重复安装；仅 import 报缺失时才补装：
 
 ```bash
-python -c "import openpyxl; print(openpyxl.__version__)"   # 缺失则: pip install openpyxl
-python -c "import pandas; print(pandas.__version__)"       # 可选：批量分析
+python -c "import openpyxl; print(openpyxl.__version__)"   # 缺失时: pip install openpyxl
+python -c "import pandas; print(pandas.__version__)"       # 预装自带；缺失时: pip install pandas
 soffice --version    # 可选：重算公式/导 PDF 需要 LibreOffice
 ```
 

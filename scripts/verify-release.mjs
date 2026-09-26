@@ -82,6 +82,9 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'provision-office-skills.mjs')]],
   [process.execPath, [join(scripts, 'provision-office-skills.mjs'), '--check']],
   [process.execPath, [join(scripts, 'test-provision-office-skills.mjs')]],
+  [process.execPath, ['--check', join(scripts, 'ensure-office-deps.mjs')]],
+  [process.execPath, [join(scripts, 'ensure-office-deps.mjs'), '--check']],
+  [process.execPath, [join(scripts, 'test-ensure-office-deps.mjs')]],
   [process.execPath, [join(scripts, 'verify-runtime.mjs')]],
   [process.execPath, [join(scripts, 'patch-console-ui.mjs'), '--check']],
   [process.execPath, [join(scripts, 'test-patch-console-ui.mjs')]],
@@ -102,21 +105,26 @@ assert.ok(existsSync(join(root, 'branding', 'app.ico')), 'branding/app.ico missi
 const patch = readFileSync(join(scripts, 'patch-console-ui.mjs'), 'utf8')
 assert.ok(patch.includes('智造云AIOS'), 'patch-console-ui must brand as 智造云 AIOS')
 
-// 7) 办公专属默认技能包（aios-office 分支）：清单、8 项技能 frontmatter、
-//    预置脚本挂接单机与 Hub 启动链路、预置测试纳入门禁
+// 7) 办公专属默认技能包（aios-office 分支）：清单、11 项技能 frontmatter、
+//    预装依赖清单、预置脚本挂接单机与 Hub 启动链路、测试纳入门禁
 const officePackRoot = join(root, 'skills', 'office')
 const officePackPath = join(officePackRoot, 'office-pack.json')
 assert.ok(existsSync(officePackPath), 'skills/office/office-pack.json missing')
 const officePack = JSON.parse(readFileSync(officePackPath, 'utf8'))
-assert.ok(Array.isArray(officePack.skills) && officePack.skills.length === 8, 'office pack must declare 8 skills')
+assert.ok(Array.isArray(officePack.skills) && officePack.skills.length === 11, 'office pack must declare 11 skills')
 for (const dir of officePack.skills) {
   assert.ok(existsSync(join(officePackRoot, dir, 'SKILL.md')), `office skill missing: skills/office/${dir}/SKILL.md`)
 }
+const officeRequirements = join(officePackRoot, 'requirements-office.txt')
+assert.ok(existsSync(officeRequirements), 'skills/office/requirements-office.txt missing')
+assert.ok(readFileSync(officeRequirements, 'utf8').includes('rapidocr-onnxruntime'), 'office deps must include the local OCR fallback')
 assert.ok(existsSync(join(scripts, 'provision-office-skills.mjs')), 'provision-office-skills.mjs missing')
+assert.ok(existsSync(join(scripts, 'ensure-office-deps.mjs')), 'ensure-office-deps.mjs missing')
 const ensureWorkspaceSrc = readFileSync(join(scripts, 'ensure-workspace.mjs'), 'utf8')
 assert.ok(ensureWorkspaceSrc.includes('provision-office-skills'), 'ensure-workspace.mjs must provision the office skill pack')
+assert.ok(ensureWorkspaceSrc.includes('ensure-office-deps'), 'ensure-workspace.mjs must preinstall the office dependencies')
 for (const hubEntry of ['start-hub.ps1', 'start-hub.sh']) {
   assert.ok(readFileSync(join(root, hubEntry), 'utf8').includes('provision-office-skills'), `${hubEntry} must provision the office skill pack`)
 }
 
-console.log('智造云 AIOS 2.2.1 发布门禁通过：QwenPaw 2.2.1 唯一运行时、原生登录、跨平台入口（单机 8088 + Hub 8000）、控制台品牌化、办公专属默认技能包（8 项默认启用）均正常。')
+console.log('智造云 AIOS 2.2.1 发布门禁通过：QwenPaw 2.2.1 唯一运行时、原生登录、跨平台入口（单机 8088 + Hub 8000）、控制台品牌化、办公专属默认技能包（11 项默认启用 + 依赖预装）均正常。')

@@ -25,12 +25,13 @@ metadata:
      逐页临时挑色是版面混乱的头号来源。
    - 深浅"三明治"结构：封面与结尾用深色底，内容页用浅色底。
 
-## 2. 环境自检（先于一切制作）
+## 2. 环境自检（办公版已预装，直接用）
 
-用 shell 工具确认依赖，缺什么先补什么（只报告一次，不要反复重试）：
+办公技能包依赖（python-pptx 等）已由启动器预装到项目运行环境，**不要在对话中
+重复安装**；仅当 import 报缺失时才补装（只报告一次，不要反复重试）：
 
 ```bash
-python -c "import pptx; print(pptx.__version__)"   # 缺失则: pip install python-pptx
+python -c "import pptx; print(pptx.__version__)"   # 预装缺失时: pip install python-pptx
 soffice --version        # 可选：导出 PDF 需要 LibreOffice
 python -m markitdown --help   # 可选：提取既有 PPT 文本
 ```

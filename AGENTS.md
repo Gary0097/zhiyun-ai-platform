@@ -45,12 +45,15 @@ These rules apply to the entire repository. Read the PRD in
 ## AIOS Office Branch (`aios-office`)
 
 - The `aios-office` branch carries the office-exclusive default skill pack
-  (`skills/office/`, 8 `office-*` skills) plus its provisioner
-  (`apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs`). The pack is
-  provisioned into the QwenPaw skill pool and every agent workspace at startup
-  (single-user via `ensure-workspace.mjs`, Hub via `start-hub.ps1/.sh`) and is
-  enabled by default; user-created same-name skills and user edits are never
-  overwritten, and user-disabled skills stay disabled.
+  (`skills/office/`, 11 `office-*` skills) plus its provisioner
+  (`apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs`) and dependency
+  preinstaller (`ensure-office-deps.mjs`, installs `requirements-office.txt`
+  into the project venv at startup so skills never pip-install at execution
+  time). The pack is provisioned into the QwenPaw skill pool and every agent
+  workspace at startup (single-user via `ensure-workspace.mjs`, Hub via
+  `start-hub.ps1/.sh`) and is enabled by default; user-created same-name
+  skills and user edits are never overwritten, and user-disabled skills stay
+  disabled.
 - Skills are guidance-level `SKILL.md` files, not business applications; the
   "no bundled business apps" rule is unaffected. `node scripts/verify-release.mjs`
   gates the pack (manifest, frontmatter, provisioner hookups, provisioning tests)

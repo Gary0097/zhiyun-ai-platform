@@ -9,10 +9,12 @@ metadata:
 
 # 办公技能 · Word 文档
 
-## 1. 环境自检
+## 1. 环境自检（办公版已预装，直接用）
+
+python-docx 已由启动器预装，不要在对话中重复安装；仅 import 报缺失时才补装：
 
 ```bash
-python -c "import docx; print(docx.__version__)"    # 缺失则: pip install python-docx
+python -c "import docx; print(docx.__version__)"    # 缺失时: pip install python-docx
 soffice --version   # 可选：.doc 转换 / 导出 PDF
 ```
 

@@ -101,3 +101,15 @@ if (existsSync(officeProvisioner) && existsSync(join(officePackRoot, 'office-pac
     console.warn('办公技能包预置失败（不影响启动，可重跑 start-ai-os 重试）：', e.message)
   }
 }
+
+// 办公技能包依赖预装（docx/excel/ppt/pdf/OCR 等常用包）：启动期幂等安装到
+// 项目 venv，避免技能执行期临时 pip install。同样缺文件静默跳过、失败不阻断。
+const officeDeps = join(scriptsRoot, 'ensure-office-deps.mjs')
+if (existsSync(officeDeps) && existsSync(join(officePackRoot, 'requirements-office.txt'))) {
+  try {
+    const { ensureOfficeDependencies } = await import(pathToFileURL(officeDeps).href)
+    ensureOfficeDependencies({ appRoot, packRoot: officePackRoot })
+  } catch (e) {
+    console.warn('办公依赖预装失败（不影响启动）：', e.message)
+  }
+}
