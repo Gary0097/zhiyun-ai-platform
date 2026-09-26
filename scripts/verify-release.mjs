@@ -85,6 +85,9 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'ensure-office-deps.mjs')]],
   [process.execPath, [join(scripts, 'ensure-office-deps.mjs'), '--check']],
   [process.execPath, [join(scripts, 'test-ensure-office-deps.mjs')]],
+  [process.execPath, ['--check', join(scripts, 'link-zcode-skills.mjs')]],
+  [process.execPath, [join(scripts, 'link-zcode-skills.mjs'), '--check']],
+  [process.execPath, [join(scripts, 'test-link-zcode-skills.mjs')]],
   [process.execPath, [join(scripts, 'verify-runtime.mjs')]],
   [process.execPath, [join(scripts, 'patch-console-ui.mjs'), '--check']],
   [process.execPath, [join(scripts, 'test-patch-console-ui.mjs')]],
@@ -120,11 +123,29 @@ assert.ok(existsSync(officeRequirements), 'skills/office/requirements-office.txt
 assert.ok(readFileSync(officeRequirements, 'utf8').includes('rapidocr-onnxruntime'), 'office deps must include the local OCR fallback')
 assert.ok(existsSync(join(scripts, 'provision-office-skills.mjs')), 'provision-office-skills.mjs missing')
 assert.ok(existsSync(join(scripts, 'ensure-office-deps.mjs')), 'ensure-office-deps.mjs missing')
+assert.ok(existsSync(join(scripts, 'link-zcode-skills.mjs')), 'link-zcode-skills.mjs missing (ZCode office skills bridge)')
 const ensureWorkspaceSrc = readFileSync(join(scripts, 'ensure-workspace.mjs'), 'utf8')
 assert.ok(ensureWorkspaceSrc.includes('provision-office-skills'), 'ensure-workspace.mjs must provision the office skill pack')
 assert.ok(ensureWorkspaceSrc.includes('ensure-office-deps'), 'ensure-workspace.mjs must preinstall the office dependencies')
+assert.ok(ensureWorkspaceSrc.includes('link-zcode-skills'), 'ensure-workspace.mjs must hook the ZCode skills bridge')
 for (const hubEntry of ['start-hub.ps1', 'start-hub.sh']) {
   assert.ok(readFileSync(join(root, hubEntry), 'utf8').includes('provision-office-skills'), `${hubEntry} must provision the office skill pack`)
 }
 
-console.log('智造云 AIOS 2.2.1 发布门禁通过：QwenPaw 2.2.1 唯一运行时、原生登录、跨平台入口（单机 8088 + Hub 8000）、控制台品牌化、办公专属默认技能包（11 项默认启用 + 依赖预装）均正常。')
+// 7.5) 办公模式质量项（#aios-office v1.2.0）：
+//   - token 预算：preload=false 时 description 是每轮固定注入，必须保持精简；
+//   - 文件下载修复与启动快跳必须存在于品牌补丁；
+//   - 品牌插件安装必须版本门控（启动提速）。
+for (const dir of officePack.skills) {
+  const skillMd = readFileSync(join(officePackRoot, dir, 'SKILL.md'), 'utf8')
+  const desc = skillMd.match(/^description: "(.*)"$/m)?.[1] || ''
+  assert.ok(desc.length > 0 && desc.length <= 110,
+    `office skill ${dir} description 长度必须在 1-110 字符（当前 ${desc.length}）：description 是每轮对话的固定 token 开销`)
+}
+const patchSrc = readFileSync(join(scripts, 'patch-console-ui.mjs'), 'utf8')
+assert.ok(patchSrc.includes('%2525'), 'patch-console-ui must carry the file-preview URL encoding fix (#/? 截断与 % 双重解码 404)')
+assert.ok(patchSrc.includes('.aios-console-patch.sig'), 'patch-console-ui must implement the content-signature fast skip (启动提速)')
+const startSrc = readFileSync(join(scripts, 'start.mjs'), 'utf8')
+assert.ok(startSrc.includes('.brand-plugin.version'), 'start.mjs must version-gate the brand plugin install (启动提速)')
+
+console.log('智造云 AIOS 2.2.1 发布门禁通过：QwenPaw 2.2.1 唯一运行时、原生登录、跨平台入口（单机 8088 + Hub 8000）、控制台品牌化、办公完全体（11 项默认启用 + 依赖预装 + ZCode 桥接 + token 预算 + 文件下载修复 + 启动提速）均正常。')

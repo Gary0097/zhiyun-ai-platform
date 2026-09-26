@@ -45,15 +45,21 @@ These rules apply to the entire repository. Read the PRD in
 ## AIOS Office Branch (`aios-office`)
 
 - The `aios-office` branch carries the office-exclusive default skill pack
-  (`skills/office/`, 11 `office-*` skills) plus its provisioner
-  (`apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs`) and dependency
+  (`skills/office/`, 11 `office-*` skills, descriptions capped at 110 chars —
+  they are the fixed per-turn token cost) plus its provisioner
+  (`apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs`), dependency
   preinstaller (`ensure-office-deps.mjs`, installs `requirements-office.txt`
   into the project venv at startup so skills never pip-install at execution
-  time). The pack is provisioned into the QwenPaw skill pool and every agent
-  workspace at startup (single-user via `ensure-workspace.mjs`, Hub via
-  `start-hub.ps1/.sh`) and is enabled by default; user-created same-name
-  skills and user edits are never overwritten, and user-disabled skills stay
-  disabled.
+  time), and the ZCode skills bridge (`link-zcode-skills.mjs` — registers the
+  local ZCode office plugin skill dirs as read-only external skill roots via
+  `config.json skill_paths`; ZCode skill content is proprietary and must never
+  be copied into this repository). The pack is provisioned into the QwenPaw
+  skill pool and every agent workspace at startup (single-user via
+  `ensure-workspace.mjs`, Hub via `start-hub.ps1/.sh`) and is enabled by
+  default; user-created same-name skills and user edits are never overwritten,
+  and user-disabled skills stay disabled. `patch-console-ui.mjs` carries the
+  file-preview URL encoding fix (required replacement + content-signature
+  fast skip) and `start.mjs` version-gates the brand plugin install.
 - Skills are guidance-level `SKILL.md` files, not business applications; the
   "no bundled business apps" rule is unaffected. `node scripts/verify-release.mjs`
   gates the pack (manifest, frontmatter, provisioner hookups, provisioning tests)

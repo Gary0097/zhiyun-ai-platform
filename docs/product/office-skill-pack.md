@@ -1,6 +1,37 @@
 # AIOS 办公专属默认技能包（aios-office 分支）
 
-> 版本：1.1.0 ｜ 分支：`aios-office` ｜ 参考 ZCode 办公模式设计
+> 版本：1.2.0 ｜ 分支：`aios-office` ｜ 参考 ZCode 办公模式设计，桥接 ZCode 官方办公技能
+
+## 0. v1.2.0：完全体 Harness（对标 WorkBuddy/Kimi，token 更省、效果更强）
+
+- **token 优化**：QwenPaw 技能注入机制为渐进式披露——每轮固定注入的只有
+  `name + description + dir`（preload=false 时正文不进上下文，按需经 Skill 工具
+  读取）。v1.2.0 把 11 项技能 description 全部压到 ≤71 字符（总计 2047→673
+  字符，固定开销降约 70%；发布门禁强制 ≤110 字符预算），正文保留完整工作流
+  ——比"全量注入文档"的常见做法（数千至数万 token/轮）低一个量级。
+- **ZCode 默认办公技能桥接（完全体）**：`link-zcode-skills.mjs` 在启动期检测
+  本机 ZCode 安装（`~/.zcode/cli/plugins/cache/zcode-plugins-official`），把
+  presentations/spreadsheets/documents/pdf/browser-use/computer-use 插件的最新
+  版本技能目录注册为 QwenPaw 外部技能根（`config.json → skill_paths`，共 7 项
+  ZCode 技能：pptx/xlsx/docx/pdf/control-browser/web-gui-tester/computer-use）。
+  原地只读引用、不复制（ZCode 技能为专有授权内容，不得再分发）；未装 ZCode
+  的机器静默跳过；外部根排在主池之后，同名时主池优先，office-* 与内置技能
+  不受影响。agent 由 office-* 轻量路由，需要深度能力时直接用 ZCode 全流程
+  技能（含其脚本资产）。
+- **文件卡片下载 404 修复**：上游 `filePreviewUrl` 把本地路径原样拼进 URL，
+  文件名含 `#`/字面 `%xx` 时被截断或双重解码 → 404。品牌补丁注入定向编码
+  （`%`→`%2525` 抵消服务端两次解码，`#`→`%23`、`?`→`%3F` 避免分隔符截断），
+  已实测中文/空格/`#`/`%20`/`50%BE` 文件名全部 200（`?` 为 Windows 非法文件名
+  字符，不存在该场景）。防回归：补丁目标为必需项 + 门禁检查。
+- **启动提速（实测 40-45s → 21s 到 HTTP 200）**：
+  - `patch-console-ui.mjs` 全量补丁（重写+重压缩+文档生成）实测约 17s——
+    新增内容签名快跳（`<venv>/qwenpaw/.aios-console-patch.sig`），签名一致
+    时整体跳过（<0.5s）；
+  - 品牌插件安装子进程实测约 11s——`start.mjs` 版本门控（workspace 标记
+    `.brand-plugin.version`，版本未变跳过；文件同步本就由 ensure-workspace
+    版本门控完成）；
+  - 办公依赖预装标记快路径 <50ms；首次启动仍需一次性全量补丁/安装/依赖
+    下载（QwenPaw 首启另有约 44s 一次性迁移，属上游行为）。
 
 ## 1. 这是什么
 
@@ -60,6 +91,8 @@ rapidocr-onnxruntime），由 `apps/zhizaoyunAIOS/scripts/ensure-office-deps.mjs
    - **Hub 多用户模式**：`start-hub.ps1/.sh` 在 hub-config 之后调用预置脚本（同一工作区）。
 2. **依赖预装**：`ensure-office-deps.mjs`（由 `ensure-workspace.mjs` 一并调用）把
    `requirements-office.txt` 幂等安装到项目 venv（见上文"依赖预装"）。
+3. **ZCode 技能桥接**：`link-zcode-skills.mjs`（同一挂接点）检测并注册本机
+   ZCode 办公插件技能为外部技能根（见 §0）。
 
 预置动作（幂等，每次启动执行）：
 
@@ -113,12 +146,14 @@ node apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs --check   # 只校�
 发布门禁 `node scripts/verify-release.mjs` 在 aios-office 分支上额外覆盖：
 
 - `skills/office/office-pack.json` 存在且声明 11 项技能，各技能 `SKILL.md` 齐全；
-- `provision-office-skills.mjs --check`（frontmatter 合法性）；
-- `test-provision-office-skills.mjs`：首装（池+工作区+默认启用）、幂等重跑、
-  用户自建同名技能保护（conflict）、用户修改保护（user-modified）、
-  版本升级更新、新智能体工作区覆盖、用户禁用不被覆盖、
-  ensure-workspace 启动挂接（含技能包缺失时静默跳过）、CLI `--check`；
-- `ensure-workspace.mjs`、`start-hub.ps1`、`start-hub.sh` 均挂接预置脚本（防回归）。
+- **token 预算**：每项技能 description 长度 ≤110 字符（每轮固定注入成本）；
+- `provision-office-skills.mjs --check` 与 `test-provision-office-skills.mjs`；
+- `ensure-office-deps.mjs --check` 与 `test-ensure-office-deps.mjs`；
+- `link-zcode-skills.mjs --check` 与 `test-link-zcode-skills.mjs`；
+- 品牌补丁必须包含文件预览 URL 编码修复（`%2525`）与内容签名快跳；
+  `test-patch-console-ui.mjs`（95 项断言）含修复注入/回退门禁/快跳断言；
+- `start.mjs` 必须版本门控品牌插件安装；`ensure-workspace.mjs` 必须挂接
+  技能预置/依赖预装/ZCode 桥接三者。
 
 ## 5. 平台影响与回滚
 

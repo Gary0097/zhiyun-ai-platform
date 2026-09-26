@@ -113,3 +113,15 @@ if (existsSync(officeDeps) && existsSync(join(officePackRoot, 'requirements-offi
     console.warn('办公依赖预装失败（不影响启动）：', e.message)
   }
 }
+
+// ZCode 默认办公技能桥接（完全体）：本机装有 ZCode 时，把其官方办公插件
+// 技能注册为外部技能根（原地引用不复制，未安装则静默跳过）。
+const zcodeBridge = join(scriptsRoot, 'link-zcode-skills.mjs')
+if (existsSync(zcodeBridge)) {
+  try {
+    const { linkZcodeSkills } = await import(pathToFileURL(zcodeBridge).href)
+    linkZcodeSkills({ workspace })
+  } catch (e) {
+    console.warn('ZCode 技能桥接失败（不影响启动）：', e.message)
+  }
+}

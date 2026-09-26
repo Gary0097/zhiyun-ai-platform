@@ -1,6 +1,6 @@
 ---
 name: office-ppt
-description: "PPT/演示文稿制作技能。任何以 .pptx 为主要输入或输出的任务都使用本技能：从主题、资料或大纲新建演示文稿；编辑、美化、改版已有 PPT；读取与提取幻灯片内容；排版与配色设计、图表与图示、演讲备注；导出 PDF 或逐页图片并做视觉校对。触发词：PPT、幻灯片、演示文稿、汇报材料、路演、课件、宣讲、deck、slides、presentation。"
+description: "PPT/幻灯片/.pptx 制作、编辑、美化、导出与视觉校对。触发：PPT、演示文稿、汇报材料、路演、课件、slides。"
 metadata:
   version: "1.0.0"
   qwenpaw:

@@ -1,6 +1,6 @@
 ---
 name: office-ocr
-description: "OCR 与文档识别技能。扫描件、图片型 PDF、照片、截图中的文字需要识别时使用；复杂版面（论文、书籍、报表）需要保留版式/公式/表格结构的高精度解析也用本技能（MinerU 云端/本地路线）。触发词：OCR、识别文字、扫描件、图片转文字、提取公式、论文解析、票据识别、截图内容、MinerU、扫描PDF。"
+description: "OCR 识别：扫描件、图片、截图、扫描PDF；复杂版面走 MinerU 云端/MCP，本地 RapidOCR 兜底。触发：识别文字、扫描件。"
 metadata:
   version: "1.0.0"
   qwenpaw:

@@ -1,6 +1,6 @@
 ---
 name: office-pdf
-description: "PDF 文件技能。任何以 .pdf 为主要输入或输出的任务都使用本技能：读取与识别 PDF（文本、表格、图片提取）；扫描件/图片型 PDF 转走 office-ocr；合并、拆分、旋转、页面增删；加水印、加密解密；从零生成 PDF 或由 Word/Excel/PPT 转 PDF；PDF 转 Word/Markdown/图片。触发词：PDF、识别 PDF、提取表格、拆分合并、加水印、转 PDF、PDF转Word、读取文件内容。"
+description: "PDF 读取识别（文本/表格提取）、合并拆分、加密水印、生成与转换。触发：PDF、提取表格、拆分合并、加水印、转Word。"
 metadata:
   version: "1.0.0"
   qwenpaw:

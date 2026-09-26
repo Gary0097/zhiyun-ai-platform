@@ -1,6 +1,6 @@
 ---
 name: office-image-search
-description: "搜图技能。需要为 PPT/文档/公众号找配图、找图片素材、图标、插图、产品图、Logo、背景图，或按图片找相似图、下载整理图片素材库的场合使用。通过 web_search/web_fetch 与浏览器检索图片，下载到本地校验尺寸与可用性后交付。触发词：找图、配图、搜图、图片素材、封面图、插图、icon、图标、头图、banner、表情包、无版权图片。"
+description: "搜图配图：图源检索（Unsplash/Pexels/iconfont）、授权确认、下载校验、素材清单。触发：找图、配图、图片素材、图标、封面。"
 metadata:
   version: "1.0.0"
   qwenpaw:

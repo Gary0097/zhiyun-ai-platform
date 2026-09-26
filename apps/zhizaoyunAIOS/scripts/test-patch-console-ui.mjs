@@ -50,6 +50,8 @@ const entryFixture = [
   'var UM=e=>`https://qwenpaw.agentscope.io/docs/intro?lang=${Mo(e)}`;',
   'var H=`https://qwenpaw.agentscope.io/docs/faq.${N}.md`;',
   'const manifest=["assets/' + LOGIN + '","assets/' + EXTRA + '"];',
+  // 与真实 bundle 逐字符一致的 filePreviewUrl 源码（文件下载 404 修复目标）
+  'const fileApi={filePreviewUrl:e=>{if(!e)return"";if(e.startsWith("http://")||e.startsWith("https://"))return e;let t=e.replace(/^\\/+/,"");const a=`${Pp}/${t}`,n=Y(a),o=vt();return o?`${n}?token=${encodeURIComponent(o)}`:n}};',
   'export{bootTitle,manifest,i18n,ud,UM,H}',
 ].join('\n')
 
@@ -152,6 +154,8 @@ try {
   ok(entry.includes('window.QwenPaw'), '技术标识 window.QwenPaw 保留')
   ok(entry.includes('[QwenPaw audit]'), '技术标识 [QwenPaw audit] 保留')
   ok(entry.includes('"agentscope-ai/QwenPaw"'), '技术标识 agentscope-ai/QwenPaw 保留')
+  ok(entry.includes('let t=e.replace(/^\\/+/,"").replace(/%/g,"%2525").replace(/#/g,"%23").replace(/\\?/g,"%3F");const a=`${Pp}/${t}`'),
+    '文件预览 URL 编码修复已注入（#/? 截断与 % 双重解码 404 修复）')
 
   // 登录 chunk：两个外链进入死代码，语言切换保持活跃
   const loginZyb = zybJsFiles().find(n => n.startsWith(LOGIN.replace('.js', '') + '-zyb'))
@@ -255,9 +259,10 @@ try {
   const run1EntryContent = entry
 
   // ── 第二次运行：幂等 ─────────────────────────────────────────────────
-  section('运行 2：幂等性')
+  section('运行 2：幂等性（内容签名快跳）')
   const run2 = runPatch()
   ok(run2.status === 0, '重复运行以退出码 0 完成')
+  ok((run2.stdout || '').includes('快跳'), '内容签名一致时整体快跳（启动提速）')
   const run2Zyb = zybJsFiles().sort()
   ok(JSON.stringify(run1Zyb) === JSON.stringify(run2Zyb), 'zyb 文件集合不变（' + run2Zyb.length + ' 个 js ×3 表示）')
   ok(run2Zyb.every(n => occurrences(n, '-zyb') === 1), '文件名无双重 -zyb 后缀')
@@ -288,6 +293,16 @@ try {
   ok(readFileSync(join(assetsDir, upgradedEntry), 'utf8').includes('#about'), '升级后的实际入口引用修复后的关于链接')
   ok(occurrences(upgradedEntry, '-zyb') === 1, '存量品牌版升级不叠加哈希后缀')
   ok(runPatch(['--check']).status === 0, '菜单升级后门禁通过')
+
+  // 文件预览编码修复被回退 → 门禁必须发现（防回归虚绿）
+  const fixedEntry = readFileSync(join(assetsDir, entrySrcInHtml()), 'utf8')
+  const regressed = fixedEntry.replace('let t=e.replace(/^\\/+/,"").replace(/%/g,"%2525").replace(/#/g,"%23").replace(/\\?/g,"%3F");const a=`${Pp}/${t}`',
+    'let t=e.replace(/^\\/+/,"");const a=`${Pp}/${t}`')
+  writeFileSync(join(assetsDir, entrySrcInHtml()), regressed)
+  writeFileSync(join(assetsDir, ENTRY), regressed)
+  ok(runPatch(['--check']).status !== 0, '文件预览编码修复被回退时 --check 必须失败')
+  ok(runPatch().status === 0, '重新补丁可恢复文件预览编码修复')
+  ok(runPatch(['--check']).status === 0, '恢复后门禁通过')
 
   writeFileSync(pyFile, staticFilesFixture) // 注入：缓存策略回退为一年 immutable
   const checkFail = runPatch(['--check'])

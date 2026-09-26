@@ -1,6 +1,6 @@
 ---
 name: office-word
-description: "Word/文档技能。任何以 .docx 为主要输入或输出的任务都使用本技能：撰写与生成公文、报告、方案、合同、通知、简历等 Word 文档；读取、编辑、格式化既有 .docx；目录、页眉页脚、表格、图片、编号与样式体系；旧 .doc 转 .docx；docx 转 PDF。触发词：Word、文档、报告、公文、红头文件、说明书、方案书、会议纪要、合同的生成与修改。"
+description: "Word/.docx 生成与编辑：公文、报告、方案、合同、纪要；样式、目录、导出 PDF。触发：Word、文档、写报告。"
 metadata:
   version: "1.0.0"
   qwenpaw:

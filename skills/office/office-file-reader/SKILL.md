@@ -1,6 +1,6 @@
 ---
 name: office-file-reader
-description: "通用文件读取与识别入口技能。用户给出任意文件要求读取、查看、总结、提取内容时使用：先判断文件类型再分流——文本类（txt/md/json/csv/log/代码/配置）直接读取，Office 文档转对应办公技能，PDF/扫描件转 office-pdf/office-ocr，图片转 office-ocr。处理编码问题（GBK/UTF-8 乱码）、大文件分段读取、二进制格式识别。触发词：读取文件、打开文件、看看这个文件、文件内容、总结文档、提取内容、乱码。"
+description: "任意文件读取分流入口：文本直读（编码检测、大文件分段），Office/PDF/图片分流对应技能。触发：读取文件、总结文档、乱码。"
 metadata:
   version: "1.0.0"
   qwenpaw:

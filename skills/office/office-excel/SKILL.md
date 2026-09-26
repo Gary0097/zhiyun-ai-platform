@@ -1,6 +1,6 @@
 ---
 name: office-excel
-description: "Excel/表格技能。任何以 .xlsx/.xlsm/.csv/.tsv 为主要输入或输出的任务都使用本技能：读取、清洗、修复既有表格；从零或从其他数据源新建表格；公式、透视汇总与数据分析并输出带图表的 Excel；格式化与打印版式；CSV/TSV/JSON 与 XLSX 互转。触发词：Excel、表格、报表、明细、汇总、数据分析、透视、对账、花名册、预算表、csv 转 excel。"
+description: "Excel/表格/.xlsx/.csv 读写、清洗、公式、图表与数据分析。触发：Excel、报表、汇总、对账、透视、数据分析。"
 metadata:
   version: "1.0.0"
   qwenpaw:

@@ -1,5 +1,5 @@
 import { spawn, spawnSync } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveRuntime, runtimeEnvironment } from './runtime-env.mjs'
@@ -75,8 +75,21 @@ if (existsSync(join(scriptsRoot, 'patch-console-ui.mjs'))) {
 // 安装命令只接受本地目录且需服务离线，这里正在 spawn 之前，条件满足。
 const brandPlugin = join(repoRoot, 'plugins', 'aios-brand')
 if (existsSync(join(brandPlugin, 'plugin.json'))) {
-  const install = spawnSync(qwenpawCommand, ['plugin', 'install', brandPlugin, '--force'], { cwd: repoRoot, stdio: 'inherit', env: launchEnv })
-  if (install.status !== 0) console.warn('品牌层插件安装失败（不影响启动，外观回退为补丁层）。')
+  // 版本门控（#aios-office 启动提速）：安装子进程实测约 10 秒，且每次启动
+  // 重跑并无必要——ensure-workspace 已把插件文件按版本同步到 workspace/plugins，
+  // 运行时从该目录扫描加载。已注册同一版本时跳过；升级/标记丢失自动重装。
+  const brandVersion = JSON.parse(readFileSync(join(brandPlugin, 'plugin.json'), 'utf8')).version
+  const brandMarker = join(appRoot, 'workspace', '.brand-plugin.version')
+  const alreadyRegistered = existsSync(brandMarker)
+    && readFileSync(brandMarker, 'utf8').trim() === brandVersion
+    && existsSync(join(appRoot, 'workspace', 'plugins', 'aios-brand', 'plugin.json'))
+  if (alreadyRegistered) {
+    console.log(`品牌层插件 v${brandVersion} 已注册，跳过安装子进程（版本未变）。`)
+  } else {
+    const install = spawnSync(qwenpawCommand, ['plugin', 'install', brandPlugin, '--force'], { cwd: repoRoot, stdio: 'inherit', env: launchEnv })
+    if (install.status !== 0) console.warn('品牌层插件安装失败（不影响启动，外观回退为补丁层）。')
+    else writeFileSync(brandMarker, brandVersion + '\n', 'utf8')
+  }
 }
 
 console.log('\n智造云 AIOS 启动中：http://127.0.0.1:8088')

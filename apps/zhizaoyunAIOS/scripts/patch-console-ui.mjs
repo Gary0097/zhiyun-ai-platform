@@ -49,6 +49,20 @@ const REPLACEMENTS = [
     to: 'avatar:"/qwenpaw.svg"',
     patched: 'avatar:"/qwenpaw.svg"',
   },
+  // ── 功能性修复：聊天文件卡片无法点击下载（#aios-office）──
+  // 上游 filePreviewUrl 把本地绝对路径原样拼进 URL（不做任何编码）：
+  // 文件名含 # 或 ? 时被浏览器当作 fragment/query 截断；含字面 %xx 时
+  // 被服务端两次解码破坏路径（starlette 一次 + files.py unquote 一次）→ 404。
+  // 修复：仅对这三个危险字符做定向编码——% 双重编码（%2525）抵消服务端
+  // 两次解码，#/? 单次编码避免被当作分隔符；其余字符保持原样，与上游
+  // 反向解析（单次 decodeURIComponent）兼容。
+  {
+    name: '文件预览 URL 编码修复（#/? 截断与 % 双重解码 404）',
+    optional: false,
+    from: 'let t=e.replace(/^\\/+/,"");const a=`${Pp}/${t}`',
+    to: 'let t=e.replace(/^\\/+/,"").replace(/%/g,"%2525").replace(/#/g,"%23").replace(/\\?/g,"%3F");const a=`${Pp}/${t}`',
+    patched: 'let t=e.replace(/^\\/+/,"").replace(/%/g,"%2525")',
+  },
   // 2.2.1 sidebar quick menu: change only its About destination.
   {
     name: '2.2.1 右下角关于 → 本地发行版说明',
@@ -1013,6 +1027,37 @@ if (!consoleDir) {
   process.exit(0)
 }
 
+// ── 启动提速：内容签名快跳（#aios-office）──────────────────────────────
+// 全量补丁（重写 + brotli/gz 重压缩 + 内嵌文档生成）实测约 15-20 秒，是启动
+// 链路里最大的固定开销。补丁成功后保存 console 目录内容签名；下次启动签名
+// 未变则整体跳过（<0.5 秒）。签名包含补丁版本号 PATCH_REV：补丁逻辑变化时
+// 提升该版本即可强制全量重打。--check 与 --docs-only 不走快跳。
+// 标记放在 console 目录之外（运行时随包目录升级整体消失 → 自动全量重打）。
+const PATCH_REV = '2026-09-26-filefix-1'
+const sigFile = join(consoleDir, '..', '.aios-console-patch.sig')
+function consoleSignature () {
+  const h = createHash('sha1')
+  h.update(PATCH_REV + '\n')
+  const walk = d => {
+    for (const e of readdirSync(d, { withFileTypes: true })) {
+      h.update('d:' + e.name + '\n')
+      const f = join(d, e.name)
+      if (e.isDirectory()) walk(f)
+      else { const s = statSync(f); h.update('f:' + e.name + ':' + s.size + ':' + Math.round(s.mtimeMs) + '\n') }
+    }
+  }
+  walk(consoleDir)
+  return h.digest('hex')
+}
+if (!checkMode && !process.argv.includes('--docs-only')) {
+  try {
+    if (readFileSync(sigFile, 'utf8').trim() === consoleSignature()) {
+      console.log('Console 品牌补丁无变化，快跳（内容签名一致）。')
+      process.exit(0)
+    }
+  } catch { /* 无历史标记 → 全量执行 */ }
+}
+
 // Refresh documentation without rebuilding console assets or restarting services.
 if (process.argv.includes('--docs-only') && !checkMode) {
   writeLocalDocs(consoleDir)
@@ -1248,4 +1293,11 @@ sweepStaleZybAssets(consoleDir)
 
 if (missing.length) {
   warn('以下目标未找到，bundle 可能已更新：' + missing.join('、'))
+}
+
+// 全量补丁流程走完后记录内容签名，供下次启动快跳。missing 只收必需项：
+// 必需目标缺失（上游 bundle 升级漂移）时不写签名，下次启动重试全量补丁，
+// 并由 --check 门禁兜底报警。
+if (!missing.length) {
+  try { writeFileSync(sigFile, consoleSignature() + '\n', 'utf8') } catch { /* 只读介质等场景忽略 */ }
 }
