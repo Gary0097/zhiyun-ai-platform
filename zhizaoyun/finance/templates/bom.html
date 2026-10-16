@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}智能成本预测模型{% endblock %}
+{% block body %}
+{% raw %}
+<div class="page">
+  <el-row :gutter="14">
+    <el-col :span="8">
+      <div class="card-box" style="margin-bottom:12px">
+        <div class="card-title">订单 BOM 总览</div>
+        <div class="stat-row"><span>订单总数</span><b class="num">{{ stats.order_count }}</b></div>
+        <div class="stat-row"><span>BOM 成本合计</span><b class="num" style="color:#ff4d4f">¥{{ fmt(stats.total_cost / 10000) }} 万</b></div>
+        <div style="font-size:12px;color:#909399;margin-top:8px">设备型号 Top5：</div>
+        <div class="top-model" v-for="m in (stats.top_models || []).slice(0,5)" :key="m.device_model">
+          <span class="tm-name" :title="m.device_model">{{ m.device_model }}</span>
+          <span class="num">{{ m.n }} 单</span>
+        </div>
+      </div>
+      <div class="card-box" style="height:560px;display:flex;flex-direction:column">
+        <div class="card-title" style="margin-bottom:8px">搜索订单 / 设备 / 客户</div>
+        <el-input placeholder="订单号、客户名或设备型号" v-model="kw" clearable
+                  prefix-icon="el-icon-search" @input="doSearch" style="margin-bottom:10px"></el-input>
+        <div style="flex:1;overflow:auto">
+          <div v-for="o in orders" :key="o.order_no"
+               class="m-item" :class="{active: o.order_no===current}" @click="loadOrder(o.order_no)">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b>{{ o.order_no }}</b>
+              <span style="font-size:11px;color:#c0c4cc">{{ o.material_count }} 项</span>
+            </div>
+            <div style="font-size:12px;color:#606266;margin:2px 0" :title="o.device_model">{{ o.device_model }}</div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="font-size:11px;color:#909399" :title="o.customer">{{ o.customer }}</span>
+              <span style="font-size:12px;color:#ff7f16" class="num">¥{{ o.bom_cost.toLocaleString() }}</span>
+            </div>
+          </div>
+          <div v-if="!orders.length" style="color:#909399;font-size:13px;text-align:center;padding:20px">
+            {{ searching ? '搜索中…' : '没有匹配的订单' }}
+          </div>
+        </div>
+        <el-button size="small" plain style="margin-top:8px" @click="page++; doSearch(true)" :disabled="page*30>=total">加载更多（{{ orders.length }}/{{ total }}）</el-button>
+      </div>
+    </el-col>
+    <el-col :span="11">
+      <div class="card-box">
+        <div class="card-title">订单 BOM 成本结构树
+          <span style="float:right;font-weight:400;font-size:12px;color:#909399">
+            点击节点展开/收起 · 悬浮查看成本 · 画布可拖拽缩放</span>
+        </div>
+        <div v-if="info" style="font-size:12.5px;color:#606266;margin-bottom:6px">
+          <b>{{ current }}</b> · {{ info.tree.device_model }} · {{ info.tree.customer }} ·
+          物料 <b>{{ info.part_count }}</b> 种 · BOM 成本
+          <b style="color:#ff4d4f">¥{{ info.total.toLocaleString() }}</b>
+        </div>
+        <div id="chartTree" style="height:640px"></div>
+      </div>
+    </el-col>
+    <el-col :span="5">
+      <div class="card-box">
+        <div class="card-title">节点详情</div>
+        <template v-if="node">
+          <div class="nd-name">{{ node.materialName }}</div>
+          <div class="nd-row"><span>层级</span><b>{{ nodeTypeLabel(node.nodeType) }}</b></div>
+          <div class="nd-row" v-if="node.code"><span>物料编码</span><b style="font-size:11px">{{ node.code }}</b></div>
+          <div class="nd-row" v-if="node.category"><span>类别</span><b>{{ node.category }}</b></div>
+          <div class="nd-row" v-if="node.supply"><span>供应方式</span><b>{{ node.supply }}</b></div>
+          <div class="nd-row"><span>用量/规模</span><b>{{ node.usageQty }}</b></div>
+          <div class="nd-row" v-if="node.price"><span>单位成本</span><b>¥{{ node.price }}</b></div>
+          <div class="nd-row"><span>成本合计</span><b style="color:#ff4d4f">¥{{ Number(node.totalCost).toLocaleString() }}</b></div>
+          <div class="nd-row" v-if="info && node.totalCost">
+            <span>占订单 BOM</span><b>{{ (node.totalCost / info.total * 100).toFixed(1) }}%</b>
+          </div>
+        </template>
+        <div v-else style="color:#909399;font-size:13px;padding:20px 4px">选择订单后，点击树上节点查看详情</div>
+      </div>
+    </el-col>
+  </el-row>
+</div>
+{% endraw %}
+{% endblock %}
+{% block style %}
+.stat-row { display:flex; justify-content:space-between; font-size:13px; color:#606266;
+  padding:6px 0; border-bottom:1px dashed #ebeef5; }
+.stat-row span { color:#909399; }
+.top-model { display:flex; justify-content:space-between; font-size:12px; color:#606266;
+  padding:4px 0; border-bottom:1px dashed #f0f2f5; }
+.tm-name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px; }
+.m-item { padding:8px 10px; border:1px solid #ebeef5; border-radius:6px; margin-bottom:8px;
+  cursor:pointer; transition:.15s; }
+.m-item:hover { border-color:#ff7f16; }
+.m-item.active { border-color:#ff7f16; background:#fff7e8; }
+.nd-name { font-size:15px; font-weight:700; color:#303133; margin-bottom:10px; }
+.nd-row { display:flex; justify-content:space-between; gap:6px; font-size:13px; color:#606266;
+  padding:6px 0; border-bottom:1px dashed #ebeef5; }
+.nd-row span { color:#909399; white-space:nowrap; }
+.nd-row b { text-align:right; word-break:break-all; }
+{% endblock %}
+{% block script %}
+<script>
+new Vue({
+  el:'#app',
+  data:{
+    stats:{}, kw:'', orders:[], total:0, page:1, searching:false,
+    current:'', info:null, node:null,
+  },
+  created:function(){
+    axios.get('/api/orders/stats').then(function(r){ this.stats = r.data; }.bind(this));
+    this.doSearch();
+  },
+  mounted:function(){
+    window.addEventListener('resize', function(){
+      var el = document.getElementById('chartTree');
+      if (el) { var c = echarts.getInstanceByDom(el); if (c) c.resize(); }
+    });
+  },
+  methods:{
+    fmt:function(v){ return Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 1 }); },
+    nodeTypeLabel:function(t){
+      return { root:'订单', category:'物料类别', group:'图号组', part:'物料' }[t] || t;
+    },
+    doSearch:function(more){
+      var self = this;
+      if (!more) this.page = 1;
+      if (this.searching) return;
+      this.searching = true;
+      axios.get('/api/orders/search', { params:{ q:this.kw, page:this.page, size:30 } })
+        .then(function(r){
+          if (more) self.orders = self.orders.concat(r.data.rows);
+          else self.orders = r.data.rows;
+          self.total = r.data.total;
+        })
+        .finally(function(){ self.searching = false; });
+    },
+    loadOrder:function(orderNo){
+      var self = this;
+      this.current = orderNo;
+      this.node = null;
+      axios.get('/api/orders/' + orderNo + '/tree').then(function(r){
+        self.info = r.data;
+        self.$nextTick(function(){ self.drawTree(r.data.tree); });
+      }).catch(function(e){
+        self.$message.error((e.response && e.response.data && e.response.data.error) || '加载失败');
+      });
+    },
+    drawTree:function(treeData){
+      var el = document.getElementById('chartTree');
+      if (!el) return;
+      var chart = echarts.init(el);
+      chart.clear();
+      chart.off('click');
+      var self = this;
+      chart.on('click', function(params){
+        if (params.componentType === 'series' && params.data) self.node = params.data;
+      });
+      chart.setOption({
+        tooltip:{
+          trigger:'item', triggerOn:'mousemove', position:'right',
+          formatter:function(p){
+            return p.data.materialName + (p.data.code ? '（' + p.data.code + '）' : '') +
+              '<br/>用量: ' + p.data.usageQty + '<br/>成本合计: ¥ ' + Number(p.data.totalCost).toLocaleString();
+          },
+        },
+        series:[{
+          type:'tree', data:[treeData],
+          top:'8%', left:'10%', bottom:'16%', right:'12%',
+          symbol:'circle', symbolSize:function(val, params){ return params.data.symbolSize || 16; },
+          orient:'TB', edgeShape:'curve', roam:true,
+          nodePadding:70, layerPadding:100,
+          initialTreeDepth:2,
+          label:{ position:'bottom', distance:8, verticalAlign:'middle', align:'center',
+            formatter:function(p){ return p.data.materialName; },
+            color:'#606266', fontSize:12, width:96, overflow:'truncate' },
+          triggerEvent:true,
+          leaves:{ label:{ position:'bottom', distance:8, rotate:-18 } },
+          emphasis:{ focus:'descendant' },
+          expandAndCollapse:true,
+          animationDuration:550, animationDurationUpdate:750,
+        }],
+      });
+    },
+  }
+});
+</script>
+{% endblock %}

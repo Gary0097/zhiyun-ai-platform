@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}财务数据分析看板{% endblock %}
+{% block body %}
+{% raw %}
+<div class="page">
+  <el-row :gutter="16" class="kpis">
+    <el-col :span="6" v-for="k in kpiList" :key="k.label">
+      <div class="kpi" :style="{borderTop:'3px solid '+k.color}">
+        <div class="kpi-label">{{ k.label }}</div>
+        <div class="kpi-value num" :style="{color:k.color}">{{ k.value }}</div>
+        <div class="kpi-sub">{{ k.sub }}</div>
+      </div>
+    </el-col>
+  </el-row>
+
+  <el-row :gutter="16">
+    <el-col :span="16">
+      <div class="card-box">
+        <div class="card-title">月度收入 / 成本 / 毛利趋势
+          <span style="float:right;font-weight:400">
+            <el-date-picker size="small" type="monthrange" v-model="trendRange"
+              value-format="yyyy-MM" range-separator="至" start-placeholder="开始月份"
+              end-placeholder="结束月份" :clearable="true" style="width:260px"
+              @change="redrawTrend"></el-date-picker>
+          </span>
+        </div>
+        <div id="chartTrend" style="height:320px"></div>
+      </div>
+      <div class="card-box">
+        <div class="card-title">应付账款结构</div>
+        <el-row :gutter="10">
+          <el-col :span="12"><div id="chartApMonth" style="height:250px"></div></el-col>
+          <el-col :span="12"><div id="chartApType" style="height:250px"></div></el-col>
+        </el-row>
+      </div>
+    </el-col>
+    <el-col :span="8">
+      <div class="card-box">
+        <div class="card-title">应收账款账龄结构</div>
+        <div id="chartArBucket" style="height:230px"></div>
+        <div style="font-size:12px;color:#909399;text-align:center">
+          超 60 天应收 <b style="color:#ff4d4f">¥{{ fmt(ov.ar_over60) }}</b>（{{ ov.ar_warn_count }} 笔）
+        </div>
+      </div>
+      <div class="card-box">
+        <div class="card-title">⚠️ 异常预警（{{ alerts.length }}）</div>
+        <div class="alert-list">
+          <div v-for="(a,i) in alerts" :key="i" class="alert-item">
+            <el-tag size="mini" :type="a.level==='高'?'danger':'warning'">{{ a.level }}</el-tag>
+            <el-tag size="mini" type="info" style="margin:0 4px">{{ a.type }}</el-tag>
+            <span style="font-size:12.5px">{{ a.msg }}</span>
+          </div>
+          <div v-if="!alerts.length" style="color:#909399;text-align:center;padding:20px">暂无异常</div>
+        </div>
+      </div>
+    </el-col>
+  </el-row>
+
+  <el-row :gutter="16">
+    <el-col :span="12">
+      <div class="card-box">
+        <div class="card-title">应收 TOP10 客户（金额 / 最长账龄）</div>
+        <div id="chartArTop" style="height:300px"></div>
+      </div>
+    </el-col>
+    <el-col :span="12">
+      <div class="card-box">
+        <div class="card-title">超 60 天应收明细
+          <el-button size="mini" style="float:right" @click="exportAr">导出 CSV</el-button>
+        </div>
+        <el-table :data="arOver60" size="mini" border stripe max-height="300">
+          <el-table-column prop="contract_no" label="合同号" width="100"></el-table-column>
+          <el-table-column prop="customer" label="客户" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="occur_date" label="发生日期" width="100"></el-table-column>
+          <el-table-column prop="amount" label="金额" width="110" align="right">
+            <template slot-scope="s">{{ fmt(s.row.amount) }}</template>
+          </el-table-column>
+          <el-table-column prop="kind" label="款项" width="90"></el-table-column>
+          <el-table-column prop="aging_days" label="账龄(天)" width="85" align="center">
+            <template slot-scope="s"><span :style="{color:s.row.aging_days>90?'#ff4d4f':'#faad14',fontWeight:600}">{{ s.row.aging_days }}</span></template>
+          </el-table-column>
+          <el-table-column prop="status" label="状态" width="85"></el-table-column>
+        </el-table>
+      </div>
+    </el-col>
+  </el-row>
+</div>
+{% endraw %}
+{% endblock %}
+{% block style %}
+.kpis { margin-bottom:2px; }
+.kpi { background:#fff; border-radius:8px; padding:14px 18px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+.kpi-label { font-size:13px; color:#909399; }
+.kpi-value { font-size:26px; font-weight:700; margin:6px 0 4px; }
+.kpi-sub { font-size:11.5px; color:#c0c4cc; }
+.alert-list { max-height:300px; overflow:auto; }
+.alert-item { padding:7px 4px; border-bottom:1px dashed #ebeef5; line-height:1.5; }
+{% endblock %}
+{% block script %}
+<script>
+new Vue({
+  el:'#app',
+  data:{ ov:{}, alerts:[], arOver60:[], allMonths:[], trendRange:null },
+  computed:{
+    kpiList:function(){
+      var o = this.ov;
+      return [
+        { label:'应收账款总额', value:this.fmt(o.ar_total), sub:'全部未回款合同', color:'#ff7f16' },
+        { label:'应付账款（待付）', value:this.fmt(o.ap_pending), sub:'供应商待付款', color:'#faad14' },
+        { label:'综合毛利率', value:(o.margin||0)+'%', sub:'收入 '+this.fmt(o.revenue)+' / 利润 '+this.fmt(o.profit), color:'#52c41a' },
+        { label:'账龄超60天预警', value:this.fmt(o.ar_over60), sub:(o.ar_warn_count||0)+' 笔需催收', color:'#ff4d4f' },
+      ];
+    },
+  },
+  created:function(){
+    var self = this;
+    axios.get('/api/overview').then(function(r){ self.ov = r.data; });
+    axios.get('/api/alerts').then(function(r){ self.alerts = r.data.alerts; });
+    axios.get('/api/ar/list?warn=1').then(function(r){ self.arOver60 = r.data.rows; });
+    axios.get('/api/monthly').then(function(r){
+      self.allMonths = r.data.rows;
+      self.drawTrend(self.allMonths);
+    });
+    axios.get('/api/ar').then(function(r){ self.drawAr(r.data); });
+    axios.get('/api/ap').then(function(r){ self.drawAp(r.data); });
+  },
+  methods:{
+    fmt:function(v){ return '¥' + Number(v||0).toLocaleString(undefined,{maximumFractionDigits:0}); },
+    redrawTrend:function(){
+      var self = this;
+      var rows = this.allMonths;
+      if (this.trendRange && this.trendRange.length === 2) {
+        var lo = this.trendRange[0], hi = this.trendRange[1];
+        rows = this.allMonths.filter(function(r){ return r.month >= lo && r.month <= hi; });
+      }
+      this.$nextTick(function(){ self.drawTrend(rows); });
+    },
+    exportAr:function(){
+      var rows = this.arOver60;
+      var csv = '\ufeff合同号,客户,发生日期,金额,款项,账龄天数,状态\n' + rows.map(function(r){
+        return [r.contract_no,r.customer,r.occur_date,r.amount,r.kind,r.aging_days,r.status].join(',');
+      }).join('\n');
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+      a.download = '应收账龄超60天.csv'; a.click();
+    },
+    drawTrend:function(rows){
+      var el = document.getElementById('chartTrend');
+      if (!el) return;
+      var c = echarts.init(el);
+      c.setOption({
+        tooltip:{trigger:'axis'},
+        legend:{data:['销售收入','生产成本','毛利润','毛利率']},
+        grid:{left:80,right:60,top:40,bottom:30},
+        xAxis:{type:'category',data:rows.map(function(r){return r.month;})},
+        yAxis:[{type:'value',name:'金额(元)',axisLabel:{formatter:function(v){return v/10000+'万';}}},
+               {type:'value',name:'毛利率%',max:60,min:0}],
+        series:[
+          {name:'销售收入',type:'bar',barMaxWidth:26,itemStyle:{color:'#ff7f16'},data:rows.map(function(r){return r.revenue;})},
+          {name:'生产成本',type:'bar',barMaxWidth:26,itemStyle:{color:'#faad14'},data:rows.map(function(r){return r.cost;})},
+          {name:'毛利润',type:'bar',barMaxWidth:26,itemStyle:{color:'#52c41a'},data:rows.map(function(r){return r.profit;})},
+          {name:'毛利率',type:'line',yAxisIndex:1,smooth:true,lineStyle:{width:3},itemStyle:{color:'#ff4d4f'},data:rows.map(function(r){return r.margin;})},
+        ]
+      });
+    },
+    drawAr:function(d){
+      var b = echarts.init(document.getElementById('chartArBucket'));
+      var colors = {'0-30天':'#52c41a','31-60天':'#ff7f16','61-90天':'#faad14','90天以上':'#ff4d4f'};
+      b.setOption({
+        tooltip:{trigger:'item',formatter:'{b}<br/>¥{c}（{d}%）'},
+        series:[{type:'pie',radius:['42%','68%'],center:['50%','46%'],
+          label:{formatter:'{b}\n{d}%'},
+          data:Object.keys(d.buckets).map(function(k){return {name:k,value:Math.round(d.buckets[k]),itemStyle:{color:colors[k]}};})}]
+      });
+      var top = d.top.slice(0,10);
+      var t = echarts.init(document.getElementById('chartArTop'));
+      t.setOption({
+        tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
+        grid:{left:150,right:70,top:10,bottom:24},
+        xAxis:{type:'value',axisLabel:{formatter:function(v){return v/10000+'万';}}},
+        yAxis:{type:'category',data:top.map(function(r){return r.customer;}).reverse(),
+               axisLabel:{width:140,overflow:'truncate'}},
+        series:[
+          {name:'应收金额',type:'bar',barMaxWidth:16,itemStyle:{color:'#ff7f16'},
+           label:{show:true,position:'right',formatter:function(p){return (p.value/10000).toFixed(1)+'万';}},
+           data:top.map(function(r){return r.v;}).reverse()},
+        ]
+      });
+    },
+    drawAp:function(d){
+      var m = echarts.init(document.getElementById('chartApMonth'));
+      m.setOption({
+        tooltip:{trigger:'axis'},grid:{left:70,top:14,bottom:26},
+        xAxis:{type:'category',data:d.by_month.map(function(r){return r.m;})},
+        yAxis:{type:'value',axisLabel:{formatter:function(v){return v/10000+'万';}}},
+        series:[{type:'line',areaStyle:{opacity:.18},smooth:true,itemStyle:{color:'#faad14'},
+                 data:d.by_month.map(function(r){return r.v;})}]
+      });
+      var t = echarts.init(document.getElementById('chartApType'));
+      t.setOption({
+        tooltip:{trigger:'item',formatter:'{b}<br/>¥{c}（{d}%）'},
+        series:[{type:'pie',radius:'65%',center:['50%','50%'],
+          data:d.by_type.map(function(r){return {name:r.kind,value:Math.round(r.v)};})}]
+      });
+    },
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}首页{% endblock %}
+{% block body %}
+{% raw %}
+<div class="page">
+  <el-row :gutter="16">
+    <el-col :span="6" v-for="m in modules" :key="m.title">
+      <div class="mod-card" @click="go(m.url)">
+        <div class="mod-icon" :style="{background:m.bg}">{{ m.icon }}</div>
+        <div class="mod-body">
+          <div class="mod-title">{{ m.title }}</div>
+          <div class="mod-desc">{{ m.desc }}</div>
+          <ul class="mod-points">
+            <li v-for="p in m.points" :key="p">{{ p }}</li>
+          </ul>
+        </div>
+        <div class="mod-go">进入 →</div>
+      </div>
+    </el-col>
+  </el-row>
+</div>
+{% endraw %}
+{% endblock %}
+{% block style %}
+.mod-card { background:#fff; border-radius:10px; padding:20px; cursor:pointer;
+  box-shadow:0 1px 4px rgba(0,0,0,.06); transition:.2s; position:relative; height:250px; }
+.mod-card:hover { transform:translateY(-3px); box-shadow:0 6px 18px rgba(0,0,0,.12); }
+.mod-icon { width:52px; height:52px; border-radius:10px; display:flex; align-items:center;
+  justify-content:center; font-size:26px; margin-bottom:12px; }
+.mod-title { font-size:17px; font-weight:600; color:#303133; margin-bottom:6px; }
+.mod-desc { font-size:12px; color:#909399; margin-bottom:10px; }
+.mod-points { list-style:none; }
+.mod-points li { font-size:12.5px; color:#606266; line-height:1.9; }
+.mod-points li::before { content:"✓ "; color:#52c41a; font-weight:700; }
+.mod-go { position:absolute; right:16px; bottom:12px; font-size:12px; color:#ff7f16; }
+{% endblock %}
+{% block script %}
+<script>
+new Vue({
+  el:'#app',
+  data:{
+    modules:[
+      { title:'智能报销审核引擎', icon:'🧾', bg:'#e8f3ff',
+        desc:'发票图片识别 → 差旅标准比对 → 自动通过/驳回',
+        points:['视觉大模型识别发票金额/抬头/日期','差旅标准与「聚餐」等禁项自动比对','输出通过/驳回结论及原因'],
+        url:'/audit' },
+      { title:'财务数据分析看板', icon:'📊', bg:'#e8fff4',
+        desc:'应收/应付/毛利率聚合分析与异常预警',
+        points:['应收应付台账与账龄结构分析','账龄超 60 天、费用超预算自动预警','月度收入/成本/毛利趋势对比'],
+        url:'/dashboard' },
+      { title:'智能成本预测模型', icon:'🌳', bg:'#fff7e8',
+        desc:'订单级 BOM 成本结构分析',
+        points:['按订单号 / 设备型号 / 客户搜索','订单 → 物料类别 → 图号组 → 物料成本树','节点成本占比与供应方式明细'],
+        url:'/bom' },
+      { title:'数据管理', icon:'🗂️', bg:'#f4ecff',
+        desc:'导入导出 Excel，图表自动更新',
+        points:['报销/应收/应付/月度四张表','导出 Excel · 下载模板 · 一键导入','导入后看板图表自动重新生成'],
+        url:'/data' },
+    ],
+  },
+  methods:{ go(u){ location.href = u; } }
+});
+</script>
+{% endblock %}

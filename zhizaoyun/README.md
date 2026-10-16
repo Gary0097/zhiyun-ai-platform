@@ -10,6 +10,12 @@
 - `weknora-gateway/` — WeKnora 知识库网关（8001，免密自动登录 + 按企业路由专属工作空间）
 - `console-assets/` — 控制台定制入口（订单/客服/财务/销售/管理协同/采购 + 数据中枢内嵌页）
 - `mcc/ sales-platform/ purchase/` — 管理协同中心 / 销售智能分析 / 智能采购
+- `finance/` — 财务智能化中枢（Flask，FINANCE_DB/FINANCE_COMPANY 环境变量驱动，13 企业实例镜像同源）
+- `order-center/` — 智能订单处理中心（FastAPI，SSO 免密 + WeKnora 智能体解析/适配/问答）
+
+## WeKnora 知识库本体
+本体为微信开源 wechatopenai/weknora-{app,ui}:v0.8.0（docker 部署，端口 18000），
+本仓库不含其源码；`weknora-gateway/` 为自研网关（免密自动登录、按企业路由专属工作空间）。
 - `ops/` — 运维脚本（46 项数据自检、WeKnora 企业空间供给、财务实例生成）
 
 ## 部署要点

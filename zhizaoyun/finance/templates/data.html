@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}数据管理{% endblock %}
+{% block body %}
+{% raw %}
+<div class="page">
+  <el-alert type="info" :closable="false" style="margin-bottom:14px"
+    title="导入数据后，报销审核历史、财务数据分析看板将基于新数据自动重新生成图表，无需其他操作。"></el-alert>
+
+  <div class="card-box" v-for="t in tables" :key="t.key" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center">
+      <span style="font-size:20px;margin-right:10px">{{ t.icon }}</span>
+      <div style="flex:1">
+        <div style="font-size:14.5px;font-weight:600;color:#303133">{{ t.name }}
+          <el-tag size="small" type="info" style="margin-left:6px">{{ t.count }} 条</el-tag>
+        </div>
+        <div style="font-size:12px;color:#909399;margin-top:3px">字段：{{ t.headers.join(' / ') }}</div>
+      </div>
+      <div>
+        <el-button size="small" type="primary" plain icon="el-icon-download"
+                   @click="go('/api/data/export/' + t.key)">导出 Excel</el-button>
+        <el-button size="small" plain icon="el-icon-document"
+                   @click="go('/api/data/template/' + t.key)">下载模板</el-button>
+        <el-upload style="display:inline-block;margin-left:8px" action="" :auto-upload="false"
+                   :show-file-list="false" :on-change="function(f){ return onImport(t.key, f); }"
+                   accept=".xlsx,.csv">
+          <el-button size="small" type="success" plain icon="el-icon-upload2">导入 Excel</el-button>
+        </el-upload>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-box">
+    <div class="card-title">导入说明</div>
+    <ul class="notes">
+      <li>支持 <b>.xlsx</b> 与 <b>.csv</b>；表头需与模板一致（顺序无关，多余列忽略）</li>
+      <li>导入为<b>全量替换</b>：该表原有数据将被清空后写入新数据</li>
+      <li>金额列为数字；日期列为 YYYY-MM-DD；导入后看板与图表立即生效</li>
+      <li>导出文件可直接修改后再导入，形成「导出 → 修改 → 导入」的闭环</li>
+    </ul>
+  </div>
+</div>
+{% endraw %}
+{% endblock %}
+{% block style %}
+.notes { padding-left:18px; color:#606266; font-size:13px; line-height:2.1; }
+{% endblock %}
+{% block script %}
+<script>
+new Vue({
+  el:'#app',
+  data:{ tables:[] },
+  created:function(){
+    var self = this;
+    axios.get('/api/data/tables').then(function(r){ self.tables = r.data.tables; });
+  },
+  methods:{
+    go:function(u){ location.href = u; },
+    onImport:function(key, f){
+      var self = this;
+      var fd = new FormData();
+      fd.append('file', f.raw);
+      this.$message.info('导入中…');
+      axios.post('/api/data/import/' + key, fd).then(function(res){
+        self.$message.success('导入成功：' + res.data.imported + ' 条，图表已自动更新');
+        axios.get('/api/data/tables').then(function(r){ self.tables = r.data.tables; });
+      }).catch(function(e){
+        self.$message.error((e.response && e.response.data && e.response.data.error) || '导入失败');
+      });
+    },
+  }
+});
+</script>
+{% endblock %}

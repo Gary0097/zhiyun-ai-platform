@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}智能报销审核{% endblock %}
+{% block body %}
+{% raw %}
+<div class="page">
+  <el-row :gutter="16">
+    <!-- 左：上传与识别 -->
+    <el-col :span="9">
+      <div class="card-box">
+        <div class="card-title">① 上传发票（AI 识别）</div>
+        <el-upload class="up-box" drag action="" :auto-upload="false" :show-file-list="false"
+                   :on-change="onFile" accept="image/*,.pdf,application/pdf">
+          <div class="up-inner">
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将发票图片 / PDF 拖到此处，或<em>点击上传</em></div>
+            <div class="up-tip">支持 jpg / png / pdf，自动识别金额、抬头、日期、费用项目</div>
+          </div>
+        </el-upload>
+        <div v-if="preview" class="preview"><img :src="preview"></div>
+        <div v-else-if="isPdf" class="preview">
+          <span class="pdf-chip">📄 {{ fileName }}（PDF 发票，AI 将识别票据内容）</span>
+        </div>
+        <el-button type="primary" style="width:100%;margin-top:12px" :loading="ocring"
+                   @click="doOcr" :disabled="!file">{{ ocring ? 'AI 识别中…' : '开始 AI 识别' }}</el-button>
+      </div>
+
+      <div class="card-box">
+        <div class="card-title">② 报销要素（可修正）</div>
+        <el-form label-width="90px" size="small">
+          <el-form-item label="发票抬头"><el-input v-model="form.title"></el-input></el-form-item>
+          <el-form-item label="税号"><el-input v-model="form.tax_no"></el-input></el-form-item>
+          <el-form-item label="发票日期"><el-input v-model="form.invoice_date" placeholder="YYYY-MM-DD"></el-input></el-form-item>
+          <el-form-item label="金额(元)"><el-input v-model="form.amount"></el-input></el-form-item>
+          <el-form-item label="费用项目"><el-input v-model="form.item" placeholder="如：住宿费 / 交通费 / 餐饮费"></el-input></el-form-item>
+          <el-form-item label="备注"><el-input v-model="form.remark"></el-input></el-form-item>
+        </el-form>
+        <el-button type="success" style="width:100%" :loading="auditing" @click="doAudit"
+                   :disabled="!form.amount">③ 提交智能审核</el-button>
+      </div>
+    </el-col>
+
+    <!-- 右：审核结论 + 标准 + 历史 -->
+    <el-col :span="15">
+      <div class="card-box" v-if="verdict">
+        <div class="card-title">审核结论</div>
+        <div class="verdict" :class="verdict.result==='通过' ? 'pass' : 'reject'">
+          <span class="v-tag">{{ verdict.result }}</span>
+          <span style="margin-left:10px">{{ verdict.reason }}</span>
+        </div>
+        <div style="margin-top:10px" v-if="verdict.warnings && verdict.warnings.length">
+          <el-alert v-for="w in verdict.warnings" :key="w" :title="w" type="warning"
+                    :closable="false" style="margin-bottom:6px"></el-alert>
+        </div>
+        <div class="v-meta">单号 {{ verdict.req_no }} · 审核时间 {{ verdict.audited_at }}</div>
+      </div>
+
+      <div class="card-box">
+        <div class="card-title">审核规则（差旅标准 / 禁项）</div>
+        <el-table :data="stdRows" size="mini" border>
+          <el-table-column prop="k" label="费用类型" width="110"></el-table-column>
+          <el-table-column prop="v" label="标准限额(元)"></el-table-column>
+        </el-table>
+        <el-alert type="error" :closable="false" style="margin-top:8px"
+          title="禁项：聚餐 / 宴请 / 招待 / 烟 / 酒 一经识别直接驳回；发票超 90 天、抬头不符亦驳回"></el-alert>
+      </div>
+
+      <div class="card-box">
+        <div class="card-title">报销审核历史
+          <el-tag size="small" type="success">通过 {{ stat['通过']||0 }}</el-tag>
+          <el-tag size="small" type="danger" style="margin-left:6px">驳回 {{ stat['驳回']||0 }}</el-tag>
+          <el-input size="small" placeholder="搜索单号/类型/抬头" v-model="q" clearable
+                    style="width:220px;float:right" prefix-icon="el-icon-search" @input="loadHistory"></el-input>
+        </div>
+        <el-table :data="rows" size="mini" border stripe max-height="420">
+          <el-table-column prop="id" label="报销单号" width="130"></el-table-column>
+          <el-table-column prop="req_date" label="报销日期" width="95"></el-table-column>
+          <el-table-column prop="fee_type" label="费用类型" width="95"></el-table-column>
+          <el-table-column prop="title" label="发票抬头" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="amount" label="金额" width="95" align="right">
+            <template slot-scope="s">{{ Number(s.row.amount).toLocaleString() }}</template>
+          </el-table-column>
+          <el-table-column prop="invoice_date" label="发票日期" width="95"></el-table-column>
+          <el-table-column prop="forbidden" label="禁项" width="80"></el-table-column>
+          <el-table-column prop="result" label="结果" width="70">
+            <template slot-scope="s">
+              <el-tag size="mini" :type="s.row.result==='通过'?'success':'danger'">{{ s.row.result }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="reason" label="原因" show-overflow-tooltip></el-table-column>
+        </el-table>
+        <el-pagination style="margin-top:10px;text-align:right" background layout="total, prev, pager, next"
+          :total="total" :page-size="15" :current-page.sync="page" @current-change="loadHistory"></el-pagination>
+      </div>
+    </el-col>
+  </el-row>
+</div>
+{% endraw %}
+{% endblock %}
+{% block style %}
+.up-box, .up-box .el-upload, .up-box .el-upload-dragger { width:100%; }
+.up-inner { padding:26px 10px; }
+.up-tip { color:#909399; font-size:12px; margin-top:4px; }
+.preview { margin-top:10px; text-align:center; }
+.preview img { max-width:100%; max-height:220px; border:1px solid #ebeef5; border-radius:6px; }
+.pdf-chip { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; background:#fef6e5;
+  border:1px solid #f5dab1; border-radius:6px; color:#b88230; font-size:13px; }
+.verdict { padding:14px 16px; border-radius:6px; font-size:14px; }
+.verdict.pass { background:#f0f9eb; border:1px solid #e1f3d8; color:#52c41a; }
+.verdict.reject { background:#fef0f0; border:1px solid #fde2e2; color:#ff4d4f; }
+.v-tag { font-size:18px; font-weight:700; }
+.v-meta { color:#909399; font-size:12px; margin-top:8px; }
+{% endblock %}
+{% block script %}
+<script>
+new Vue({
+  el:'#app',
+  data:{
+    file:null, preview:'', isPdf:false, fileName:'', pageCount:0, ocring:false, auditing:false,
+    form:{ title:'', tax_no:'', invoice_date:'', amount:'', item:'', remark:'' },
+    verdict:null, stdRows:[], rows:[], stat:{}, total:0, page:1, q:'',
+  },
+  created(){ this.loadStd(); this.loadHistory(); },
+  methods:{
+    onFile(f){
+      this.fileName = f.name || (f.raw && f.raw.name) || '';
+      this.isPdf = /\.pdf$/i.test(this.fileName) || (f.raw && f.raw.type === 'application/pdf');
+      this.pageCount = this.isPdf ? 1 : 0;
+      this.verdict = null;
+      this.file = f.raw;  // 先用原文件占位，压缩完成后替换
+      if (this.isPdf) { this.preview = ''; return; }
+      var self = this;
+      this.compressImage(f.raw).then(function(blob){
+        if (blob !== f.raw) {
+          self.file = new File([blob], self.fileName || 'invoice.jpg', { type: 'image/jpeg' });
+          self.$message({ message: '图片已自动压缩', type: 'success', duration: 2000 });
+        }
+        self.preview = URL.createObjectURL(blob);
+      });
+    },
+    compressImage:function(raw){
+      return new Promise(function(resolve){
+        if (raw.size <= 400 * 1024) { resolve(raw); return; }
+        var img = new Image();
+        var url = URL.createObjectURL(raw);
+        img.onload = function(){
+          var MAX = 1600;
+          var w = img.width, h = img.height;
+          var scale = Math.min(1, MAX / Math.max(w, h));
+          var cv = document.createElement('canvas');
+          cv.width = Math.round(w * scale); cv.height = Math.round(h * scale);
+          cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          URL.revokeObjectURL(url);
+          cv.toBlob(function(blob){ resolve(blob || raw); }, 'image/jpeg', 0.85);
+        };
+        img.onerror = function(){ URL.revokeObjectURL(url); resolve(raw); };
+        img.src = url;
+      });
+    },
+    doOcr(){
+      var self = this;
+      this.ocring = true;
+      var fd = new FormData();
+      fd.append('file', this.file);
+      this.$message.info('AI 识别中，一般 5~20 秒…');
+      axios.post('/api/audit/ocr', fd, { timeout: 120000 }).then(function(res){
+        var f = res.data.fields || {};
+        ['title','tax_no','invoice_date','amount','item','remark'].forEach(function(k){
+          if (f[k] !== undefined && f[k] !== null) self.form[k] = String(f[k]);
+        });
+        self.$message.success('AI 识别完成，请核对要素后提交审核');
+      }).catch(function(e){
+        var msg = '识别失败';
+        if (e.code === 'ECONNABORTED') msg = '识别超时（网络较慢），请重试；图片已自动压缩';
+        else if (e.response && e.response.data && e.response.data.error) msg = e.response.data.error;
+        self.$message.error(msg);
+      }).finally(function(){ self.ocring = false; });
+    },
+    doAudit(){
+      this.auditing = true;
+      axios.post('/api/audit/submit', this.form).then(function(res){
+        this.verdict = res.data;
+        this.loadHistory();
+      }.bind(this)).finally(function(){ this.auditing = false; }.bind(this));
+    },
+    loadStd(){
+      axios.get('/api/standards').then(function(res){
+        var d = res.data;
+        this.stdRows = Object.keys(d.standards).map(function(k){ return { k:k, v:d.standards[k] }; });
+      }.bind(this));
+    },
+    loadHistory(){
+      axios.get('/api/reimburse', { params:{ page:this.page, size:15, q:this.q } })
+        .then(function(res){
+          this.rows = res.data.rows; this.total = res.data.total; this.stat = res.data.stat;
+        }.bind(this));
+    },
+  }
+});
+</script>
+{% endblock %}
