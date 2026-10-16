@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI数据中枢 · SQL 查询台（只读）</title>
+<style>
+  :root { --ink:#1F2329; --sub:#646A73; --bg:#F5F6F7; --red: var(--brand, #C7000B); }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:var(--bg); color:var(--ink); }
+  .top { background:linear-gradient(90deg, color-mix(in srgb, var(--brand,#B00A0A) 82%, #000), var(--brand,#C7000B) 55%, color-mix(in srgb, var(--brand,#E23A22) 70%, #fff)); color:#fff; padding:18px 28px; }
+  .top h1 { margin:0; font-size:18px; }
+  .top .sub { margin-top:5px; font-size:12px; opacity:.9; }
+  .wrap { max-width:1180px; margin:18px auto; padding:0 16px 40px; }
+  .card { background:#fff; border-radius:10px; padding:16px 18px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+  textarea { width:100%; min-height:96px; border:1px solid #E0E2E6; border-radius:8px; padding:10px 12px;
+             font-family:ui-monospace,Consolas,Menlo,monospace; font-size:13px; resize:vertical; }
+  .row { display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+  button { background:var(--red); color:#fff; border:0; border-radius:8px; padding:8px 16px; font-size:13px; cursor:pointer; }
+  button.ghost { background:#fff; color:var(--red); border:1px solid var(--red); }
+  .hint { color:var(--sub); font-size:12px; }
+  table { border-collapse:collapse; width:100%; font-size:12.5px; margin-top:10px; }
+  th,td { border-bottom:1px solid #F0F0F0; padding:6px 8px; text-align:left; white-space:nowrap; }
+  th { color:var(--sub); font-weight:500; position:sticky; top:0; background:#fff; }
+  .scroll { max-height:60vh; overflow:auto; }
+  .err { color:#B00A0A; background:#FFF3F3; border-radius:8px; padding:10px 12px; font-family:ui-monospace,monospace; font-size:12.5px; }
+  .meta { margin-top:8px; font-size:12px; color:var(--sub); }
+  a { color:var(--red); }
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>AI数据中枢 · SQL 查询台</h1>
+  <div class="sub">只读模式（mode=ro）· 仅允许 SELECT / PRAGMA · 单次最多返回 2000 行 · 数据库：计算副本 agent_data.sqlite（快照 <span id="snap">加载中…</span>）</div>
+</div>
+<div class="wrap">
+  <div class="card">
+    <h2 style="margin:0 0 10px;font-size:15px">🤖 智能问数 <span class="hint">一句话提问，AI 自动写 SQL 并执行（约20–40秒）</span></h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <input type="text" id="askQ" placeholder="例如：超时时间最久的10个订单" style="flex:1;min-width:260px;border:1px solid #E0E2E6;border-radius:8px;padding:9px 12px;font-size:13.5px">
+      <button id="askBtn">提问</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px">
+      <button class="ghost" style="font-size:12px" data-ask="订单 KL251128-602-A 现在卡在哪个节点？">订单卡在哪？</button>
+      <button class="ghost" style="font-size:12px" data-ask="每个业务员签了多少合同、总金额多少？">业务员业绩</button>
+      <button class="ghost" style="font-size:12px" data-ask="未收款最多的前10个客户">未收款客户</button>
+      <button class="ghost" style="font-size:12px" data-ask="现在有哪些生产订单在待回料？">待回料订单</button>
+    </div>
+    <div class="meta" id="askMeta"></div>
+    <div id="askSql"></div>
+    <div id="askOut"></div>
+    <div id="askErr"></div>
+  </div>
+  <div class="card">
+    <textarea id="q">SELECT sales_order_id, customer_id, product_id, quantity, unit, promised_delivery_at FROM v_current_orders LIMIT 20</textarea>
+    <div class="row">
+      <button id="run">运行（只读）</button>
+      <button class="ghost" data-sql="SELECT COUNT(*) AS 已生效订单 FROM v_current_orders">示例：已生效订单数</button>
+      <button class="ghost" data-sql="WITH lr AS (SELECT sales_order_id, COUNT(*) b, SUM(CASE WHEN status='已签收' AND received_at IS NOT NULL AND received_at&lt;&gt;'' THEN 1 ELSE 0 END) s FROM shipments GROUP BY sales_order_id) SELECT COUNT(*) AS 未交付订单 FROM v_current_orders o LEFT JOIN lr ON lr.sales_order_id=o.sales_order_id WHERE lr.sales_order_id IS NULL OR lr.s&lt;lr.b">示例：未交付订单数</button>
+      <button class="ghost" data-sql="SELECT sales_order_id, stage_name, stage_status, source_status AS 原始状态, planned_end_at FROM stage_nodes WHERE stage_code='SHIP' LIMIT 7">示例：发货节点订单</button>
+      <a href="./" style="margin-left:auto">← 返回协同看板</a>　<a href="snapshot.html">静态快照</a>
+    </div>
+    <div class="meta" id="meta"></div>
+    <div class="scroll" id="out"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="hint">
+      常用表/视图：<code>v_current_orders</code>（已生效订单）、<code>shipments</code>（运单，签收=全量完成口径）、<code>wms_transactions</code>（库存流水，正入负出）、
+      <code>stage_nodes</code>（订单节点，含 source_status 原始状态）、<code>contracts</code>（合同）、<code>exceptions</code>（售后工单）、<code>configuration</code>（快照时点）。labor_logs（工时日志）与 attendance（考勤）已接入。
+      只读接口：<code>POST /api/sql {"sql": "SELECT ..."}</code> —— 可供其他应用/系统直接调用。
+    </div>
+  </div>
+</div>
+<script>
+const q = document.getElementById('q');
+const out = document.getElementById('out');
+const meta = document.getElementById('meta');
+
+async function run() {
+  const sql = q.value.trim();
+  if (!sql) return;
+  meta.textContent = '执行中…';
+  out.innerHTML = '';
+  try {
+    const r = await fetch('/api/sql', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({sql})
+    });
+    const d = await r.json();
+    if (d.error) {
+      meta.textContent = '';
+      out.innerHTML = '<div class="err">' + String(d.error).replace(/</g, '&lt;') + '</div>';
+      return;
+    }
+    const cols = d.columns || [];
+    const rows = d.rows || [];
+    meta.textContent = '返回 ' + rows.length + ' 行' + (d.truncated ? '（已截断到 2000 行）' : '');
+    let h = '<table><thead><tr>' + cols.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+    for (const row of rows) {
+      h += '<tr>' + cols.map(c => {
+        const v = row[c];
+        return '<td>' + (v === null || v === undefined ? '' : String(v).replace(/</g, '&lt;')) + '</td>';
+      }).join('') + '</tr>';
+    }
+    h += '</tbody></table>';
+    out.innerHTML = h;
+  } catch (e) {
+    meta.textContent = '';
+    out.innerHTML = '<div class="err">请求失败：' + String(e.message) + '</div>';
+  }
+}
+
+document.getElementById('run').addEventListener('click', run);
+document.querySelectorAll('button[data-sql]').forEach(b => {
+  b.addEventListener('click', () => { q.value = b.getAttribute('data-sql'); run(); });
+});
+q.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') run(); });
+
+async function askAI(q) {
+  if (q) document.getElementById('askQ').value = q;
+  const question = document.getElementById('askQ').value.trim();
+  if (!question) return;
+  const btn = document.getElementById('askBtn'); btn.disabled = true;
+  document.getElementById('askMeta').textContent = '⏳ AI 正在生成 SQL 并查询…（约20–40秒）';
+  document.getElementById('askOut').innerHTML = '<div class="hint" style="padding:12px 2px">⏳ AI 思考中…</div>';
+  document.getElementById('askSql').innerHTML = ''; document.getElementById('askErr').innerHTML = '';
+  try {
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 150000);
+    const r = await fetch('/api/ask', {method:'POST', signal: ctl.signal,
+      headers:{'Content-Type':'application/json'}, body: JSON.stringify({question})});
+    clearTimeout(t);
+    const d = await r.json();
+    if (!r.ok || d.error) throw new Error(d.error || ('HTTP ' + r.status));
+    document.getElementById('askMeta').textContent = '✅ 返回 ' + d.row_count + ' 行 · 耗时 ' + (d.elapsed_ms/1000).toFixed(1) + ' 秒';
+    document.getElementById('askSql').innerHTML = '<details><summary style="cursor:pointer;color:#1F6FEB;font-size:12px">查看 AI 生成的 SQL</summary><pre style="background:#FAFBFC;border:1px solid #F0F0F0;border-radius:8px;padding:10px;font-size:12px;white-space:pre-wrap">' +
+      String(d.sql).replace(/</g,'&lt;') + '</pre></details>';
+    const cols = d.columns || [];
+    let h = cols.length ? '<table><thead><tr>' + cols.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>' : '';
+    for (const row of d.rows) h += '<tr>' + cols.map(c => '<td>' + (row[c] === null ? '' : String(row[c]).replace(/</g,'&lt;')) + '</td>').join('') + '</tr>';
+    if (cols.length) h += '</tbody></table>';
+    document.getElementById('askOut').innerHTML = d.rows.length ? '<div class="scroll">' + h + '</div>' : '<div class="hint">查询成功，无匹配数据</div>';
+  } catch (e) {
+    document.getElementById('askMeta').textContent = '';
+    document.getElementById('askOut').innerHTML = '';
+    document.getElementById('askErr').innerHTML = '<div class="err">问数失败：' + String(e.message || e).replace(/</g,'&lt;') + '</div>';
+  }
+  btn.disabled = false;
+}
+document.getElementById('askBtn').addEventListener('click', () => askAI());
+document.getElementById('askQ').addEventListener('keydown', e => { if (e.key === 'Enter') askAI(); });
+document.querySelectorAll('button[data-ask]').forEach(b => b.addEventListener('click', () => askAI(b.dataset.ask)));
+
+</script>
+<script>
+fetch('/health').then(r=>r.json()).then(d=>{const el=document.getElementById('snap');if(el)el.textContent=d.snapshot_at?d.snapshot_at.replace('T',' ').slice(0,19):'未知';}).catch(()=>{const el=document.getElementById('snap');if(el)el.textContent='获取失败';});
+</script>
+</body>
+</html>

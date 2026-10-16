@@ -1,0 +1,15 @@
+services:
+  mcc-app:
+    build: .
+    image: mcc-app:latest
+    container_name: mcc-app
+    restart: unless-stopped
+    ports:
+      - "8310:8100"   # Hub 侧边栏 iframe 经 8310 访问
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # 容器内经宿主访问 WeKnora(18000)
+    environment:
+      WEKNORA_API: http://host.docker.internal:18000/api/v1
+      WEKNORA_EMAIL: ${WEKNORA_EMAIL:-}
+      WEKNORA_PASSWORD: ${WEKNORA_PASSWORD:-}
+      WEKNORA_KB_NAME: 金汉隆-管理协同中心

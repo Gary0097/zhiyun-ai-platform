@@ -1,0 +1,13 @@
+services:
+  sales-platform:
+    build: .
+    image: sales-platform:v1
+    container_name: sales-platform-app
+    restart: always
+    ports:
+      - "8302:8080"
+    environment:
+      TZ: Asia/Shanghai
+      SALES_LLM_BASE: http://api.computing.lzwcai.com:3110/v1
+      SALES_LLM_KEY: 
+      SALES_LLM_MODEL: deepseek-v4-flash

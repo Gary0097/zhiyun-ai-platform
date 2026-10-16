@@ -1,0 +1,262 @@
+{
+ "泓佳": {
+  "tier": "中",
+  "color": "#E63946",
+  "orders": 4,
+  "sup": 1,
+  "po": 2,
+  "reim": 1,
+  "ar": 1,
+  "erp": 1,
+  "chats": 24,
+  "u_lo": 35,
+  "u_hi": 70,
+  "mail": 2,
+  "wx": 5,
+  "freq": "workday",
+  "hours": [
+   8,
+   10
+  ]
+ },
+ "捷泰克": {
+  "tier": "高",
+  "color": "#F4A261",
+  "orders": 5,
+  "sup": 2,
+  "po": 3,
+  "reim": 2,
+  "ar": 1,
+  "erp": 2,
+  "chats": 36,
+  "u_lo": 60,
+  "u_hi": 120,
+  "mail": 3,
+  "wx": 8,
+  "freq": "daily",
+  "hours": [
+   9,
+   11
+  ]
+ },
+ "阳诚": {
+  "tier": "中",
+  "color": "#6A4C93",
+  "orders": 3,
+  "sup": 1,
+  "po": 1,
+  "reim": 0,
+  "ar": 2,
+  "erp": 0,
+  "chats": 24,
+  "u_lo": 35,
+  "u_hi": 70,
+  "mail": 1,
+  "wx": 5,
+  "freq": "workday",
+  "hours": [
+   10,
+   12
+  ]
+ },
+ "大铁": {
+  "tier": "高",
+  "color": "#2A9D8F",
+  "orders": 7,
+  "sup": 3,
+  "po": 4,
+  "reim": 2,
+  "ar": 2,
+  "erp": 2,
+  "chats": 37,
+  "u_lo": 60,
+  "u_hi": 120,
+  "mail": 3,
+  "wx": 8,
+  "freq": "daily",
+  "hours": [
+   8,
+   10
+  ]
+ },
+ "达健": {
+  "tier": "低",
+  "color": "#E76F51",
+  "orders": 2,
+  "sup": 0,
+  "po": 0,
+  "reim": 0,
+  "ar": 0,
+  "erp": 0,
+  "chats": 12,
+  "u_lo": 15,
+  "u_hi": 35,
+  "mail": 1,
+  "wx": 3,
+  "freq": "weekly",
+  "hours": [
+   14,
+   16
+  ]
+ },
+ "金汉隆": {
+  "tier": "高",
+  "color": "#D4A017",
+  "orders": 8,
+  "sup": 3,
+  "po": 4,
+  "reim": 3,
+  "ar": 2,
+  "erp": 3,
+  "chats": 37,
+  "u_lo": 60,
+  "u_hi": 120,
+  "mail": 4,
+  "wx": 8,
+  "freq": "daily",
+  "hours": [
+   8,
+   10
+  ]
+ },
+ "瑞铂特": {
+  "tier": "中",
+  "color": "#457B9D",
+  "orders": 6,
+  "sup": 2,
+  "po": 2,
+  "reim": 1,
+  "ar": 1,
+  "erp": 1,
+  "chats": 26,
+  "u_lo": 35,
+  "u_hi": 70,
+  "mail": 2,
+  "wx": 5,
+  "freq": "workday",
+  "hours": [
+   9,
+   12
+  ]
+ },
+ "程旭": {
+  "tier": "低",
+  "color": "#3A7D44",
+  "orders": 1,
+  "sup": 0,
+  "po": 0,
+  "reim": 0,
+  "ar": 0,
+  "erp": 0,
+  "chats": 13,
+  "u_lo": 15,
+  "u_hi": 35,
+  "mail": 1,
+  "wx": 3,
+  "freq": "weekly",
+  "hours": [
+   15,
+   17
+  ]
+ },
+ "浩铭达": {
+  "tier": "高",
+  "color": "#BC4749",
+  "orders": 9,
+  "sup": 2,
+  "po": 3,
+  "reim": 2,
+  "ar": 1,
+  "erp": 2,
+  "chats": 36,
+  "u_lo": 60,
+  "u_hi": 120,
+  "mail": 3,
+  "wx": 8,
+  "freq": "daily",
+  "hours": [
+   10,
+   12
+  ]
+ },
+ "纳丰": {
+  "tier": "中",
+  "color": "#7B2CBF",
+  "orders": 5,
+  "sup": 1,
+  "po": 1,
+  "reim": 1,
+  "ar": 0,
+  "erp": 1,
+  "chats": 24,
+  "u_lo": 35,
+  "u_hi": 70,
+  "mail": 2,
+  "wx": 5,
+  "freq": "workday",
+  "hours": [
+   13,
+   15
+  ]
+ },
+ "枫源": {
+  "tier": "低",
+  "color": "#B5838D",
+  "orders": 2,
+  "sup": 0,
+  "po": 0,
+  "reim": 0,
+  "ar": 1,
+  "erp": 0,
+  "chats": 15,
+  "u_lo": 15,
+  "u_hi": 35,
+  "mail": 1,
+  "wx": 3,
+  "freq": "weekly",
+  "hours": [
+   11,
+   13
+  ]
+ },
+ "卡史特": {
+  "tier": "低",
+  "color": "#1D3557",
+  "orders": 3,
+  "sup": 1,
+  "po": 0,
+  "reim": 1,
+  "ar": 0,
+  "erp": 0,
+  "chats": 15,
+  "u_lo": 15,
+  "u_hi": 35,
+  "mail": 1,
+  "wx": 3,
+  "freq": "weekly",
+  "hours": [
+   16,
+   18
+  ]
+ },
+ "高益美": {
+  "tier": "中",
+  "color": "#E07A5F",
+  "orders": 4,
+  "sup": 1,
+  "po": 2,
+  "reim": 1,
+  "ar": 1,
+  "erp": 1,
+  "chats": 25,
+  "u_lo": 35,
+  "u_hi": 70,
+  "mail": 2,
+  "wx": 5,
+  "freq": "workday",
+  "hours": [
+   14,
+   16
+  ]
+ }
+}

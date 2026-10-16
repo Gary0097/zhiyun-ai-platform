@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>金汉隆 AI数据中枢 · 经营看板</title>
+<style>
+  :root { --ink:#1F2329; --sub:#646A73; --bg:#F5F6F7; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:var(--bg); color:var(--ink); }
+  .top { background:linear-gradient(90deg,#B00A0A,#C7000B 55%,#E23A22); color:#fff; padding:20px 28px; }
+  .top h1 { margin:0; font-size:20px; letter-spacing:.5px; }
+  .top .sub { margin-top:6px; font-size:12px; opacity:.9; }
+  .wrap { max-width:1080px; margin:20px auto; padding:0 16px 40px; }
+  .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .kpi { background:#fff; border-radius:10px; padding:16px 18px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+  .kpi-label { font-size:12px; color:var(--sub); }
+  .kpi-value { font-size:26px; font-weight:700; margin-top:6px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+  .card { background:#fff; border-radius:10px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+  .card h2 { margin:0 0 12px; font-size:15px; }
+  .card h2 .tag { font-size:11px; color:var(--sub); font-weight:400; margin-left:8px; }
+  .lg { display:flex; align-items:center; font-size:13px; margin:6px 0; color:var(--ink); }
+  .dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:8px; }
+  .center { display:flex; align-items:center; gap:18px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th,td { text-align:left; padding:7px 8px; border-bottom:1px solid #F0F0F0; }
+  th { color:var(--sub); font-weight:500; }
+  .note { margin-top:8px; font-size:12px; color:var(--sub); }
+  .foot { max-width:1080px; margin:6px auto 0; padding:0 16px; font-size:12px; color:var(--sub); }
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>金汉隆 AI数据中枢 · 经营看板</h1>
+  <div class="sub">数据时点 2026-09-20 08:00（北京时间） · 金汉隆经营数据</div>
+</div>
+<div class="wrap">
+  <div class="kpis"><div class="kpi"><div class="kpi-label">已生效订单</div><div class="kpi-value" style="color:#1F2329">2409 单</div></div><div class="kpi"><div class="kpi-label">已全量签收</div><div class="kpi-value" style="color:#2E8B57">1232 单</div></div><div class="kpi"><div class="kpi-label">未全量交付</div><div class="kpi-value" style="color:#D48806">1177 单</div></div><div class="kpi"><div class="kpi-label">其中已逾期</div><div class="kpi-value" style="color:#C7000B">1150 单</div></div></div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>客户订单进度<span class="tag">完成=全量签收</span></h2>
+      <div class="center"><svg width="190" height="190" viewBox="0 0 190 190"><circle cx="95.0" cy="95.0" r="80.0" fill="none" stroke="#EEE" stroke-width="30"/><circle cx="95.0" cy="95.0" r="80.0" fill="none" stroke="#2E8B57" stroke-width="30" stroke-dasharray="257.07 245.59" stroke-dashoffset="-0.00" transform="rotate(-90 95.0 95.0)"/><circle cx="95.0" cy="95.0" r="80.0" fill="none" stroke="#D48806" stroke-width="30" stroke-dasharray="176.11 326.55" stroke-dashoffset="-257.07" transform="rotate(-90 95.0 95.0)"/><circle cx="95.0" cy="95.0" r="80.0" fill="none" stroke="#8C8C8C" stroke-width="30" stroke-dasharray="69.48 433.17" stroke-dashoffset="-433.17" transform="rotate(-90 95.0 95.0)"/><text x="95.0" y="91.0" text-anchor="middle" font-size="26" font-weight="700" fill="#1F2329">2409</text><text x="95.0" y="115.0" text-anchor="middle" font-size="12" fill="#646A73">未交付订单</text></svg>
+        <div><div class="lg"><span class="dot" style="background:#2E8B57"></span>已全量签收 1232 单</div><div class="lg"><span class="dot" style="background:#D48806"></span>在途未签收 844 单</div><div class="lg"><span class="dot" style="background:#8C8C8C"></span>未发货 333 单</div>
+          <div class="note">分批发货按运单累计，最后一批签收后才计完成。</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>交付风险分布<span class="tag">按交期与履约状态分析</span></h2>
+      <svg width="100%" viewBox="0 0 760 108" preserveAspectRatio="xMidYMid meet"><text x="0" y="18" font-size="13" fill="#1F2329">高风险（红）</text><rect x="150" y="0" width="500.0" height="26" rx="4" fill="#C7000B"/><text x="658" y="18" font-size="13" fill="#646A73">1157</text><text x="0" y="54" font-size="13" fill="#1F2329">中风险（黄）</text><rect x="150" y="36" width="5.2" height="26" rx="4" fill="#D48806"/><text x="163" y="54" font-size="13" fill="#646A73">12</text><text x="0" y="90" font-size="13" fill="#1F2329">低风险（绿）</text><rect x="150" y="72" width="3.5" height="26" rx="4" fill="#2E8B57"/><text x="161" y="90" font-size="13" fill="#646A73">8</text></svg>
+      <div class="note">红：已逾期或 7 天内到期；黄：8–30 天；绿：其余（均在 89 单未交付范围内）。</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>订单节点进度<span class="tag">计划 / 加工 / 质检 / 发货</span></h2>
+      <table>
+        <thead><tr><th>节点</th><th>已完成</th><th>进行中</th><th>未开始</th><th>超时</th></tr></thead>
+        <tbody><tr><td>计划</td><td>40</td><td>47</td><td>0</td><td style="color:#C7000B">0</td></tr><tr><td>加工</td><td>20</td><td>20</td><td>47</td><td style="color:#C7000B">0</td></tr><tr><td>质检</td><td>15</td><td>5</td><td>67</td><td style="color:#C7000B">0</td></tr><tr><td>发货</td><td>0</td><td>15</td><td>72</td><td style="color:#C7000B">0</td></tr><tr><td>签收</td><td>0</td><td>0</td><td>87</td><td style="color:#C7000B">0</td></tr></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h2>数据采集状态<span class="tag">最近同步记录</span></h2>
+      <table>
+        <thead><tr><th>来源</th><th>接收</th><th>已处理</th><th>异常</th><th>状态</th></tr></thead>
+        <tbody><tr><td>机器下单表_20260920072729.xlsx</td><td>2328</td><td>2322</td><td>6</td><td>已完成</td></tr><tr><td>合同表_20260920072414.xlsx</td><td>6881</td><td>5846</td><td>0</td><td>已完成</td></tr><tr><td>产品名称_20260919101024.xlsx</td><td>1084</td><td>0</td><td>0</td><td>分析完成</td></tr><tr><td>机型一级分类_20260919101004.xlsx</td><td>0</td><td>0</td><td>0</td><td>分析完成</td></tr><tr><td>机型二级类目_20260919101013.xlsx</td><td>0</td><td>0</td><td>0</td><td>分析完成</td></tr><tr><td>库存表9.18.xlsx(补全每日流水+快照)</td><td>1697</td><td>1695</td><td>2</td><td>已加载</td></tr><tr><td>库存表9.18.xlsx</td><td>2143</td><td>1695</td><td>448</td><td>部分提取</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>跨部门经营分析<span class="tag">人效 / 标准工时产出 / 作业产值</span></h2>
+      <table>
+        <thead><tr><th>工作中心</th><th>标准工时</th><th>投入人时</th><th>人效</th><th>作业产值</th></tr></thead>
+        <tbody><tr><td>WC01</td><td>12055.74</td><td>13105.62</td><td>0.9199</td><td>790591.43</td></tr><tr><td>WC02</td><td>10419.22</td><td>11635.61</td><td>0.8955</td><td>696183.37</td></tr><tr><td>WC03</td><td>14014.9</td><td>14615.0</td><td>0.9589</td><td>777685.58</td></tr><tr><td>WC04</td><td>11852.45</td><td>13184.88</td><td>0.8989</td><td>687154.43</td></tr></tbody>
+      </table>
+      <div class="note">损耗成本按物料成本单独统计，不与台、套、件数量直接相加。</div>
+    </div>
+    <div class="card">
+      <h2>每日经营简报<span class="tag">报告日 2026-09-19 · 08:00</span></h2>
+      <table>
+        <tbody>
+          <tr><td>完成订单</td><td>9 单</td></tr>
+          <tr><td>新增异常工单</td><td>2 单</td></tr>
+          <tr><td>报销提交</td><td>2 笔 / 11141.18 元</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h2>加工二组 WC02 人效趋势（近30个有作业日）<span class="tag">人效=标准工时产出/实际人时</span></h2>
+    <svg width="100%" viewBox="0 0 760 240" preserveAspectRatio="xMidYMid meet"><line x1="46" y1="18.0" x2="744" y2="18.0" stroke="#EEE"/><text x="40" y="22.0" text-anchor="end" font-size="10" fill="#646A73">0.96</text><line x1="46" y1="82.0" x2="744" y2="82.0" stroke="#EEE"/><text x="40" y="86.0" text-anchor="end" font-size="10" fill="#646A73">0.90</text><line x1="46" y1="146.0" x2="744" y2="146.0" stroke="#EEE"/><text x="40" y="150.0" text-anchor="end" font-size="10" fill="#646A73">0.85</text><line x1="46" y1="210.0" x2="744" y2="210.0" stroke="#EEE"/><text x="40" y="214.0" text-anchor="end" font-size="10" fill="#646A73">0.80</text><text x="46.0" y="232" text-anchor="middle" font-size="10" fill="#646A73">08-17</text><text x="118.2" y="232" text-anchor="middle" font-size="10" fill="#646A73">08-20</text><text x="190.4" y="232" text-anchor="middle" font-size="10" fill="#646A73">08-24</text><text x="262.6" y="232" text-anchor="middle" font-size="10" fill="#646A73">08-27</text><text x="334.8" y="232" text-anchor="middle" font-size="10" fill="#646A73">08-31</text><text x="407.0" y="232" text-anchor="middle" font-size="10" fill="#646A73">09-03</text><text x="479.2" y="232" text-anchor="middle" font-size="10" fill="#646A73">09-07</text><text x="551.4" y="232" text-anchor="middle" font-size="10" fill="#646A73">09-10</text><text x="623.7" y="232" text-anchor="middle" font-size="10" fill="#646A73">09-14</text><text x="695.9" y="232" text-anchor="middle" font-size="10" fill="#646A73">09-17</text><polyline points="46.0,32.6 70.1,97.4 94.1,59.5 118.2,31.2 142.3,83.5 166.3,106.2 190.4,46.7 214.5,81.5 238.6,84.5 262.6,99.6 286.7,98.5 310.8,80.3 334.8,97.7 358.9,92.3 383.0,80.9 407.0,155.4 431.1,127.3 455.2,113.0 479.2,167.6 503.3,108.6 527.4,121.6 551.4,148.9 575.5,160.9 599.6,142.2 623.7,144.8 647.7,169.7 671.8,119.9 695.9,196.8 719.9,158.6 744.0,138.9" fill="none" stroke="#1F6FEB" stroke-width="2"/><circle cx="46.0" cy="32.6" r="2.4" fill="#1F6FEB"><title>2026-08-17: 0.9434</title></circle><circle cx="70.1" cy="97.4" r="2.4" fill="#1F6FEB"><title>2026-08-18: 0.8893</title></circle><circle cx="94.1" cy="59.5" r="2.4" fill="#1F6FEB"><title>2026-08-19: 0.9209</title></circle><circle cx="118.2" cy="31.2" r="2.4" fill="#1F6FEB"><title>2026-08-20: 0.9445</title></circle><circle cx="142.3" cy="83.5" r="2.4" fill="#1F6FEB"><title>2026-08-21: 0.9009</title></circle><circle cx="166.3" cy="106.2" r="2.4" fill="#1F6FEB"><title>2026-08-22: 0.882</title></circle><circle cx="190.4" cy="46.7" r="2.4" fill="#1F6FEB"><title>2026-08-24: 0.9316</title></circle><circle cx="214.5" cy="81.5" r="2.4" fill="#1F6FEB"><title>2026-08-25: 0.9026</title></circle><circle cx="238.6" cy="84.5" r="2.4" fill="#1F6FEB"><title>2026-08-26: 0.9001</title></circle><circle cx="262.6" cy="99.6" r="2.4" fill="#1F6FEB"><title>2026-08-27: 0.8875</title></circle><circle cx="286.7" cy="98.5" r="2.4" fill="#1F6FEB"><title>2026-08-28: 0.8884</title></circle><circle cx="310.8" cy="80.3" r="2.4" fill="#1F6FEB"><title>2026-08-29: 0.9036</title></circle><circle cx="334.8" cy="97.7" r="2.4" fill="#1F6FEB"><title>2026-08-31: 0.8891</title></circle><circle cx="358.9" cy="92.3" r="2.4" fill="#1F6FEB"><title>2026-09-01: 0.8936</title></circle><circle cx="383.0" cy="80.9" r="2.4" fill="#1F6FEB"><title>2026-09-02: 0.9031</title></circle><circle cx="407.0" cy="155.4" r="2.4" fill="#1F6FEB"><title>2026-09-03: 0.841</title></circle><circle cx="431.1" cy="127.3" r="2.4" fill="#1F6FEB"><title>2026-09-04: 0.8644</title></circle><circle cx="455.2" cy="113.0" r="2.4" fill="#1F6FEB"><title>2026-09-05: 0.8763</title></circle><circle cx="479.2" cy="167.6" r="2.4" fill="#1F6FEB"><title>2026-09-07: 0.8308</title></circle><circle cx="503.3" cy="108.6" r="2.4" fill="#1F6FEB"><title>2026-09-08: 0.88</title></circle><circle cx="527.4" cy="121.6" r="2.4" fill="#1F6FEB"><title>2026-09-09: 0.8692</title></circle><circle cx="551.4" cy="148.9" r="2.4" fill="#1F6FEB"><title>2026-09-10: 0.8464</title></circle><circle cx="575.5" cy="160.9" r="2.4" fill="#1F6FEB"><title>2026-09-11: 0.8364</title></circle><circle cx="599.6" cy="142.2" r="2.4" fill="#1F6FEB"><title>2026-09-12: 0.852</title></circle><circle cx="623.7" cy="144.8" r="2.4" fill="#1F6FEB"><title>2026-09-14: 0.8498</title></circle><circle cx="647.7" cy="169.7" r="2.4" fill="#1F6FEB"><title>2026-09-15: 0.8291</title></circle><circle cx="671.8" cy="119.9" r="2.4" fill="#1F6FEB"><title>2026-09-16: 0.8706</title></circle><circle cx="695.9" cy="196.8" r="2.4" fill="#1F6FEB"><title>2026-09-17: 0.8065</title></circle><circle cx="719.9" cy="158.6" r="2.4" fill="#1F6FEB"><title>2026-09-18: 0.8383</title></circle><circle cx="744.0" cy="138.9" r="2.4" fill="#1F6FEB"><title>2026-09-19: 0.8547</title></circle><polyline points="190.4,65.3 214.5,72.3 238.6,70.5 262.6,76.2 286.7,85.8 310.8,85.3 334.8,84.1 358.9,90.6 383.0,90.5 407.0,100.7 431.1,104.6 455.2,106.7 479.2,119.2 503.3,120.7 527.4,124.9 551.4,134.6 575.5,135.4 599.6,137.5 623.7,142.1 647.7,142.4 671.8,144.0 695.9,154.7 719.9,156.1 744.0,153.0" fill="none" stroke="#C7000B" stroke-width="2.2" stroke-dasharray="6 3"/></svg>
+    <div class="note">
+      近7个有作业日均值 <b>0.843</b>，前7个有作业日均值 <b>0.857643</b>，
+      变化 <b style="color:#C7000B">-1.71%</b>；14日线性回归斜率 <b>-0.002205</b>（斜率为负=下降）。
+      黄色虚线为7点移动平均。下降原因需结合设备报警/停机与报工记录核查，不在此图上断言。
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h2>未交付订单 · 交期最近的 10 单</h2>
+    <table>
+      <thead><tr><th>订单号</th><th>承诺交期</th><th>状态</th></tr></thead>
+      <tbody><tr><td>KL-260305-602-A</td><td>—</td><td>未发货</td></tr><tr><td>返修</td><td>—</td><td>未发货</td></tr><tr><td>CRM-MO-02196</td><td>2019-12-31</td><td>未发货</td></tr><tr><td>CRM-MO-02217</td><td>2021-12-01</td><td>未发货</td></tr><tr><td>CRM-MO-02236</td><td>2022-08-31</td><td>未发货</td></tr><tr><td>CRM-MO-02272</td><td>2022-09-23</td><td>未发货</td></tr><tr><td>CRM-MO-02193</td><td>2022-09-30</td><td>未发货</td></tr><tr><td>CRM-MO-02300</td><td>2022-10-21</td><td>未发货</td></tr><tr><td>CRM-MO-02204</td><td>2022-12-01</td><td>未发货</td></tr><tr><td>CRM-MO-02290</td><td>2023-02-23</td><td>未发货</td></tr></tbody>
+    </table>
+    <div class="note">完整订单清单可通过页面查询和明细入口查看。</div>
+  </div>
+
+  <div class="foot">
+    数据按统一业务口径计算，详情可进入对应模块查看订单、采集、趋势和日报明细。
+  </div>
+</div>
+</body>
+</html>

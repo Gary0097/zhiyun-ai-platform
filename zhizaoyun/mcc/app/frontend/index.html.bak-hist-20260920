@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>管理协同中心 · 智造云</title>
+<style>
+:root{
+  --blue:#ff7f16; --blue-dark:#bd5100; --blue-bg:#fff7e8;
+  --ink:rgba(20,20,19,.88); --muted:rgba(20,20,19,.58); --line:#eae8e7; --bg:#f9f8f4;
+  --ok:#52c41a; --warn:#faad14; --danger:#ff4d4f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;color:var(--ink);background:var(--bg);font-size:14px}
+.layout{display:flex;height:100vh;overflow:hidden}
+/* 侧边栏 */
+.side{width:216px;background:#faf9f7;color:rgba(20,20,19,.58);display:flex;flex-direction:column;flex-shrink:0}
+.side .brand{padding:18px 16px;border-bottom:1px solid #eae8e7}
+.side .brand h1{font-size:17px;color:rgba(20,20,19,.88);display:flex;align-items:center;gap:8px}
+.side .brand h1 .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#ff7f16,#ff9d4d);color:#fff;box-shadow:0 2px 6px rgba(255,127,22,.28);display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+.side .brand p{font-size:11px;color:rgba(20,20,19,.45);margin-top:4px}
+.nav{flex:1;overflow-y:auto;padding:10px 8px}
+.nav .group{font-size:11px;color:rgba(20,20,19,.45);padding:10px 10px 6px;letter-spacing:.08em}
+.nav a{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;color:rgba(20,20,19,.58);text-decoration:none;margin-bottom:2px;font-size:13.5px;cursor:pointer}
+.nav a .no{font-size:10px;background:rgba(255,127,22,.12);border-radius:4px;padding:1px 5px;color:#bd5100}
+.nav a:hover{background:rgba(255,127,22,.10)}
+.nav a.active{background:var(--blue-bg);color:#bd5100;border:1px solid rgba(255,127,22,.42);font-weight:600}
+.nav a.active .no{background:#ffe9cf;color:#bd5100}
+.side .foot{padding:12px 16px;border-top:1px solid #eae8e7;font-size:11px;color:rgba(20,20,19,.45)}
+.side .foot a{color:rgba(255,127,22,.42);text-decoration:none}
+/* 主区 */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{height:54px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.top .crumb{font-size:13px;color:var(--muted)}
+.top .crumb b{color:var(--ink);font-size:15px}
+.top .badge{display:inline-flex;align-items:center;gap:5px;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(255,127,22,.42);border-radius:999px;padding:2px 10px;font-size:12px}
+.top .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.top .spacer{flex:1}
+.top .user{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.top .user .avatar{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+.top button.plain{border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer}
+.top button.plain:hover{color:var(--blue);border-color:rgba(255,127,22,.42)}
+.content{flex:1;overflow-y:auto;padding:18px 20px}
+/* 卡片 */
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.card h3{font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card h3 .sub{font-size:12px;color:var(--muted);font-weight:400}
+.card .desc{color:var(--muted);font-size:12.5px;line-height:1.7}
+/* 指标 */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.metric{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.metric .k{font-size:12px;color:var(--muted)}
+.metric .v{font-size:24px;font-weight:700;color:var(--blue-dark);margin-top:4px}
+.metric .v small{font-size:12px;color:var(--muted);font-weight:400}
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{background:#faf9f7;text-align:left;padding:8px 10px;color:rgba(20,20,19,.58);font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid #f0eeeb;vertical-align:top}
+tr:hover td{background:#faf9f7}
+.tag{display:inline-block;border-radius:4px;padding:1px 7px;font-size:11px;margin:1px 2px}
+.tag.blue{background:var(--blue-bg);color:var(--blue)}
+.tag.green{background:#f6ffed;color:#389e0d}
+.tag.red{background:#fff2f0;color:var(--danger)}
+.tag.amber{background:#fffbe6;color:var(--warn)}
+.tag.gray{background:#f0eeeb;color:rgba(20,20,19,.58)}
+.ratebar{display:inline-block;width:60px;height:6px;background:#f0eeeb;border-radius:3px;overflow:hidden;vertical-align:middle;margin-right:6px}
+.ratebar i{display:block;height:100%;background:var(--blue)}
+/* 工具行 */
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.tools input,.tools select{border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:12.5px;outline:none;background:#fff}
+.tools input:focus,.tools select:focus{border-color:#ff9d4d}
+.tools .count{font-size:12px;color:var(--muted)}
+/* 聊天 */
+.chatwrap{display:flex;flex-direction:column;height:calc(100vh - 54px - 36px)}
+.chatgrid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:14px;height:calc(100vh - 54px - 36px)}
+.chatcol{display:flex;flex-direction:column;min-width:0}
+.msgs{flex:1;overflow-y:auto;padding:6px 2px;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;gap:9px;max-width:92%}
+.msg .who{width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg.user .who{background:var(--blue);color:#fff}
+.msg.bot .who{background:#fff;border:1px solid var(--line);color:var(--blue)}
+.msg .bubble{border-radius:10px;padding:10px 13px;line-height:1.75;font-size:13.5px;overflow-wrap:anywhere}
+.msg.user .bubble{background:var(--blue);color:#fff}
+.msg.bot .bubble{background:#fff;border:1px solid var(--line)}
+.msg.error .bubble{background:#fff2f0;color:var(--danger);border-color:#ffccc7}
+.bubble p{margin:.25em 0}
+.bubble table{margin:.5em 0;font-size:12px}
+.bubble th,.bubble td{border:1px solid var(--line);padding:4px 8px;background:#fff}
+.bubble code{background:#f0eeeb;border-radius:4px;padding:0 4px;font-size:12px}
+.bubble .refs{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--muted)}
+.quick{display:flex;gap:8px;flex-wrap:wrap;padding:8px 0}
+.quick button{border:1px solid rgba(255,127,22,.42);background:var(--blue-bg);color:var(--blue);border-radius:999px;padding:4px 12px;font-size:12px;cursor:pointer}
+.quick button:hover{background:rgba(20,20,19,.58)}
+.inputbar{display:flex;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;align-items:flex-end}
+.inputbar textarea{flex:1;border:none;outline:none;resize:none;font-size:13.5px;font-family:inherit;max-height:110px;min-height:22px;padding:4px 6px}
+.inputbar button.send{background:var(--blue);color:#fff;border:none;border-radius:8px;width:38px;height:32px;font-size:15px;cursor:pointer}
+.inputbar button.send:disabled{background:#ff9d4d;cursor:not-allowed}
+.hint{font-size:11px;color:var(--muted);padding:4px 2px}
+.typing{display:inline-flex;gap:4px;padding:2px 0}
+.typing i{width:5px;height:5px;background:#ff9d4d;border-radius:50%;animation:bl 1s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,100%{opacity:.25}50%{opacity:1}}
+/* 右侧面板 */
+.sidepanel{display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.agentcard{background:linear-gradient(135deg,#fff7e8,#fffdf7);border:1px solid rgba(255,127,22,.42);border-radius:12px;padding:14px 16px}
+.agentcard .name{font-weight:700;color:var(--blue-dark);display:flex;align-items:center;gap:8px;font-size:13.5px}
+.agentcard .st{font-size:11px;border-radius:4px;padding:1px 7px}
+.agentcard .st.on{background:#f6ffed;color:var(--ok)}
+.agentcard .st.off{background:#fff2f0;color:var(--danger)}
+.agentcard p{font-size:12px;color:rgba(20,20,19,.58);margin-top:6px;line-height:1.6}
+.kv{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px dashed #eae8e7}
+.kv:last-child{border-bottom:none}
+.kv b{color:var(--blue-dark)}
+.navrow{cursor:pointer;border-radius:8px;padding:8px 8px}
+.navrow:hover{background:#fff7e8}
+.navrow small{display:inline-block;line-height:1.5}
+.docitem{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed #f0eeeb;font-size:12.5px}
+.docitem:last-child{border-bottom:none}
+.docitem .ic{width:26px;height:26px;border-radius:6px;background:var(--blue-bg);color:var(--blue);display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.docitem .meta{font-size:11px;color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:26px 0;font-size:12.5px}
+.loading{color:var(--muted);font-size:12.5px;padding:14px;text-align:center}
+@media (max-width:1100px){.chatgrid{grid-template-columns:1fr}.sidepanel{display:none}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">
+      <h1><span class="logo">协</span>管理协同中心</h1>
+      <p>智造云 · 组织与知识管理</p>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="group">功能模块（22-27）</div>
+      <!-- 模块由 JS 注入 -->
+      <div class="group">支撑</div>
+      <a data-view="dashboard">📊 数据看板</a>
+      <a data-view="kb">📚 智能知识库</a>
+      <a data-view="history">🕐 运行历史</a>
+    </nav>
+    <div class="foot">智造云 · 组织与知识管理</div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <div class="crumb">管理协同中心 / <b id="crumbTitle">数据看板</b></div>
+      <span class="badge" id="agentBadge" style="display:none"><span class="dot"></span><span id="agentBadgeText"></span></span>
+      <div class="spacer"></div>
+      <div class="user"><span class="avatar" id="userAvatar">H</span><span id="userName">加载中…</span></div>
+      <button class="plain" onclick="refresh()">刷新</button>
+    </header>
+    <div class="content" id="content"><div class="loading">正在加载…</div></div>
+  </div>
+</div>
+<script>
+/* ============ 基础 ============ */
+const $=s=>document.querySelector(s);
+const api={token:localStorage.getItem('mcc_token')||'',
+  async req(path,opts={}){
+    const r=await fetch(path,{...opts,headers:{'X-Token':this.token,'Content-Type':'application/json',...(opts.headers||{})}});
+    if(r.status===401){await this.sso();return this.req(path,opts);}
+    return r;
+  },
+  async sso(){
+    const r=await fetch('/sso-token');const d=await r.json();
+    this.token=d.token;localStorage.setItem('mcc_token',d.token);
+    $('#userName').textContent=d.user.display;$('#userAvatar').textContent=(d.user.name||'H')[0].toUpperCase();
+  },
+  async get(path){const r=await this.req(path);return r.json();}
+};
+
+/* 极简 Markdown 渲染（表格/加粗/代码/列表） */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function md(t){
+  t=esc(t);
+  const lines=t.split('\n');let out=[],i=0;
+  while(i<lines.length){
+    const L=lines[i];
+    if(/^\|.*\|/.test(L)&&i+1<lines.length&&/^\|[\s:|-]+\|?$/.test(lines[i+1])){
+      const rows=[];
+      while(i<lines.length&&/^\|/.test(lines[i])){rows.push(lines[i]);i++;}
+      const cells=r=>r.replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+      let h='<table><tr>'+cells(rows[0]).map(c=>'<th>'+c+'</th>').join('')+'</tr>';
+      for(let j=2;j<rows.length;j++)h+='<tr>'+cells(rows[j]).map(c=>'<td>'+c+'</td>').join('')+'</tr>';
+      out.push(h+'</table>');continue;
+    }
+    if(/^#{1,4}\s/.test(L)){out.push('<p><b>'+L.replace(/^#+\s/,'')+'</b></p>');i++;continue;}
+    if(/^[-*]\s/.test(L)||/^\d+\.\s/.test(L)){
+      let items=[];
+      while(i<lines.length&&(/^[-*]\s/.test(lines[i])||/^\d+\.\s/.test(lines[i]))){items.push(lines[i].replace(/^([-*]|\d+\.)\s/,''));i++;}
+      out.push('<ul>'+items.map(x=>'<li>'+x+'</li>').join('')+'</ul>');continue;
+    }
+    out.push(L?'<p>'+L+'</p>':'');i++;
+  }
+  let html=out.join('');
+  html=html.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`]+)`/g,'<code>$1</code>');
+  return html;
+}
+
+/* ============ 状态 ============ */
+let MODULES=[],SESSIONS={};
+
+/* ============ 导航 ============ */
+function buildNav(){
+  const nav=$('#nav');const group=nav.querySelector('.group');
+  MODULES.forEach(m=>{
+    const a=document.createElement('a');
+    a.innerHTML=`<span class="no">${m.no}</span>${m.name}`;
+    a.onclick=()=>showModule(m.key);
+    a.dataset.mod=m.key;group.after(a);
+  });
+}
+function setActive(sel){
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
+  if(sel)sel.classList.add('active');
+}
+
+/* ============ 视图：数据看板 ============ */
+async function showDashboard(){
+  setActive(document.querySelector('.nav a[data-view="dashboard"]'));
+  $('#crumbTitle').textContent='数据看板';$('#agentBadge').style.display='none';
+  const c=$('#content');c.innerHTML='<div class="loading">加载看板数据…</div>';
+  const [dash,kb]=await Promise.all([api.get('/api/data/dashboard'),api.get('/api/kb/overview')]);
+  const mcc=kb.kbs&&kb.kbs[0];
+  c.innerHTML=`
+  <div class="metrics">${dash.metrics.map(m=>`<div class="metric"><div class="k">${esc(m.metric)}</div><div class="v">${esc(m.value)}</div></div>`).join('')}
+  ${mcc?`<div class="metric"><div class="k">知识库文档</div><div class="v">${mcc.knowledge_count}<small> 篇</small></div></div>`:''}
+  </div>
+  <div class="chatgrid" style="height:auto;grid-template-columns:1fr 1fr">
+    <div class="card"><h3>部门编制与季度离职（2026Q3）</h3>
+      <table><tr><th>部门</th><th>在编</th><th>已录入</th><th>季度离职</th><th>离职率</th><th>预警</th></tr>
+      ${dash.hr.map(r=>`<tr><td>${esc(r.dept)}</td><td>${r.headcount}</td><td>${r.recorded??'—'}${r.missing?`<small style="color:#D48806">（缺${r.missing}）</small>`:''}</td><td>${r.quarterly_left}</td>
+        <td><span class="ratebar"><i style="width:${Math.min(100,r.rate*2)}%"></i></span>${r.rate}%</td>
+        <td><span class="tag ${r.alert==='稳定'?'green':'amber'}">${esc(r.alert)}</span></td></tr>`).join('')}
+      </table></div>
+    <div class="card"><h3>功能模块 <span class="sub">点击进入对应工作台</span></h3>
+      ${MODULES.map(m=>`<div class="kv navrow" onclick="showModule('${m.key}')"><span><b>${m.no}</b> ${esc(m.name)}<br><small style="color:var(--muted)">${esc(m.desc)}</small></span><b style="color:var(--blue)">进入 ›</b></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ============ 视图：运行历史 ============ */
+let HIST_MODULE='';
+async function showHistory(){
+  setActive(document.querySelector('.nav a[data-view="history"]'));
+  $('#crumbTitle').textContent='运行历史';$('#agentBadge').style.display='none';
+  const c=$('#content');c.innerHTML='<div class="loading">加载运行历史…</div>';
+  const d=await api.get('/api/history?days=30&limit=300');
+  const name=k=>{const m=MODULES.find(x=>x.key===k);return m?m.no+' '+m.name:(k==='system'?'系统':k);};
+  const today=(d.by_day[d.by_day.length-1]||{}).count||0;
+  const last7=d.by_day.slice(-7).reduce((a,b)=>a+b.count,0);
+  const mx=Math.max(...d.by_day.map(x=>x.count),1),W=760,H=150,pad=30;
+  const bx=i=>pad+i*(W-2*pad)/Math.max(d.by_day.length-1,1);
+  const by=v=>H-22-v/mx*(H-44);
+  const bars=d.by_day.map((x,i)=>{const h=H-22-by(x.count);
+    return `<rect x="${bx(i)-6}" y="${by(x.count)}" width="12" height="${Math.max(h,1)}" rx="3" fill="${x.count?'#ff7f16':'#eee'}"><title>${x.date}: ${x.count} 次</title></rect>`+
+      (i%Math.ceil(d.by_day.length/10)===0?`<text x="${bx(i)}" y="${H-8}" font-size="9" fill="#999" text-anchor="middle">${x.date.slice(5)}</text>`:'');}).join('');
+  c.innerHTML=`
+  <div class="metrics">
+    <div class="metric"><div class="k">近30天调用</div><div class="v">${d.total}</div></div>
+    <div class="metric"><div class="k">今日调用</div><div class="v">${today}</div></div>
+    <div class="metric"><div class="k">近7天</div><div class="v">${last7}</div></div>
+    <div class="metric"><div class="k">成功率</div><div class="v">${d.success_rate}%</div></div>
+  </div>
+  <div class="card"><h3>调用趋势（近30天 / 次）</h3>
+    <svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${bars}</svg></div>
+  <div class="card"><h3>运行明细
+    <select id="histMod" style="margin-left:10px;padding:4px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+      <option value="">全部模块</option>${MODULES.map(m=>`<option value="${m.key}" ${HIST_MODULE===m.key?'selected':''}>${m.no} ${m.name}</option>`).join('')}
+    </select>
+    <small style="color:var(--muted);margin-left:8px">每次智能体调用自动留痕，可追溯</small></h3>
+    <div style="max-height:480px;overflow:auto"><table><tr><th>时间</th><th>模块</th><th>问题/内容</th><th>回复摘要</th><th>耗时</th><th>状态</th></tr>
+    <tbody id="histBody"></tbody></table></div></div>`;
+  const render=rows=>{
+    $('#histBody').innerHTML=rows.map(e=>`<tr>
+      <td style="white-space:nowrap">${esc((e.ts||'').replace('T',' ').slice(5,19))}</td>
+      <td style="white-space:nowrap">${esc(name(e.module))}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(e.query||'')}">${esc(e.query||'—')}</td>
+      <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(e.summary||'')}">${esc(e.summary||'—')}</td>
+      <td class="num">${e.duration_ms!=null?e.duration_ms+'ms':'—'}</td>
+      <td><span class="tag ${e.status==='success'?'green':'red'}" style="font-size:11px;padding:2px 8px;border-radius:8px">${e.status==='success'?'成功':'异常'}</span></td>
+    </tr>`).join('')||'<tr><td colspan="6" style="color:#999;padding:14px">该筛选条件下暂无记录</td></tr>';
+  };
+  render(d.rows);
+  $('#histMod').onchange=e=>{HIST_MODULE=e.target.value;
+    api.get('/api/history?days=30&limit=300'+(HIST_MODULE?'&module='+HIST_MODULE:'')).then(dd=>render(dd.rows));};
+}
+
+/* ============ 视图：知识库 ============ */
+async function showKb(){
+  setActive(document.querySelector('.nav a[data-view="kb"]'));
+  $('#crumbTitle').textContent='智能知识库';$('#agentBadge').style.display='none';
+  const c=$('#content');c.innerHTML='<div class="loading">加载知识库…</div>';
+  const kb=await api.get('/api/kb/overview');
+  const mcc=kb.kbs&&kb.kbs[0];
+  if(!mcc){c.innerHTML='<div class="card"><div class="empty">知识库暂不可用</div></div>';return;}
+  c.innerHTML=`
+  <div class="metrics">
+    <div class="metric"><div class="k">知识库</div><div class="v" style="font-size:16px">${esc(mcc.name)}</div></div>
+    <div class="metric"><div class="k">文档数</div><div class="v">${mcc.knowledge_count}</div></div>
+  </div>
+  <div class="card"><h3>知识库文档 <span class="sub">SOP · 维修日志 · 合同 · 组织数据</span></h3>
+    ${(mcc.docs||[]).map(d=>`<div class="docitem"><span class="ic">📄</span><div><div>${esc(d.title)}</div><div class="meta">${esc(d.status)}${d.enabled?' · 已启用':' · 已停用'} · ${esc(d.updated_at)}</div></div></div>`).join('')||'<div class="empty">暂无文档</div>'}
+  </div>
+  <div class="card"><h3>问答入口</h3><p class="desc">在左侧任意功能模块中提问即可进行知识检索问答，例如功能24中提问「设备异响怎么修？」。</p></div>`;
+}
+
+/* ============ 视图：功能模块 ============ */
+function showModule(key){
+  const m=MODULES.find(x=>x.key===key);if(!m)return;
+  setActive(document.querySelector(`.nav a[data-mod="${key}"]`));
+  $('#crumbTitle').textContent=m.name;
+  $('#agentBadge').style.display='';
+  $('#agentBadgeText').textContent=m.agent;
+  $('#content').innerHTML=`
+  <div class="chatgrid">
+    <div class="chatcol card" style="margin-bottom:0;display:flex;flex-direction:column;padding:12px 14px">
+      <div class="msgs" id="msgs">
+        <div class="msg bot"><div class="who">🤖</div><div class="bubble">
+          <p>您好，我是「<b>${esc(m.agent)}</b>」（功能${m.no}：${esc(m.name)}）。</p>
+          <p>${esc(m.desc)}。请直接提问：</p></div></div>
+      </div>
+      <div class="quick" id="quick">${m.quick.map(q=>`<button onclick="ask(${JSON.stringify(q).replace(/"/g,'&quot;')})">${esc(q)}</button>`).join('')}</div>
+      <div class="inputbar">
+        <textarea id="q" rows="1" placeholder="输入问题，Enter 发送…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ask();}"></textarea>
+        <button class="send" id="sendBtn" onclick="ask()">➤</button>
+      </div>
+      <div class="hint">回答基于企业知识库检索生成，引用以来源文档为准</div>
+    </div>
+    <div class="sidepanel" id="sidepanel"><div class="loading">加载数据…</div></div>
+  </div>`;
+  loadSidePanel(key);
+}
+
+async function loadSidePanel(key){
+  const el=$('#sidepanel');
+  if(key==='perm'||key==='contact'){
+    const d=await api.get('/api/data/employees');
+    const depts=[...new Set(d.rows.map(r=>r.dept))];
+    if(key==='perm'){
+      el.innerHTML=`
+      <div class="agentcard"><div class="name">🛡️ 权限规则推理智能体</div>
+        <p>按岗位职责基线（审批流程/查看订单/知识库维护/生产数据查看）生成权限配置建议，识别越权风险。</p></div>
+      <div class="card"><h3>权限清单 <span class="sub" id="permCount"></span></h3>
+        <div class="tools"><select id="fDept"><option value="">全部部门</option>${depts.map(x=>`<option>${esc(x)}</option>`).join('')}</select>
+          <input id="fQ" placeholder="搜索姓名/岗位/编号" style="flex:1"></div>
+        <div style="max-height:420px;overflow:auto"><table><tr><th>员工</th><th>部门/岗位</th><th>状态</th><th>当前权限</th><th>AI建议</th></tr>
+        <tbody id="permBody"></tbody></table></div></div>`;
+      const render=(rows)=>{$('#permBody').innerHTML=rows.map(r=>`<tr><td><b>${esc(r.name)}</b><br><small style="color:var(--muted)">${r.id}</small></td>
+        <td>${esc(r.dept)}<br><small style="color:var(--muted)">${esc(r.post)}</small></td>
+        <td><span class="tag ${r.status==='正常'?'green':'red'}">${esc(r.status||'正常')}</span></td>
+        <td><span class="tag blue">${esc(r.perm)}</span></td>
+        <td><span class="tag ${r.perm_suggest==='建议开通'?'green':r.perm_suggest==='限制访问'?'red':'gray'}">${esc(r.perm_suggest)}</span></td></tr>`).join('');
+        $('#permCount').textContent=`共 ${rows.length} 人`;};
+      render(d.rows);
+      $('#fDept').onchange=()=>{const v=$('#fDept').value;render(v?d.rows.filter(r=>r.dept===v):d.rows);};
+      $('#fQ').oninput=()=>{const v=$('#fQ').value.trim();render(d.rows.filter(r=>!v||r.name.includes(v)||r.post.includes(v)||r.id.includes(v)));};
+    }else{
+      el.innerHTML=`
+      <div class="agentcard"><div class="name">👥 人员信息关联智能体</div>
+        <p>「找谁修XX？」一键推荐：按可解决问题五类匹配，优先历史协作次数高的人选。</p></div>
+      <div class="card"><h3>按问题找人</h3>
+        ${['包装机调试','售后维修','财务审核','采购协同','订单跟进'].map(p=>{
+          const tops=d.rows.filter(r=>r.problem===p).sort((a,b)=>b.collab-a.collab).slice(0,4);
+          return `<div style="margin-bottom:10px"><span class="tag blue">${p}</span>
+            ${tops.map(r=>`<div class="kv"><span>${esc(r.name)} <small style="color:var(--muted)">${esc(r.dept)}·${esc(r.post)}</small></span><b>协作${r.collab}次</b></div>`).join('')}</div>`;}).join('')}
+        </div>
+      <div class="card"><h3>通讯录搜索</h3>
+        <div class="tools"><input id="cQ" placeholder="姓名/技能/问题" style="flex:1"></div>
+        <div style="max-height:260px;overflow:auto"><table><tbody id="cBody"></tbody></table></div></div>`;
+      const cr=(rows)=>{$('#cBody').innerHTML=rows.map(r=>`<tr><td><b>${esc(r.name)}</b> <small style="color:var(--muted)">${esc(r.dept)}·${esc(r.post)}</small><br>
+        <span class="tag gray">${esc(r.problem)}</span> <small>协作${r.collab}次</small></td></tr>`).join('')||'<tr><td class="empty">无匹配</td></tr>';};
+      cr(d.rows.slice(0,20));
+      $('#cQ').oninput=()=>{const v=$('#cQ').value.trim();cr(d.rows.filter(r=>!v||r.name.includes(v)||r.post.includes(v)||r.skills.some(s=>s.includes(v))||(r.problem||'').includes(v)).slice(0,30));};
+    }
+  }else if(key==='approval'){
+    const d=await api.get('/api/data/employees');
+    const ap=d.rows.filter(r=>r.perm==='审批流程');
+    el.innerHTML=`
+    <div class="agentcard"><div class="name">✅ 审批路径推荐智能体</div>
+      <p>按事项类型与金额分档（A≤0.5万 / B≤5万 / C≤20万 / D>20万）推荐最可通过的审批人组合。</p></div>
+    <div class="card"><h3>金额分档规则</h3>
+      <div class="kv"><span>A档 ≤0.5万</span><b>部门负责人即生效</b></div>
+      <div class="kv"><span>B档 0.5万~5万</span><b>部门负责人→分管条线</b></div>
+      <div class="kv"><span>C档 5万~20万</span><b>负责人→财务→董事长</b></div>
+      <div class="kv"><span>D档 >20万</span><b>同C档+上会决议</b></div></div>
+    <div class="card"><h3>审批人（${ap.length}人具备「审批流程」权限）</h3>
+      <div style="max-height:320px;overflow:auto">${ap.map(r=>`<div class="kv"><span>${esc(r.name)} <small style="color:var(--muted)">${esc(r.dept)}·${esc(r.post)}</small></span><b>${r.id}</b></div>`).join('')}</div></div>`;
+  }else if(key==='care'){
+    const now=new Date();
+    const d=await api.get('/api/data/care?month='+(now.getMonth()+1));
+    const known=d.rows.filter(r=>r.birthday||r.hire_date);
+    const pending=d.rows.length-known.length;
+    el.innerHTML=`
+    <div class="agentcard"><div class="name">🎂 员工关怀触发智能体</div>
+      <p>自动识别本月生日/入司周年，生成个性化祝福语（演示环境仅生成内容）。</p></div>
+    <div class="card"><h3>${now.getMonth()+1}月关怀日历 <span class="sub">已建档 ${known.length} 人${pending?` · 待完善 ${pending} 人`:''}</span></h3>
+      <div style="max-height:420px;overflow:auto"><table><tr><th>员工</th><th>生日</th><th>入司日</th><th>本月</th></tr>
+      ${known.map(r=>`<tr><td><b>${esc(r.name)}</b><br><small style="color:var(--muted)">${esc(r.dept)}</small></td>
+        <td>${esc(r.birthday)||'—'}</td><td>${esc(r.hire_date)||'—'}</td>
+        <td>${r.birthday_this_month?'<span class="tag red">生日</span>':''}${r.anniversary_this_month?'<span class="tag blue">周年</span>':''}</td></tr>`).join('')}
+      </table></div>
+      ${pending?`<div class="meta" style="margin-top:8px">另有 ${pending} 名员工尚未录入生日/入司日期，可在员工档案导入模板中补充后再次导入。</div>`:''}</div>`;
+  }else if(key==='hr'){
+    const d=await api.get('/api/data/hr');
+    el.innerHTML=`
+    <div class="agentcard"><div class="name">📉 人员流动预测智能体</div>
+      <p>离职率≥15%或人数≤2黄色预警；≥30%红色预警并要求留人方案。</p></div>
+    <div class="card"><h3>部门离职率（${d.quarter}）</h3>
+      <table><tr><th>部门</th><th>在编</th><th>已录入</th><th>离职</th><th>率</th><th>预警</th></tr>
+      ${d.rows.map(r=>`<tr><td>${esc(r.dept)}</td><td>${r.headcount}</td><td>${r.recorded??'—'}${r.missing?`<small style="color:#D48806">（缺${r.missing}）</small>`:''}</td><td>${r.quarterly_left}</td>
+        <td><span class="ratebar"><i style="width:${Math.min(100,r.rate*2)}%;background:${r.rate>=30?'#ff4d4f':r.rate>=15?'#faad14':''}"></i></span>${r.rate}%</td>
+        <td><span class="tag ${r.alert==='稳定'?'green':'amber'}">${esc(r.alert)}</span></td></tr>`).join('')}
+      </table></div>`;
+  }else{ // kb
+    const kb=await api.get('/api/kb/overview');
+    const mcc=kb.kbs&&kb.kbs[0];
+    el.innerHTML=`
+    <div class="agentcard"><div class="name">📚 知识结构化与检索智能体</div>
+      <p>解析SOP、维修日志（案例KB-001~KB-005）、合同要点，秒级语义问答。</p></div>
+    ${mcc?`<div class="card"><h3>知识库《${esc(mcc.name)}》</h3>
+      <div class="kv"><span>文档数</span><b>${mcc.knowledge_count}</b></div>
+      ${(mcc.docs||[]).slice(0,8).map(dd=>`<div class="docitem"><span class="ic">📄</span><div><div>${esc(dd.title)}</div><div class="meta">${esc(dd.status)}</div></div></div>`).join('')}
+    </div>`:''}`;
+  }
+}
+
+/* ============ 聊天 ============ */
+let BUSY=false;
+async function ask(preset){
+  const key=document.querySelector('.nav a.active')?.dataset.mod;
+  if(!key||BUSY)return;
+  const m=MODULES.find(x=>x.key===key);
+  const q=(preset||$('#q').value).trim();
+  if(!q)return;
+  if(!preset){$('#q').value='';$('#q').style.height='auto';}
+  const msgs=$('#msgs');
+  msgs.insertAdjacentHTML('beforeend',`<div class="msg user"><div class="who">H</div><div class="bubble">${esc(q)}</div></div>`);
+  const bid='b'+Date.now();
+  msgs.insertAdjacentHTML('beforeend',`<div class="msg bot" id="${bid}"><div class="who">🤖</div><div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div></div>`);
+  msgs.scrollTop=msgs.scrollHeight;
+  const bub=document.querySelector('#'+bid+' .bubble');
+  BUSY=true;$('#sendBtn').disabled=true;
+  let text='';
+  try{
+    const resp=await api.req(`/api/chat/${key}`,{method:'POST',body:JSON.stringify({query:q,session_id:SESSIONS[key]||''})});
+    if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.detail||('HTTP '+resp.status));}
+    const reader=resp.body.getReader();const dec=new TextDecoder();let buf='';
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      let idx;
+      while((idx=buf.indexOf('\n\n'))>=0){
+        const chunk=buf.slice(0,idx);buf=buf.slice(idx+2);
+        const ev=(chunk.match(/^event:\s*(.+)$/m)||[])[1]||'';
+        const dm=chunk.match(/^data:\s*(.*)$/m);
+        if(!dm)continue;
+        let d;try{d=JSON.parse(dm[1]);}catch{continue;}
+        if(ev==='session'){SESSIONS[key]=d.session_id;}
+        else if(ev==='delta'){
+          text+=d.text;
+          bub.innerHTML=md(text);
+          msgs.scrollTop=msgs.scrollHeight;
+        }else if(ev==='refs'){
+          const div=document.createElement('div');div.className='refs';
+          div.innerHTML='📎 来源：'+d.refs.map(esc).join('、');
+          bub.appendChild(div);
+        }else if(ev==='error'){throw new Error(d.message);}
+      }
+    }
+    if(!text)bub.innerHTML='<p>（智能体未返回内容，请重试）</p>';
+  }catch(e){
+    document.getElementById(bid).classList.add('error');
+    bub.innerHTML='<p>⚠️ '+esc(e.message)+'</p>';
+  }
+  BUSY=false;$('#sendBtn').disabled=false;$('#q').focus();
+}
+window.ask=ask;
+
+function refresh(){location.reload();}
+
+/* ============ 启动 ============ */
+(async function boot(){
+  try{await api.sso();}catch(e){$('#userName').textContent='未登录';}
+  const d=await api.get('/api/modules').catch(()=>({modules:[]}));
+  MODULES=d.modules||[];
+  buildNav();
+  document.querySelectorAll('.nav a[data-view]').forEach(a=>{
+    a.onclick=()=>({dashboard:showDashboard,kb:showKb,history:showHistory})[a.dataset.view]();
+  });
+  showDashboard();
+})();
+</script>
+</body>
+</html>

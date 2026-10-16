@@ -1,0 +1,1534 @@
+{
+ "employees": [
+  {
+   "id": "E001",
+   "name": "蔡云龙",
+   "dept": "管理层",
+   "post": "董事长",
+   "perm": "审批流程",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "董事长",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 99,
+   "birthday": "1991-01-04",
+   "hire_date": "2022-07-01",
+   "event": "生日"
+  },
+  {
+   "id": "E002",
+   "name": "王小旋",
+   "dept": "财务部",
+   "post": "财务负责人",
+   "perm": "查看订单",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "财务负责人",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 89,
+   "birthday": "1990-04-15",
+   "hire_date": "2020-03-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E003",
+   "name": "谭百福",
+   "dept": "售后部",
+   "post": "售后总监",
+   "perm": "知识库维护",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "售后总监",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 75,
+   "birthday": "1990-08-21",
+   "hire_date": "2025-07-01",
+   "event": "生日"
+  },
+  {
+   "id": "E004",
+   "name": "吴晓蕾",
+   "dept": "销售部",
+   "post": "跟单主管",
+   "perm": "审批流程",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "跟单主管",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 56,
+   "birthday": "1990-04-03",
+   "hire_date": "2025-12-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E005",
+   "name": "杜长远",
+   "dept": "售后部",
+   "post": "售后工程师",
+   "perm": "生产数据查看",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "售后工程师",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 25,
+   "birthday": "1990-05-03",
+   "hire_date": "2025-02-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E006",
+   "name": "沈嘉伟",
+   "dept": "信息部",
+   "post": "IT工程师",
+   "perm": "查看订单",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "IT工程师",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 118,
+   "birthday": "1990-02-04",
+   "hire_date": "2024-06-01",
+   "event": "生日"
+  },
+  {
+   "id": "E007",
+   "name": "施伟超",
+   "dept": "销售部",
+   "post": "销售经理",
+   "perm": "审批流程",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "销售经理",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 70,
+   "birthday": "1990-06-08",
+   "hire_date": "2023-09-01",
+   "event": "生日"
+  },
+  {
+   "id": "E008",
+   "name": "何泳欣",
+   "dept": "销售部",
+   "post": "商务专员",
+   "perm": "查看订单",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "商务专员",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 46,
+   "birthday": "1990-04-13",
+   "hire_date": "2020-03-01",
+   "event": "生日"
+  },
+  {
+   "id": "E009",
+   "name": "李华婷",
+   "dept": "销售部",
+   "post": "商务专员",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "商务专员",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 67,
+   "birthday": "1990-06-12",
+   "hire_date": "2021-11-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E010",
+   "name": "王振敏",
+   "dept": "销售部",
+   "post": "销售经理",
+   "perm": "审批流程",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "销售经理",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 46,
+   "birthday": "1990-05-18",
+   "hire_date": "2020-02-01",
+   "event": "生日"
+  },
+  {
+   "id": "E011",
+   "name": "李鹏飞",
+   "dept": "销售部",
+   "post": "销售专员",
+   "perm": "审批流程",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "销售专员",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 112,
+   "birthday": "1990-03-03",
+   "hire_date": "2022-02-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E012",
+   "name": "温梅芳",
+   "dept": "销售部",
+   "post": "销售专员",
+   "perm": "知识库维护",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "销售专员",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 9,
+   "birthday": "1990-02-22",
+   "hire_date": "2024-05-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E013",
+   "name": "郭栩文",
+   "dept": "销售部",
+   "post": "销售专员",
+   "perm": "审批流程",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "销售专员",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 19,
+   "birthday": "1990-09-11",
+   "hire_date": "2025-07-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E014",
+   "name": "范和平",
+   "dept": "销售部",
+   "post": "销售经理",
+   "perm": "生产数据查看",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "销售经理",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 76,
+   "birthday": "1990-03-18",
+   "hire_date": "2025-04-01",
+   "event": "生日"
+  },
+  {
+   "id": "E015",
+   "name": "黎文杰",
+   "dept": "销售部",
+   "post": "销售专员",
+   "perm": "知识库维护",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "销售专员",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 20,
+   "birthday": "1990-07-27",
+   "hire_date": "2024-11-01",
+   "event": "生日"
+  },
+  {
+   "id": "E016",
+   "name": "张伟强",
+   "dept": "研发部",
+   "post": "研发经理",
+   "perm": "查看订单",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "研发经理",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 11,
+   "birthday": "1990-06-22",
+   "hire_date": "2024-07-01",
+   "event": "生日"
+  },
+  {
+   "id": "E017",
+   "name": "李志强",
+   "dept": "研发部",
+   "post": "机械工程师",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "机械工程师",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 133,
+   "birthday": "1990-06-02",
+   "hire_date": "2025-11-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E018",
+   "name": "陈嘉豪",
+   "dept": "研发部",
+   "post": "机械工程师",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "机械工程师",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 67,
+   "birthday": "1990-08-20",
+   "hire_date": "2021-04-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E019",
+   "name": "林俊杰",
+   "dept": "研发部",
+   "post": "机械设计",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "机械设计",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 43,
+   "birthday": "1991-10-15",
+   "hire_date": "2021-09-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E020",
+   "name": "王浩然",
+   "dept": "研发部",
+   "post": "机械设计",
+   "perm": "知识库维护",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "机械设计",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 75,
+   "birthday": "1990-07-04",
+   "hire_date": "2022-10-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E021",
+   "name": "陈子豪",
+   "dept": "电控部",
+   "post": "电气工程师",
+   "perm": "知识库维护",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "电气工程师",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 137,
+   "birthday": "1990-07-15",
+   "hire_date": "2025-03-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E022",
+   "name": "赵子龙",
+   "dept": "电控部",
+   "post": "PLC工程师",
+   "perm": "查看订单",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "PLC工程师",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 63,
+   "birthday": "1991-02-25",
+   "hire_date": "2022-06-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E023",
+   "name": "周文杰",
+   "dept": "电控部",
+   "post": "电气调试",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "电气调试",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 44,
+   "birthday": "1991-02-06",
+   "hire_date": "2021-07-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E024",
+   "name": "杨建国",
+   "dept": "生产部",
+   "post": "生产经理",
+   "perm": "审批流程",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "生产经理",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 98,
+   "birthday": "1991-02-23",
+   "hire_date": "2025-12-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E025",
+   "name": "孙伟杰",
+   "dept": "生产部",
+   "post": "生产主管",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "生产主管",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 52,
+   "birthday": "1990-02-09",
+   "hire_date": "2024-09-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E026",
+   "name": "吴建华",
+   "dept": "生产部",
+   "post": "装配主管",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "装配主管",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 94,
+   "birthday": "1990-07-06",
+   "hire_date": "2023-02-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E027",
+   "name": "郑志强",
+   "dept": "生产部",
+   "post": "调试工程师",
+   "perm": "查看订单",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "调试工程师",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 33,
+   "birthday": "1991-10-01",
+   "hire_date": "2023-11-01",
+   "event": "生日"
+  },
+  {
+   "id": "E028",
+   "name": "刘海峰",
+   "dept": "生产部",
+   "post": "装配技师",
+   "perm": "查看订单",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "装配技师",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 141,
+   "birthday": "1990-07-27",
+   "hire_date": "2022-06-01",
+   "event": "生日"
+  },
+  {
+   "id": "E029",
+   "name": "黄志鹏",
+   "dept": "生产部",
+   "post": "装配技师",
+   "perm": "知识库维护",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "装配技师",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 124,
+   "birthday": "1990-08-15",
+   "hire_date": "2025-01-01",
+   "event": "生日"
+  },
+  {
+   "id": "E030",
+   "name": "马俊杰",
+   "dept": "生产部",
+   "post": "机加工主管",
+   "perm": "审批流程",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "机加工主管",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 24,
+   "birthday": "1991-02-09",
+   "hire_date": "2020-05-01",
+   "event": "生日"
+  },
+  {
+   "id": "E031",
+   "name": "高文博",
+   "dept": "生产部",
+   "post": "机加工技师",
+   "perm": "审批流程",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "机加工技师",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 115,
+   "birthday": "1990-02-25",
+   "hire_date": "2021-01-01",
+   "event": "生日"
+  },
+  {
+   "id": "E032",
+   "name": "梁志伟",
+   "dept": "生产部",
+   "post": "生产技师",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "生产技师",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 94,
+   "birthday": "1990-06-05",
+   "hire_date": "2021-08-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E033",
+   "name": "许文涛",
+   "dept": "售后部",
+   "post": "售后工程师",
+   "perm": "知识库维护",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "售后工程师",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 135,
+   "birthday": "1990-06-06",
+   "hire_date": "2023-09-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E034",
+   "name": "罗俊杰",
+   "dept": "售后部",
+   "post": "售后工程师",
+   "perm": "知识库维护",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "售后工程师",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 127,
+   "birthday": "1990-08-01",
+   "hire_date": "2024-04-01",
+   "event": "生日"
+  },
+  {
+   "id": "E035",
+   "name": "陈浩宇",
+   "dept": "售后部",
+   "post": "售后工程师",
+   "perm": "生产数据查看",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "售后工程师",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 124,
+   "birthday": "1990-01-14",
+   "hire_date": "2024-02-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E036",
+   "name": "张凯文",
+   "dept": "售后部",
+   "post": "售后工程师",
+   "perm": "知识库维护",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "售后工程师",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 104,
+   "birthday": "1991-10-28",
+   "hire_date": "2020-03-01",
+   "event": "生日"
+  },
+  {
+   "id": "E037",
+   "name": "刘志鹏",
+   "dept": "售后部",
+   "post": "售后工程师",
+   "perm": "查看订单",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "售后工程师",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 70,
+   "birthday": "1990-07-08",
+   "hire_date": "2021-08-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E038",
+   "name": "黄伟强",
+   "dept": "采购部",
+   "post": "采购经理",
+   "perm": "审批流程",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "采购经理",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 80,
+   "birthday": "1990-09-25",
+   "hire_date": "2021-10-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E039",
+   "name": "周晓峰",
+   "dept": "采购部",
+   "post": "采购专员",
+   "perm": "查看订单",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "采购专员",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 106,
+   "birthday": "1990-04-28",
+   "hire_date": "2025-03-01",
+   "event": "生日"
+  },
+  {
+   "id": "E040",
+   "name": "陈晓东",
+   "dept": "采购部",
+   "post": "采购专员",
+   "perm": "审批流程",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "采购专员",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 133,
+   "birthday": "1990-06-06",
+   "hire_date": "2024-06-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E041",
+   "name": "林晓明",
+   "dept": "采购部",
+   "post": "采购专员",
+   "perm": "审批流程",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "采购专员",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 124,
+   "birthday": "1990-03-28",
+   "hire_date": "2023-07-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E042",
+   "name": "刘海涛",
+   "dept": "仓库",
+   "post": "仓库主管",
+   "perm": "知识库维护",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "仓库主管",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 41,
+   "birthday": "1990-02-05",
+   "hire_date": "2020-07-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E043",
+   "name": "王建国",
+   "dept": "仓库",
+   "post": "仓管员",
+   "perm": "查看订单",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "仓管员",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 134,
+   "birthday": "1990-01-04",
+   "hire_date": "2024-09-01",
+   "event": "生日"
+  },
+  {
+   "id": "E044",
+   "name": "赵明辉",
+   "dept": "仓库",
+   "post": "仓管员",
+   "perm": "审批流程",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "仓管员",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 78,
+   "birthday": "1990-08-23",
+   "hire_date": "2024-08-01",
+   "event": "生日"
+  },
+  {
+   "id": "E045",
+   "name": "李晓峰",
+   "dept": "质检部",
+   "post": "质量主管",
+   "perm": "知识库维护",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "质量主管",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 93,
+   "birthday": "1990-07-14",
+   "hire_date": "2023-11-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E046",
+   "name": "陈文杰",
+   "dept": "质检部",
+   "post": "质检员",
+   "perm": "审批流程",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "质检员",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 137,
+   "birthday": "1990-03-20",
+   "hire_date": "2020-03-01",
+   "event": "生日"
+  },
+  {
+   "id": "E047",
+   "name": "张海涛",
+   "dept": "质检部",
+   "post": "质检员",
+   "perm": "知识库维护",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "质检员",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 38,
+   "birthday": "1990-01-14",
+   "hire_date": "2023-03-01",
+   "event": "生日"
+  },
+  {
+   "id": "E048",
+   "name": "赵婷婷",
+   "dept": "财务部",
+   "post": "会计",
+   "perm": "生产数据查看",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "会计",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 125,
+   "birthday": "1991-10-22",
+   "hire_date": "2023-06-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E049",
+   "name": "刘芳菲",
+   "dept": "财务部",
+   "post": "出纳",
+   "perm": "生产数据查看",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "出纳",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 107,
+   "birthday": "1991-10-25",
+   "hire_date": "2022-12-01",
+   "event": "生日"
+  },
+  {
+   "id": "E050",
+   "name": "黄婷婷",
+   "dept": "行政部",
+   "post": "行政主管",
+   "perm": "审批流程",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "行政主管",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 121,
+   "birthday": "1990-08-16",
+   "hire_date": "2022-11-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E051",
+   "name": "张晓琳",
+   "dept": "人事部",
+   "post": "人事专员",
+   "perm": "审批流程",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "人事专员",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 96,
+   "birthday": "1990-09-26",
+   "hire_date": "2024-10-01",
+   "event": "生日"
+  },
+  {
+   "id": "E052",
+   "name": "陈丽娜",
+   "dept": "人事部",
+   "post": "招聘专员",
+   "perm": "生产数据查看",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "招聘专员",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 8,
+   "birthday": "1990-04-11",
+   "hire_date": "2023-12-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E053",
+   "name": "何俊峰",
+   "dept": "IT部",
+   "post": "系统管理员",
+   "perm": "审批流程",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "系统管理员",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 76,
+   "birthday": "1990-04-20",
+   "hire_date": "2020-02-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E054",
+   "name": "吴天宇",
+   "dept": "IT部",
+   "post": "数据工程师",
+   "perm": "生产数据查看",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "数据工程师",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 134,
+   "birthday": "1990-07-05",
+   "hire_date": "2025-07-01",
+   "event": "生日"
+  },
+  {
+   "id": "E055",
+   "name": "周浩宇",
+   "dept": "研发部",
+   "post": "研发工程师",
+   "perm": "审批流程",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "研发工程师",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 130,
+   "birthday": "1991-01-20",
+   "hire_date": "2025-09-01",
+   "event": "生日"
+  },
+  {
+   "id": "E056",
+   "name": "王俊杰",
+   "dept": "研发部",
+   "post": "机械工程师",
+   "perm": "审批流程",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "机械工程师",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 140,
+   "birthday": "1990-07-15",
+   "hire_date": "2020-06-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E057",
+   "name": "陈宇航",
+   "dept": "生产部",
+   "post": "生产技师",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "生产技师",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 121,
+   "birthday": "1991-01-04",
+   "hire_date": "2023-04-01",
+   "event": "生日"
+  },
+  {
+   "id": "E058",
+   "name": "林浩然",
+   "dept": "生产部",
+   "post": "装配技师",
+   "perm": "审批流程",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "装配技师",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 22,
+   "birthday": "1990-07-10",
+   "hire_date": "2023-03-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E059",
+   "name": "张文博",
+   "dept": "生产部",
+   "post": "调试工程师",
+   "perm": "审批流程",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "调试工程师",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 149,
+   "birthday": "1990-04-08",
+   "hire_date": "2025-10-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E060",
+   "name": "李俊豪",
+   "dept": "售后部",
+   "post": "售后工程师",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "售后工程师",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 37,
+   "birthday": "1990-06-17",
+   "hire_date": "2024-12-01",
+   "event": "生日"
+  },
+  {
+   "id": "E061",
+   "name": "陈俊杰",
+   "dept": "售后部",
+   "post": "售后工程师",
+   "perm": "查看订单",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "售后工程师",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 76,
+   "birthday": "1990-03-23",
+   "hire_date": "2021-12-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E062",
+   "name": "王志强",
+   "dept": "采购部",
+   "post": "采购专员",
+   "perm": "知识库维护",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "采购专员",
+    "设备/业务协作"
+   ],
+   "problem": "售后维修",
+   "collab": 87,
+   "birthday": "1990-05-02",
+   "hire_date": "2020-04-01",
+   "event": "生日"
+  },
+  {
+   "id": "E063",
+   "name": "张伟杰",
+   "dept": "采购部",
+   "post": "供应商管理",
+   "perm": "知识库维护",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "供应商管理",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 12,
+   "birthday": "1991-02-11",
+   "hire_date": "2020-05-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E064",
+   "name": "刘宇航",
+   "dept": "仓库",
+   "post": "仓管员",
+   "perm": "查看订单",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "仓管员",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 94,
+   "birthday": "1990-05-01",
+   "hire_date": "2025-07-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E065",
+   "name": "吴俊杰",
+   "dept": "仓库",
+   "post": "仓管员",
+   "perm": "查看订单",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "仓管员",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 69,
+   "birthday": "1990-09-22",
+   "hire_date": "2025-10-01",
+   "event": "生日"
+  },
+  {
+   "id": "E066",
+   "name": "周志强",
+   "dept": "质检部",
+   "post": "质检员",
+   "perm": "查看订单",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "质检员",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 55,
+   "birthday": "1990-06-24",
+   "hire_date": "2021-07-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E067",
+   "name": "杨浩宇",
+   "dept": "质检部",
+   "post": "质检员",
+   "perm": "知识库维护",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "质检员",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 9,
+   "birthday": "1990-04-12",
+   "hire_date": "2024-06-01",
+   "event": "生日"
+  },
+  {
+   "id": "E068",
+   "name": "郑凯文",
+   "dept": "销售部",
+   "post": "销售专员",
+   "perm": "查看订单",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "销售专员",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 10,
+   "birthday": "1991-02-13",
+   "hire_date": "2022-07-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E069",
+   "name": "黄子轩",
+   "dept": "销售部",
+   "post": "销售专员",
+   "perm": "查看订单",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "销售专员",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 130,
+   "birthday": "1990-03-11",
+   "hire_date": "2025-07-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E070",
+   "name": "陈宇杰",
+   "dept": "销售部",
+   "post": "销售专员",
+   "perm": "生产数据查看",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "销售专员",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 92,
+   "birthday": "1990-08-05",
+   "hire_date": "2022-06-01",
+   "event": "生日"
+  },
+  {
+   "id": "E071",
+   "name": "林志豪",
+   "dept": "电控部",
+   "post": "电气工程师",
+   "perm": "生产数据查看",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "电气工程师",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 115,
+   "birthday": "1991-01-01",
+   "hire_date": "2020-12-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E072",
+   "name": "赵文博",
+   "dept": "电控部",
+   "post": "电气调试",
+   "perm": "生产数据查看",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "电气调试",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 55,
+   "birthday": "1990-07-02",
+   "hire_date": "2025-09-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E073",
+   "name": "高俊杰",
+   "dept": "行政部",
+   "post": "行政专员",
+   "perm": "查看订单",
+   "perm_suggest": "建议开通",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "行政专员",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 54,
+   "birthday": "1990-09-27",
+   "hire_date": "2025-06-01",
+   "event": "入司周年"
+  },
+  {
+   "id": "E074",
+   "name": "李娜娜",
+   "dept": "财务部",
+   "post": "财务专员",
+   "perm": "知识库维护",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "财务专员",
+    "设备/业务协作"
+   ],
+   "problem": "财务审核",
+   "collab": 147,
+   "birthday": "1991-02-20",
+   "hire_date": "2025-10-01",
+   "event": "生日"
+  },
+  {
+   "id": "E075",
+   "name": "王丽娜",
+   "dept": "财务部",
+   "post": "财务专员",
+   "perm": "审批流程",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "财务专员",
+    "设备/业务协作"
+   ],
+   "problem": "采购协同",
+   "collab": 57,
+   "birthday": "1990-01-20",
+   "hire_date": "2023-05-01",
+   "event": "生日"
+  },
+  {
+   "id": "E076",
+   "name": "张萌萌",
+   "dept": "行政部",
+   "post": "行政专员",
+   "perm": "审批流程",
+   "perm_suggest": "限制访问",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "行政专员",
+    "设备/业务协作"
+   ],
+   "problem": "包装机调试",
+   "collab": 25,
+   "birthday": "1990-01-05",
+   "hire_date": "2020-11-01",
+   "event": "生日"
+  },
+  {
+   "id": "E077",
+   "name": "陈晓伟",
+   "dept": "研发部",
+   "post": "研发助理",
+   "perm": "审批流程",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "研发助理",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 60,
+   "birthday": "1991-02-10",
+   "hire_date": "2021-10-01",
+   "event": "生日"
+  },
+  {
+   "id": "E078",
+   "name": "孙浩然",
+   "dept": "生产部",
+   "post": "生产计划",
+   "perm": "审批流程",
+   "perm_suggest": "保持现有",
+   "perm_reason": "岗位职责+历史操作推理",
+   "skills": [
+    "生产计划",
+    "设备/业务协作"
+   ],
+   "problem": "订单跟进",
+   "collab": 116,
+   "birthday": "1990-06-01",
+   "hire_date": "2021-08-01",
+   "event": "入司周年"
+  }
+ ],
+ "hr": [
+  {
+   "dept": "管理层",
+   "headcount": 1,
+   "quarterly_left": 0,
+   "rate": 0.0,
+   "alert": "建议补充"
+  },
+  {
+   "dept": "财务部",
+   "headcount": 5,
+   "quarterly_left": 0,
+   "rate": 0.0,
+   "alert": "稳定"
+  },
+  {
+   "dept": "售后部",
+   "headcount": 9,
+   "quarterly_left": 0,
+   "rate": 0.0,
+   "alert": "稳定"
+  },
+  {
+   "dept": "销售部",
+   "headcount": 13,
+   "quarterly_left": 2,
+   "rate": 15.4,
+   "alert": "稳定"
+  },
+  {
+   "dept": "信息部",
+   "headcount": 1,
+   "quarterly_left": 0,
+   "rate": 0.0,
+   "alert": "建议补充"
+  },
+  {
+   "dept": "研发部",
+   "headcount": 8,
+   "quarterly_left": 1,
+   "rate": 12.5,
+   "alert": "稳定"
+  },
+  {
+   "dept": "电控部",
+   "headcount": 5,
+   "quarterly_left": 2,
+   "rate": 40.0,
+   "alert": "稳定"
+  },
+  {
+   "dept": "生产部",
+   "headcount": 13,
+   "quarterly_left": 1,
+   "rate": 7.7,
+   "alert": "稳定"
+  },
+  {
+   "dept": "采购部",
+   "headcount": 6,
+   "quarterly_left": 1,
+   "rate": 16.7,
+   "alert": "稳定"
+  },
+  {
+   "dept": "仓库",
+   "headcount": 5,
+   "quarterly_left": 1,
+   "rate": 20.0,
+   "alert": "稳定"
+  },
+  {
+   "dept": "质检部",
+   "headcount": 5,
+   "quarterly_left": 1,
+   "rate": 20.0,
+   "alert": "稳定"
+  },
+  {
+   "dept": "行政部",
+   "headcount": 3,
+   "quarterly_left": 2,
+   "rate": 66.7,
+   "alert": "建议补充"
+  },
+  {
+   "dept": "人事部",
+   "headcount": 2,
+   "quarterly_left": 0,
+   "rate": 0.0,
+   "alert": "建议补充"
+  },
+  {
+   "dept": "IT部",
+   "headcount": 2,
+   "quarterly_left": 1,
+   "rate": 50.0,
+   "alert": "建议补充"
+  }
+ ],
+ "dashboard": [
+  {
+   "metric": "员工总数",
+   "value": "80"
+  },
+  {
+   "metric": "部门数量",
+   "value": "14"
+  },
+  {
+   "metric": "技能标签数量",
+   "value": "80"
+  },
+  {
+   "metric": "权限规则数量",
+   "value": "80"
+  },
+  {
+   "metric": "知识关联人数",
+   "value": "80"
+  },
+  {
+   "metric": "审批路径",
+   "value": "采购/合同/费用/生产"
+  }
+ ]
+}

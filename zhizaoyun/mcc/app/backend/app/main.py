@@ -1,0 +1,294 @@
+# -*- coding: utf-8 -*-
+"""管理协同中心 - FastAPI 入口（组织与知识管理，功能22-27）。
+接入方式与「合同管理/智能客服」一致：前端无 token 时自动请求同源 /sso-token，
+服务端以共享坐席签发会话令牌，前端零凭证暴露，Hub iframe 内嵌免登录。
+
+六大功能各对接一个 WeKnora(8001 知识库) 智能体，AI 问答为主：
+22 权限系统与组织架构管理 / 23 全员通讯录与即时协作 / 24 智能知识库系统
+25 审批流引擎 / 26 员工信息与生日管理 / 27 人力资源数据分析
+"""
+import base64
+import hashlib
+import hmac
+import json
+import os
+import threading
+import time
+import uuid
+from datetime import datetime, date, timedelta
+
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from pydantic import BaseModel
+
+from . import weknora
+
+SECRET = os.environ.get("MCC_SECRET", "mcc-hub-sso-secret-20260918")
+STATIC_DIR = os.environ.get("MCC_STATIC", os.path.join(os.path.dirname(__file__), "..", "static"))
+SHARED_USER = {"name": "hub", "display": "管理协同中心（共享坐席）"}
+
+MODULES = {
+    "perm": {"no": 22, "name": "权限系统与组织架构管理",
+             "agent": "权限规则推理智能体",
+             "desc": "根据岗位职责自动生成权限配置建议清单，降低配置错误与越权风险",
+             "quick": ["生成生产部的权限配置建议清单", "李华婷的权限建议是什么？",
+                       "哪些员工存在越权风险？", "仓库应该有什么权限？"]},
+    "contact": {"no": 23, "name": "全员通讯录与即时协作",
+                "agent": "人员信息关联智能体",
+                "desc": "聚合技能标签、协作记录，支持“找谁修XX？”一键推荐",
+                "quick": ["包装机异响找谁修？", "财务审核问题找谁？",
+                          "推荐订单跟进的协作人选", "谭百福的技能标签是什么？"]},
+    "kb": {"no": 24, "name": "智能知识库系统",
+           "agent": "知识结构化与检索智能体",
+           "desc": "解析SOP、维修日志、合同，构建向量语义库，支持“设备异响怎么修？”秒级响应",
+           "quick": ["设备异响怎么修？", "枕式包装机温控怎么设定？",
+                     "合同付款条款要注意什么？", "包装机日常保养有哪些要求？"]},
+    "approval": {"no": 25, "name": "审批流引擎",
+                 "agent": "审批路径推荐智能体",
+                 "desc": "根据申请内容（如“采购5万”）、历史轨迹、权限规则，推荐最可通过的审批人组合",
+                 "quick": ["采购5万元备件走什么审批路径？", "报销800元的费用审批怎么走？",
+                           "30万的设备采购需要谁审批？", "哪些人有审批权限？"]},
+    "care": {"no": 26, "name": "员工信息与生日管理",
+             "agent": "员工关怀触发智能体",
+             "desc": "自动识别生日／入司日，生成个性化祝福语并推送至员工群",
+             "quick": ["本月有哪些员工过生日？", "给谭百福生成生日祝福",
+                       "生成本月关怀推送清单", "今年入司满周年的员工有哪些？"]},
+    "hr": {"no": 27, "name": "人力资源数据分析",
+           "agent": "人员流动预测智能体",
+           "desc": "分析离职率、空缺周期，识别产线操作员季度流失率并输出招聘预警",
+           "quick": ["输出本季度招聘预警报告", "哪些部门离职风险最高？",
+                     "产线操作员的季度流失率是多少？", "行政部需要补充几个人？"]},
+}
+
+app = FastAPI(title="管理协同中心", docs_url=None, redoc_url=None)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+# ---------- 种子数据 ----------
+_seed_path = os.path.join(os.path.dirname(__file__), "mcc_seed.json")
+with open(_seed_path, encoding="utf-8") as f:
+    SEED = json.load(f)
+
+
+# ---------- 认证 ----------
+def issue_token(user: str, days: int = 7) -> str:
+    payload = f"{user}|{int(time.time()) + days * 86400}"
+    sig = hmac.new(SECRET.encode(), payload.encode(), hashlib.sha256).hexdigest()[:32]
+    return base64.urlsafe_b64encode(f"{payload}|{sig}".encode()).decode()
+
+
+def verify_token(token: str):
+    try:
+        raw = base64.urlsafe_b64decode(token.encode()).decode()
+        user, exp, sig = raw.rsplit("|", 2)
+        if int(exp) < time.time():
+            return None
+        expect = hmac.new(SECRET.encode(), f"{user}|{exp}".encode(), hashlib.sha256).hexdigest()[:32]
+        return user if hmac.compare_digest(sig, expect) else None
+    except Exception:
+        return None
+
+
+@app.middleware("http")
+async def auth_guard(request: Request, call_next):
+    path = request.url.path
+    open_paths = ("/sso-token", "/api/login", "/api/health", "/login")
+    if path.startswith("/api") and not any(path.startswith(p) for p in open_paths):
+        token = request.headers.get("X-Token", "")
+        if not verify_token(token):
+            return JSONResponse({"detail": "unauthorized"}, status_code=401)
+    return await call_next(request)
+
+
+@app.get("/sso-token")
+def sso_token():
+    """Hub iframe 免登录：签发共享坐席令牌。"""
+    return {"token": issue_token(SHARED_USER["name"]), "user": SHARED_USER}
+
+
+@app.post("/api/login")
+def login(body: dict = None):
+    user = (body or {}).get("username") or "hub"
+    return {"token": issue_token(user), "user": {"name": user, "display": SHARED_USER["display"]}}
+
+
+@app.get("/api/health")
+def health():
+    return {"ok": True, "weknora": weknora.health(),
+            "kb": weknora.KB_NAME, "time": datetime.now().isoformat(timespec="seconds")}
+
+
+# ---------- 模块与智能体 ----------
+@app.get("/api/modules")
+def modules():
+    agents = {}
+    try:
+        agents = weknora.agent_ids()
+    except weknora.WeknoraError:
+        pass
+    out = []
+    for key, m in MODULES.items():
+        aid = agents.get(m["agent"])
+        out.append({"key": key, "no": m["no"], "name": m["name"], "desc": m["desc"],
+                    "agent": m["agent"], "agent_id": aid,
+                    "agent_status": "已注册" if aid else "未注册",
+                    "quick": m["quick"]})
+    return {"modules": out, "kb": weknora.KB_NAME}
+
+
+# ---------- AI 问答 ----------
+class ChatBody(BaseModel):
+    query: str
+    session_id: str = ""
+
+
+# ---------- 运行历史（可追溯） ----------
+HISTORY_PATH = os.path.join(os.path.dirname(__file__), "run_history.json")
+_HIST_LOCK = threading.Lock()
+
+def _load_history():
+    try:
+        with open(HISTORY_PATH, encoding="utf-8") as f:
+            return json.load(f).get("events", [])
+    except Exception:  # noqa: BLE001
+        return []
+
+def _save_history(events):
+    with open(HISTORY_PATH, "w", encoding="utf-8") as f:
+        json.dump({"events": events[-8000:]}, f, ensure_ascii=False)
+
+def append_history(module, kind, query, summary, status, duration_ms):
+    ev = {"id": uuid.uuid4().hex, "ts": datetime.now().isoformat(timespec="milliseconds"),
+          "module": module, "kind": kind, "actor": SHARED_USER["display"],
+          "query": (query or "")[:300], "summary": (summary or "")[:300],
+          "status": status, "duration_ms": duration_ms}
+    with _HIST_LOCK:
+        evs = _load_history()
+        evs.append(ev)
+        _save_history(evs)
+
+@app.get("/api/history")
+def api_history(module: str = "", days: int = 30, limit: int = 300):
+    events = _load_history()
+    cutoff = (datetime.now() - timedelta(days=max(1, days))).isoformat()
+    rows = [e for e in events if e["ts"] >= cutoff and (not module or e["module"] == module)]
+    by_day = {}
+    for e in rows:
+        d = e["ts"][:10]
+        by_day[d] = by_day.get(d, 0) + 1
+    days_list = []
+    cur = datetime.now().date() - timedelta(days=max(1, days) - 1)
+    for _ in range(max(1, days)):
+        days_list.append({"date": cur.isoformat(), "count": by_day.get(cur.isoformat(), 0)})
+        cur += timedelta(days=1)
+    ok = sum(1 for e in rows if e["status"] == "success")
+    return {"total": len(rows),
+            "success_rate": round(ok / len(rows) * 100, 1) if rows else 100.0,
+            "by_day": days_list,
+            "rows": list(reversed(rows[-min(limit, 500):]))}
+
+@app.post("/api/chat/{module}")
+def chat(module: str, body: ChatBody):
+    if module not in MODULES:
+        return JSONResponse({"detail": "unknown module"}, status_code=404)
+    if not body.query.strip():
+        return JSONResponse({"detail": "empty query"}, status_code=400)
+    try:
+        session_id = body.session_id or weknora.create_session(
+            "管理协同中心·%s" % MODULES[module]["name"])
+    except weknora.WeknoraError as e:
+        return JSONResponse({"detail": str(e)}, status_code=502)
+
+    t0 = time.time()
+
+    def gen():
+        answer, err = [], None
+        yield "event: session\ndata: %s\n\n" % json.dumps({"session_id": session_id})
+        try:
+            for kind, payload in weknora.iter_agent_chat(session_id, body.query, module):
+                if kind == "delta":
+                    answer.append(str(payload))
+                    yield "event: delta\ndata: %s\n\n" % json.dumps(
+                        {"text": weknora.clean_inline_tags(payload)})
+                elif kind == "refs":
+                    yield "event: refs\ndata: %s\n\n" % json.dumps({"refs": payload})
+                elif kind == "error":
+                    err = str(payload)
+                    yield "event: error\ndata: %s\n\n" % json.dumps({"message": str(payload)})
+        except Exception as e:  # noqa: BLE001
+            err = str(e)
+            yield "event: error\ndata: %s\n\n" % json.dumps({"message": str(e)})
+        yield "event: done\ndata: {}\n\n"
+        try:
+            text = "".join(answer)
+            append_history(module, "agent_chat", body.query,
+                           text[:260] if text else (err or "")[:260],
+                           "error" if err else "success",
+                           int((time.time() - t0) * 1000))
+        except Exception:  # noqa: BLE001 - 历史记录失败不影响响应
+            pass
+
+    return StreamingResponse(gen(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+# ---------- 结构化数据（表格展示，与知识库同源） ----------
+@app.get("/api/data/dashboard")
+def data_dashboard():
+    return {"metrics": SEED["dashboard"], "hr": SEED["hr"]}
+
+
+@app.get("/api/data/employees")
+def data_employees(dept: str = "", q: str = ""):
+    rows = SEED["employees"]
+    if dept:
+        rows = [r for r in rows if r["dept"] == dept]
+    if q:
+        rows = [r for r in rows if q in r["name"] or q in r["post"] or q in r["id"]
+                or any(q in s for s in r["skills"]) or q in (r["problem"] or "")]
+    return {"total": len(rows), "rows": rows}
+
+
+@app.get("/api/data/hr")
+def data_hr():
+    return {"quarter": "2026Q3", "rows": SEED["hr"]}
+
+
+@app.get("/api/data/care")
+def data_care(month: int = 0):
+    rows = []
+    today = date.today()
+    for r in SEED["employees"]:
+        b = r.get("birthday") or ""
+        h = r.get("hire_date") or ""
+        bm = int(b[5:7]) if len(b) >= 7 and b[5:7].isdigit() else None
+        hm = int(h[5:7]) if len(h) >= 7 and h[5:7].isdigit() else None
+        if month and bm != month and hm != month:
+            continue
+        rows.append({"id": r["id"], "name": r["name"], "dept": r["dept"],
+                     "birthday": b, "hire_date": h,
+                     "birthday_this_month": bm == today.month,
+                     "anniversary_this_month": hm == today.month})
+    rows.sort(key=lambda x: (x.get("birthday") or "9999")[5:])
+    total_known = sum(1 for e in SEED["employees"] if e.get("birthday") or e.get("hire_date"))
+    return {"month": month or today.month, "total": len(rows), "rows": rows,
+            "total_known": total_known, "total_employees": len(SEED["employees"])}
+
+
+@app.get("/api/kb/overview")
+def kb_overview():
+    try:
+        return {"ok": True, "kbs": weknora.kb_overview()}
+    except weknora.WeknoraError as e:
+        return {"ok": False, "detail": str(e), "kbs": []}
+
+
+# ---------- 前端静态资源 ----------
+@app.get("/")
+def index():
+    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
+
+@app.get("/login")
+def login_page():
+    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
