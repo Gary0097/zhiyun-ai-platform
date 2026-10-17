@@ -49,3 +49,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-office-installe
 
 撤回本 PR 并重装先前通过验收的发行包；用户 Workspace/账号不迁移、不删除。旧版系统仍可忽略新增 extras/libreoffice 目录。
 版本锁不变化时重复安装走标记快路径；主动修复仅影响本安装的托管办公依赖，不改系统 Python 或用户原始文档。
+
+## 2026-10-17 Windows 实包验收记录
+
+- 交付版本：2.2.1-office-1.6.0；安装包产品源码提交 `2161a13c41fe95dbccf6abc8bfeb6ad122cca6bd`。后续提交仅包含验收脚本代理修正、报告和版本清单。
+- EXE：944.30 MiB，SHA-256 `43f8d668b2f5f4524354dace52c577d91f5fbc7cacbcc244ffe69533a6b87ce3`。
+- ZIP：944.24 MiB，SHA-256 `175741ccf11a577105b2badfe2036d39145f9bc3086d7301f71c44844d40cefd`。EXE 末尾载荷与该 ZIP 哈希一致；ZIP 完整 CRC 校验通过，无重复 MSI。
+- 最终验收使用全新中文含空格目录、系统最小 PATH、断网代理与 UV_OFFLINE，成功解压 77,439 文件并完成运行时和办公安装。只豁免本机回环地址，以便检测本地页面；原验收脚本遗漏 NO_PROXY 导致计时误报，修正后完整重跑通过。
+- 七组实际文件测试通过：Word、Excel、PPT、PDF、本地中文 OCR、文件/数据/图像处理、LibreOffice 转换与重算。包括 Word/PPT 导出 PDF、Excel 公式及缓存值验证。
+- ONNX 实际加载安装目录 Python 自带 MSVCP，两个 Python 缓存名称均包含 VC DLL，不依赖宿主预装运行库。
+- 重复 setup 使用标记快速返回；缺失标记时启动只提示、安装阶段离线恢复；删除受管 docx 文件后主动离线修复恢复成功。
+- 首次完整启动到 HTTP 200 为 29.687 秒，第二次 18.763 秒（当前 Windows 主机实测，包含运行时诊断和服务启动）；两次启动没有改写办公依赖标记。匿名 token 验证均返回 401。
+- 完整 `verify-release.mjs` 门禁通过，包含现有 Windows 安装器回归；当前分支包含最新 master。此次没有进行独立干净虚拟机或图形向导人工验收。
+- 模型账号/权重不入包；云 OCR、联网研究、桌面 GUI 和模型对话不计入本轮离线文件能力通过项。此前模型对话验收见 PR #160。

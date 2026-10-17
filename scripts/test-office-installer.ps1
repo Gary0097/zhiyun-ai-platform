@@ -29,12 +29,13 @@ $SourceDir = Join-Path $PSScriptRoot 'exe-installer'
 $Exe = Join-Path $Build 'office-installer-test.exe'
 & $Compiler /nologo /target:exe /main:OfficeInstallerAcceptance "/out:$Exe" /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll "$SourceDir\bootstrap.cs" "$SourceDir\wizard.cs" "$SourceDir\uninstaller.cs" "$Build\VersionInfo.cs" "$Build\acceptance.cs"
 if ($LASTEXITCODE -ne 0) { throw 'Acceptance harness compilation failed' }
-$previous = @{ UV_OFFLINE=$env:UV_OFFLINE; HTTP_PROXY=$env:HTTP_PROXY; HTTPS_PROXY=$env:HTTPS_PROXY; ALL_PROXY=$env:ALL_PROXY; Path=$env:Path; SOFFICE=$env:SOFFICE; PYTHONUTF8=$env:PYTHONUTF8; PYTHONPATH=$env:PYTHONPATH; PYTHONHOME=$env:PYTHONHOME }
+$previous = @{ NO_PROXY=$env:NO_PROXY; UV_OFFLINE=$env:UV_OFFLINE; HTTP_PROXY=$env:HTTP_PROXY; HTTPS_PROXY=$env:HTTPS_PROXY; ALL_PROXY=$env:ALL_PROXY; Path=$env:Path; SOFFICE=$env:SOFFICE; PYTHONUTF8=$env:PYTHONUTF8; PYTHONPATH=$env:PYTHONPATH; PYTHONHOME=$env:PYTHONHOME }
 try {
   $env:UV_OFFLINE='1'
   $env:HTTP_PROXY='http://127.0.0.1:9'
   $env:HTTPS_PROXY='http://127.0.0.1:9'
   $env:ALL_PROXY='http://127.0.0.1:9'
+  $env:NO_PROXY='127.0.0.1,localhost,::1'
   $env:Path = "$env:WINDIR\System32;$env:WINDIR;$env:WINDIR\System32\WindowsPowerShell\v1.0"
   Remove-Item Env:PYTHONPATH,Env:PYTHONHOME -ErrorAction SilentlyContinue
   & $Exe $Archive $Target
