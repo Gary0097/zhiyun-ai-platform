@@ -1,6 +1,6 @@
 product: zhiyun-ai-os
 version: 2.2.1-office-1.6.0
-source_commit: 2161a13c41fe95dbccf6abc8bfeb6ad122cca6bd
+source_commit: a7f6e6618a5b0032b2c1276a979aa8665de11c22
 qwenpaw: 2.2.1
 libreoffice: 26.8.1
 office_dependencies: pinned, installed during setup
