@@ -13,6 +13,7 @@ python-pptx>=1.0          # office-ppt：.pptx 生成与编辑
 pdfplumber>=0.11          # office-pdf：文本/表格提取
 pypdf>=5.0                # office-pdf：合并/拆分/加密
 fpdf2>=2.8                # office-pdf：从零生成 PDF（含中文字体嵌入）
+pypdfium2>=4.30           # office-pdf/OCR：PDF 页面渲染，无需外部程序
 
 # --- 通用读取与转换 ---
 Pillow>=10.0              # 图片处理（OCR 前置、素材校验）

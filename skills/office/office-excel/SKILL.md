@@ -57,9 +57,12 @@ soffice --version    # 可选：重算公式/导 PDF 需要 LibreOffice
 
 ## 4. 公式与重算注意
 
-- openpyxl 写入公式后不会计算值；没有 LibreOffice 重算时，单元格显示为空或 0，
-  属正常现象——交付时说明"首次在 Excel/WPS 打开后自动计算"，
-  或用 LibreOffice `--convert-to xlsx` 重算一遍。
+- openpyxl 写入公式后不会计算缓存值。设置
+  `wb.calculation.fullCalcOnLoad = True` 和 `wb.calculation.forceFullCalc = True`。
+  交付前用 Excel/WPS 或 LibreOffice 在独立输出目录重算，重新以
+  `data_only=True` 打开，核对公式结果与错误值。没有重算引擎时必须注明
+  “公式缓存未验证，需在 Excel/WPS 打开后重算”，不得宣称计算已验收。
+  LibreOffice 输入和输出不能指向同一个文件；重算后还要确认公式仍保留。
 - 公式引用区域随数据行数变化时，用整列引用或命名区域，避免追加数据后漏行。
 
 ## 5. 交付前检查单

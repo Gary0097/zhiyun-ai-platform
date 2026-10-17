@@ -13,7 +13,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const scriptsRoot = fileURLToPath(new URL('.', import.meta.url))
 const repoRoot = join(scriptsRoot, '..', '..', '..')
 const packRoot = join(repoRoot, 'skills', 'office')
-const { parseRequirements, requirementsHash, resolveVenvPython, ensureOfficeDependencies } =
+const { parseRequirements, requirementsHash, resolveVenvPython, ensureOfficeDependencies, environmentFingerprint, probeOfficeDependencies } =
   await import(pathToFileURL(join(scriptsRoot, 'ensure-office-deps.mjs')).href)
 
 const temp = mkdtempSync(join(tmpdir(), 'aios-office-deps-'))
@@ -56,15 +56,22 @@ try {
   assert.equal(ensureOfficeDependencies({ appRoot: noReqRoot, packRoot: join(temp, 'no-such-pack'), log: quiet }).status, 'skipped')
 
   // ---------- 4) 标记快路径：有效标记直接 up-to-date（不触碰 python） ----------
-  // 借用本仓库真实 appRoot（venv 存在）：先写一个与当前 requirements 匹配的标记
-  const realAppRoot = join(scriptsRoot, '..')
+  // Hermetic fake environment: tests must never touch the installed runtime marker.
+  const realAppRoot = join(temp, 'marker-app')
+  mkdirSync(realAppRoot, { recursive: true })
+  writeFileSync(join(realAppRoot, 'qwenpaw.lock.json'), JSON.stringify({ runtime_dir: 'runtime/test' }))
   const { runtimeRoot } = resolveVenvPython(realAppRoot)
+  const { python: markerPython } = resolveVenvPython(realAppRoot)
+  mkdirSync(join(markerPython, '..'), { recursive: true })
+  writeFileSync(markerPython, 'fake-python')
   const markerPath = join(runtimeRoot, 'office-deps.ok')
   let existedMarker = null
   try { existedMarker = readFileSync(markerPath, 'utf8') } catch { /* 首次运行无标记 */ }
   try {
-    writeFileSync(markerPath, JSON.stringify({ hash: requirementsHash(reqText) }) + '\n', 'utf8')
+    writeFileSync(markerPath, JSON.stringify({ hash: requirementsHash(reqText), environment: environmentFingerprint(markerPython) }) + '\n', 'utf8')
     assert.equal(ensureOfficeDependencies({ appRoot: realAppRoot, packRoot, log: quiet }).status, 'up-to-date')
+    writeFileSync(markerPath, JSON.stringify({ hash: requirementsHash(reqText) }))
+    assert.equal(ensureOfficeDependencies({ appRoot: realAppRoot, packRoot, log: quiet }).status, 'probe-failed', '旧标记不能绕过环境复验')
     // 哈希不匹配的标记无效 → 必须重新探测。用 venv 自带依赖构造临时清单，
     // 避免测试触发真实下载安装（无 venv 环境则返回 no-runtime，同样合法）。
     const stubPack = join(temp, 'stub-pack')
@@ -72,11 +79,23 @@ try {
     writeFileSync(join(stubPack, 'requirements-office.txt'), 'pydantic>=2\npyyaml>=6\n')
     writeFileSync(markerPath, JSON.stringify({ hash: 'stale' }) + '\n', 'utf8')
     const recheck = ensureOfficeDependencies({ appRoot: realAppRoot, packRoot: stubPack, log: quiet })
-    assert.ok(['satisfied', 'no-runtime'].includes(recheck.status), '过期标记必须重新探测（实际：' + recheck.status + '）')
+    assert.equal(recheck.status, 'probe-failed', '过期标记必须探测，假解释器不能成功')
+    writeFileSync(markerPath, JSON.stringify({ hash: requirementsHash(reqText), environment: environmentFingerprint(markerPython) }))
+    writeFileSync(markerPython, 'rebuilt-python-environment')
+    assert.equal(ensureOfficeDependencies({ appRoot: realAppRoot, packRoot, log: quiet }).status, 'probe-failed')
+    rmSync(markerPython)
+    assert.equal(ensureOfficeDependencies({ appRoot: realAppRoot, packRoot, log: quiet }).status, 'no-runtime')
   } finally {
     // 还原真实标记（后续端到端启动还会用到）
     if (existedMarker !== null) writeFileSync(markerPath, existedMarker, 'utf8')
     else rmSync(markerPath, { force: true })
+  }
+
+  // Optional real interpreter regression: module presence must not hide an old version.
+  if (process.env.OFFICE_TEST_PYTHON) {
+    const probe = probeOfficeDependencies(process.env.OFFICE_TEST_PYTHON, parseRequirements('python-docx>=999\nopenpyxl>=3.1\n'))
+    assert.equal(probe.status, 0, probe.stderr)
+    assert.deepEqual(JSON.parse(probe.stdout), ['python-docx>=999'])
   }
 
   // ---------- 5) ensure-workspace 挂接与 CLI --check ----------

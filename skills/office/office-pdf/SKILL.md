@@ -74,7 +74,19 @@ w3 = PdfWriter(); w3.append("a.pdf"); w3.encrypt("用户提供的密码"); w3.wr
   **告知用户**复杂版式（多栏、脚注、精确分栏）只能近似还原；
 - PDF → Markdown：按"标题/段落/表格"结构化输出；配合 `office-ocr` 的
   MinerU 路线可保留公式与复杂版面；
-- PDF → 图片：LibreOffice 转 PDF→PNG，或 Pillow 渲染页缩略图用于人工核对。
+- PDF → 图片：使用已预装的 `pypdfium2` 渲染整页；Pillow 本身不能解码 PDF，
+  不要依赖机器偶然安装的 Ghostscript。逐页保存并关闭资源：
+
+  ```python
+  import pypdfium2 as pdfium
+  with pdfium.PdfDocument("文件.pdf") as pdf:
+      for i in range(len(pdf)):
+          page = pdf[i]
+          bitmap = page.render(scale=200/72)
+          bitmap.to_pil().save(f"第{i+1}页.png")
+          bitmap.close()
+          page.close()
+  ```
 
 ## 6. 交付前检查单
 

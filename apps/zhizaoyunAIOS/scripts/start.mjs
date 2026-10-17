@@ -2,6 +2,7 @@ import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import net from 'node:net'
 import { resolveRuntime, runtimeEnvironment } from './runtime-env.mjs'
 
 // 智造云 AIOS 2.2.1 —— 原生 QwenPaw 2.2.1 启动器（无捆绑业务应用）
@@ -36,8 +37,18 @@ function run (command, args, hint) {
 // 升级/重复启动接管：8088 若被“我们自己的实例”（可执行文件路径含
 // zhizaoyunAIOS / qwenpaw）占用，直接停掉旧进程再启动。外来进程不动，
 // 交给 doctor 的端口检查报错。
-function stopStaleInstance () {
+async function stopStaleInstance () {
   if (process.platform !== 'win32') return false
+  // Most starts have no listener. Avoid loading PowerShell/NetTCPIP just to
+  // discover an unused port; ownership checks below remain mandatory if busy.
+  const listening = await new Promise(resolve => {
+    const socket = net.createConnection({ host: '127.0.0.1', port: 8088 })
+    socket.setTimeout(300)
+    socket.once('connect', () => { socket.destroy(); resolve(true) })
+    socket.once('error', () => { socket.destroy(); resolve(false) })
+    socket.once('timeout', () => { socket.destroy(); resolve(true) })
+  })
+  if (!listening) return false
   const probe = spawnSync('powershell', ['-NoProfile', '-Command',
     "(Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1).OwningProcess"], { encoding: 'utf8' })
   const pid = parseInt((probe.stdout || '').trim(), 10)
@@ -60,7 +71,7 @@ function stopStaleInstance () {
 }
 
 if (!process.argv.includes('--check')) {
-  try { stopStaleInstance() } catch (e) { console.warn('旧实例接管检查失败：', e.message) }
+  try { await stopStaleInstance() } catch (e) { console.warn('旧实例接管检查失败：', e.message) }
 }
 
 run(process.execPath, [join(scriptsRoot, 'doctor.mjs')], '启动诊断未通过；请按上方提示处理后重试。')

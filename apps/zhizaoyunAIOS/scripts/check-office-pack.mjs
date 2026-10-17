@@ -1,4 +1,4 @@
-// 智造云 AIOS 办公版体检（aios-office 分支 v1.5.0）
+// 智造云 AIOS 办公版体检（aios-office 分支 v1.5.1）
 // 一条命令审计办公完全体的全部关键状态，供安装后自检与售后排查：
 //   ① 技能包清单与磁盘一致（frontmatter 合法）
 //   ② 全部智能体工作区 11 项技能已预置且默认启用
@@ -13,6 +13,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { join, dirname } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { parseRequirements, probeOfficeDependencies } from './ensure-office-deps.mjs'
 
 const scriptRoot = dirname(fileURLToPath(import.meta.url))
 const appRoot = join(scriptRoot, '..')
@@ -85,10 +86,10 @@ try {
     if (!existsSync(python)) {
       report(false, '依赖预装', '运行环境未安装', '运行 setup-ai-os.ps1/.sh 安装运行环境')
     } else {
-      const probe = spawnSync(python, ['-c',
-        'from importlib.util import find_spec;import sys;sys.exit(0 if all(find_spec(m) for m in ["docx","openpyxl","pptx","pdfplumber","pypdf","fpdf","PIL","chardet","markdownify","pandas","rapidocr_onnxruntime"]) else 1)'],
-        { encoding: 'utf8', timeout: 120000 })
-      report(probe.status === 0, '依赖预装', probe.status === 0 ? '11 项办公依赖全部可导入' : '存在缺失依赖',
+      const requirements = parseRequirements(readFileSync(join(packRoot, 'requirements-office.txt'), 'utf8'))
+      const probe = probeOfficeDependencies(python, requirements)
+      const missing = probe.status === 0 ? JSON.parse(probe.stdout) : ['依赖探测失败']
+      report(probe.status === 0 && !missing.length, '依赖预装', !missing.length ? `${requirements.length} 项依赖模块和版本满足要求（实际导入另见能力测试）` : '缺失或版本不满足：' + missing.join(', '),
         '重跑 start-ai-os 自动补装，或 node apps/zhizaoyunAIOS/scripts/ensure-office-deps.mjs')
     }
   } catch (e) {

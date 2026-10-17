@@ -44,7 +44,8 @@ record('node', nodeMajor >= 18 ? 'pass' : 'fail', `Node.js ${process.versions.no
 const git = command('git', ['--version'])
 record('git', git.ok ? 'pass' : 'warn', git.output || git.error || '未找到 Git', '仅开发者工作流需要 Git。')
 
-const qwenpaw = runtime.command ? command(runtime.command, ['--version']) : { ok: false, output: runtime.output, error: '' }
+// resolveRuntime already executed and validated --version; avoid a second CLI startup.
+const qwenpaw = { ok: Boolean(runtime.command), output: runtime.output, error: '' }
 record(
   'qwenpaw-cli',
   qwenpaw.ok && qwenpaw.output.includes(runtime.version) ? 'pass' : 'fail',
