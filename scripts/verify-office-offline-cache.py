@@ -17,6 +17,7 @@ def verify(archive, scratch):
         target = Path(directory).resolve()
         cache = target / 'cache'
         with zipfile.ZipFile(archive) as bundle:
+            members = {entry.filename.removeprefix('./'): entry for entry in bundle.infolist()}
             for entry in bundle.infolist():
                 name = entry.filename.removeprefix('./')
                 if not name.startswith(prefix) or entry.is_dir():
@@ -29,7 +30,7 @@ def verify(archive, scratch):
                 with bundle.open(entry) as source, destination.open('wb') as output:
                     shutil.copyfileobj(source, output)
             requirements = target / 'office.txt'
-            requirements.write_bytes(bundle.read(lock))
+            requirements.write_bytes(bundle.read(members[lock]))
         uv = cache / 'bin/uv.exe'
         interpreters = sorted((cache / 'python').glob('*/python.exe'))
         if not uv.is_file() or not interpreters:
