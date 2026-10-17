@@ -119,7 +119,7 @@ export function environmentFingerprint (python) {
   }).join('\n')).digest('hex')
 }
 
-export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log, allowInstall = true, offline = false } = {}) {
+export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log, allowInstall = true, offline = false, forceReinstall = false } = {}) {
   if (!appRoot || !packRoot) throw new Error('ensureOfficeDependencies 需要 appRoot 与 packRoot 参数')
   if (!existsSync(join(packRoot, 'requirements-office.txt'))) { log('  [office-deps] 未找到 requirements-office.txt，跳过依赖预装'); return { status: 'skipped' } }
   const { reqPath, requirements, hash } = officeDependencySpec(packRoot)
@@ -137,7 +137,7 @@ export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log
     log('  [office-deps] 项目运行环境未安装（' + python + '），请运行 setup-ai-os 安装或修复。')
     return { status: 'no-runtime' }
   }
-  if (markerValid()) return { status: 'up-to-date' }
+  if (!forceReinstall && markerValid()) return { status: 'up-to-date' }
   if (!allowInstall) {
     log('  [office-deps] 办公依赖需要安装或修复，请运行 setup-ai-os.ps1；启动阶段不探测 Python、不下载依赖。')
     return { status: 'repair-required' }
@@ -153,7 +153,7 @@ export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log
     return { status: 'probe-failed' }
   }
   const missing = JSON.parse(probe.stdout)
-  if (!missing.length) {
+  if (!missing.length && !forceReinstall) {
     saveMarker()
     return { status: 'satisfied' }
   }
@@ -165,6 +165,7 @@ export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log
   let install
   if (existsSync(cachedUv)) {
     const args = ['pip', 'install', '--python', python, '-r', reqPath]
+    if (forceReinstall) args.push('--reinstall')
     if (offlineMode) args.push('--offline')
     install = spawnSync(cachedUv, args, {
       stdio: 'inherit', timeout: 10 * 60 * 1000,
@@ -173,6 +174,7 @@ export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log
   } else {
     // Honor offline packages even when the cached uv binary is absent.
     const args = ['-m', 'pip', 'install', '-r', reqPath]
+    if (forceReinstall) args.push('--force-reinstall')
     if (offlineMode) args.push('--no-index', '--find-links', join(appRoot, 'runtime', 'cache', 'wheels'))
     install = spawnSync(python, args, { stdio: 'inherit', timeout: 10 * 60 * 1000 })
   }

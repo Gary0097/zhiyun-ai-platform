@@ -128,6 +128,21 @@ if (offline) {
     console.log(`内嵌 runtime/${part}（${dirSizeMb(src)} MB）...`)
     if (!cacheArchive || part !== 'cache') cpSync(src, join(pkgRuntime, part), { recursive: true })
   }
+  if (officeLock) {
+    // ONNX/OpenCV require MSVCP, which python-build-standalone does not ship.
+    // Supply the verified MSI's x64 redistributables beside the real Python
+    // image; merely putting them on PATH or beside the venv redirector fails.
+    const vcRoot = join(workDir, 'extras', 'libreoffice', 'System64')
+    const pythonCache = join(liveRuntime, 'cache', 'python')
+    for (const home of readdirSync(pythonCache, { withFileTypes: true })) {
+      if (!home.isDirectory() || !existsSync(join(pythonCache, home.name, 'python.exe'))) continue
+      const target = join(pkgRuntime, 'cache', 'python', home.name)
+      mkdirSync(target, { recursive: true })
+      for (const file of readdirSync(vcRoot)) {
+        if (file.endsWith('.dll')) copyFileSync(join(vcRoot, file), join(target, file))
+      }
+    }
+  }
   // 2) 便携 Node（仅 node.exe，约 80MB；start-ai-os.cmd 会自动优先使用）
   const nodeSrc = process.env.NODE_SRC || join(process.env.ProgramFiles || 'C:\\Program Files', 'nodejs', 'node.exe')
   if (existsSync(nodeSrc)) {
@@ -135,7 +150,8 @@ if (offline) {
     copyFileSync(nodeSrc, join(workDir, 'extras', 'node', 'node.exe'))
     console.log(`内嵌便携 Node：${nodeSrc}`)
   } else {
-    throw new Error('Offline Windows installer requires bundled node.exe; set NODE_SRC to a valid Windows Node executable.')
+    if (process.platform === 'win32') throw new Error('Offline Windows installer requires bundled node.exe; set NODE_SRC to a valid Windows Node executable.')
+    console.warn('Non-Windows offline package requires an existing Node.js installation.')
   }
   // 3) U盘一键安装入口（自动优先使用内嵌 node）
   // cmd 在中文系统默认 GBK 代码页，UTF-8 中文 echo 会被误读成乱码命令
@@ -228,7 +244,9 @@ if (offline) {
     '常用入口：start-ai-os.cmd（启动）、diagnose-ai-os.cmd（诊断）、',
     'start-hub.cmd（局域网多用户，0.0.0.0:8000）。',
     '',
-    '要求：Windows 10/11 x64；本包未内嵌 node.exe 时需 Node.js 20+。',
+    '要求：Windows 10/11 x64。已内置 Python、Node、LibreOffice 与办公依赖，无需手工补装。',
+    '办公依赖只在安装或主动修复时配置；日常启动不下载。停止服务后可运行 setup-ai-os.ps1 -RepairOffice 离线修复办公库。',
+    '本包不包含模型权重或 API 密钥；模型服务请按现有供应商配置。',
     '',
   ].join('\r\n')
   writeFileSync(join(workDir, 'USB-INSTALL.md'), '\uFEFF' + guide, 'utf8')

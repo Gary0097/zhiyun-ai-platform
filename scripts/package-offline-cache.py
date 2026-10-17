@@ -32,11 +32,18 @@ with zipfile.ZipFile(baseline) as old:
     assert json.loads(old.read(members[lock_path])) == json.loads((source / lock_path).read_text()), 'Runtime lock mismatch'
     assert cache_prefix + 'bin/uv.exe' in members, 'Windows uv missing'
     assert any(n.startswith(cache_prefix + 'python/') and n.endswith('/python.exe') for n in members), 'Managed Python missing'
+    office_lock = 'skills/office/requirements-office-windows.lock.txt'
+    if (source / office_lock).exists():
+        assert office_lock in members and old.read(members[office_lock]).decode().replace('\r\n', '\n') == (source / office_lock).read_text().replace('\r\n', '\n'), 'Office dependency lock mismatch; build with fresh caches'
+    overrides = {path.relative_to(source).as_posix() for path in (source / cache_prefix).rglob('*') if path.is_file()}
+    for name in overrides:
+        if name.endswith('/msvcp140.dll'):
+            assert name.rsplit('/', 1)[0] + '/python.exe' in members, 'Managed Python cache version mismatch'
     count = 0
     try:
         with zipfile.ZipFile(temp, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=6, allowZip64=True) as result:
             for name, entry in members.items():
-                if name.startswith(cache_prefix) and not entry.is_dir():
+                if name.startswith(cache_prefix) and not entry.is_dir() and name not in overrides:
                     result.writestr(name, old.read(entry))
                     count += 1
             for folder, dirs, files in os.walk(source):
@@ -44,7 +51,7 @@ with zipfile.ZipFile(baseline) as old:
                 for filename in files:
                     path = Path(folder) / filename
                     name = path.relative_to(source).as_posix()
-                    if name == '.git' or name.startswith(cache_prefix):
+                    if name == '.git':
                         continue
                     assert not path.is_symlink(), 'Source symlinks are not supported'
                     result.write(path, name)

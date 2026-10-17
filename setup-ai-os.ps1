@@ -1,5 +1,5 @@
 ﻿[CmdletBinding()]
-param([switch]$Offline, [string]$CacheDir = "")
+param([switch]$Offline, [string]$CacheDir = "", [switch]$RepairOffice)
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EmbeddedRoot = Join-Path $ProjectRoot "apps\zhizaoyunAIOS"
@@ -10,6 +10,7 @@ $VenvRoot = Join-Path $RuntimeRoot "venv"
 $QwenPawCommand = Join-Path $VenvRoot "Scripts\qwenpaw.exe"
 $PythonCommand = Join-Path $VenvRoot "Scripts\python.exe"
 $CachedUv = Join-Path $RuntimeCache "bin\uv.exe"
+if (Test-Path -LiteralPath (Join-Path $RuntimeCache 'OFFLINE-PACKAGE')) { $Offline = $true }
 
 function Invoke-OfficeSetup {
   $OfficeScript = Join-Path $EmbeddedRoot 'scripts\setup-office.mjs'
@@ -18,6 +19,7 @@ function Invoke-OfficeSetup {
   $OfficeNode = if (Test-Path -LiteralPath $BundledNode) { $BundledNode } else { (Get-Command node -ErrorAction Stop).Source }
   $OfficeArgs = @($OfficeScript)
   if ($Offline) { $OfficeArgs += '--offline' }
+  if ($RepairOffice) { $OfficeArgs += '--repair' }
   & $OfficeNode @OfficeArgs
   if ($LASTEXITCODE -ne 0) { throw 'Office setup failed. See the diagnostic above; installation is incomplete.' }
 }

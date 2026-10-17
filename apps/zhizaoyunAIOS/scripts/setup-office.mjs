@@ -47,14 +47,16 @@ export function officeInstallationReady (repoRoot) {
   try {
     const { runtimeRoot, python } = resolveVenvPython(join(repoRoot, 'apps', 'zhizaoyunAIOS'))
     if (!existsSync(python)) return false
+    const dependencies = JSON.parse(readFileSync(join(runtimeRoot, 'office-deps.ok'), 'utf8'))
+    if (dependencies.hash !== officeDependencySpec(join(repoRoot, 'skills', 'office')).hash || dependencies.environment !== environmentFingerprint(python)) return false
     const receipt = JSON.parse(readFileSync(join(runtimeRoot, 'office-install.ok'), 'utf8'))
     return receipt.key === installationKey(repoRoot)
   } catch { return false }
 }
 
-export async function setupOffice ({ repoRoot, offline = false, log = console.log }) {
+export async function setupOffice ({ repoRoot, offline = false, repair = false, log = console.log }) {
   if (process.platform !== 'win32') return { status: 'not-windows' }
-  if (officeInstallationReady(repoRoot)) {
+  if (!repair && officeInstallationReady(repoRoot)) {
     log('[office-setup] Office ready; no dependency probe, download or LibreOffice process needed.')
     return { status: 'up-to-date' }
   }
@@ -66,7 +68,7 @@ export async function setupOffice ({ repoRoot, offline = false, log = console.lo
   if (manifest.version !== lock.version || manifest.msi_sha256 !== lock.sha256) throw new Error('LibreOffice manifest does not match office-windows.lock.json')
   log(`[office-setup] Verifying bundled LibreOffice ${lock.version} (installation only)...`)
   await verifyOfficePayload(office.root, manifest)
-  const dependencies = ensureOfficeDependencies({ appRoot, packRoot: join(repoRoot, 'skills', 'office'), offline, log })
+  const dependencies = ensureOfficeDependencies({ appRoot, packRoot: join(repoRoot, 'skills', 'office'), offline, log, forceReinstall: repair })
   if (!['up-to-date', 'satisfied', 'installed'].includes(dependencies.status)) throw new Error('Office dependencies failed: ' + dependencies.status)
   const { runtimeRoot, python } = resolveVenvPython(appRoot)
   const probe = spawnSync(python, ['-c', 'import docx,openpyxl,pptx,pdfplumber,pypdf,fpdf,pypdfium2,PIL,chardet,markdownify,pandas,rapidocr_onnxruntime; print("office-imports-ok")'], { encoding: 'utf8', timeout: 120000 })
@@ -74,6 +76,11 @@ export async function setupOffice ({ repoRoot, offline = false, log = console.lo
   const profile = pathToFileURL(join(runtimeRoot, 'office-profile')).href
   const version = spawnSync(office.command, [`-env:UserInstallation=${profile}`, '--headless', '--version'], { encoding: 'utf8', timeout: 30000 })
   if (version.status !== 0 || !(version.stdout || '').includes('LibreOffice ' + lock.version)) throw new Error('Bundled LibreOffice cannot start')
+  // Real imports can create site-packages/__pycache__ after a reinstall.
+  // Bind both receipts to the final verified environment, not the pre-import one.
+  const dependencyMarker = join(runtimeRoot, 'office-deps.ok')
+  const dependencyReceipt = JSON.parse(readFileSync(dependencyMarker, 'utf8'))
+  writeFileSync(dependencyMarker, JSON.stringify({ ...dependencyReceipt, environment: environmentFingerprint(python), imports_verified_at: new Date().toISOString() }) + '\n')
   writeFileSync(join(runtimeRoot, 'office-install.ok'), JSON.stringify({ schema_version: 1, key: installationKey(repoRoot), libreoffice: lock.version, installed_at: new Date().toISOString() }) + '\n')
   log(`[office-setup] Office installed: LibreOffice ${lock.version}, pinned Python dependencies and local OCR ready.`)
   return { status: 'installed' }
@@ -81,6 +88,6 @@ export async function setupOffice ({ repoRoot, offline = false, log = console.lo
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-  try { await setupOffice({ repoRoot, offline: process.argv.includes('--offline') }) }
+  try { await setupOffice({ repoRoot, offline: process.argv.includes('--offline'), repair: process.argv.includes('--repair') }) }
   catch (e) { console.error('[office-setup] ' + e.message); process.exitCode = 1 }
 }
