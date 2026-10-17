@@ -56,8 +56,8 @@ for line in result or []:      # [box, text, score]
     print(line[1], round(line[2], 2))
 ```
 
-- 扫描 PDF 先转图片再逐页 OCR：`pdfplumber`/`pypdf` 提取页面图片，或
-  LibreOffice/PyMuPDF 渲染整页（`page.to_image(resolution=200)`）；
+- 扫描 PDF 使用已预装的 `pypdfium2` 以 200 DPI 渲染整页再逐页 OCR，
+  代码见 `office-pdf`；提取嵌入图片不等于渲染整页，可能遗漏文字或图层。
 - 输出按页分组、按坐标 y 排序恢复阅读顺序；置信度 < 0.6 的行标注 `[?]`
   供人工复核；
 - 票据/证件类：只提取用户要求的字段，输出结构化 JSON；识别结果涉及

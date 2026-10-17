@@ -9,7 +9,7 @@
 // 优先用 --offline 从本地缓存安装。
 import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, statSync, readdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
@@ -29,6 +29,25 @@ const IMPORT_NAMES = {
 
 function importNameFor (packageName) {
   return IMPORT_NAMES[packageName.toLowerCase()] || packageName.replace(/-/g, '_')
+}
+
+export function probeOfficeDependencies (python, requirements) {
+  const packages = requirements.map(r => ({ raw: r.raw, module: importNameFor(r.name) }))
+  return spawnSync(python, ['-c', [
+    'import json, sys',
+    'from importlib.util import find_spec',
+    'from importlib.metadata import version, PackageNotFoundError',
+    'from packaging.requirements import Requirement',
+    'missing = []',
+    'for item in json.loads(sys.argv[1]):',
+    '    req = Requirement(item["raw"])',
+    '    if req.marker and not req.marker.evaluate(): continue',
+    '    try:',
+    '        ok = find_spec(item["module"]) is not None and req.specifier.contains(version(req.name), prereleases=True)',
+    '    except (PackageNotFoundError, ModuleNotFoundError): ok = False',
+    '    if not ok: missing.append(item["raw"])',
+    'print(json.dumps(missing))',
+  ].join('\n'), JSON.stringify(packages)], { encoding: 'utf8', timeout: 120000 })
 }
 
 export function parseRequirements (text) {
@@ -63,6 +82,27 @@ export function resolveVenvPython (appRoot) {
   return { runtimeRoot, python: scripts }
 }
 
+// Bind the fast path to this environment, including package-directory changes.
+// A requirements-only marker survives setup --clear and incorrectly skips repair.
+export function environmentFingerprint (python) {
+  const venv = dirname(dirname(python))
+  const paths = [python, join(venv, 'pyvenv.cfg')]
+  if (process.platform === 'win32') paths.push(join(venv, 'Lib', 'site-packages'))
+  else {
+    try {
+      for (const entry of readdirSync(join(venv, 'lib'))) {
+        if (/^python\d+\.\d+$/.test(entry)) paths.push(join(venv, 'lib', entry, 'site-packages'))
+      }
+    } catch { /* Missing environment is handled by the caller. */ }
+  }
+  return createHash('sha256').update(paths.map(path => {
+    try {
+      const s = statSync(path)
+      return `${path}:${s.size}:${s.mtimeMs}:${s.ctimeMs}`
+    } catch { return `${path}:missing` }
+  }).join('\n')).digest('hex')
+}
+
 export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log } = {}) {
   if (!appRoot || !packRoot) throw new Error('ensureOfficeDependencies 需要 appRoot 与 packRoot 参数')
   const reqPath = join(packRoot, 'requirements-office.txt')
@@ -74,28 +114,30 @@ export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log
   const marker = join(runtimeRoot, MARKER_NAME)
 
   const markerValid = () => {
-    try { return JSON.parse(readFileSync(marker, 'utf8')).hash === hash }
+    try {
+      const saved = JSON.parse(readFileSync(marker, 'utf8'))
+      return saved.hash === hash && saved.environment === environmentFingerprint(python)
+    }
     catch { return false }
   }
-  if (markerValid()) return { status: 'up-to-date' }
-
   if (!existsSync(python)) {
     log('  [office-deps] 项目运行环境未安装（' + python + '），跳过依赖预装；首次 setup 后下次启动自动补装')
     return { status: 'no-runtime' }
   }
+  if (markerValid()) return { status: 'up-to-date' }
+  const saveMarker = () => writeFileSync(marker, JSON.stringify({
+    hash, environment: environmentFingerprint(python), checkedAt: new Date().toISOString(),
+  }) + '\n', 'utf8')
 
   // 探测缺失包（find_spec 只定位不导入，秒级完成）
-  const importList = requirements.map(r => importNameFor(r.name))
-  const probe = spawnSync(python, ['-c',
-    'from importlib.util import find_spec\nimport sys\nmissing=[m for m in sys.argv[1:] if not find_spec(m)]\nprint(",".join(missing))',
-    ...importList], { encoding: 'utf8', timeout: 120000 })
+  const probe = probeOfficeDependencies(python, requirements)
   if (probe.status !== 0) {
     log('  [office-deps] 依赖探测失败（' + (probe.stderr || '').trim().slice(0, 120) + '），跳过；技能执行期可自行兜底安装')
     return { status: 'probe-failed' }
   }
-  const missing = (probe.stdout || '').trim().split(',').filter(Boolean)
+  const missing = JSON.parse(probe.stdout)
   if (!missing.length) {
-    writeFileSync(marker, JSON.stringify({ hash, checkedAt: new Date().toISOString() }) + '\n', 'utf8')
+    saveMarker()
     return { status: 'satisfied' }
   }
 
@@ -107,23 +149,27 @@ export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log
   if (existsSync(cachedUv)) {
     const args = ['pip', 'install', '--python', python, '-r', reqPath]
     if (offlineMode) args.push('--offline')
-    install = spawnSync(cachedUv, args, { stdio: 'inherit', timeout: 10 * 60 * 1000 })
+    install = spawnSync(cachedUv, args, {
+      stdio: 'inherit', timeout: 10 * 60 * 1000,
+      env: { ...process.env, UV_CACHE_DIR: join(appRoot, 'runtime', 'cache', 'uv') },
+    })
   } else {
-    install = spawnSync(python, ['-m', 'pip', 'install', '-r', reqPath], { stdio: 'inherit', timeout: 10 * 60 * 1000 })
+    // Honor offline packages even when the cached uv binary is absent.
+    const args = ['-m', 'pip', 'install', '-r', reqPath]
+    if (offlineMode) args.push('--no-index', '--find-links', join(appRoot, 'runtime', 'cache', 'wheels'))
+    install = spawnSync(python, args, { stdio: 'inherit', timeout: 10 * 60 * 1000 })
   }
   if (install.status !== 0) {
     log('  [office-deps] 依赖预装失败（不影响启动）；技能执行期会按需安装，或重跑 start-ai-os 重试')
     return { status: 'install-failed', missing }
   }
   // 复验：全部可导入才落标记
-  const recheck = spawnSync(python, ['-c',
-    'from importlib.util import find_spec\nimport sys\nsys.exit(0 if all(find_spec(m) for m in sys.argv[1:]) else 1)',
-    ...importList], { encoding: 'utf8', timeout: 120000 })
-  if (recheck.status !== 0) {
+  const recheck = probeOfficeDependencies(python, requirements)
+  if (recheck.status !== 0 || JSON.parse(recheck.stdout).length) {
     log('  [office-deps] 安装后复验仍有缺失，未写入完成标记；下次启动将重试')
     return { status: 'recheck-failed' }
   }
-  writeFileSync(marker, JSON.stringify({ hash, installedAt: new Date().toISOString() }) + '\n', 'utf8')
+  saveMarker()
   log('  [office-deps] 办公依赖预装完成（docx/excel/ppt/pdf/OCR），技能执行无需临时安装')
   return { status: 'installed' }
 }

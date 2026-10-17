@@ -26,12 +26,14 @@ metadata:
    → 4. 填写或点击 → 5. 再次读取确认结果。
 
 ```python
-# 典型骨架（具体 API 以运行时内置 browser 技能文档为准）
-page = await browser.new_page()          # 或复用当前页
-await page.goto("https://example.com")   # 感知
-title = await page.title()               # 确认到达
-await page.click("text=登录")            # 操作
-await page.screenshot(path="结果.png")   # 验证
+# QwenPaw 2.2.1 Browser SDK（不是 Playwright，先读内置 browser 技能）
+browser = await Browser.connect(identity="guest")
+page = await browser.open("https://example.com")
+obs = await page.snapshot()              # 感知，核对 obs.text
+print(obs.text[:6000])
+# 仅在观测到目标按钮后操作：
+# await page.get_by_role("button", name="查询").click()
+# print((await page.snapshot()).text[:6000])  # 验证
 ```
 
 若技能池中存在内置 `browser` 技能，先读取其最新用法说明再编码，

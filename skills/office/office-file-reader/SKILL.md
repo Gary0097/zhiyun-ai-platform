@@ -18,17 +18,18 @@ metadata:
 | --- | --- | --- |
 | 文本类：txt / md / json / csv / tsv / log / ini / yaml / 代码 / sql | 扩展名 + 二进制探测为文本 | 本技能 §2 直接读 |
 | .docx / .doc | 扩展名 | `office-word`（.doc 先转 .docx） |
-| .xlsx / .xlsm / .csv(复杂) | 扩展名 | `office-excel` |
-| .pptx | 扩展名 | `office-ppt` |
+| .xlsx / .xls / .xlsm / .csv(复杂) | 扩展名 | `office-excel`（.xls 先转换；.xlsm 用 keep_vba=True 保留宏，不执行宏） |
+| .pptx / .ppt | 扩展名 | `office-ppt`（.ppt 先用 LibreOffice 转 .pptx） |
 | .pdf | 扩展名 | `office-pdf`（扫描件再转 `office-ocr`） |
 | 图片：png / jpg / webp / bmp | 扩展名 | 提取文字 → `office-ocr`；看内容用看图工具 |
 | .zip / .rar / 7z | 扩展名 | shell 解压到 `解压_<文件名>/` 后逐个分流 |
 | 未知/无扩展名 | `file` 命令 / 头字节 | 报告实际类型，向用户确认处理方式 |
 
 ```python
-# 快速探测：路径读前 4KB，含大量 \x00 → 二进制
+# 快速探测：UTF-16/32 文本含 NUL，必须先识别 BOM
 with open(path, 'rb') as f: head = f.read(4096)
-is_binary = b'\x00' in head
+has_unicode_bom = head.startswith((b'\xff\xfe', b'\xfe\xff', b'\x00\x00\xfe\xff'))
+is_binary = not has_unicode_bom and b'\x00' in head
 ```
 
 ## 2. 文本类读取规范
