@@ -47,7 +47,9 @@ try {
   $RuntimePython = Join-Path $Target 'apps\zhizaoyunAIOS\runtime\zhizaoyunAIOS\venv\Scripts\python.exe'
   $env:SOFFICE = Join-Path $Target 'extras\libreoffice\program\soffice.com'
   $env:PYTHONUTF8='1'
-  & $RuntimePython -c 'import onnxruntime,ctypes,sys; k=ctypes.windll.kernel32; k.GetModuleHandleW.restype=ctypes.c_void_p; k.GetModuleFileNameW.argtypes=[ctypes.c_void_p,ctypes.c_wchar_p,ctypes.c_uint]; b=ctypes.create_unicode_buffer(32768); k.GetModuleFileNameW(k.GetModuleHandleW("msvcp140.dll"),b,len(b)); assert b.value.lower().startswith(sys.base_prefix.lower()), b.value; print("PASS ONNX loads app-local MSVCP from bundled Python")'
+  $NativeCheck = Join-Path $Build 'check-native-runtime.py'
+  [IO.File]::WriteAllText($NativeCheck, 'import onnxruntime,ctypes,sys; k=ctypes.windll.kernel32; k.GetModuleHandleW.restype=ctypes.c_void_p; k.GetModuleFileNameW.argtypes=[ctypes.c_void_p,ctypes.c_wchar_p,ctypes.c_uint]; b=ctypes.create_unicode_buffer(32768); k.GetModuleFileNameW(k.GetModuleHandleW("msvcp140.dll"),b,len(b)); assert b.value.lower().startswith(sys.base_prefix.lower()), b.value; print("PASS ONNX loads app-local MSVCP from bundled Python")')
+  & $RuntimePython $NativeCheck
   if ($LASTEXITCODE -ne 0) { throw 'OCR relies on a system-installed VC runtime' }
   $Marker = Join-Path $Target 'apps\zhizaoyunAIOS\runtime\zhizaoyunAIOS\office-deps.ok'
   Move-Item -LiteralPath $Marker -Destination ($Marker + '.test-backup')

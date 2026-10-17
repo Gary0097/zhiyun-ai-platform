@@ -135,7 +135,9 @@ if (offline) {
     const vcRoot = join(workDir, 'extras', 'libreoffice', 'System64')
     const pythonCache = join(liveRuntime, 'cache', 'python')
     for (const home of readdirSync(pythonCache, { withFileTypes: true })) {
-      if (!home.isDirectory() || !existsSync(join(pythonCache, home.name, 'python.exe'))) continue
+      // uv also exposes a junction named cpython-3.12; ZIP export expands it
+      // into a separate home, so both names need the same app-local DLLs.
+      if (!existsSync(join(pythonCache, home.name, 'python.exe'))) continue
       const target = join(pkgRuntime, 'cache', 'python', home.name)
       mkdirSync(target, { recursive: true })
       for (const file of readdirSync(vcRoot)) {
