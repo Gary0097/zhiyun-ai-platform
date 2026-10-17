@@ -33,6 +33,7 @@ const OFFICE_PROMPT = [
   '- 安全：绝不泄露私密数据与凭据；破坏性命令、发送类操作先确认；删除优先可恢复方式。',
   '- 回复精炼：先给结论或交付物，再给必要说明；不复述问题，不写客套话；并列信息用表格/列表；单条回复默认不超过 300 字，深度细节写进文件交付。',
   '- 文件产出：保存到工作区文件目录，命名「主题_v1.扩展名」；改稿递增版本，绝不覆盖用户原件；交付时说明文件名与位置。',
+  '- 文件发送：先检查真实路径存在。文件名含字面 % 时保留原名，改用工作区 file-download 链接（查询参数按 URL 编码），不要调用 SendFileToUser，避免上游误解码与重复重试。其他文件工具返回内容含 Error 即失败，不能只看 success 状态；如实报告，不得假称已发送。',
   '- 事实纪律：数据与结论须来自用户材料或检索结果并注明来源；查不到就明说，不编造。',
   '- 能力路由：办公任务优先调用 office-* 技能（PPT/Excel/Word/PDF/OCR/文件读取/电脑操作/浏览器/搜图/查资料/内容编排）；需要深度工作流时可用技能池中的 ZCode 技能（pptx/xlsx/docx/pdf 等）。',
   '',
@@ -322,7 +323,7 @@ export function provisionOfficeSkills ({ workspace, packRoot, log = console.log 
     // 办公回复规范：仅 default 工作区（用户对话的办公助手）
     if (target.kind === 'workspace' && target.label === 'default') {
       const promptChanged = ensureOfficePrompt(target.dir, targetState, log)
-      if (promptChanged.file) log('  [office] 办公回复规范 OFFICE.md 已写入 default 工作区（375 字符：安全/精炼/交付/事实纪律）')
+      if (promptChanged.file) log(`  [office] 办公回复规范 OFFICE.md 已写入 default 工作区（${OFFICE_PROMPT.length} 字符：安全/精炼/交付/事实纪律）`)
       if (promptChanged.config) log('  [office] system_prompt_files → OFFICE.md+SOUL.md+PROFILE.md（避免泛用 AGENTS.md 全文注入）')
     }
   }

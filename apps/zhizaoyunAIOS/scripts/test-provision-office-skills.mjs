@@ -165,6 +165,7 @@ try {
   assert.ok(existsSync(join(promptDefault, 'OFFICE.md')), 'default 工作区应写入 OFFICE.md')
   const officeMd = readFileSync(join(promptDefault, 'OFFICE.md'), 'utf8')
   assert.ok(officeMd.includes('回复精炼') && officeMd.includes('绝不覆盖用户原件'), 'OFFICE.md 应含回复与交付纪律')
+  assert.ok(officeMd.includes('file-download') && officeMd.includes('不要调用 SendFileToUser'), '字面 % 文件名必须路由到可验证的工作区下载接口')
   assert.ok(officeMd.length <= 600, 'OFFICE.md 必须精简（≤600 字符，每轮注入成本）')
   const agentCfg = JSON.parse(readFileSync(join(promptDefault, 'agent.json'), 'utf8'))
   assert.deepEqual(agentCfg.system_prompt_files, ['OFFICE.md', 'SOUL.md', 'PROFILE.md'], '默认三件套应替换为 OFFICE 注入列表')
