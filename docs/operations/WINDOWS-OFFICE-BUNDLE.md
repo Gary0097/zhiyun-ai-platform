@@ -62,3 +62,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-office-installe
 - 首次完整启动到 HTTP 200 为 29.687 秒，第二次 18.763 秒（当前 Windows 主机实测，包含运行时诊断和服务启动）；两次启动没有改写办公依赖标记。匿名 token 验证均返回 401。
 - 完整 `verify-release.mjs` 门禁通过，包含现有 Windows 安装器回归；当前分支包含最新 master。此次没有进行独立干净虚拟机或图形向导人工验收。
 - 模型账号/权重不入包；云 OCR、联网研究、桌面 GUI 和模型对话不计入本轮离线文件能力通过项。此前模型对话验收见 PR #160。
+
+## PR #162 发布前复查
+
+源码 Windows 安装保留办公库预装；Git checkout 没有发行包载荷时明确提示 LibreOffice 转换需使用完整安装包，不再将整个源码安装判为失败。正式安装包缺失载荷仍失败。
+构建阶段从实际生成 ZIP 中取出缓存，在全新 venv 强制离线安装全部固定办公依赖；缺失任何缓存则删除未通过的 ZIP 和校验文件，中止交付。复用缓存 ZIP 也执行相同验证。

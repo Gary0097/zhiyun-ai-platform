@@ -17,6 +17,18 @@ function Invoke-OfficeSetup {
   if (-not (Test-Path -LiteralPath $OfficeScript)) { return }
   $BundledNode = Join-Path $ProjectRoot 'extras\node\node.exe'
   $OfficeNode = if (Test-Path -LiteralPath $BundledNode) { $BundledNode } else { (Get-Command node -ErrorAction Stop).Source }
+  # Source checkouts do not carry the release-only LibreOffice payload.
+  # A damaged packaged installation must still fail instead of silently skipping it.
+  if ((Test-Path -LiteralPath (Join-Path $ProjectRoot '.git')) -and
+      -not (Test-Path -LiteralPath (Join-Path $ProjectRoot 'INSTALLER-VERSION.txt')) -and
+      -not (Test-Path -LiteralPath (Join-Path $ProjectRoot 'extras\libreoffice\office-bundle.manifest.json'))) {
+    $DependencyArgs = @((Join-Path $EmbeddedRoot 'scripts\ensure-office-deps.mjs'))
+    if ($Offline) { $DependencyArgs += '--offline' }
+    & $OfficeNode @DependencyArgs
+    if ($LASTEXITCODE -ne 0) { throw 'Source office dependency setup failed.' }
+    Write-Warning 'Source checkout: office libraries ready; LibreOffice conversion requires the full Windows installer or a separately configured LibreOffice.'
+    return
+  }
   $OfficeArgs = @($OfficeScript)
   if ($Offline) { $OfficeArgs += '--offline' }
   if ($RepairOffice) { $OfficeArgs += '--repair' }

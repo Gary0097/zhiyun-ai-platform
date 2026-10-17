@@ -275,6 +275,16 @@ try {
   } else {
     run(`cd "${workDir}" && zip -r -q "${zipPath}" . -x '.git'`)
   }
+  if (offline && officeLock) {
+    const python = join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'qwenpaw-hub', 'venv', 'Scripts', 'python.exe')
+    try {
+      execFileSync(python, [join(root, 'scripts', 'verify-office-offline-cache.py'), '--archive', zipPath, '--scratch', join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'office-build')], { stdio: 'inherit' })
+    } catch (error) {
+      rmSync(zipPath, { force: true })
+      rmSync(`${zipPath}.sha256`, { force: true })
+      throw new Error('Offline office cache is incomplete; refusing to emit an installer.', { cause: error })
+    }
+  }
 } finally {
   // 无论成败都清理 worktree（失败后 prune，保证下次可重建）
   try { run('git worktree remove --force .release-worktree') } catch { run('git worktree prune'); rmSync(workDir, { recursive: true, force: true }) }
