@@ -25,6 +25,11 @@ const IMPORT_NAMES = {
   'fpdf2': 'fpdf',
   'beautifulsoup4': 'bs4',
   'rapidocr-onnxruntime': 'rapidocr_onnxruntime',
+  'pdfminer-six': 'pdfminer',
+  'opencv-python': 'cv2',
+  'python-dateutil': 'dateutil',
+  'fonttools': 'fontTools',
+  'protobuf': 'google.protobuf',
 }
 
 function importNameFor (packageName) {
@@ -71,6 +76,17 @@ export function requirementsHash (text) {
   return createHash('sha256').update(effective).digest('hex')
 }
 
+export function officeDependencySpec (packRoot, platform = process.platform) {
+  const base = readFileSync(join(packRoot, 'requirements-office.txt'), 'utf8')
+  const frozen = join(packRoot, 'requirements-office-windows.lock.txt')
+  const pinned = platform === 'win32' && existsSync(frozen) ? readFileSync(frozen, 'utf8') : ''
+  return {
+    reqPath: pinned ? frozen : join(packRoot, 'requirements-office.txt'),
+    requirements: parseRequirements(pinned || base),
+    hash: requirementsHash(base + (pinned ? '\n' + pinned : '')),
+  }
+}
+
 // 项目 venv 解释器位置（依据 qwenpaw.lock.json 的 runtime_dir，双平台；
 // runtime_dir 形如 "runtime/zhizaoyunAIOS"，已含 runtime 前缀，相对 appRoot）
 export function resolveVenvPython (appRoot) {
@@ -103,13 +119,10 @@ export function environmentFingerprint (python) {
   }).join('\n')).digest('hex')
 }
 
-export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log } = {}) {
+export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log, allowInstall = true, offline = false } = {}) {
   if (!appRoot || !packRoot) throw new Error('ensureOfficeDependencies 需要 appRoot 与 packRoot 参数')
-  const reqPath = join(packRoot, 'requirements-office.txt')
-  if (!existsSync(reqPath)) { log('  [office-deps] 未找到 requirements-office.txt，跳过依赖预装'); return { status: 'skipped' } }
-  const reqText = readFileSync(reqPath, 'utf8')
-  const requirements = parseRequirements(reqText)
-  const hash = requirementsHash(reqText)
+  if (!existsSync(join(packRoot, 'requirements-office.txt'))) { log('  [office-deps] 未找到 requirements-office.txt，跳过依赖预装'); return { status: 'skipped' } }
+  const { reqPath, requirements, hash } = officeDependencySpec(packRoot)
   const { runtimeRoot, python } = resolveVenvPython(appRoot)
   const marker = join(runtimeRoot, MARKER_NAME)
 
@@ -121,10 +134,14 @@ export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log
     catch { return false }
   }
   if (!existsSync(python)) {
-    log('  [office-deps] 项目运行环境未安装（' + python + '），跳过依赖预装；首次 setup 后下次启动自动补装')
+    log('  [office-deps] 项目运行环境未安装（' + python + '），请运行 setup-ai-os 安装或修复。')
     return { status: 'no-runtime' }
   }
   if (markerValid()) return { status: 'up-to-date' }
+  if (!allowInstall) {
+    log('  [office-deps] 办公依赖需要安装或修复，请运行 setup-ai-os.ps1；启动阶段不探测 Python、不下载依赖。')
+    return { status: 'repair-required' }
+  }
   const saveMarker = () => writeFileSync(marker, JSON.stringify({
     hash, environment: environmentFingerprint(python), checkedAt: new Date().toISOString(),
   }) + '\n', 'utf8')
@@ -143,7 +160,7 @@ export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log
 
   // 补装：优先用项目缓存里的 uv（setup 时落盘），其次 PATH 中的 uv/pip
   const cachedUv = join(appRoot, 'runtime', 'cache', 'bin', process.platform === 'win32' ? 'uv.exe' : 'uv')
-  const offlineMode = existsSync(join(appRoot, 'runtime', 'cache', 'OFFLINE-PACKAGE'))
+  const offlineMode = offline || existsSync(join(appRoot, 'runtime', 'cache', 'OFFLINE-PACKAGE'))
   log(`  [office-deps] 检测到缺失依赖 ${missing.length} 项，开始预装（一次性，约 1-3 分钟）…`)
   let install
   if (existsSync(cachedUv)) {
@@ -151,7 +168,7 @@ export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log
     if (offlineMode) args.push('--offline')
     install = spawnSync(cachedUv, args, {
       stdio: 'inherit', timeout: 10 * 60 * 1000,
-      env: { ...process.env, UV_CACHE_DIR: join(appRoot, 'runtime', 'cache', 'uv') },
+      env: { ...process.env, UV_CACHE_DIR: join(appRoot, 'runtime', 'cache', 'uv'), ...(offlineMode ? { UV_OFFLINE: '1' } : {}) },
     })
   } else {
     // Honor offline packages even when the cached uv binary is absent.
@@ -204,6 +221,7 @@ if (invokedDirectly) {
       process.exit(1)
     }
   } else {
-    ensureOfficeDependencies({ appRoot, packRoot })
+    const result = ensureOfficeDependencies({ appRoot, packRoot, offline: args.includes('--offline') })
+    if (!['up-to-date', 'satisfied', 'installed'].includes(result.status)) process.exitCode = 1
   }
 }

@@ -59,14 +59,14 @@
   - 品牌插件安装子进程实测约 11s——`start.mjs` 版本门控（workspace 标记
     `.brand-plugin.version`，版本未变跳过；文件同步本就由 ensure-workspace
     版本门控完成）；
-  - 办公依赖预装标记快路径 <50ms；首次启动仍需一次性全量补丁/安装/依赖
-    下载（QwenPaw 首启另有约 44s 一次性迁移，属上游行为）。
+  - Windows 1.6.0 起，LibreOffice 与锁定办公依赖在安装阶段一次配置，启动只读本地标记，
+    不执行依赖探测、安装或下载。首次服务启动仍可能执行上游迁移与控制台补丁。
 
 ## 1. 这是什么
 
 `aios-office` 分支在智造云 AIOS 2.2.1 标准形态之上，预置了一套**办公专属默认技能包**：
 用户完成一键安装并启动后，11 项办公能力已进入技能池与全部智能体工作区，并**默认启用**，
-无需在控制台手动导入或开启。常用 Python 依赖（文档读写/PDF/OCR）也由启动器**预装**到
+无需在控制台手动导入或开启。Windows 常用 Python 依赖（文档读写/PDF/OCR）由安装器**预装**到
 项目运行环境，技能执行不再临时 `pip install` 浪费时间。
 
 | 技能 | 能力 | 说明 |
@@ -92,14 +92,15 @@
 
 `skills/office/requirements-office.txt` 声明常用办公依赖（python-docx、openpyxl、
 python-pptx、pdfplumber、pypdf、fpdf2、Pillow、chardet、markdownify、pandas、
-rapidocr-onnxruntime），由 `apps/zhizaoyunAIOS/scripts/ensure-office-deps.mjs` 在
-**启动期幂等安装**到项目 venv：
+rapidocr-onnxruntime）。Windows 使用 `requirements-office-windows.lock.txt` 固定全部39个依赖版本，
+由 `setup-ai-os.ps1` → `setup-office.mjs` 在**安装阶段**配置到项目 venv：
 
-- 标记文件 `<runtime>/office-deps.ok` 记录清单内容哈希，未变化时启动开销 <50ms；
-- 清单变化或有包缺失时自动用 uv 补装（一次性，约 1–3 分钟），复验通过才落标记；
-- 运行环境尚未安装时优雅跳过（首次 setup 后的下次启动自动补装）；
-- 安装失败只告警、不阻断启动（技能文档内保留按需安装兜底）；
-- 离线安装包（OFFLINE-PACKAGE）优先走 uv `--offline` 本地缓存。
+- 完整 Windows 包携带 LibreOffice 26.8.1、原始许可/源码获取说明、VC运行库、Python/Node与依赖缓存；
+- 安装时校验完整 LibreOffice 清单、实际导入办公库及启动 LibreOffice，失败则安装失败，不报告就绪；
+- `office-deps.ok` 与 `office-install.ok` 绑定清单与环境，重复安装走轻量标记快路径；
+- Windows 启动阶段不探测 Python 包、不下载；标记失效提示重新运行安装程序修复；
+- 离线安装强制 uv `--offline`，缺缓存直接失败。Linux 保留原依赖供给方式，不附带 Windows 二进制；
+- 运行环境自动提供 `soffice` 命令与 `SOFFICE` 环境变量，无需改系统 PATH 或安装额外插件。
 
 ### OCR 路线（office-ocr 技能内置，按优先级自动选择）
 
@@ -118,8 +119,8 @@ rapidocr-onnxruntime），由 `apps/zhizaoyunAIOS/scripts/ensure-office-deps.mjs
 1. **技能预置**：`apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs`
    - **单机模式**：`start-ai-os.cmd/.sh` → `ensure-workspace.mjs` 末尾动态调用预置脚本；
    - **Hub 多用户模式**：`start-hub.ps1/.sh` 在 hub-config 之后调用预置脚本（同一工作区）。
-2. **依赖预装**：`ensure-office-deps.mjs`（由 `ensure-workspace.mjs` 一并调用）把
-   `requirements-office.txt` 幂等安装到项目 venv（见上文"依赖预装"）。
+2. **依赖就绪**：Windows 安装器已完成依赖预装；`ensure-workspace.mjs` 只核对轻量本地标记，
+   不再下载/安装。Linux 保留启动期幂等供给方式。
 3. **ZCode 技能桥接**：`link-zcode-skills.mjs`（同一挂接点）检测并注册本机
    ZCode 办公插件技能为外部技能根（见 §0）。
 

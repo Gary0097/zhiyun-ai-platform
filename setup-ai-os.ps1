@@ -11,6 +11,17 @@ $QwenPawCommand = Join-Path $VenvRoot "Scripts\qwenpaw.exe"
 $PythonCommand = Join-Path $VenvRoot "Scripts\python.exe"
 $CachedUv = Join-Path $RuntimeCache "bin\uv.exe"
 
+function Invoke-OfficeSetup {
+  $OfficeScript = Join-Path $EmbeddedRoot 'scripts\setup-office.mjs'
+  if (-not (Test-Path -LiteralPath $OfficeScript)) { return }
+  $BundledNode = Join-Path $ProjectRoot 'extras\node\node.exe'
+  $OfficeNode = if (Test-Path -LiteralPath $BundledNode) { $BundledNode } else { (Get-Command node -ErrorAction Stop).Source }
+  $OfficeArgs = @($OfficeScript)
+  if ($Offline) { $OfficeArgs += '--offline' }
+  & $OfficeNode @OfficeArgs
+  if ($LASTEXITCODE -ne 0) { throw 'Office setup failed. See the diagnostic above; installation is incomplete.' }
+}
+
 function Test-QwenPawRuntime {
   if (-not (Test-Path -LiteralPath $QwenPawCommand) -or -not (Test-Path -LiteralPath $PythonCommand)) { return $false }
   $venvConfig = Get-Content -Encoding UTF8 -LiteralPath (Join-Path $VenvRoot "pyvenv.cfg") -ErrorAction SilentlyContinue
@@ -23,6 +34,7 @@ function Test-QwenPawRuntime {
   return $LASTEXITCODE -eq 0 -and $versionOutput -match ("version\s+" + [regex]::Escape($Lock.version) + "\s*$")
 }
 if (Test-QwenPawRuntime) {
+  Invoke-OfficeSetup
   Write-Host "QwenPaw $($Lock.version) 项目运行环境已就绪：$RuntimeRoot"; exit 0
 }
 
@@ -55,4 +67,5 @@ try {
   foreach ($name in $previous.Keys) { Set-Item -Path "env:$name" -Value $previous[$name] }
 }
 if (-not (Test-QwenPawRuntime)) { throw "项目运行环境安装后版本校验失败。" }
+Invoke-OfficeSetup
 Write-Host "QwenPaw $($Lock.version) 项目运行环境安装完成：$RuntimeRoot"

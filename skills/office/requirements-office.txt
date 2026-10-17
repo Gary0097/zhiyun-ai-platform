@@ -1,5 +1,6 @@
 # 智造云 AIOS 办公技能包预装依赖（aios-office 分支）
-# 启动器通过 apps/zhizaoyunAIOS/scripts/ensure-office-deps.mjs 幂等安装到项目 venv，
+# Windows 安装器通过 ensure-office-deps.mjs 与 windows.lock.txt 一次安装到项目 venv；
+# Windows 启动阶段不安装/下载，Linux 保留原启动期供给方式。
 # 避免办公技能执行期临时 pip install 浪费时间。
 # 全部为 Windows/Linux 通用 wheel（纯 Python 或自带二进制），Python 3.11-3.13。
 # 修改本文件会触发启动器重新校验与补装（标记文件记录内容哈希）。

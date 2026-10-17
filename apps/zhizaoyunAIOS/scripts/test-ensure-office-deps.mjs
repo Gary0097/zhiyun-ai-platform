@@ -13,7 +13,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const scriptsRoot = fileURLToPath(new URL('.', import.meta.url))
 const repoRoot = join(scriptsRoot, '..', '..', '..')
 const packRoot = join(repoRoot, 'skills', 'office')
-const { parseRequirements, requirementsHash, resolveVenvPython, ensureOfficeDependencies, environmentFingerprint, probeOfficeDependencies } =
+const { parseRequirements, requirementsHash, resolveVenvPython, ensureOfficeDependencies, environmentFingerprint, probeOfficeDependencies, officeDependencySpec } =
   await import(pathToFileURL(join(scriptsRoot, 'ensure-office-deps.mjs')).href)
 
 const temp = mkdtempSync(join(tmpdir(), 'aios-office-deps-'))
@@ -21,6 +21,7 @@ const quiet = () => {}
 try {
   // ---------- 1) requirements 解析与哈希 ----------
   const reqText = readFileSync(join(packRoot, 'requirements-office.txt'), 'utf8')
+  const markerHash = officeDependencySpec(packRoot).hash
   const entries = parseRequirements(reqText)
   assert.ok(entries.length >= 10, '依赖清单应包含核心办公包')
   assert.ok(entries.some(e => e.name === 'python-docx'), '应包含 python-docx')
@@ -68,9 +69,9 @@ try {
   let existedMarker = null
   try { existedMarker = readFileSync(markerPath, 'utf8') } catch { /* 首次运行无标记 */ }
   try {
-    writeFileSync(markerPath, JSON.stringify({ hash: requirementsHash(reqText), environment: environmentFingerprint(markerPython) }) + '\n', 'utf8')
+    writeFileSync(markerPath, JSON.stringify({ hash: markerHash, environment: environmentFingerprint(markerPython) }) + '\n', 'utf8')
     assert.equal(ensureOfficeDependencies({ appRoot: realAppRoot, packRoot, log: quiet }).status, 'up-to-date')
-    writeFileSync(markerPath, JSON.stringify({ hash: requirementsHash(reqText) }))
+    writeFileSync(markerPath, JSON.stringify({ hash: markerHash }))
     assert.equal(ensureOfficeDependencies({ appRoot: realAppRoot, packRoot, log: quiet }).status, 'probe-failed', '旧标记不能绕过环境复验')
     // 哈希不匹配的标记无效 → 必须重新探测。用 venv 自带依赖构造临时清单，
     // 避免测试触发真实下载安装（无 venv 环境则返回 no-runtime，同样合法）。
@@ -80,8 +81,9 @@ try {
     writeFileSync(markerPath, JSON.stringify({ hash: 'stale' }) + '\n', 'utf8')
     const recheck = ensureOfficeDependencies({ appRoot: realAppRoot, packRoot: stubPack, log: quiet })
     assert.equal(recheck.status, 'probe-failed', '过期标记必须探测，假解释器不能成功')
-    writeFileSync(markerPath, JSON.stringify({ hash: requirementsHash(reqText), environment: environmentFingerprint(markerPython) }))
+    writeFileSync(markerPath, JSON.stringify({ hash: markerHash, environment: environmentFingerprint(markerPython) }))
     writeFileSync(markerPython, 'rebuilt-python-environment')
+    assert.equal(ensureOfficeDependencies({ appRoot: realAppRoot, packRoot, log: quiet, allowInstall: false }).status, 'repair-required', '启动阶段禁止启动损坏的解释器或下载安装')
     assert.equal(ensureOfficeDependencies({ appRoot: realAppRoot, packRoot, log: quiet }).status, 'probe-failed')
     rmSync(markerPython)
     assert.equal(ensureOfficeDependencies({ appRoot: realAppRoot, packRoot, log: quiet }).status, 'no-runtime')

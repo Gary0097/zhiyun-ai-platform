@@ -108,9 +108,18 @@ const officeDeps = join(scriptsRoot, 'ensure-office-deps.mjs')
 if (existsSync(officeDeps) && existsSync(join(officePackRoot, 'requirements-office.txt'))) {
   try {
     const { ensureOfficeDependencies } = await import(pathToFileURL(officeDeps).href)
-    ensureOfficeDependencies({ appRoot, packRoot: officePackRoot })
+    ensureOfficeDependencies({ appRoot, packRoot: officePackRoot, allowInstall: process.platform !== 'win32' })
   } catch (e) {
     console.warn('办公依赖预装失败（不影响启动）：', e.message)
+  }
+}
+
+// Windows receipts are cheap local metadata checks only. Repairs belong to setup.
+const officeSetup = join(scriptsRoot, 'setup-office.mjs')
+if (process.platform === 'win32' && existsSync(officeSetup)) {
+  const { officeInstallationReady } = await import(pathToFileURL(officeSetup).href)
+  if (!officeInstallationReady(join(appRoot, '..', '..'))) {
+    console.warn('办公环境未完成安装或需要修复：运行 setup-ai-os.ps1；启动不会重新下载 LibreOffice 或办公依赖。')
   }
 }
 
