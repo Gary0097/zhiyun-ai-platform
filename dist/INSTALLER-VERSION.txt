@@ -1,7 +1,10 @@
 product: zhiyun-ai-os
-version: 2.2.0
-source_commit: 037bdbc885d3131417aca9517f3e15de0bc0604a
-qwenpaw: 2.2.0
+version: 2.2.1-office-1.6.0
+source_commit: a7f6e6618a5b0032b2c1276a979aa8665de11c22
+qwenpaw: 2.2.1
+libreoffice: 26.8.1
+office_dependencies: pinned, installed during setup
+office_startup_downloads: disabled
 locked_pawapps: 0
 channel: offline-usb
 note: U盘离线安装包 —— 内嵌 Python 运行时缓存、锁定 PawApp 与便携 Node；解压后运行 install-usb.cmd

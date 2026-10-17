@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { delimiter, dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const appRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
 const lockPath = join(appRoot, 'qwenpaw.lock.json')
@@ -99,6 +99,9 @@ export function resolveRuntime ({
 export function runtimeEnvironment (runtime, env = process.env) {
   if (!runtime.command) return { ...env }
   const commandDir = runtime.command === 'qwenpaw' ? null : dirname(runtime.command)
+  const officeDir = join(appRoot, '..', '..', 'extras', 'libreoffice', 'program')
+  const soffice = join(officeDir, 'soffice.com')
+  const officeReady = process.platform === 'win32' && existsSync(soffice)
   return {
     ...env,
     ...(runtime.python ? { PYTHON: runtime.python } : {}),
@@ -107,7 +110,8 @@ export function runtimeEnvironment (runtime, env = process.env) {
       QWENPAW_HOME: join(appRoot, 'workspace'),
       QWENPAW_WORKING_DIR: join(appRoot, 'workspace'),
     } : {}),
-    PATH: commandDir ? `${commandDir}${delimiter}${env.PATH || ''}` : (env.PATH || ''),
+    ...(officeReady ? { SOFFICE: soffice, AIOS_LIBREOFFICE_PROFILE: pathToFileURL(join(appRoot, 'runtime', 'office-profile')).href } : {}),
+    PATH: [commandDir, officeReady ? officeDir : null, env.PATH || ''].filter(Boolean).join(delimiter),
   }
 }
 

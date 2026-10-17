@@ -13,7 +13,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { join, dirname } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { parseRequirements, probeOfficeDependencies } from './ensure-office-deps.mjs'
+import { officeDependencySpec, probeOfficeDependencies } from './ensure-office-deps.mjs'
+import { officeInstallationReady } from './setup-office.mjs'
 
 const scriptRoot = dirname(fileURLToPath(import.meta.url))
 const appRoot = join(scriptRoot, '..')
@@ -86,7 +87,7 @@ try {
     if (!existsSync(python)) {
       report(false, '依赖预装', '运行环境未安装', '运行 setup-ai-os.ps1/.sh 安装运行环境')
     } else {
-      const requirements = parseRequirements(readFileSync(join(packRoot, 'requirements-office.txt'), 'utf8'))
+      const { requirements } = officeDependencySpec(packRoot)
       const probe = probeOfficeDependencies(python, requirements)
       const missing = probe.status === 0 ? JSON.parse(probe.stdout) : ['依赖探测失败']
       report(probe.status === 0 && !missing.length, '依赖预装', !missing.length ? `${requirements.length} 项依赖模块和版本满足要求（实际导入另见能力测试）` : '缺失或版本不满足：' + missing.join(', '),
@@ -94,6 +95,10 @@ try {
     }
   } catch (e) {
     report(false, '依赖预装', e.message, '检查 qwenpaw.lock.json')
+  }
+
+  if (process.platform === 'win32') {
+    report(officeInstallationReady(repoRoot), 'LibreOffice 与办公安装凭据', 'Windows 内置办公环境就绪标记', '运行完整 Windows 安装包或 setup-ai-os.ps1 修复；启动不自动下载')
   }
 
   // ⑤ OFFICE.md 办公回复规范

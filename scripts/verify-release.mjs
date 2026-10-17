@@ -85,6 +85,8 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'ensure-office-deps.mjs')]],
   [process.execPath, [join(scripts, 'ensure-office-deps.mjs'), '--check']],
   [process.execPath, [join(scripts, 'test-ensure-office-deps.mjs')]],
+  [process.execPath, [join(scripts, 'test-setup-office.mjs')]],
+  [process.execPath, ['--check', join(root, 'scripts', 'prepare-office-windows.mjs')]],
   [process.execPath, ['--check', join(scripts, 'link-zcode-skills.mjs')]],
   [process.execPath, ['--check', join(scripts, 'check-office-pack.mjs')]],
   [process.execPath, [join(scripts, 'link-zcode-skills.mjs'), '--check']],
@@ -128,6 +130,8 @@ assert.ok(existsSync(join(scripts, 'link-zcode-skills.mjs')), 'link-zcode-skills
 const ensureWorkspaceSrc = readFileSync(join(scripts, 'ensure-workspace.mjs'), 'utf8')
 assert.ok(ensureWorkspaceSrc.includes('provision-office-skills'), 'ensure-workspace.mjs must provision the office skill pack')
 assert.ok(ensureWorkspaceSrc.includes('ensure-office-deps'), 'ensure-workspace.mjs must preinstall the office dependencies')
+assert.ok(ensureWorkspaceSrc.includes("allowInstall: process.platform !== 'win32'"), 'Windows startup must not install or probe office dependencies')
+assert.ok(readFileSync(join(root, 'setup-ai-os.ps1'), 'utf8').includes('Invoke-OfficeSetup'), 'Windows installer must provision office before reporting success')
 assert.ok(ensureWorkspaceSrc.includes('link-zcode-skills'), 'ensure-workspace.mjs must hook the ZCode skills bridge')
 for (const hubEntry of ['start-hub.ps1', 'start-hub.sh']) {
   assert.ok(readFileSync(join(root, hubEntry), 'utf8').includes('provision-office-skills'), `${hubEntry} must provision the office skill pack`)

@@ -1,5 +1,5 @@
 ﻿[CmdletBinding()]
-param([switch]$Offline, [string]$CacheDir = "")
+param([switch]$Offline, [string]$CacheDir = "", [switch]$RepairOffice)
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EmbeddedRoot = Join-Path $ProjectRoot "apps\zhizaoyunAIOS"
@@ -10,6 +10,31 @@ $VenvRoot = Join-Path $RuntimeRoot "venv"
 $QwenPawCommand = Join-Path $VenvRoot "Scripts\qwenpaw.exe"
 $PythonCommand = Join-Path $VenvRoot "Scripts\python.exe"
 $CachedUv = Join-Path $RuntimeCache "bin\uv.exe"
+if (Test-Path -LiteralPath (Join-Path $RuntimeCache 'OFFLINE-PACKAGE')) { $Offline = $true }
+
+function Invoke-OfficeSetup {
+  $OfficeScript = Join-Path $EmbeddedRoot 'scripts\setup-office.mjs'
+  if (-not (Test-Path -LiteralPath $OfficeScript)) { return }
+  $BundledNode = Join-Path $ProjectRoot 'extras\node\node.exe'
+  $OfficeNode = if (Test-Path -LiteralPath $BundledNode) { $BundledNode } else { (Get-Command node -ErrorAction Stop).Source }
+  # Source checkouts do not carry the release-only LibreOffice payload.
+  # A damaged packaged installation must still fail instead of silently skipping it.
+  if ((Test-Path -LiteralPath (Join-Path $ProjectRoot '.git')) -and
+      -not (Test-Path -LiteralPath (Join-Path $ProjectRoot 'INSTALLER-VERSION.txt')) -and
+      -not (Test-Path -LiteralPath (Join-Path $ProjectRoot 'extras\libreoffice\office-bundle.manifest.json'))) {
+    $DependencyArgs = @((Join-Path $EmbeddedRoot 'scripts\ensure-office-deps.mjs'))
+    if ($Offline) { $DependencyArgs += '--offline' }
+    & $OfficeNode @DependencyArgs
+    if ($LASTEXITCODE -ne 0) { throw 'Source office dependency setup failed.' }
+    Write-Warning 'Source checkout: office libraries ready; LibreOffice conversion requires the full Windows installer or a separately configured LibreOffice.'
+    return
+  }
+  $OfficeArgs = @($OfficeScript)
+  if ($Offline) { $OfficeArgs += '--offline' }
+  if ($RepairOffice) { $OfficeArgs += '--repair' }
+  & $OfficeNode @OfficeArgs
+  if ($LASTEXITCODE -ne 0) { throw 'Office setup failed. See the diagnostic above; installation is incomplete.' }
+}
 
 function Test-QwenPawRuntime {
   if (-not (Test-Path -LiteralPath $QwenPawCommand) -or -not (Test-Path -LiteralPath $PythonCommand)) { return $false }
@@ -23,6 +48,7 @@ function Test-QwenPawRuntime {
   return $LASTEXITCODE -eq 0 -and $versionOutput -match ("version\s+" + [regex]::Escape($Lock.version) + "\s*$")
 }
 if (Test-QwenPawRuntime) {
+  Invoke-OfficeSetup
   Write-Host "QwenPaw $($Lock.version) 项目运行环境已就绪：$RuntimeRoot"; exit 0
 }
 
@@ -55,4 +81,5 @@ try {
   foreach ($name in $previous.Keys) { Set-Item -Path "env:$name" -Value $previous[$name] }
 }
 if (-not (Test-QwenPawRuntime)) { throw "项目运行环境安装后版本校验失败。" }
+Invoke-OfficeSetup
 Write-Host "QwenPaw $($Lock.version) 项目运行环境安装完成：$RuntimeRoot"
