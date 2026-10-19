@@ -48,7 +48,7 @@ def child(other):
         target.mkdir()
         result = subprocess.run([office, '--headless', '--convert-to', extension,
                                  '--outdir', str(target), str(source)],
-                                capture_output=True, text=True, timeout=120)
+                                capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=120)
         assert result.returncode == 0, result.stderr
         output = target / (source.stem + '.' + extension)
         assert output.is_file(), result.stdout
