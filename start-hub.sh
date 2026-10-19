@@ -22,6 +22,7 @@ HUB_BIN=./apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv/bin/qwenpaw
 command -v bwrap >/dev/null 2>&1 || echo "[WARN] bwrap (Bubblewrap) not found: Local runtimes will fail to start. Install it (e.g. apt install bubblewrap)."
 # 派生配置：public_base_url 用本机局域网 IPv4（OAuth/MCP 回调需与浏览器可见地址一致）
 node apps/zhizaoyunAIOS/scripts/hub-config.mjs
+node apps/zhizaoyunAIOS/scripts/chinese-defaults.mjs
 # 办公专属默认技能包预置（aios-office 分支）：与单机模式共用同一工作区；
 # 预置失败仅告警，不阻断 Hub 启动
 node apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs \
