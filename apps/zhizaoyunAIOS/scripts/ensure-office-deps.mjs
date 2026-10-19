@@ -119,11 +119,11 @@ export function environmentFingerprint (python) {
   }).join('\n')).digest('hex')
 }
 
-export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log, allowInstall = true, offline = false, forceReinstall = false } = {}) {
+export function ensureOfficeDependencies ({ appRoot, packRoot, log = console.log, allowInstall = true, offline = false, forceReinstall = false, runtime } = {}) {
   if (!appRoot || !packRoot) throw new Error('ensureOfficeDependencies 需要 appRoot 与 packRoot 参数')
   if (!existsSync(join(packRoot, 'requirements-office.txt'))) { log('  [office-deps] 未找到 requirements-office.txt，跳过依赖预装'); return { status: 'skipped' } }
   const { reqPath, requirements, hash } = officeDependencySpec(packRoot)
-  const { runtimeRoot, python } = resolveVenvPython(appRoot)
+  const { runtimeRoot, python } = runtime || resolveVenvPython(appRoot)
   const marker = join(runtimeRoot, MARKER_NAME)
 
   const markerValid = () => {

@@ -34,6 +34,12 @@ function Invoke-OfficeSetup {
   if ($RepairOffice) { $OfficeArgs += '--repair' }
   & $OfficeNode @OfficeArgs
   if ($LASTEXITCODE -ne 0) { throw 'Office setup failed. See the diagnostic above; installation is incomplete.' }
+  # The complete Windows package provisions Hub and member conversion support
+  # during installation, not during a member's first office task.
+  $HubArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $ProjectRoot 'setup-hub.ps1'), '-CacheDir', $RuntimeCache)
+  if ($Offline) { $HubArgs += '-Offline' }
+  & powershell.exe @HubArgs
+  if ($LASTEXITCODE -ne 0) { throw 'Bundled Hub setup failed.' }
 }
 
 function Test-QwenPawRuntime {

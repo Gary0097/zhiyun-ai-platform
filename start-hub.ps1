@@ -28,6 +28,10 @@ if ($LASTEXITCODE -ne 0) { throw 'Hub configuration failed.' }
 & node (Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\scripts\provision-office-skills.mjs')
 if ($LASTEXITCODE -ne 0) { Write-Host '[WARN] 办公技能包预置失败（不影响 Hub 启动）。' }
 $HubBin = Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\runtime\qwenpaw-hub\venv\Scripts'
+if (Test-Path -LiteralPath (Join-Path $HubBin 'soffice.exe')) {
+  $env:SOFFICE = Join-Path $HubBin 'soffice.exe'
+  $env:PATH = $HubBin + ';' + $env:PATH
+}
 $HubHost = & (Join-Path $HubBin 'python.exe') (Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\scripts\hub-bind-host.py')
 if ($LASTEXITCODE -ne 0) { throw 'Cannot read Hub administrator state; no server was started.' }
 if ($HubHost -eq '127.0.0.1') { Write-Host 'First-time setup: register the administrator at http://127.0.0.1:8000, then restart Hub for team access.' }
