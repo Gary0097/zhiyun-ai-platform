@@ -21,6 +21,6 @@
   ],
   "zcode_bridge": "apps/zhizaoyunAIOS/scripts/link-zcode-skills.mjs（本机装有 ZCode 时自动注册外部技能根）",
   "office_prompt": "default 工作区预置 OFFICE.md 办公回复规范并精简 system_prompt_files（每轮注入省约 1900 字符，输出纪律降低输出 token）",
-  "release": "https://github.com/Gary0097/zhiyun-ai-platform/releases/tag/aios-office-v1.4.0",
+  "release": "https://github.com/Gary0097/zhiyun-ai-platform/releases/tag/aios-office-v1.6.1",
   "health_check": "node apps/zhizaoyunAIOS/scripts/check-office-pack.mjs（check-ai-os 入口已内置；--json 输出机读）"
 }

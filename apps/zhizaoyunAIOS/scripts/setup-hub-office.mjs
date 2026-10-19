@@ -31,6 +31,7 @@ export async function setupHubOffice(repoRoot, { offline = false, repair = false
     dependencies: readFileSync(join(runtimeRoot, 'office-deps.ok'), 'utf8'),
     entry: statSync(entry).mtimeMs,
     command: statSync(join(target, 'program', 'soffice.com')).mtimeMs,
+    library: statSync(join(target, 'program', 'mergedlo.dll')).mtimeMs,
   })).digest('hex')
   try {
     if (!repair && JSON.parse(readFileSync(receipt, 'utf8')).key === key()) {

@@ -4,6 +4,7 @@ The child receives the upstream LocalProcessRuntimeProvisioner environment;
 no inherited Office/Python/PATH settings or sandbox bypass is used.
 """
 import argparse
+import ctypes
 from concurrent.futures import ThreadPoolExecutor
 import json
 import os
@@ -49,9 +50,11 @@ def child(other):
         result = subprocess.run([office, '--headless', '--convert-to', extension,
                                  '--outdir', str(target), str(source)],
                                 capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=120)
-        assert result.returncode == 0, result.stderr
+        diagnostic = {'exit_code': result.returncode, 'stdout': result.stdout, 'stderr': result.stderr}
+        (target / 'conversion-process.json').write_text(json.dumps(diagnostic, ensure_ascii=False, indent=2), encoding='utf-8')
+        assert result.returncode == 0, diagnostic
         output = target / (source.stem + '.' + extension)
-        assert output.is_file(), result.stdout
+        assert output.is_file(), diagnostic
         if extension == 'pdf':
             assert '85' in ''.join(page.extract_text() for page in PdfReader(output).pages)
         else:
@@ -110,6 +113,18 @@ def parent(root, output):
                     if process.poll() is None:
                         process.kill()
             assert (record.working_dir / 'conversion-result.json').is_file()
+            # Check the actual OS-private cache, not just the member's TMP.
+            sid = isolator._boundaries[record.runtime_id].loopback_sid
+            pointer = ctypes.c_void_p()
+            get_folder = ctypes.WinDLL('userenv').GetAppContainerFolderPath
+            get_folder.argtypes = [ctypes.c_wchar_p, ctypes.POINTER(ctypes.c_void_p)]
+            assert get_folder(sid, ctypes.byref(pointer)) == 0
+            try:
+                assert not list(Path(ctypes.wstring_at(pointer)).glob('lo-*')), 'Private Office profiles leaked'
+            finally:
+                free = ctypes.WinDLL('ole32').CoTaskMemFree
+                free.argtypes = [ctypes.c_void_p]
+                free(pointer)
         finally:
             isolator.release(record.runtime_id)
     (output / 'PASS.json').write_text(json.dumps({'native_windows_appcontainer': True, 'tenants': 2,
