@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Archive, [Parameter(Mandatory=$true)][string]$Target, [switch]$SkipStartupBenchmark)
+﻿param([Parameter(Mandatory=$true)][string]$Archive, [Parameter(Mandatory=$true)][string]$Target, [switch]$SkipStartupBenchmark)
 $ErrorActionPreference = 'Stop'
 $Repository = Split-Path -Parent $PSScriptRoot
 $Archive = (Resolve-Path -LiteralPath $Archive).Path
@@ -40,6 +40,11 @@ try {
   Remove-Item Env:PYTHONPATH,Env:PYTHONHOME -ErrorAction SilentlyContinue
   & $Exe $Archive $Target
   if ($LASTEXITCODE -ne 0) { throw ('Offline installer acceptance failed. Inspect ' + (Join-Path $Target 'office-install-test.log')) }
+  $SetupLog = Get-Content -LiteralPath (Join-Path $Target 'office-install-test.log') -Encoding UTF8 -Raw
+  if ($SetupLog -notmatch '项目运行环境安装完成|项目运行环境已就绪') { throw 'Installer log lost Chinese text across the PowerShell/process boundary' }
+  $HubScriptBytes = [IO.File]::ReadAllBytes((Join-Path $Target 'start-hub.ps1'))
+  if ($HubScriptBytes.Length -lt 3 -or $HubScriptBytes[0] -ne 239 -or $HubScriptBytes[1] -ne 187 -or $HubScriptBytes[2] -ne 191) { throw 'Windows PowerShell 5 Chinese Hub entry requires UTF-8 BOM' }
+  Write-Output 'PASS Chinese setup output and Windows PowerShell 5 Hub source encoding'
   $Node = Join-Path $Target 'extras\node\node.exe'
   $Setup = Join-Path $Target 'apps\zhizaoyunAIOS\scripts\setup-office.mjs'
   $Repeat = & $Node $Setup --offline 2>&1 | Out-String

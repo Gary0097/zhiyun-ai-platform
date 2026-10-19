@@ -434,6 +434,8 @@ class Installer
             CreateNoWindow = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            StandardOutputEncoding = new System.Text.UTF8Encoding(false),
+            StandardErrorEncoding = new System.Text.UTF8Encoding(false),
         };
         // 便携 Node 优先（与 install-usb.cmd 一致）
         psi.EnvironmentVariables.Remove("AIOS_UPDATE_TRANSACTION");

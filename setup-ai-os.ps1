@@ -1,6 +1,8 @@
 ﻿[CmdletBinding()]
 param([switch]$Offline, [string]$CacheDir = "", [switch]$RepairOffice)
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
+$OutputEncoding = [Console]::OutputEncoding
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EmbeddedRoot = Join-Path $ProjectRoot "apps\zhizaoyunAIOS"
 $Lock = Get-Content -LiteralPath (Join-Path $EmbeddedRoot "qwenpaw.lock.json") -Raw | ConvertFrom-Json
