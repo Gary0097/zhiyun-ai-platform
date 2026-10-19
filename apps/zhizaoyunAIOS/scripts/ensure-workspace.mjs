@@ -8,6 +8,11 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
 const appRoot = join(scriptsRoot, '..')
 const workspace = join(appRoot, 'workspace')
+const chineseDefaults = join(scriptsRoot, 'chinese-defaults.mjs')
+if (existsSync(chineseDefaults)) {
+  const { applyChineseDefaults } = await import(pathToFileURL(chineseDefaults).href)
+  console.log(`  [中文] 默认配置已就绪，更新 ${applyChineseDefaults(workspace)} 个文件。`)
+}
 
 // Node 24.11.1 on Windows can terminate natively in fs.cpSync when the
 // installation path contains Chinese characters. Copy the small brand tree

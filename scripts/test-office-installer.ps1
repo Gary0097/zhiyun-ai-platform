@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Archive, [Parameter(Mandatory=$true)][string]$Target)
+param([Parameter(Mandatory=$true)][string]$Archive, [Parameter(Mandatory=$true)][string]$Target, [switch]$SkipStartupBenchmark)
 $ErrorActionPreference = 'Stop'
 $Repository = Split-Path -Parent $PSScriptRoot
 $Archive = (Resolve-Path -LiteralPath $Archive).Path
@@ -69,6 +69,10 @@ try {
   & $RuntimePython (Join-Path $Target 'scripts\test-office-capabilities.py') --output (Join-Path $Target 'office-acceptance-fixtures')
   if ($LASTEXITCODE -ne 0) { throw 'Installed office functionality failed' }
   Write-Output 'PASS fresh offline install: document/OCR/conversion/Excel recalculation'
+  if ($SkipStartupBenchmark) {
+    Write-Output 'SKIP 8088 startup benchmark explicitly requested; leave existing host services untouched.'
+    return
+  }
   $ReceiptHash = (Get-FileHash -LiteralPath $Marker -Algorithm SHA256).Hash
   $env:Path = (Join-Path $Target 'extras\node') + ';' + $env:Path
   & $RuntimePython (Join-Path $Target 'scripts\benchmark-office-start.py') --output (Join-Path $Target 'office-startup-test') --runs 2

@@ -23,6 +23,8 @@ if (Test-Path -LiteralPath (Join-Path $Cache 'OFFLINE-PACKAGE')) { $SetupArgs +=
 if ($LASTEXITCODE -ne 0) { throw "Hub setup failed ($LASTEXITCODE)." }
 & node (Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\scripts\hub-config.mjs')
 if ($LASTEXITCODE -ne 0) { throw 'Hub configuration failed.' }
+& node (Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\scripts\chinese-defaults.mjs')
+if ($LASTEXITCODE -ne 0) { throw '中文默认配置设置失败。' }
 # 办公专属默认技能包预置（aios-office 分支）：与单机模式共用同一工作区；
 # 预置失败仅告警，不阻断 Hub 启动（QWENPAW_WORKING_DIR 已在上方设置）
 & node (Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\scripts\provision-office-skills.mjs')
