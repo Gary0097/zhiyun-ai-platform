@@ -16,6 +16,23 @@
   var LOGO = '/api/frontend_plugin/aios-brand/files/assets/brand-logo.png';
   var BRAND = { primary: '#0086AD', primaryHover: '#00A3C4', primaryActive: '#00688A', accent: '#0055A5' };
 
+  // Load the native model setup helper only when opened, never during chat boot.
+  try {
+    var ModelSetup = React.lazy(function () {
+      var modelSetupUrl = Q.host.getApiUrl('/frontend_plugin/aios-brand/files/dist/model-setup.mjs?v=1.1.0');
+      return import(new URL(modelSetupUrl, window.location.origin).href).then(function (module) {
+        return { default: module.createModelSetupPage(Q) };
+      });
+    });
+    Q.route.add(pluginId, {
+      id: 'aios-brand.models', path: '/aios-model-setup', meta: { title: '模型快配' },
+      component: function () {
+        return React.createElement(React.Suspense, { fallback: React.createElement('p', null, '正在打开模型配置…') }, React.createElement(ModelSetup));
+      }
+    });
+    Q.menu.add(pluginId, { id: 'aios-brand.models-menu', label: '模型快配', route: 'aios-brand.models', location: 'primary.settings', order: 4 });
+  } catch (e) { console.warn('[aios-brand] model setup unavailable'); }
+
   /* ── 1) 顶栏 Logo 槽位替换 ─────────────────────────────── */
   try {
     Q.slot.replace(pluginId, 'header.logo', function () {

@@ -3,7 +3,8 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import net from 'node:net'
-import { resolveRuntime, runtimeEnvironment } from './runtime-env.mjs'
+import { resolveRuntime, runtimeEnvironment, listenPort } from './runtime-env.mjs'
+import { diagnose } from './doctor.mjs'
 
 // 智造云 AIOS 2.2.2 —— 原生 QwenPaw 2.2.2 启动器（无捆绑业务应用）
 // 形态：原生 QwenPaw 单进程 + 控制台原生登录（QWENPAW_AUTH_ENABLED）。
@@ -11,6 +12,7 @@ import { resolveRuntime, runtimeEnvironment } from './runtime-env.mjs'
 const appRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
 const repoRoot = join(appRoot, '..', '..')
 const scriptsRoot = join(appRoot, 'scripts')
+const port = listenPort(process.env.AIOS_PORT)
 const runtime = resolveRuntime()
 const launchEnv = runtimeEnvironment(runtime)
 const qwenpawCommand = runtime.command || 'qwenpaw'
@@ -42,7 +44,7 @@ async function stopStaleInstance () {
   // Most starts have no listener. Avoid loading PowerShell/NetTCPIP just to
   // discover an unused port; ownership checks below remain mandatory if busy.
   const listening = await new Promise(resolve => {
-    const socket = net.createConnection({ host: '127.0.0.1', port: 8088 })
+    const socket = net.createConnection({ host: '127.0.0.1', port })
     socket.setTimeout(300)
     socket.once('connect', () => { socket.destroy(); resolve(true) })
     socket.once('error', () => { socket.destroy(); resolve(false) })
@@ -50,7 +52,7 @@ async function stopStaleInstance () {
   })
   if (!listening) return false
   const probe = spawnSync('powershell', ['-NoProfile', '-Command',
-    "(Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1).OwningProcess"], { encoding: 'utf8' })
+    `(Get-NetTCPConnection -LocalPort ${port} -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1).OwningProcess`], { encoding: 'utf8' })
   const pid = parseInt((probe.stdout || '').trim(), 10)
   if (!pid || Number.isNaN(pid)) return false
   const pathProbe = spawnSync('powershell', ['-NoProfile', '-Command',
@@ -63,7 +65,7 @@ async function stopStaleInstance () {
     `try { Stop-Process -Id ${pid} -Force } catch {}`])
   for (let i = 0; i < 10; i++) {
     const check = spawnSync('powershell', ['-NoProfile', '-Command',
-      "(Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyContinue) -ne $null"], { encoding: 'utf8' })
+      `(Get-NetTCPConnection -LocalPort ${port} -State Listen -ErrorAction SilentlyContinue) -ne $null`], { encoding: 'utf8' })
     if ((check.stdout || '').trim() !== 'True') return true
     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 500)
   }
@@ -74,39 +76,40 @@ if (!process.argv.includes('--check')) {
   try { await stopStaleInstance() } catch (e) { console.warn('旧实例接管检查失败：', e.message) }
 }
 
-run(process.execPath, [join(scriptsRoot, 'doctor.mjs')], '启动诊断未通过；请按上方提示处理后重试。')
+// Reuse the validated object in this process, never an environment-supplied receipt.
+if (await diagnose({ runtime, port }) !== 0) process.exit(1)
 if (process.argv.includes('--check')) process.exit(0)
 
 run(process.execPath, [join(scriptsRoot, 'ensure-workspace.mjs')], 'Workspace 初始化失败。')
 if (existsSync(join(scriptsRoot, 'patch-console-ui.mjs'))) {
-  run(process.execPath, [join(scriptsRoot, 'patch-console-ui.mjs')], 'Console UI 品牌化脚本执行失败。')
+  const consoleDir = process.platform === 'win32' && runtime.python
+    ? join(dirname(runtime.python), '..', 'Lib', 'site-packages', 'qwenpaw', 'console') : null
+  const args = [join(scriptsRoot, 'patch-console-ui.mjs')]
+  if (consoleDir && existsSync(join(consoleDir, 'index.html'))) args.push('--console-dir', consoleDir)
+  run(process.execPath, args, 'Console UI 品牌化脚本执行失败。')
 }
 
-// 品牌层插件（#126 官方扩展点形态）：启动前（服务离线窗口）安装/更新。
-// 安装命令只接受本地目录且需服务离线，这里正在 spawn 之前，条件满足。
+// ensure-workspace synchronizes the sanctioned frontend tree. The native
+// loader discovers it at boot; a separate CLI installation is unnecessary.
 const brandPlugin = join(repoRoot, 'plugins', 'aios-brand')
 if (existsSync(join(brandPlugin, 'plugin.json'))) {
-  // 版本门控（#aios-office 启动提速）：安装子进程实测约 10 秒，且每次启动
-  // 重跑并无必要——ensure-workspace 已把插件文件按版本同步到 workspace/plugins，
-  // 运行时从该目录扫描加载。已注册同一版本时跳过；升级/标记丢失自动重装。
   const brandVersion = JSON.parse(readFileSync(join(brandPlugin, 'plugin.json'), 'utf8')).version
   const brandMarker = join(appRoot, 'workspace', '.brand-plugin.version')
-  const alreadyRegistered = existsSync(brandMarker)
-    && readFileSync(brandMarker, 'utf8').trim() === brandVersion
-    && existsSync(join(appRoot, 'workspace', 'plugins', 'aios-brand', 'plugin.json'))
-  if (alreadyRegistered) {
-    console.log(`品牌层插件 v${brandVersion} 已注册，跳过安装子进程（版本未变）。`)
+  const installedManifest = join(appRoot, 'workspace', 'plugins', 'aios-brand', 'plugin.json')
+  if (existsSync(installedManifest) && JSON.parse(readFileSync(installedManifest, 'utf8')).version === brandVersion) {
+    if (!existsSync(brandMarker) || readFileSync(brandMarker, 'utf8').trim() !== brandVersion) {
+      writeFileSync(brandMarker, brandVersion + '\n', 'utf8')
+    }
+    console.log(`品牌前端 v${brandVersion} 已同步，由原生加载器发现，无需安装子进程。`)
   } else {
-    const install = spawnSync(qwenpawCommand, ['plugin', 'install', brandPlugin, '--force'], { cwd: repoRoot, stdio: 'inherit', env: launchEnv })
-    if (install.status !== 0) console.warn('品牌层插件安装失败（不影响启动，外观回退为补丁层）。')
-    else writeFileSync(brandMarker, brandVersion + '\n', 'utf8')
+    console.warn('品牌前端文件尚未同步，外观回退为补丁层。')
   }
 }
 
-console.log('\n智造云 AIOS 启动中：http://127.0.0.1:8088')
+console.log(`\n智造云 AIOS 启动中：http://127.0.0.1:${port}`)
 console.log('运行形态：原生 QwenPaw 2.2.2 单进程；控制台原生登录；无捆绑业务应用。')
 console.log('多用户/集中模型账号：运行 start-hub.cmd（QwenPaw Hub，端口 8000）。\n')
-const child = spawn(qwenpawCommand, ['app'], { cwd: repoRoot, stdio: 'inherit', env: launchEnv })
+const child = spawn(qwenpawCommand, ['app', '--port', String(port)], { cwd: repoRoot, stdio: 'inherit', env: launchEnv })
 process.on('SIGINT', () => child.kill('SIGINT'))
 process.on('SIGTERM', () => child.kill('SIGTERM'))
 child.on('exit', code => { process.exitCode = code || 0 })
