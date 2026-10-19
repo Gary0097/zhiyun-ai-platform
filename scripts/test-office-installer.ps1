@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Archive, [Parameter(Mandatory=$true)][string]$Target)
+﻿param([Parameter(Mandatory=$true)][string]$Archive, [Parameter(Mandatory=$true)][string]$Target, [switch]$SkipStartupBenchmark)
 $ErrorActionPreference = 'Stop'
 $Repository = Split-Path -Parent $PSScriptRoot
 $Archive = (Resolve-Path -LiteralPath $Archive).Path
@@ -40,6 +40,11 @@ try {
   Remove-Item Env:PYTHONPATH,Env:PYTHONHOME -ErrorAction SilentlyContinue
   & $Exe $Archive $Target
   if ($LASTEXITCODE -ne 0) { throw ('Offline installer acceptance failed. Inspect ' + (Join-Path $Target 'office-install-test.log')) }
+  $SetupLog = Get-Content -LiteralPath (Join-Path $Target 'office-install-test.log') -Encoding UTF8 -Raw
+  if ($SetupLog -notmatch '项目运行环境安装完成|项目运行环境已就绪') { throw 'Installer log lost Chinese text across the PowerShell/process boundary' }
+  $HubScriptBytes = [IO.File]::ReadAllBytes((Join-Path $Target 'start-hub.ps1'))
+  if ($HubScriptBytes.Length -lt 3 -or $HubScriptBytes[0] -ne 239 -or $HubScriptBytes[1] -ne 187 -or $HubScriptBytes[2] -ne 191) { throw 'Windows PowerShell 5 Chinese Hub entry requires UTF-8 BOM' }
+  Write-Output 'PASS Chinese setup output and Windows PowerShell 5 Hub source encoding'
   $Node = Join-Path $Target 'extras\node\node.exe'
   $Setup = Join-Path $Target 'apps\zhizaoyunAIOS\scripts\setup-office.mjs'
   $Repeat = & $Node $Setup --offline 2>&1 | Out-String
@@ -64,11 +69,23 @@ try {
   & $Node $Setup --offline --repair | Out-Null
   if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $DocxInit)) { throw 'Explicit offline office repair failed' }
   Write-Output 'PASS explicit offline repair restores damaged managed package files'
+  $HubDocxInit = Join-Path $Target 'apps\zhizaoyunAIOS\runtime\qwenpaw-hub\venv\Lib\site-packages\docx\__init__.py'
+  Remove-Item -LiteralPath $HubDocxInit
+  # PATH deliberately still excludes every global and bundled Node directory.
+  & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Target 'setup-ai-os.ps1') -Offline -RepairOffice | Out-Null
+  if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $HubDocxInit)) { throw 'Offline maintenance did not restore Hub package using bundled Node' }
+  $HubRepeat = & $Node (Join-Path $Target 'apps\zhizaoyunAIOS\scripts\setup-hub-office.mjs') --offline 2>&1 | Out-String
+  if ($LASTEXITCODE -ne 0 -or $HubRepeat -notmatch 'no copy, dependency probe or download') { throw 'Hub repair did not leave a stable receipt' }
+  Write-Output 'PASS offline maintenance restores nested Hub package damage without global Node and leaves a fast receipt'
   $AfterRepair = & $Node $Setup --offline 2>&1 | Out-String
   if ($LASTEXITCODE -ne 0 -or $AfterRepair -notmatch 'no dependency probe, download or LibreOffice process') { throw 'Repair did not leave a stable installation receipt' }
   & $RuntimePython (Join-Path $Target 'scripts\test-office-capabilities.py') --output (Join-Path $Target 'office-acceptance-fixtures')
   if ($LASTEXITCODE -ne 0) { throw 'Installed office functionality failed' }
   Write-Output 'PASS fresh offline install: document/OCR/conversion/Excel recalculation'
+  if ($SkipStartupBenchmark) {
+    Write-Output 'SKIP 8088 startup benchmark explicitly requested; leave existing host services untouched.'
+    return
+  }
   $ReceiptHash = (Get-FileHash -LiteralPath $Marker -Algorithm SHA256).Hash
   $env:Path = (Join-Path $Target 'extras\node') + ';' + $env:Path
   & $RuntimePython (Join-Path $Target 'scripts\benchmark-office-start.py') --output (Join-Path $Target 'office-startup-test') --runs 2

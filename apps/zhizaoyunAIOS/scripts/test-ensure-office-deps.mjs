@@ -93,6 +93,14 @@ try {
     else rmSync(markerPath, { force: true })
   }
 
+  // Hub must use its own venv and receipt, not the single-user installation.
+  const hubRoot = join(temp, 'runtime-hub')
+  const hubPython = join(hubRoot, 'venv', 'Scripts', 'python.exe')
+  mkdirSync(join(hubPython, '..'), { recursive: true })
+  writeFileSync(hubPython, 'fake-interpreter-must-not-execute')
+  writeFileSync(join(hubRoot, 'office-deps.ok'), JSON.stringify({ hash: officeDependencySpec(packRoot).hash, environment: environmentFingerprint(hubPython) }))
+  assert.equal(ensureOfficeDependencies({ appRoot: join(temp, 'missing-app'), packRoot, log: quiet, runtime: { runtimeRoot: hubRoot, python: hubPython } }).status, 'up-to-date')
+
   // Optional real interpreter regression: module presence must not hide an old version.
   if (process.env.OFFICE_TEST_PYTHON) {
     const probe = probeOfficeDependencies(process.env.OFFICE_TEST_PYTHON, parseRequirements('python-docx>=999\nopenpyxl>=3.1\n'))

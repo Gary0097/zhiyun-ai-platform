@@ -4,24 +4,42 @@
 # 模型账号（API Key）由管理员在 Hub 管理界面统一配置（凭据保险库），
 # 本脚本只负责运行环境。
 [CmdletBinding()]
-param([switch]$Offline, [string]$CacheDir = "")
+param([switch]$Offline, [string]$CacheDir = "", [switch]$RepairOffice)
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
+$OutputEncoding = [Console]::OutputEncoding
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EmbeddedRoot = Join-Path $ProjectRoot "apps\zhizaoyunAIOS"
 $Lock = Get-Content -LiteralPath (Join-Path $EmbeddedRoot "qwenpaw.lock.json") -Raw | ConvertFrom-Json
 $RuntimeCache = if ($CacheDir) { $CacheDir } else { Join-Path $EmbeddedRoot "runtime\cache" }
+if (Test-Path -LiteralPath (Join-Path $RuntimeCache 'OFFLINE-PACKAGE')) { $Offline = $true }
 $HubVenv = Join-Path $EmbeddedRoot "runtime\qwenpaw-hub\venv"
 $HubQwenPaw = Join-Path $HubVenv "Scripts\qwenpaw.exe"
 $HubPython = Join-Path $HubVenv "Scripts\python.exe"
 $CachedUv = Join-Path $RuntimeCache "bin\uv.exe"
+$BundledNode = Join-Path $ProjectRoot 'extras\node\node.exe'
+$HubNode = if (Test-Path -LiteralPath $BundledNode) { $BundledNode } else { (Get-Command node -ErrorAction Stop).Source }
 
 # Hub 控制台品牌化（智造云 AIOS 风格；失败不阻断，可重跑）
 function Invoke-HubBranding {
   $PatchScript = Join-Path $ProjectRoot "apps\zhizaoyunAIOS\scripts\patch-console-ui.mjs"
   $HubConsole = Join-Path $HubVenv "Lib\site-packages\qwenpaw\console"
   if ((Test-Path $PatchScript) -and (Test-Path (Join-Path $HubConsole "index.html"))) {
-    try { & node $PatchScript --console-dir $HubConsole | Out-Null } catch { Write-Host "提示：Hub 控制台品牌化未完成，可重跑 setup-hub.ps1。" }
+    try { & $HubNode $PatchScript --console-dir $HubConsole | Out-Null } catch { Write-Host "提示：Hub 控制台品牌化未完成，可重跑 setup-hub.ps1。" }
   }
+}
+
+function Invoke-HubOffice {
+  if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot 'extras\office\soffice.exe'))) {
+    if (Test-Path -LiteralPath (Join-Path $ProjectRoot 'INSTALLER-VERSION.txt')) { throw 'Bundled Hub Office wrapper is missing; use the complete Windows installer.' }
+    Write-Warning 'Source checkout: bundled Hub Office is unavailable until a full Windows package is built.'
+    return
+  }
+  $OfficeArgs = @((Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\scripts\setup-hub-office.mjs'))
+  if ($Offline -or (Test-Path -LiteralPath (Join-Path $RuntimeCache 'OFFLINE-PACKAGE'))) { $OfficeArgs += '--offline' }
+  if ($RepairOffice) { $OfficeArgs += '--repair' }
+  & $HubNode @OfficeArgs
+  if ($LASTEXITCODE -ne 0) { throw 'Hub Office provisioning failed.' }
 }
 
 function Test-HubRuntime {
@@ -37,6 +55,7 @@ function Test-HubRuntime {
 if (Test-HubRuntime) {
   Write-Host "QwenPaw Hub $($Lock.version) 运行环境已就绪：$HubVenv"
   Invoke-HubBranding
+  Invoke-HubOffice
   exit 0
 }
 
@@ -71,4 +90,5 @@ try {
 if (-not (Test-HubRuntime)) { throw "QwenPaw Hub 运行环境安装后版本校验失败。" }
 
 Invoke-HubBranding
+Invoke-HubOffice
 Write-Host "QwenPaw Hub $($Lock.version) 运行环境安装完成：$HubVenv"

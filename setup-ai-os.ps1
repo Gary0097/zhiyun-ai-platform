@@ -1,6 +1,8 @@
 ﻿[CmdletBinding()]
 param([switch]$Offline, [string]$CacheDir = "", [switch]$RepairOffice)
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
+$OutputEncoding = [Console]::OutputEncoding
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EmbeddedRoot = Join-Path $ProjectRoot "apps\zhizaoyunAIOS"
 $Lock = Get-Content -LiteralPath (Join-Path $EmbeddedRoot "qwenpaw.lock.json") -Raw | ConvertFrom-Json
@@ -34,6 +36,13 @@ function Invoke-OfficeSetup {
   if ($RepairOffice) { $OfficeArgs += '--repair' }
   & $OfficeNode @OfficeArgs
   if ($LASTEXITCODE -ne 0) { throw 'Office setup failed. See the diagnostic above; installation is incomplete.' }
+  # The complete Windows package provisions Hub and member conversion support
+  # during installation, not during a member's first office task.
+  $HubArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $ProjectRoot 'setup-hub.ps1'), '-CacheDir', $RuntimeCache)
+  if ($Offline) { $HubArgs += '-Offline' }
+  if ($RepairOffice) { $HubArgs += '-RepairOffice' }
+  & powershell.exe @HubArgs
+  if ($LASTEXITCODE -ne 0) { throw 'Bundled Hub setup failed.' }
 }
 
 function Test-QwenPawRuntime {

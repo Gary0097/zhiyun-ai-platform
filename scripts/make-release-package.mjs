@@ -73,6 +73,13 @@ if (process.platform === 'win32' && existsSync(officeLockPath)) {
   if (bundle.version !== officeLock.version || bundle.msi_sha256 !== officeLock.sha256) throw new Error('Prepared LibreOffice does not match the packaged ref')
   await verifyOfficePayload(source, bundle)
   cpSync(source, join(workDir, 'extras', 'libreoffice'), { recursive: true, filter: path => !path.toLowerCase().endsWith('.msi') })
+  const wrapperSource = join(workDir, 'scripts', 'exe-installer', 'office-wrapper.cs')
+  if (existsSync(wrapperSource)) {
+  const officeWrapper = join(workDir, 'extras', 'office', 'soffice.exe')
+  mkdirSync(dirname(officeWrapper), { recursive: true })
+  const compiler = join(process.env.WINDIR || 'C:\\Windows', 'Microsoft.NET', 'Framework64', 'v4.0.30319', 'csc.exe')
+  execFileSync(compiler, ['/nologo', '/target:exe', '/optimize+', '/out:' + officeWrapper, wrapperSource], { stdio: 'inherit' })
+  }
   console.log(`Bundled LibreOffice ${officeLock.version} with licenses, source offer and app-local VC runtime.`)
 }
 const manifest = [

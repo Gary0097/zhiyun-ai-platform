@@ -86,6 +86,8 @@ const commands = [
   [process.execPath, [join(scripts, 'ensure-office-deps.mjs'), '--check']],
   [process.execPath, [join(scripts, 'test-ensure-office-deps.mjs')]],
   [process.execPath, [join(scripts, 'test-setup-office.mjs')]],
+  [process.execPath, ['--check', join(scripts, 'setup-hub-office.mjs')]],
+  [process.execPath, [join(scripts, 'test-chinese-defaults.mjs')]],
   [process.execPath, ['--check', join(root, 'scripts', 'prepare-office-windows.mjs')]],
   [process.execPath, ['--check', join(scripts, 'link-zcode-skills.mjs')]],
   [process.execPath, ['--check', join(scripts, 'check-office-pack.mjs')]],
