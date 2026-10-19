@@ -64,6 +64,14 @@ try {
   & $Node $Setup --offline --repair | Out-Null
   if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $DocxInit)) { throw 'Explicit offline office repair failed' }
   Write-Output 'PASS explicit offline repair restores damaged managed package files'
+  $HubDocxInit = Join-Path $Target 'apps\zhizaoyunAIOS\runtime\qwenpaw-hub\venv\Lib\site-packages\docx\__init__.py'
+  Remove-Item -LiteralPath $HubDocxInit
+  # PATH deliberately still excludes every global and bundled Node directory.
+  & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Target 'setup-ai-os.ps1') -Offline -RepairOffice | Out-Null
+  if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $HubDocxInit)) { throw 'Offline maintenance did not restore Hub package using bundled Node' }
+  $HubRepeat = & $Node (Join-Path $Target 'apps\zhizaoyunAIOS\scripts\setup-hub-office.mjs') --offline 2>&1 | Out-String
+  if ($LASTEXITCODE -ne 0 -or $HubRepeat -notmatch 'no copy, dependency probe or download') { throw 'Hub repair did not leave a stable receipt' }
+  Write-Output 'PASS offline maintenance restores nested Hub package damage without global Node and leaves a fast receipt'
   $AfterRepair = & $Node $Setup --offline 2>&1 | Out-String
   if ($LASTEXITCODE -ne 0 -or $AfterRepair -notmatch 'no dependency probe, download or LibreOffice process') { throw 'Repair did not leave a stable installation receipt' }
   & $RuntimePython (Join-Path $Target 'scripts\test-office-capabilities.py') --output (Join-Path $Target 'office-acceptance-fixtures')

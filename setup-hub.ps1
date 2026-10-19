@@ -4,7 +4,7 @@
 # 模型账号（API Key）由管理员在 Hub 管理界面统一配置（凭据保险库），
 # 本脚本只负责运行环境。
 [CmdletBinding()]
-param([switch]$Offline, [string]$CacheDir = "")
+param([switch]$Offline, [string]$CacheDir = "", [switch]$RepairOffice)
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EmbeddedRoot = Join-Path $ProjectRoot "apps\zhizaoyunAIOS"
@@ -15,13 +15,15 @@ $HubVenv = Join-Path $EmbeddedRoot "runtime\qwenpaw-hub\venv"
 $HubQwenPaw = Join-Path $HubVenv "Scripts\qwenpaw.exe"
 $HubPython = Join-Path $HubVenv "Scripts\python.exe"
 $CachedUv = Join-Path $RuntimeCache "bin\uv.exe"
+$BundledNode = Join-Path $ProjectRoot 'extras\node\node.exe'
+$HubNode = if (Test-Path -LiteralPath $BundledNode) { $BundledNode } else { (Get-Command node -ErrorAction Stop).Source }
 
 # Hub 控制台品牌化（智造云 AIOS 风格；失败不阻断，可重跑）
 function Invoke-HubBranding {
   $PatchScript = Join-Path $ProjectRoot "apps\zhizaoyunAIOS\scripts\patch-console-ui.mjs"
   $HubConsole = Join-Path $HubVenv "Lib\site-packages\qwenpaw\console"
   if ((Test-Path $PatchScript) -and (Test-Path (Join-Path $HubConsole "index.html"))) {
-    try { & node $PatchScript --console-dir $HubConsole | Out-Null } catch { Write-Host "提示：Hub 控制台品牌化未完成，可重跑 setup-hub.ps1。" }
+    try { & $HubNode $PatchScript --console-dir $HubConsole | Out-Null } catch { Write-Host "提示：Hub 控制台品牌化未完成，可重跑 setup-hub.ps1。" }
   }
 }
 
@@ -33,7 +35,8 @@ function Invoke-HubOffice {
   }
   $OfficeArgs = @((Join-Path $ProjectRoot 'apps\zhizaoyunAIOS\scripts\setup-hub-office.mjs'))
   if ($Offline -or (Test-Path -LiteralPath (Join-Path $RuntimeCache 'OFFLINE-PACKAGE'))) { $OfficeArgs += '--offline' }
-  & node @OfficeArgs
+  if ($RepairOffice) { $OfficeArgs += '--repair' }
+  & $HubNode @OfficeArgs
   if ($LASTEXITCODE -ne 0) { throw 'Hub Office provisioning failed.' }
 }
 

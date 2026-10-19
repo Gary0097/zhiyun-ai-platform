@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { bundledOffice, verifyOfficePayload } from './setup-office.mjs'
 import { ensureOfficeDependencies, officeDependencySpec, environmentFingerprint } from './ensure-office-deps.mjs'
 
-export async function setupHubOffice(repoRoot, { offline = false } = {}) {
+export async function setupHubOffice(repoRoot, { offline = false, repair = false } = {}) {
   if (process.platform !== 'win32') return
   const appRoot = join(repoRoot, 'apps', 'zhizaoyunAIOS')
   const runtimeRoot = join(appRoot, 'runtime', 'qwenpaw-hub')
@@ -33,7 +33,7 @@ export async function setupHubOffice(repoRoot, { offline = false } = {}) {
     command: statSync(join(target, 'program', 'soffice.com')).mtimeMs,
   })).digest('hex')
   try {
-    if (JSON.parse(readFileSync(receipt, 'utf8')).key === key()) {
+    if (!repair && JSON.parse(readFileSync(receipt, 'utf8')).key === key()) {
       console.log('[hub-office] Ready; no copy, dependency probe or download.')
       return
     }
@@ -42,7 +42,7 @@ export async function setupHubOffice(repoRoot, { offline = false } = {}) {
   mkdirSync(target, { recursive: true })
   cpSync(office.root, target, { recursive: true, filter: path => !path.toLowerCase().endsWith('.msi') })
   copyFileSync(wrapper, entry)
-  const result = ensureOfficeDependencies({ appRoot, packRoot, offline, runtime: { runtimeRoot, python } })
+  const result = ensureOfficeDependencies({ appRoot, packRoot, offline, forceReinstall: repair, runtime: { runtimeRoot, python } })
   if (!['installed', 'satisfied', 'up-to-date'].includes(result.status)) throw new Error('Hub office dependencies failed: ' + result.status)
   const probe = spawnSync(python, ['-c', 'import docx,openpyxl,pptx,pypdf,rapidocr_onnxruntime'], { encoding: 'utf8', timeout: 120000 })
   if (probe.status !== 0) throw new Error('Hub office imports failed')
@@ -56,6 +56,6 @@ export async function setupHubOffice(repoRoot, { offline = false } = {}) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  try { await setupHubOffice(resolve(dirname(fileURLToPath(import.meta.url)), '../../..'), { offline: process.argv.includes('--offline') }) }
+  try { await setupHubOffice(resolve(dirname(fileURLToPath(import.meta.url)), '../../..'), { offline: process.argv.includes('--offline'), repair: process.argv.includes('--repair') }) }
   catch (error) { console.error(error.message); process.exitCode = 1 }
 }

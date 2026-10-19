@@ -38,6 +38,7 @@ function Invoke-OfficeSetup {
   # during installation, not during a member's first office task.
   $HubArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $ProjectRoot 'setup-hub.ps1'), '-CacheDir', $RuntimeCache)
   if ($Offline) { $HubArgs += '-Offline' }
+  if ($RepairOffice) { $HubArgs += '-RepairOffice' }
   & powershell.exe @HubArgs
   if ($LASTEXITCODE -ne 0) { throw 'Bundled Hub setup failed.' }
 }
