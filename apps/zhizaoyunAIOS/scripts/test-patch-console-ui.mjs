@@ -40,7 +40,7 @@ const EXTRA = 'ExtraHelp-EXTRA01.js'
 // 片段嵌入合法的声明/对象上下文——真实 bundle 中这些片段本就位于对象字面量
 // 或赋值语句内，fixture 必须保持同等语法合法性，ESM 解析校验才有意义。
 const entryFixture = [
-  'const i18n={lng:localStorage.getItem("language")||navigator.language||"en",avatar:"/qwenpaw.png"};',
+  'const Z1=localStorage.getItem("language")||navigator.language||"en";const i18n={lng:Z1,avatar:"/qwenpaw.png"};',
   'const bootTitle="QwenPaw Console";',
   'window.QwenPaw=window.QwenPaw||{};',
   'console.info("[QwenPaw audit] boot");',
@@ -51,7 +51,7 @@ const entryFixture = [
   'var H=`https://qwenpaw.agentscope.io/docs/faq.${N}.md`;',
   'const manifest=["assets/' + LOGIN + '","assets/' + EXTRA + '"];',
   // 与真实 bundle 逐字符一致的 filePreviewUrl 源码（文件下载 404 修复目标）
-  'const fileApi={filePreviewUrl:e=>{if(!e)return"";if(e.startsWith("http://")||e.startsWith("https://"))return e;let t=e.replace(/^\\/+/,"");const a=`${Pp}/${t}`,n=Y(a),o=vt();return o?`${n}?token=${encodeURIComponent(o)}`:n}};',
+  'const fileApi={filePreviewUrl:e=>{if(!e)return"";if(e.startsWith("http://")||e.startsWith("https://"))return e;let t=e.replace(/^\\/+/,"");const n=`${aE}/${t}`,o=ce(n),s=Dt();return s?`${o}?token=${encodeURIComponent(s)}`:o}};',
   'export{bootTitle,manifest,i18n,ud,UM,H}',
 ].join('\n')
 
@@ -148,13 +148,13 @@ try {
   ok(/eb="\/aios-docs\.html\?v=[0-9a-f]{8}#about"/.test(entry), '右下角关于打开本地版本说明（带缓存版本）')
   ok(/H=`\/aios-docs-faq\.\$\{N\}\.md\?v=[0-9a-f]{8}`/.test(entry), '更新弹窗 FAQ 拉取本地化并带版本参数（消除运行时外呼）')
   ok(/UM=e=>"\/aios-docs\.html\?v=[0-9a-f]{8}#tutorial"/.test(entry), '文档菜单 URL 改指内嵌文档（带版本参数）')
-  ok(entry.includes('lng:localStorage.getItem("language")||"zh"'), '默认语言替换为 zh')
+  ok(entry.includes('localStorage.getItem("language")||"zh"'), '默认语言替换为 zh')
   ok(entry.includes('avatar:"/qwenpaw.svg"'), '欢迎页头像改用品牌 Logo SVG')
   ok(entry.includes('bootTitle="智造云AIOS Console"'), '用户可见 QwenPaw 文案替换为 智造云AIOS')
   ok(entry.includes('window.QwenPaw'), '技术标识 window.QwenPaw 保留')
   ok(entry.includes('[QwenPaw audit]'), '技术标识 [QwenPaw audit] 保留')
   ok(entry.includes('"agentscope-ai/QwenPaw"'), '技术标识 agentscope-ai/QwenPaw 保留')
-  ok(entry.includes('let t=e.replace(/^\\/+/,"").replace(/%/g,"%2525").replace(/#/g,"%23").replace(/\\?/g,"%3F");const a=`${Pp}/${t}`'),
+  ok(entry.includes('let t=e.replace(/^\\/+/,"").replace(/%/g,"%2525").replace(/#/g,"%23").replace(/\\?/g,"%3F");const n=`${aE}/${t}`'),
     '文件预览 URL 编码修复已注入（#/? 截断与 % 双重解码 404 修复）')
 
   // 登录 chunk：两个外链进入死代码，语言切换保持活跃
@@ -205,7 +205,7 @@ try {
   ok(!/<a href="[^"]*agentscope/i.test(docs), '内嵌文档无 agentscope 外链锚点')
   ok(!docs.includes('id="doc-desktop"'), '内嵌文档不含上游 desktop 章节')
   ok(!/QwenPaw Desktop(?!\.app)/.test(docs), '行文中的上游桌面版名称已隐藏为中性表述（.app 真实路径按技术标识保留）')
-  ok(docs.includes('智造云AIOS 2.2.1 更新公告') && docs.includes('智能体内核升级 2.2.0 → 2.2.1'), '更新日志为结合内核升级的 2.2.1 完整更新公告')
+  ok(docs.includes('智造云AIOS 2.2.2 更新公告') && docs.includes('智能体内核升级 2.2.1 → 2.2.2'), '更新日志为结合内核升级的 2.2.2 完整更新公告')
   ok(docs.includes('企业内支持'), '问题反馈章节已品牌化改写')
   ok(!/qwenpaw\.agentscope\.io/.test(docs) && !docs.includes('AgentScope Platform') && !docs.includes('魔搭创空间'), '上游官网/云平台/魔搭引用清零（含安装脚本）')
   ok(docs.includes('install-oneclick.cmd') && docs.includes('start-ai-os.cmd'), '安装指引为智造云AIOS 启动器方式')
@@ -222,7 +222,7 @@ try {
   ok(docSection('console').includes('start-hub.cmd') && docSection('console').includes('bash start-hub.sh') && docSection('console').includes(':8000/'), '共享控制台帮助区分 Hub 与单机入口')
   ok(!docSection('channels').includes('Hi! This is QwenPaw') && !docSection('channels').includes('QwenPaw-Bot'), '普通欢迎语和机器人示例使用发行版名称')
   ok(docSection('channels').includes('尚未安装') && !docSection('channels').includes('零外部依赖'), 'SIP 如实说明缺失依赖，不提供虚假的开箱部署指引')
-  ok(docSection('contributing').includes('QwenPaw 2.2.1'), '来源声明与当前运行时一致')
+  ok(docSection('contributing').includes('QwenPaw 2.2.2'), '来源声明与当前运行时一致')
   ok(docSection('console').includes('href="#doc-configReference"') && docSection('cli').includes('href="#doc-configReference"'), '技术配置链接进入完整参考章节')
   ok(docSection('faq').includes('定时任务没有执行') && docSection('faq').includes('时区'), '保留定时任务排查目的章节')
   ok(docSection('models').includes('QwenPaw-Flash') && docSection('models').includes('QwenPaw Local'), '保留真实模型与提供商名称')
@@ -296,8 +296,8 @@ try {
 
   // 文件预览编码修复被回退 → 门禁必须发现（防回归虚绿）
   const fixedEntry = readFileSync(join(assetsDir, entrySrcInHtml()), 'utf8')
-  const regressed = fixedEntry.replace('let t=e.replace(/^\\/+/,"").replace(/%/g,"%2525").replace(/#/g,"%23").replace(/\\?/g,"%3F");const a=`${Pp}/${t}`',
-    'let t=e.replace(/^\\/+/,"");const a=`${Pp}/${t}`')
+  const regressed = fixedEntry.replace('let t=e.replace(/^\\/+/,"").replace(/%/g,"%2525").replace(/#/g,"%23").replace(/\\?/g,"%3F");const n=`${aE}/${t}`',
+    'let t=e.replace(/^\\/+/,"");const n=`${aE}/${t}`')
   writeFileSync(join(assetsDir, entrySrcInHtml()), regressed)
   writeFileSync(join(assetsDir, ENTRY), regressed)
   ok(runPatch(['--check']).status !== 0, '文件预览编码修复被回退时 --check 必须失败')

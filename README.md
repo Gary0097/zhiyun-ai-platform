@@ -1,6 +1,6 @@
 # 智造云 AIOS
 
-基于 **原版 QwenPaw 2.2.1 + QwenPaw Hub** 的智造云品牌发行版：开箱即用的企业智能体操作系统。
+基于 **原版 QwenPaw 2.2.2 + QwenPaw Hub** 的智造云品牌发行版：开箱即用的企业智能体操作系统。
 
 > 产品定义：[`docs/product/PRD-V7.0-AIOS-2.2.0.md`](docs/product/PRD-V7.0-AIOS-2.2.0.md)
 
@@ -12,11 +12,11 @@
 **PPT（office-ppt）、EXCEL（office-excel）、WORD（office-word）、PDF 识别（office-pdf）、
 OCR（office-ocr）、文件读取（office-file-reader）、电脑操作（office-computer）、
 浏览器操控（office-browser）、搜图（office-image-search）、查资料（office-research）、
-制作内容（office-content）**；常用 Python 依赖（文档/PDF/OCR）由启动器预装，执行期不再临时安装。
+制作内容（office-content）**；Windows 办公依赖在安装阶段预装，启动时不再安装或下载；Linux 保留启动期供给。
 
 一键完整下载使用（详见 [`docs/product/office-skill-pack.md`](docs/product/office-skill-pack.md)）：
 
-- **免 Git 一键完整下载（推荐）**：[Releases `aios-office-v1.4.0`](https://github.com/Gary0097/zhiyun-ai-platform/releases/tag/aios-office-v1.4.0)——下载 zip 解压后运行 `install-oneclick.cmd`（Linux 为 `install-oneclick.sh`），办公技能包与依赖随首次启动自动预置。
+- **已发布 Windows 离线包**：[Release `aios-office-v1.6.0`](https://github.com/Gary0097/zhiyun-ai-platform/releases/tag/aios-office-v1.6.0)——包含 LibreOffice、Node、Python 和办公依赖，双击 EXE 安装。该已发布安装包基于 2.2.1；本分支源码锁已更新到 2.2.2，需重新构建和验收后才能发布新版安装包。
 
 ```cmd
 git clone -b aios-office https://github.com/Gary0097/zhiyun-ai-platform.git
@@ -47,9 +47,9 @@ install-oneclick.cmd
 
 ## 项目介绍
 
-智造云 AIOS 2.2.1 是一台"智造云牌"的 QwenPaw 智能体计算机：
+智造云 AIOS 2.2.2 是一台"智造云牌"的 QwenPaw 智能体计算机：
 
-- **原版内核**：QwenPaw 2.2.1（智能体运行时 + 控制台 + Agent 容器），不改内核行为，随锁文件整体升级
+- **原版内核**：QwenPaw 2.2.2（智能体运行时 + 控制台 + Agent 容器），不改内核行为，随锁文件整体升级
 - **原生登录**：单机用 QwenPaw 原生认证（首个用户控制台注册）；多用户用 QwenPaw Hub 账号体系
 - **模型凭据保险库**：原生 Hub 按个人租户加密保存凭据，并注入该租户的运行环境。管理员录入的凭据不会自动共享给员工；PRD 中的管理员统一供给与员工零接触密钥流程尚未验收，见 #138。
 - **智造云品牌**：控制台与 Hub 界面全套"智造云 AIOS"标识与齿轮 Logo
@@ -73,7 +73,7 @@ start-ai-os.cmd
 ### Hub 多用户模式（端口 8000，推荐团队使用）
 
 ```cmd
-start-hub.cmd   :: 首次自动安装 Hub 环境（qwenpaw[hub]==2.2.1）
+start-hub.cmd   :: 首次自动安装 Hub 环境（qwenpaw[hub]==2.2.2）
 > Local 运行环境前置要求：Windows 需以管理员身份运行启动器（AppContainer 隔离）；Linux 需安装 Bubblewrap（`apt install bubblewrap`）。启动器会自动检测并提示。
 ```
 
@@ -85,8 +85,8 @@ start-hub.cmd   :: 首次自动安装 Hub 环境（qwenpaw[hub]==2.2.1）
 ## 架构
 
 ```
-智造云 AIOS 2.2.1
-├─ QwenPaw 2.2.1（原版内核；版本锁 apps/zhizaoyunAIOS/qwenpaw.lock.json）
+智造云 AIOS 2.2.2
+├─ QwenPaw 2.2.2（原版内核；版本锁 apps/zhizaoyunAIOS/qwenpaw.lock.json）
 │  ├─ 单机控制台  http://127.0.0.1:8088（原生登录 QWENPAW_AUTH_ENABLED）
 │  └─ QwenPaw Hub http://<host>:8000（多用户账号 + 凭据保险库集中管 Key）
 ├─ 品牌化 patch-console-ui.mjs（智造云 AIOS 文案 + branding/ 资产）
@@ -109,8 +109,8 @@ start-hub.cmd   :: 首次自动安装 Hub 环境（qwenpaw[hub]==2.2.1）
 
 ## 文档
 
-- 产品需求：[PRD V7.0（智造云 AIOS 2.2.1）](docs/product/PRD-V7.0-AIOS-2.2.0.md)
-- 使用说明：[docs/user-manual](docs/user-manual/README.md)（v1.x 手册，2.2.1 版重写中）
+- 产品需求：[PRD V7.0（智造云 AIOS 2.2.2）](docs/product/PRD-V7.0-AIOS-2.2.0.md)
+- 使用说明：[docs/user-manual](docs/user-manual/README.md)（v1.x 手册，2.2.2 版重写中）
 - QwenPaw 官方文档：https://qwenpaw.agentscope.io/
 
 ## 国内镜像（Gitee）

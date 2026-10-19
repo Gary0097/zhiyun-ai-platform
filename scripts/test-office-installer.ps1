@@ -23,7 +23,7 @@ class OfficeInstallerAcceptance {
 }
 '@
 [IO.File]::WriteAllText((Join-Path $Build 'acceptance.cs'), $Source)
-[IO.File]::WriteAllText((Join-Path $Build 'VersionInfo.cs'), 'static class VersionInfo { public const string AppVersion = "2.2.1"; }')
+[IO.File]::WriteAllText((Join-Path $Build 'VersionInfo.cs'), 'static class VersionInfo { public const string AppVersion = "2.2.2"; }')
 $Compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 $SourceDir = Join-Path $PSScriptRoot 'exe-installer'
 $Exe = Join-Path $Build 'office-installer-test.exe'
