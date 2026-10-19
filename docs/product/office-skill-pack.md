@@ -1,6 +1,6 @@
 # AIOS 办公专属默认技能包（aios-office 分支）
 
-> 版本：1.5.0 ｜ 分支：`aios-office` ｜ 参考 ZCode 办公模式设计，桥接 ZCode 官方办公技能
+> 版本：1.6.0 ｜ 分支：`aios-office` ｜ 参考 ZCode 办公模式设计，桥接 ZCode 官方办公技能
 
 ## 0. 版本演进：完全体 Harness（对标 WorkBuddy/Kimi，token 更省、效果更强）
 
@@ -64,7 +64,7 @@
 
 ## 1. 这是什么
 
-`aios-office` 分支在智造云 AIOS 2.2.1 标准形态之上，预置了一套**办公专属默认技能包**：
+`aios-office` 分支在智造云 AIOS 2.2.2 标准形态之上，预置了一套**办公专属默认技能包**：
 用户完成一键安装并启动后，11 项办公能力已进入技能池与全部智能体工作区，并**默认启用**，
 无需在控制台手动导入或开启。Windows 常用 Python 依赖（文档读写/PDF/OCR）由安装器**预装**到
 项目运行环境，技能执行不再临时 `pip install` 浪费时间。
@@ -132,7 +132,7 @@ rapidocr-onnxruntime）。Windows 使用 `requirements-office-windows.lock.txt` 
    并以 `skill-pool-manifest.v1` 格式登记池清单条目；
 3. 把技能目录复制到 `$QWENPAW_WORKING_DIR/workspaces/<agent_id>/skills/`（每个现有
    智能体工作区），并以 `workspace-skill-manifest.v1` 格式在工作区 `skill.json` 写入
-   `enabled: true, channels: ["all"]` 条目——QwenPaw 2.2.1 的清单调和逻辑会保留该状态；
+   `enabled: true, channels: ["all"]` 条目——QwenPaw 2.2.2 的清单调和逻辑会保留该状态；
 4. 同步状态（内容哈希）记录在 `<工作区>/.office-pack.json`：内容未变化不重写任何文件。
 
 数据安全边界：
@@ -200,7 +200,7 @@ node apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs --check   # 只校�
 ## 6. 设计说明
 
 - 参考 ZCode 办公模式（pptx/xlsx/docx/浏览器/电脑操作/搜图等技能的"工作流+校验+
-  交付清单"范式），适配 QwenPaw 2.2.1 技能系统（技能池 → 工作区副本 → skill.json
+  交付清单"范式），适配 QwenPaw 2.2.2 技能系统（技能池 → 工作区副本 → skill.json
   清单调和）；
 - 技能均为指导型 SKILL.md（不声明 `metadata.requires`，避免因缺少二进制/环境变量被
   运行时跳过），依赖检查内置于各技能工作流（如 `pip install python-pptx`）；
