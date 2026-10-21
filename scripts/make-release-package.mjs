@@ -7,10 +7,11 @@
 // --no-prune：跳过 dist 历史产物清理（默认打包成功后只保留最近 2 个版本）。
 import { createHash } from 'node:crypto'
 import { execSync, execFileSync, spawnSync } from 'node:child_process'
-import { mkdirSync, copyFileSync, readFileSync, writeFileSync, existsSync, statSync, rmSync, cpSync, readdirSync } from 'node:fs'
+import { mkdirSync, copyFileSync, readFileSync, writeFileSync, existsSync, statSync, rmSync, cpSync, readdirSync, createReadStream } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { pruneDist } from './release-prune.mjs'
+import { verifyOfficePayload } from '../apps/zhizaoyunAIOS/scripts/setup-office.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const argv = process.argv.slice(2)
@@ -61,11 +62,32 @@ const pawappsLock = existsSync(pawappsLockPath)
   : { apps: [] }
 // 运行时版本以被打包 ref 的锁为准（--ref 重建旧版本时清单不得错报）
 const qwenpawLock = JSON.parse(readFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'qwenpaw.lock.json'), 'utf8'))
+const officeLockPath = join(workDir, 'apps', 'zhizaoyunAIOS', 'office-windows.lock.json')
+let officeLock
+if (process.platform === 'win32' && existsSync(officeLockPath)) {
+  officeLock = JSON.parse(readFileSync(officeLockPath, 'utf8'))
+  const source = process.env.LIBREOFFICE_SRC || join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'office-build', `libreoffice-${officeLock.version}`)
+  const manifestPath = join(source, 'office-bundle.manifest.json')
+  if (!existsSync(manifestPath)) throw new Error('Prepare the pinned LibreOffice payload first: node scripts/prepare-office-windows.mjs')
+  const bundle = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  if (bundle.version !== officeLock.version || bundle.msi_sha256 !== officeLock.sha256) throw new Error('Prepared LibreOffice does not match the packaged ref')
+  await verifyOfficePayload(source, bundle)
+  cpSync(source, join(workDir, 'extras', 'libreoffice'), { recursive: true, filter: path => !path.toLowerCase().endsWith('.msi') })
+  const wrapperSource = join(workDir, 'scripts', 'exe-installer', 'office-wrapper.cs')
+  if (existsSync(wrapperSource)) {
+  const officeWrapper = join(workDir, 'extras', 'office', 'soffice.exe')
+  mkdirSync(dirname(officeWrapper), { recursive: true })
+  const compiler = join(process.env.WINDIR || 'C:\\Windows', 'Microsoft.NET', 'Framework64', 'v4.0.30319', 'csc.exe')
+  execFileSync(compiler, ['/nologo', '/target:exe', '/optimize+', '/out:' + officeWrapper, wrapperSource], { stdio: 'inherit' })
+  }
+  console.log(`Bundled LibreOffice ${officeLock.version} with licenses, source offer and app-local VC runtime.`)
+}
 const manifest = [
   'product: zhiyun-ai-os',
   `version: ${version}`,
   `source_commit: ${execFileSync('git', ['rev-parse', 'HEAD'], { cwd: workDir, encoding: 'utf8' }).trim()}`,
   `qwenpaw: ${qwenpawLock.version}`,
+  ...(officeLock ? [`libreoffice: ${officeLock.version}`, 'office_dependencies: pinned, installed during setup', 'office_startup_downloads: disabled'] : []),
   `locked_pawapps: ${pawappsLock.apps.length}`,
   ...pawappsLock.apps.map(a => `  - ${a.id} @ ${a.commit}`),
   `channel: ${offline ? 'offline-usb' : 'online-installer'}`,
@@ -113,6 +135,23 @@ if (offline) {
     console.log(`内嵌 runtime/${part}（${dirSizeMb(src)} MB）...`)
     if (!cacheArchive || part !== 'cache') cpSync(src, join(pkgRuntime, part), { recursive: true })
   }
+  if (officeLock) {
+    // ONNX/OpenCV require MSVCP, which python-build-standalone does not ship.
+    // Supply the verified MSI's x64 redistributables beside the real Python
+    // image; merely putting them on PATH or beside the venv redirector fails.
+    const vcRoot = join(workDir, 'extras', 'libreoffice', 'System64')
+    const pythonCache = join(liveRuntime, 'cache', 'python')
+    for (const home of readdirSync(pythonCache, { withFileTypes: true })) {
+      // uv also exposes a junction named cpython-3.12; ZIP export expands it
+      // into a separate home, so both names need the same app-local DLLs.
+      if (!existsSync(join(pythonCache, home.name, 'python.exe'))) continue
+      const target = join(pkgRuntime, 'cache', 'python', home.name)
+      mkdirSync(target, { recursive: true })
+      for (const file of readdirSync(vcRoot)) {
+        if (file.endsWith('.dll')) copyFileSync(join(vcRoot, file), join(target, file))
+      }
+    }
+  }
   // 2) 便携 Node（仅 node.exe，约 80MB；start-ai-os.cmd 会自动优先使用）
   const nodeSrc = process.env.NODE_SRC || join(process.env.ProgramFiles || 'C:\\Program Files', 'nodejs', 'node.exe')
   if (existsSync(nodeSrc)) {
@@ -120,7 +159,8 @@ if (offline) {
     copyFileSync(nodeSrc, join(workDir, 'extras', 'node', 'node.exe'))
     console.log(`内嵌便携 Node：${nodeSrc}`)
   } else {
-    console.warn('警告：未找到 node.exe，离线包将要求目标机器自行安装 Node.js 20+。')
+    if (process.platform === 'win32') throw new Error('Offline Windows installer requires bundled node.exe; set NODE_SRC to a valid Windows Node executable.')
+    console.warn('Non-Windows offline package requires an existing Node.js installation.')
   }
   // 3) U盘一键安装入口（自动优先使用内嵌 node）
   // cmd 在中文系统默认 GBK 代码页，UTF-8 中文 echo 会被误读成乱码命令
@@ -213,7 +253,9 @@ if (offline) {
     '常用入口：start-ai-os.cmd（启动）、diagnose-ai-os.cmd（诊断）、',
     'start-hub.cmd（局域网多用户，0.0.0.0:8000）。',
     '',
-    '要求：Windows 10/11 x64；本包未内嵌 node.exe 时需 Node.js 20+。',
+    '要求：Windows 10/11 x64。已内置 Python、Node、LibreOffice 与办公依赖，无需手工补装。',
+    '办公依赖只在安装或主动修复时配置；日常启动不下载。停止服务后可运行 setup-ai-os.ps1 -RepairOffice 离线修复办公库。',
+    '本包不包含模型权重或 API 密钥；模型服务请按现有供应商配置。',
     '',
   ].join('\r\n')
   writeFileSync(join(workDir, 'USB-INSTALL.md'), '\uFEFF' + guide, 'utf8')
@@ -240,12 +282,24 @@ try {
   } else {
     run(`cd "${workDir}" && zip -r -q "${zipPath}" . -x '.git'`)
   }
+  if (offline && officeLock) {
+    const python = join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'qwenpaw-hub', 'venv', 'Scripts', 'python.exe')
+    try {
+      execFileSync(python, [join(root, 'scripts', 'verify-office-offline-cache.py'), '--archive', zipPath, '--scratch', join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'office-build')], { stdio: 'inherit' })
+    } catch (error) {
+      rmSync(zipPath, { force: true })
+      rmSync(`${zipPath}.sha256`, { force: true })
+      throw new Error('Offline office cache is incomplete; refusing to emit an installer.', { cause: error })
+    }
+  }
 } finally {
   // 无论成败都清理 worktree（失败后 prune，保证下次可重建）
   try { run('git worktree remove --force .release-worktree') } catch { run('git worktree prune'); rmSync(workDir, { recursive: true, force: true }) }
 }
 
-const sha256 = createHash('sha256').update(readFileSync(zipPath)).digest('hex')
+const hash = createHash('sha256')
+for await (const bytes of createReadStream(zipPath)) hash.update(bytes)
+const sha256 = hash.digest('hex')
 writeFileSync(`${zipPath}.sha256`, `${sha256}  ${zipName}\n`, 'utf8')
 writeFileSync(join(distDir, 'INSTALLER-VERSION.txt'), manifest.join('\n') + '\n', 'utf8')
 const sizeMb = (statSync(zipPath).size / 1024 / 1024).toFixed(2)

@@ -434,6 +434,8 @@ class Installer
             CreateNoWindow = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            StandardOutputEncoding = new System.Text.UTF8Encoding(false),
+            StandardErrorEncoding = new System.Text.UTF8Encoding(false),
         };
         // 便携 Node 优先（与 install-usb.cmd 一致）
         psi.EnvironmentVariables.Remove("AIOS_UPDATE_TRANSACTION");
@@ -460,6 +462,8 @@ class Installer
         string prefix = TargetRoot(targetDir);
         var paths = new System.Collections.Generic.List<string>();
         var pending = new System.Collections.Generic.Stack<string>();
+        foreach (string relative in new[] { "apps/zhizaoyunAIOS/runtime/zhizaoyunAIOS/office-install.ok", "apps/zhizaoyunAIOS/runtime/zhizaoyunAIOS/office-deps.ok", "apps/zhizaoyunAIOS/runtime/qwenpaw-hub/hub-office.ok", "apps/zhizaoyunAIOS/runtime/qwenpaw-hub/office-deps.ok" })
+            if (File.Exists(Uninstaller.CheckedPath(targetDir, relative))) paths.Add(relative);
         foreach (string relative in new[] { "apps/zhizaoyunAIOS/runtime/zhizaoyunAIOS/venv", "apps/zhizaoyunAIOS/runtime/qwenpaw-hub/venv" })
         {
             string folder = Uninstaller.CheckedPath(targetDir, relative);

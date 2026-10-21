@@ -3,11 +3,16 @@
 // zhiyun-auth 的 users.json/token_secret；仅保留运行必需的基础目录。
 import { mkdirSync, existsSync, renameSync, readdirSync, copyFileSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const scriptsRoot = dirname(fileURLToPath(import.meta.url))
 const appRoot = join(scriptsRoot, '..')
 const workspace = join(appRoot, 'workspace')
+const chineseDefaults = join(scriptsRoot, 'chinese-defaults.mjs')
+if (existsSync(chineseDefaults)) {
+  const { applyChineseDefaults } = await import(pathToFileURL(chineseDefaults).href)
+  console.log(`  [中文] 默认配置已就绪，更新 ${applyChineseDefaults(workspace)} 个文件。`)
+}
 
 // Node 24.11.1 on Windows can terminate natively in fs.cpSync when the
 // installation path contains Chinese characters. Copy the small brand tree
@@ -87,3 +92,50 @@ if (existsSync(join(brandSrc, 'plugin.json'))) {
 }
 
 console.log('Workspace 目录结构已就绪。')
+
+// 办公专属默认技能包预置（aios-office 分支）：把仓库 skills/office 同步到
+// 技能池与全部智能体工作区并默认启用。动态导入 + 存在性检查：技能包或脚本
+// 缺失（如测试单文件拷贝、裁剪安装）时静默跳过；预置失败不阻断启动。
+const officeProvisioner = join(scriptsRoot, 'provision-office-skills.mjs')
+const officePackRoot = join(appRoot, '..', '..', 'skills', 'office')
+if (existsSync(officeProvisioner) && existsSync(join(officePackRoot, 'office-pack.json'))) {
+  try {
+    const { provisionOfficeSkills } = await import(pathToFileURL(officeProvisioner).href)
+    provisionOfficeSkills({ workspace, packRoot: officePackRoot })
+  } catch (e) {
+    console.warn('办公技能包预置失败（不影响启动，可重跑 start-ai-os 重试）：', e.message)
+  }
+}
+
+// 办公技能包依赖预装（docx/excel/ppt/pdf/OCR 等常用包）：启动期幂等安装到
+// 项目 venv，避免技能执行期临时 pip install。同样缺文件静默跳过、失败不阻断。
+const officeDeps = join(scriptsRoot, 'ensure-office-deps.mjs')
+if (existsSync(officeDeps) && existsSync(join(officePackRoot, 'requirements-office.txt'))) {
+  try {
+    const { ensureOfficeDependencies } = await import(pathToFileURL(officeDeps).href)
+    ensureOfficeDependencies({ appRoot, packRoot: officePackRoot, allowInstall: process.platform !== 'win32' })
+  } catch (e) {
+    console.warn('办公依赖预装失败（不影响启动）：', e.message)
+  }
+}
+
+// Windows receipts are cheap local metadata checks only. Repairs belong to setup.
+const officeSetup = join(scriptsRoot, 'setup-office.mjs')
+if (process.platform === 'win32' && existsSync(officeSetup)) {
+  const { officeInstallationReady } = await import(pathToFileURL(officeSetup).href)
+  if (!officeInstallationReady(join(appRoot, '..', '..'))) {
+    console.warn('办公环境未完成安装或需要修复：运行 setup-ai-os.ps1；启动不会重新下载 LibreOffice 或办公依赖。')
+  }
+}
+
+// ZCode 默认办公技能桥接（完全体）：本机装有 ZCode 时，把其官方办公插件
+// 技能注册为外部技能根（原地引用不复制，未安装则静默跳过）。
+const zcodeBridge = join(scriptsRoot, 'link-zcode-skills.mjs')
+if (existsSync(zcodeBridge)) {
+  try {
+    const { linkZcodeSkills } = await import(pathToFileURL(zcodeBridge).href)
+    linkZcodeSkills({ workspace })
+  } catch (e) {
+    console.warn('ZCode 技能桥接失败（不影响启动）：', e.message)
+  }
+}

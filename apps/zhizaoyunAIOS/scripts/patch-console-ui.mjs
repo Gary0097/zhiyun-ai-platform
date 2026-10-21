@@ -49,6 +49,20 @@ const REPLACEMENTS = [
     to: 'avatar:"/qwenpaw.svg"',
     patched: 'avatar:"/qwenpaw.svg"',
   },
+  // ── 功能性修复：聊天文件卡片无法点击下载（#aios-office）──
+  // 上游 filePreviewUrl 把本地绝对路径原样拼进 URL（不做任何编码）：
+  // 文件名含 # 或 ? 时被浏览器当作 fragment/query 截断；含字面 %xx 时
+  // 被服务端两次解码破坏路径（starlette 一次 + files.py unquote 一次）→ 404。
+  // 修复：仅对这三个危险字符做定向编码——% 双重编码（%2525）抵消服务端
+  // 两次解码，#/? 单次编码避免被当作分隔符；其余字符保持原样，与上游
+  // 反向解析（单次 decodeURIComponent）兼容。
+  {
+    name: '文件预览 URL 编码修复（#/? 截断与 % 双重解码 404）',
+    optional: false,
+    from: 'filePreviewUrl:e=>{if(!e)return"";if(e.startsWith("http://")||e.startsWith("https://"))return e;let t=e.replace(/^\\/+/,"");',
+    to: 'filePreviewUrl:e=>{if(!e)return"";if(e.startsWith("http://")||e.startsWith("https://"))return e;let t=e.replace(/^\\/+/,"").replace(/%/g,"%2525").replace(/#/g,"%23").replace(/\\?/g,"%3F");',
+    patched: 'let t=e.replace(/^\\/+/,"").replace(/%/g,"%2525")',
+  },
   // 2.2.1 sidebar quick menu: change only its About destination.
   {
     name: '2.2.1 右下角关于 → 本地发行版说明',
@@ -109,9 +123,9 @@ const REPLACEMENTS = [
   },
   {
     name: '默认中文语言',
-    from: 'lng:localStorage.getItem("language")||navigator.language||"en"',
-    to: 'lng:localStorage.getItem("language")||"zh"',
-    patched: 'lng:localStorage.getItem("language")||"zh"',
+    from: 'localStorage.getItem("language")||navigator.language||"en"',
+    to: 'localStorage.getItem("language")||"zh"',
+    patched: 'localStorage.getItem("language")||"zh"',
   },
 ]
 
@@ -862,7 +876,7 @@ toc,
 '</aside>',
 '<main>',
 '<h1>智造云AIOS 帮助中心</h1>',
-'<p class="sub">智造云AIOS 2.2.1（灵泽万川 · 企业级智能体操作系统） · 离线内嵌文档</p>',
+'<p class="sub">智造云AIOS 2.2.2（灵泽万川 · 企业级智能体操作系统） · 离线内嵌文档</p>',
 '<div class="quick">',
 '<a href="#tutorial">快速上手</a>',
 '<a href="#demo">视频教程</a>',
@@ -871,7 +885,7 @@ toc,
 '</div>',
 '<section id="about">',
 '<h2>关于 智造云AIOS</h2>',
-'<p>智造云AIOS 2.2.1，由灵泽万川提供品牌、安装与维护体验，基于开源 QwenPaw 2.2.1 运行时构建。</p>',
+'<p>智造云AIOS 2.2.2，由灵泽万川提供品牌、安装与维护体验，基于开源 QwenPaw 2.2.2 运行时构建。</p>',
 '<p>Windows 安装版可通过系统托盘的“检查软件更新”或安装目录的 update-ai-os.cmd 检查正式更新。更新前请保存工作；更新过程需要停服和备份。</p>',
 '<p>账号、工作区和模型配置保存在本机。应用与系统独立交付，模型服务由所配置的供应商提供。</p>',
 '</section>',
@@ -881,11 +895,11 @@ toc,
 '</section>',
 '<section id="changelog">',
 '<h2>更新日志</h2>',
-'<h3>智造云AIOS 2.2.1 更新公告</h3>',
-'<p><strong>智能体内核升级 2.2.0 → 2.2.1</strong>：升级至 2.2.1 运行时，包含上游稳定性修复与能力更新；升级前应备份工作区和凭据；新版运行环境须通过安装脚本准备，保留已有账号与数据目录。</p>',
+'<h3>智造云AIOS 2.2.2 更新公告</h3>',
+'<p><strong>智能体内核升级 2.2.1 → 2.2.2</strong>：升级至 2.2.2 运行时，包含上游稳定性修复与能力更新；升级前应备份工作区和凭据；新版运行环境须通过安装脚本准备，保留已有账号与数据目录。</p>',
 '<ul>',
-'<li><strong>2.2.1 上游更新</strong>：调整侧栏与设置页，支持按智能体配置模型路由、统一管理环境变量；修复 Windows 工作区启动、会话切换和 MCP 工具白名单等问题。具体新增能力尚未逐项实机验收。</li>',
-'<li><strong>多用户模式（Hub）</strong>：提供独立账号和用户运行环境。原生凭据按个人租户保存；管理员集中供给模型仍待实现与验收。</li>',
+'<li><strong>2.2.2 上游更新</strong>：新增主题与字号设置、会话终端、统一模型发现与会话级模型选择；改进文件交付展示、历史消息恢复与控制台按需加载。具体新增能力尚未逐项实机验收。</li>',
+'<li><strong>多用户模式（Hub）</strong>：上游新增组织模型网关、成员用量预算和邀请注册。独立账号与初始化列入兼容性检查；集中模型供给和成员运行环境仍需部署后端到端验收。</li>',
 '<li><strong>登录体系</strong>：单机首次注册账号；Hub 首个账号为管理员。两套账号分别管理，没有预置账号密码。</li>',
 '<li><strong>应用体系解耦</strong>：业务应用不再捆绑发行，转为独立交付、按需安装；本次不安装或迁移独立业务应用的数据。</li>',
 '<li><strong>品牌与体验</strong>：智造云AIOS 保留品牌化界面（主题、Logo、登录页）、内嵌离线帮助中心、竖屏/窄屏适配。</li>',
@@ -893,7 +907,7 @@ toc,
 '</ul>',
 '</section>',
 sections,
-'<footer>灵泽万川 · 智造云AIOS 2.2.1 — 本页面为内嵌离线文档</footer>',
+'<footer>灵泽万川 · 智造云AIOS 2.2.2 — 本页面为内嵌离线文档</footer>',
 '</main>',
 '</div>',
 '</body>',
@@ -923,7 +937,7 @@ sections,
     '- 先获取新发行版安装包或经审查的项目版本，备份数据并停止服务，再按该版本发布说明更新。',
     '- 单纯重启旧启动器不会下载新发行版源码；启动脚本只按当前版本锁校验运行环境。',
     '- 控制台内无在线自更新；版本升级一律由管理员在服务器上执行。',
-    '- 2.2.1 完整变更见 帮助中心 → 更新日志。'].join('\n')
+    '- 2.2.2 完整变更见 帮助中心 → 更新日志。'].join('\n')
   const faqEn = ['### How to update 智造云AIOS', '',
     '- Obtain the new distribution package or reviewed project revision, back up data, stop the service, and follow its release instructions.',
     '- Restarting an old launcher does not download a new distribution; scripts validate the runtime against the current version lock.',
@@ -996,10 +1010,11 @@ function sweepStaleZybAssets (consoleDir) {
   if (removed) console.log('已清理 ' + removed + ' 个历史遗留的未引用 zyb 资产文件。')
 }
 
-const runtime = resolveRuntime()
 // --console-dir <目录>：显式指定控制台资产目录（如 Hub venv 的 console），
 // 缺省时按项目运行时解析
 const dirFlagIdx = process.argv.indexOf('--console-dir')
+// An explicit console path (Hub and validated launcher) needs no CLI startup.
+const runtime = dirFlagIdx !== -1 && process.argv[dirFlagIdx + 1] ? null : resolveRuntime()
 const consoleDir = dirFlagIdx !== -1 && process.argv[dirFlagIdx + 1]
   ? process.argv[dirFlagIdx + 1]
   : locateConsoleDir(runtime)
@@ -1011,6 +1026,37 @@ if (!consoleDir) {
   }
   warn('Console UI 定制跳过：未找到可用的 QwenPaw Console 目录（CLI-only 或无本地控制台），不影响启动。')
   process.exit(0)
+}
+
+// ── 启动提速：内容签名快跳（#aios-office）──────────────────────────────
+// 全量补丁（重写 + brotli/gz 重压缩 + 内嵌文档生成）实测约 15-20 秒，是启动
+// 链路里最大的固定开销。补丁成功后保存 console 目录内容签名；下次启动签名
+// 未变则整体跳过（<0.5 秒）。签名包含补丁版本号 PATCH_REV：补丁逻辑变化时
+// 提升该版本即可强制全量重打。--check 与 --docs-only 不走快跳。
+// 标记放在 console 目录之外（运行时随包目录升级整体消失 → 自动全量重打）。
+const PATCH_REV = '2026-10-19-qwenpaw-222-filefix-3'
+const sigFile = join(consoleDir, '..', '.aios-console-patch.sig')
+function consoleSignature () {
+  const h = createHash('sha1')
+  h.update(PATCH_REV + '\n')
+  const walk = d => {
+    for (const e of readdirSync(d, { withFileTypes: true })) {
+      h.update('d:' + e.name + '\n')
+      const f = join(d, e.name)
+      if (e.isDirectory()) walk(f)
+      else { const s = statSync(f); h.update('f:' + e.name + ':' + s.size + ':' + Math.round(s.mtimeMs) + '\n') }
+    }
+  }
+  walk(consoleDir)
+  return h.digest('hex')
+}
+if (!checkMode && !process.argv.includes('--docs-only')) {
+  try {
+    if (readFileSync(sigFile, 'utf8').trim() === consoleSignature()) {
+      console.log('Console 品牌补丁无变化，快跳（内容签名一致）。')
+      process.exit(0)
+    }
+  } catch { /* 无历史标记 → 全量执行 */ }
 }
 
 // Refresh documentation without rebuilding console assets or restarting services.
@@ -1248,4 +1294,11 @@ sweepStaleZybAssets(consoleDir)
 
 if (missing.length) {
   warn('以下目标未找到，bundle 可能已更新：' + missing.join('、'))
+}
+
+// 全量补丁流程走完后记录内容签名，供下次启动快跳。missing 只收必需项：
+// 必需目标缺失（上游 bundle 升级漂移）时不写签名，下次启动重试全量补丁，
+// 并由 --check 门禁兜底报警。
+if (!missing.length) {
+  try { writeFileSync(sigFile, consoleSignature() + '\n', 'utf8') } catch { /* 只读介质等场景忽略 */ }
 }

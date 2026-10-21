@@ -2,11 +2,15 @@
 chcp 65001 >nul
 title 灵泽万川智造云 一键安装
 echo ============================================
-echo   灵泽万川智造云 一键安装（在线模式）
+echo   灵泽万川智造云 一键安装（在线模式·AIOS 办公版）
 echo   安装完成后自动启动并打开浏览器
+echo   内置办公技能包：PPT / Excel / Word / PDF / OCR /
+echo   文件读取 / 电脑操作 / 浏览器操控 / 搜图 / 查资料 /
+echo   制作内容（默认启用，办公依赖在安装时一次配置）
 echo ============================================
 echo.
 
+if exist "%~dp0extras\node\node.exe" set "PATH=%~dp0extras\node;%PATH%"
 where node >nul 2>nul
 if errorlevel 1 (
   echo [错误] 未检测到 Node.js（需要 20 或以上）。

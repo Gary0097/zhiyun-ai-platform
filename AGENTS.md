@@ -5,14 +5,14 @@ These rules apply to the entire repository. Read the PRD in
 
 ## Architecture
 
-- 智造云 AIOS 2.2.1 is a branded build of vanilla QwenPaw 2.2.1 plus
+- 智造云 AIOS 2.2.2 is a branded build of vanilla QwenPaw 2.2.2 plus
   QwenPaw Hub (product decision 2026-09-04). This repository contains only
   launchers, branding assets, setup scripts, docs, and the runtime version
   lock — no bundled business applications.
 - All business apps (PawApps, vendored plugins, the Studio suite) have been
   decoupled from this tree. They live in their own repositories and may return
   later as standalone optional add-ons; do not re-vendor them here.
-- Login uses QwenPaw 2.2.1 native auth: the single-user console enforces
+- Login uses QwenPaw 2.2.2 native auth: the single-user console enforces
   `QWENPAW_AUTH_ENABLED=true` (first user registers from the console; the
   documented reset is deleting `auth.json` under the secret dir). Multi-user
   login uses QwenPaw Hub accounts (`start-hub.cmd`, port 8000). Do not
@@ -24,7 +24,7 @@ These rules apply to the entire repository. Read the PRD in
   are replaced with 智造云 AIOS by `patch-console-ui.mjs`; brand assets live in
   `branding/`. Protected technical identifiers (URLs, host APIs, paths) must
   never be rebranded.
-- QwenPaw 2.2.1 is the only runtime (lock: `apps/zhizaoyunAIOS/qwenpaw.lock.json`);
+- QwenPaw 2.2.2 is the only runtime (lock: `apps/zhizaoyunAIOS/qwenpaw.lock.json`);
   lock entries must move in lockstep with product decisions.
 - Do not restore DeepSeek Harness, the enterprise service, or port 8390.
 
@@ -42,6 +42,34 @@ These rules apply to the entire repository. Read the PRD in
   Empty data must remain visibly empty unless the user explicitly selects a
   clearly labeled simulation mode.
 
+## AIOS Office Branch (`aios-office`)
+
+- The `aios-office` branch carries the office-exclusive default skill pack
+  (`skills/office/`, 11 `office-*` skills, descriptions capped at 110 chars —
+  they are the fixed per-turn token cost) plus its provisioner
+  (`apps/zhizaoyunAIOS/scripts/provision-office-skills.mjs`), dependency
+  preinstaller (`ensure-office-deps.mjs`, installs `requirements-office.txt`
+  into the project venv at startup so skills never pip-install at execution
+  time), and the ZCode skills bridge (`link-zcode-skills.mjs` — registers the
+  local ZCode office plugin skill dirs as read-only external skill roots via
+  `config.json skill_paths`; ZCode skill content is proprietary and must never
+  be copied into this repository). The pack is provisioned into the QwenPaw
+  skill pool and every agent workspace at startup (single-user via
+  `ensure-workspace.mjs`, Hub via `start-hub.ps1/.sh`) and is enabled by
+  default; user-created same-name skills and user edits are never overwritten,
+  and user-disabled skills stay disabled. `patch-console-ui.mjs` carries the
+  file-preview URL encoding fix (required replacement + content-signature
+  fast skip). `ensure-workspace.mjs` synchronizes the brand frontend by version;
+  `start.mjs` records that version and the native loader discovers it at boot,
+  without a separate CLI plugin-install subprocess.
+- Skills are guidance-level `SKILL.md` files, not business applications; the
+  "no bundled business apps" rule is unaffected. `node scripts/verify-release.mjs`
+  gates the pack (manifest, frontmatter, provisioner hookups, provisioning tests)
+  on this branch.
+- Keep the office pack in sync with `master`: before delivering changes on
+  `aios-office`, merge or rebase the latest `master` and resolve conflicts so
+  the branch stays a superset of the standard distribution.
+
 ## Required Validation
 
 - Run `node scripts/verify-release.mjs` before delivery. All lock, entry,
@@ -51,7 +79,7 @@ These rules apply to the entire repository. Read the PRD in
   business acceptance.
 - Preserve valid Windows (`.cmd`) and Linux (`.sh`) launch and maintenance
   entries. Report the impact on both platforms.
-- Keep manifest and lock versions consistent (system version 2.2.1).
+- Keep manifest and lock versions consistent (system version 2.2.2).
 - If the full gate cannot run because of an external service or network limit,
   run all unaffected checks and report the exact limitation; do not report the
   gate as passed.
