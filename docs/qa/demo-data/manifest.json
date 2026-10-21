@@ -1,0 +1,142 @@
+[
+  {
+    "studio": "zhiyun-sales-studio",
+    "module": "bi",
+    "label": "销售BI分析",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-sales-studio\\bi-销售BI分析.csv",
+    "rows": 4,
+    "columns": 6
+  },
+  {
+    "studio": "zhiyun-sales-studio",
+    "module": "customers",
+    "label": "客户价值分层",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-sales-studio\\customers-客户价值分层.csv",
+    "rows": 3,
+    "columns": 4
+  },
+  {
+    "studio": "zhiyun-sales-studio",
+    "module": "performance",
+    "label": "销售业绩统计",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-sales-studio\\performance-销售业绩统计.csv",
+    "rows": 3,
+    "columns": 4
+  },
+  {
+    "studio": "zhiyun-finance-studio",
+    "module": "expense",
+    "label": "报销审核",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-finance-studio\\expense-报销审核.csv",
+    "rows": 3,
+    "columns": 8
+  },
+  {
+    "studio": "zhiyun-finance-studio",
+    "module": "finance",
+    "label": "财务看板",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-finance-studio\\finance-财务看板.csv",
+    "rows": 2,
+    "columns": 9
+  },
+  {
+    "studio": "zhiyun-finance-studio",
+    "module": "cost",
+    "label": "成本预测 / 原材料（材料占比/涨跌%）",
+    "kind": "form-subtable",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-finance-studio\\cost-成本预测-原材料（材料占比-涨跌%）.csv",
+    "rows": 2,
+    "columns": 3
+  },
+  {
+    "studio": "zhiyun-people-studio",
+    "module": "permission",
+    "label": "权限建议",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-people-studio\\permission-权限建议.csv",
+    "rows": 3,
+    "columns": 3
+  },
+  {
+    "studio": "zhiyun-people-studio",
+    "module": "contact",
+    "label": "通讯录协作",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-people-studio\\contact-通讯录协作.csv",
+    "rows": 3,
+    "columns": 6
+  },
+  {
+    "studio": "zhiyun-people-studio",
+    "module": "anniversary",
+    "label": "员工关怀",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-people-studio\\anniversary-员工关怀.csv",
+    "rows": 3,
+    "columns": 4
+  },
+  {
+    "studio": "zhiyun-people-studio",
+    "module": "hr",
+    "label": "人力分析",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-people-studio\\hr-人力分析.csv",
+    "rows": 3,
+    "columns": 4
+  },
+  {
+    "studio": "zhiyun-supply-studio",
+    "module": "supplier",
+    "label": "供应商评估",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-supply-studio\\supplier-供应商评估.csv",
+    "rows": 3,
+    "columns": 5
+  },
+  {
+    "studio": "zhiyun-supply-studio",
+    "module": "replenishment",
+    "label": "智能补货",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-supply-studio\\replenishment-智能补货.csv",
+    "rows": 2,
+    "columns": 10
+  },
+  {
+    "studio": "zhiyun-supply-studio",
+    "module": "risk",
+    "label": "风险监控",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-supply-studio\\risk-风险监控.csv",
+    "rows": 3,
+    "columns": 4
+  },
+  {
+    "studio": "zhiyun-service-studio",
+    "module": "answer",
+    "label": "客户咨询应答",
+    "kind": "text",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-service-studio\\answer-客户咨询应答.txt"
+  },
+  {
+    "studio": "zhiyun-service-studio",
+    "module": "intent",
+    "label": "智能意图识别",
+    "kind": "text",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-service-studio\\intent-智能意图识别.txt"
+  },
+  {
+    "studio": "zhiyun-service-studio",
+    "module": "knowledge",
+    "label": "知识库构建",
+    "kind": "table",
+    "file": "H:\\zhiyunAIOS\\docs\\qa\\demo-data\\zhiyun-service-studio\\knowledge-知识库构建.csv",
+    "rows": 3,
+    "columns": 5
+  }
+]

@@ -1,0 +1,27 @@
+name: Track stable QwenPaw releases
+on:
+  schedule:
+    - cron: '17 1 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: upstream-watch
+  cancel-in-progress: false
+jobs:
+  check:
+    if: github.repository == 'Gary0097/zhiyun-ai-platform'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node scripts/updates/track-upstream.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}

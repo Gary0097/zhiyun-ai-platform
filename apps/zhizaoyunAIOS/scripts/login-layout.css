@@ -1,0 +1,30 @@
+/* Login is intentionally light; the signed-in console keeps the user's theme.
+   Only the outer Spark container owns the grid. Nested App providers stay in flow. */
+body.zy-login { background:#fff !important; color:#172b36; color-scheme:light; }
+body.zy-login #root { height:100vh !important; overflow-y:auto !important; overflow-x:hidden !important; }
+body.zy-login img { max-width:100%; object-fit:contain; }
+body.zy-login .qwenpaw-app.spark { min-height:100vh; background:#fff !important; }
+body.zy-login .qwenpaw-app.spark > .qwenpaw-app { position:relative !important; inset:auto !important; display:block !important; min-width:0; background:#fff !important; }
+body.zy-login .qwenpaw-app.spark > .qwenpaw-app > div { min-height:100vh !important; height:auto !important; padding:32px !important; box-sizing:border-box !important; display:flex !important; justify-content:center !important; align-items:center !important; background:#fff !important; overflow:visible !important; }
+body.zy-login div:has(> form) { width:100% !important; max-width:400px !important; padding:0 !important; box-sizing:border-box !important; background:#fff !important; box-shadow:none !important; border-radius:0 !important; }
+body.zy-login form { width:100% !important; color:#172b36 !important; }
+body.zy-login h2 { color:#172b36 !important; font-size:24px !important; line-height:1.4 !important; margin:16px 0 8px !important; }
+body.zy-login p { color:#526773 !important; }
+body.zy-login .qwenpaw-input-affix-wrapper,body.zy-login input.qwenpaw-input { background:#fff !important; color:#172b36 !important; border-color:#acbcc5 !important; }
+body.zy-login input.qwenpaw-input::placeholder { color:#637784 !important; }
+body.zy-login .qwenpaw-input-prefix,body.zy-login .qwenpaw-input-suffix { color:#637784 !important; }
+body.zy-login [class*="hubDisclaimer"] { color:#52606b !important; }
+body.zy-login [class*="hubDisclaimer"] li,body.zy-login [class*="hubDisclaimer"] label,body.zy-login [class*="hubDisclaimer"] span { color:#52606b !important; }
+body.zy-login [class*="hubDisclaimer"] button { color:#855116 !important; }
+body.zy-login nav button { color:#526773 !important; }
+body.zy-login form::before { content:""; display:block; height:3px; background:__PRIMARY__; margin-bottom:32px; border-radius:2px; }
+@media (min-width: 900px) {
+  body.zy-login .qwenpaw-app.spark { display:grid !important; grid-template-columns:58.333% 41.667%; }
+  body.zy-login .qwenpaw-app.spark::before { content:""; position:fixed; inset:0 auto 0 0; width:58.333%; pointer-events:none; background:linear-gradient(160deg,#1E56C8,#3B82F6); }
+  body.zy-login .qwenpaw-app.spark > .qwenpaw-app { grid-column:2; }
+}
+@media (max-width: 899px) {
+  #aios-brand-copy{display:none !important;}
+  body.zy-login .qwenpaw-app.spark { display:block !important; }
+  body.zy-login .qwenpaw-app.spark > .qwenpaw-app > div { padding:24px 16px !important; }
+}

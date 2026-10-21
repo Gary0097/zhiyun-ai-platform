@@ -1,0 +1,51 @@
+name: Publish verified dual-entry release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Accepted stable draft tag (vX.Y.Z); full installers and update signatures required'
+        required: true
+      acceptance_confirmed:
+        description: 'Full-package install, existing-data upgrade and recovery accepted for this exact draft'
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: sign-update
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/master' && inputs.acceptance_confirmed
+    runs-on: ubuntu-24.04
+    environment: update-release
+    timeout-minutes: 30
+    steps:
+      # Run the verifier from reviewed master, not code chosen by a draft tag.
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify draft and download both entry points
+        env:
+          TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          COMMIT=$(git rev-parse "refs/tags/$TAG^{commit}")
+          git merge-base --is-ancestor "$COMMIT" HEAD
+          git show "$COMMIT:apps/zhizaoyunAIOS/qwenpaw.lock.json" > target-lock.json
+          test "$TAG" = "v$(node -p "JSON.parse(require('fs').readFileSync('target-lock.json')).version")"
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          test "$(gh release view "$TAG" --json isPrerelease --jq .isPrerelease)" = false
+          mkdir update-assets
+          gh release download "$TAG" -D update-assets -p "zhiyun-ai-os-$TAG-setup.exe" -p "zhiyun-ai-os-$TAG-online-installer.zip" -p aios-update.json -p aios-update.sig
+          node scripts/updates/verify-release-assets.mjs update-assets "$TAG" "$COMMIT"
+          gh release edit "$TAG" --draft=false --latest

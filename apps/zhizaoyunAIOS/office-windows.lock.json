@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "version": "26.8.1",
+  "platform": "win32-x64",
+  "url": "https://download.documentfoundation.org/libreoffice/stable/26.8.1/win/x86_64/LibreOffice_26.8.1_Win_x86-64.msi",
+  "sha256": "c6298b10cfa1748bcbedad94c62ce771e240e5021bfd6d7a967cd571b04b5312",
+  "checksum_source": "https://download.documentfoundation.org/libreoffice/stable/26.8.1/win/x86_64/LibreOffice_26.8.1_Win_x86-64.msi.sha256",
+  "source_url": "https://download.documentfoundation.org/libreoffice/src/26.8.1/",
+  "license_url": "https://www.libreoffice.org/licenses/",
+  "payload": "extras/libreoffice",
+  "requirements": "skills/office/requirements-office-windows.lock.txt"
+}

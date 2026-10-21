@@ -1,0 +1,92 @@
+name: Codex-ready capability
+description: Define one testable, end-to-end capability for an isolated pull request.
+title: "[Capability]: "
+labels:
+  - codex-ready
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep this issue small enough for one branch and one pull request. Do not mark it ready until every required field and acceptance criterion is concrete.
+  - type: dropdown
+    id: repository
+    attributes:
+      label: Owning repository
+      description: Business PawApp work belongs in its independent repository.
+      options:
+        - Gary0097/zhiyun-ai-platform
+        - Gary0097/zhiyun-data-studio
+        - Gary0097/zhiyun-order-studio
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - priority-p0
+        - priority-p1
+        - priority-p2
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: User goal
+      description: Describe the observable user outcome, not only an internal implementation.
+      placeholder: A user can...
+    validations:
+      required: true
+  - type: textarea
+    id: current_behavior
+    attributes:
+      label: Current behavior and evidence
+      description: Link the relevant PRD section, progress ledger, screenshots, API output, or database behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Use a numbered, independently verifiable list covering real data, empty/error states, persistence, and the complete UI/backend/tool path.
+      placeholder: |
+        1. The page reads records from Data Core without hard-coded data.
+        2. Empty data produces an explicit empty state.
+        3. A database update is visible after reload.
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Required tests
+      description: Include focused tests plus the full release gate where applicable.
+      placeholder: Backend tests, frontend-state tests, runtime interface tests, and node scripts/verify-release.mjs.
+    validations:
+      required: true
+  - type: textarea
+    id: platforms
+    attributes:
+      label: Windows and Linux impact
+      description: State how both launch paths are affected and how each will be verified.
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Data safety, risks, and rollback
+      description: Cover Workspace/database preservation, migration risk, security controls, and rollback.
+    validations:
+      required: true
+  - type: checkboxes
+    id: readiness
+    attributes:
+      label: Ready-for-development checklist
+      options:
+        - label: This issue describes exactly one independently deliverable capability.
+          required: true
+        - label: The acceptance criteria do not treat mock or hard-coded data as a completed feature.
+          required: true
+        - label: Dependencies and external-repository changes are identified.
+          required: true
+        - label: No automatic merge or production deployment is requested.
+          required: true
