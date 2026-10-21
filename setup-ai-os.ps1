@@ -76,18 +76,31 @@ if (-not $UvCommand) {
 $previous = @{
   UV_CACHE_DIR = $env:UV_CACHE_DIR; UV_PYTHON_INSTALL_DIR = $env:UV_PYTHON_INSTALL_DIR
   UV_PYTHON_PREFERENCE = $env:UV_PYTHON_PREFERENCE; UV_OFFLINE = $env:UV_OFFLINE
+  TEMP = $env:TEMP; TMP = $env:TMP
 }
 try {
   $env:UV_CACHE_DIR = Join-Path $RuntimeCache "uv"
   $env:UV_PYTHON_INSTALL_DIR = Join-Path $RuntimeCache "python"
   $env:UV_PYTHON_PREFERENCE = "only-managed"
   if ($Offline) { $env:UV_OFFLINE = "1" }
+  # uv creates Windows trampoline executables while installing wheels. A
+  # user TEMP under a non-ASCII profile or a locked-down/monitored temp
+  # directory can reject uv's PE-resource update with access denied. Keep
+  # this temporary staging directory inside the installer cache (which we
+  # already create and own), while restoring the caller's environment below.
+  $InstallTemp = Join-Path $RuntimeCache "tmp"
+  New-Item -ItemType Directory -Force -Path $InstallTemp | Out-Null
+  $env:TEMP = $InstallTemp
+  $env:TMP = $InstallTemp
   & $UvCommand venv $VenvRoot --python 3.12 --clear
   if ($LASTEXITCODE -ne 0) { throw "uv venv 退出码：$LASTEXITCODE" }
   & $UvCommand pip install --python $PythonCommand "qwenpaw==$($Lock.version)"
   if ($LASTEXITCODE -ne 0) { throw "uv pip install 退出码：$LASTEXITCODE" }
 } finally {
-  foreach ($name in $previous.Keys) { Set-Item -Path "env:$name" -Value $previous[$name] }
+  foreach ($name in $previous.Keys) {
+    if ($null -eq $previous[$name] -or $previous[$name] -eq '') { Remove-Item -Path "env:$name" -ErrorAction SilentlyContinue }
+    else { Set-Item -Path "env:$name" -Value $previous[$name] }
+  }
 }
 if (-not (Test-QwenPawRuntime)) { throw "项目运行环境安装后版本校验失败。" }
 Invoke-OfficeSetup

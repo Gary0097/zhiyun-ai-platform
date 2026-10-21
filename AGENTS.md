@@ -59,7 +59,9 @@ These rules apply to the entire repository. Read the PRD in
   default; user-created same-name skills and user edits are never overwritten,
   and user-disabled skills stay disabled. `patch-console-ui.mjs` carries the
   file-preview URL encoding fix (required replacement + content-signature
-  fast skip) and `start.mjs` version-gates the brand plugin install.
+  fast skip). `ensure-workspace.mjs` synchronizes the brand frontend by version;
+  `start.mjs` records that version and the native loader discovers it at boot,
+  without a separate CLI plugin-install subprocess.
 - Skills are guidance-level `SKILL.md` files, not business applications; the
   "no bundled business apps" rule is unaffected. `node scripts/verify-release.mjs`
   gates the pack (manifest, frontmatter, provisioner hookups, provisioning tests)

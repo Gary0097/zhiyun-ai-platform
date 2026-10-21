@@ -6,6 +6,11 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const appRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
 const lockPath = join(appRoot, 'qwenpaw.lock.json')
 
+export function listenPort(value = '8088') {
+  if (!/^\d+$/.test(value) || Number(value) < 1 || Number(value) > 65535) throw new Error('AIOS_PORT 必须为 1–65535 的整数端口')
+  return Number(value)
+}
+
 export function runtimeLock () {
   const lock = JSON.parse(readFileSync(lockPath, 'utf8'))
   if (lock.schema_version !== 1 || lock.package !== 'qwenpaw' || !/^\d+\.\d+\.\d+(b\d+)?$/.test(lock.version)) {

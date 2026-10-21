@@ -1010,10 +1010,11 @@ function sweepStaleZybAssets (consoleDir) {
   if (removed) console.log('已清理 ' + removed + ' 个历史遗留的未引用 zyb 资产文件。')
 }
 
-const runtime = resolveRuntime()
 // --console-dir <目录>：显式指定控制台资产目录（如 Hub venv 的 console），
 // 缺省时按项目运行时解析
 const dirFlagIdx = process.argv.indexOf('--console-dir')
+// An explicit console path (Hub and validated launcher) needs no CLI startup.
+const runtime = dirFlagIdx !== -1 && process.argv[dirFlagIdx + 1] ? null : resolveRuntime()
 const consoleDir = dirFlagIdx !== -1 && process.argv[dirFlagIdx + 1]
   ? process.argv[dirFlagIdx + 1]
   : locateConsoleDir(runtime)

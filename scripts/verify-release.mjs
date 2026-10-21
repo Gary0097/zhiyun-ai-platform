@@ -77,6 +77,9 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'start.mjs')]],
   [process.execPath, ['--check', join(scripts, 'runtime-env.mjs')]],
   [process.execPath, ['--check', join(scripts, 'doctor.mjs')]],
+  [process.execPath, [join(root, 'scripts', 'test-startup-diagnostics.mjs')]],
+  [process.execPath, [join(root, 'scripts', 'test-model-setup.mjs')]],
+  [process.execPath, ['--check', join(root, 'plugins', 'aios-brand', 'dist', 'index.js')]],
   [process.execPath, ['--check', join(scripts, 'ensure-workspace.mjs')]],
   [process.execPath, ['--check', join(scripts, 'patch-console-ui.mjs')]],
   [process.execPath, ['--check', join(scripts, 'provision-office-skills.mjs')]],
@@ -153,7 +156,8 @@ const patchSrc = readFileSync(join(scripts, 'patch-console-ui.mjs'), 'utf8')
 assert.ok(patchSrc.includes('%2525'), 'patch-console-ui must carry the file-preview URL encoding fix (#/? 截断与 % 双重解码 404)')
 assert.ok(patchSrc.includes('.aios-console-patch.sig'), 'patch-console-ui must implement the content-signature fast skip (启动提速)')
 const startSrc = readFileSync(join(scripts, 'start.mjs'), 'utf8')
-assert.ok(startSrc.includes('.brand-plugin.version'), 'start.mjs must version-gate the brand plugin install (启动提速)')
+assert.ok(startSrc.includes('.brand-plugin.version'), 'start.mjs must record the synchronized brand version')
+assert.ok(!startSrc.includes("['plugin', 'install'"), 'Bundled frontend must use native discovery without a redundant install subprocess')
 const provisionerSrc = readFileSync(join(scripts, 'provision-office-skills.mjs'), 'utf8')
 assert.ok(provisionerSrc.includes('OFFICE.md') && provisionerSrc.includes('system_prompt_files'),
   'provisioner must provision the compact OFFICE.md reply discipline and slim the default system_prompt_files')
