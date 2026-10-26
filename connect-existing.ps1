@@ -6,7 +6,7 @@ if (Get-NetTCPConnection -LocalPort 8088 -State Listen -ErrorAction SilentlyCont
 if (-not (Test-Path -LiteralPath (Join-Path $Workspace 'config.json')) -or -not (Test-Path -LiteralPath $SecretDir)) { throw '没有找到已有工作区或凭据目录，请明确指定原路径。' }
 $Node = Join-Path $Root 'extras\node\node.exe'
 if (-not (Test-Path -LiteralPath $Node)) { $Node = (Get-Command node -ErrorAction Stop).Source }
-$Arguments = @((Join-Path $Root 'apps\zhizaoyunAIOS\scripts\local-instance.mjs'), '--workspace', $Workspace, '--secret-dir', $SecretDir)
+$Arguments = @((Join-Path $Root 'apps\zhizaoyunAIOS\scripts\local-instance.mjs'), '--workspace', $Workspace, '--secret-dir', $SecretDir, '--replace-profile')
 if ($LocalNoAuth) { $Arguments += '--local-no-auth' }
 & $Node @Arguments
 if ($LASTEXITCODE -ne 0) { throw '接入失败，原工作区与模型数据未迁移。' }

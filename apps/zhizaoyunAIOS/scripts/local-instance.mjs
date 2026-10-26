@@ -24,13 +24,16 @@ function copyTree(source, target) {
     else if (e.isFile()) copyFileSync(a, b)
   }
 }
-export function attachLocalInstance({ workspace, secretDir, localNoAuth = false }) {
+export function attachLocalInstance({ workspace, secretDir, localNoAuth = false, replaceProfile = false }) {
   const profile = { schema_version: 1, workspace: resolve(workspace), secret_dir: resolve(secretDir), auth_enabled: !localNoAuth }
   if (localNoAuth && existsSync(join(profile.secret_dir, 'auth.json'))) throw Error('已有原生账号，不能切换为免登录。')
   if (!existsSync(join(profile.workspace, 'config.json')) || !existsSync(profile.secret_dir)) throw Error('接入必须指向已有工作区和凭据目录；不会新建或移动用户数据。')
   if (existsSync(profilePath)) {
     const old = readLocalProfile()
-    if (old.workspace !== profile.workspace || old.secret_dir !== profile.secret_dir) throw Error('已接入其他工作区，请先备份并移开本地接入配置。')
+    if (old.workspace !== profile.workspace || old.secret_dir !== profile.secret_dir) {
+      if (!replaceProfile) throw Error('已接入其他工作区，请显式使用 connect-existing.ps1 切换。')
+      copyFileSync(profilePath, profilePath + '.backup-' + Date.now())
+    }
   }
   const brandSource = join(root, 'plugins/aios-brand')
   const brandTarget = join(profile.workspace, 'plugins/aios-brand')
@@ -75,7 +78,7 @@ export async function startLocalInstance(profile = readLocalProfile()) {
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
     const args = process.argv.slice(2), wi = args.indexOf('--workspace'), si = args.indexOf('--secret-dir')
-    if (wi >= 0 && si >= 0) attachLocalInstance({ workspace: args[wi + 1], secretDir: args[si + 1], localNoAuth: args.includes('--local-no-auth') })
+    if (wi >= 0 && si >= 0) attachLocalInstance({ workspace: args[wi + 1], secretDir: args[si + 1], localNoAuth: args.includes('--local-no-auth'), replaceProfile: args.includes('--replace-profile') })
     else process.exitCode = await startLocalInstance()
   } catch (error) { console.error(error.message); process.exitCode = 1 }
 }
