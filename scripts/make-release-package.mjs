@@ -17,6 +17,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const argv = process.argv.slice(2)
 const version = argv.find(a => !a.startsWith('--')) || process.env.RELEASE_VERSION || ''
 const offline = argv.includes('--offline')
+const localOffice = argv.includes('--local-office')
 const cacheArchiveIndex = argv.indexOf('--cache-archive')
 const cacheArchive = cacheArchiveIndex < 0 ? null : argv[cacheArchiveIndex + 1]
 if (cacheArchive && (!offline || !existsSync(cacheArchive))) throw new Error('--cache-archive requires --offline and an existing ZIP')
@@ -104,7 +105,7 @@ if (offline) {
   const hubProbe = existsSync(hubExe)
     ? spawnSync(hubExe, ['hub', '--help'], { stdio: 'ignore', timeout: 60000 })
     : { status: 1 }
-  if (hubProbe.status !== 0) {
+  if (!localOffice && hubProbe.status !== 0) {
     console.error('离线包要求本机 Hub 运行环境可执行 qwenpaw hub（依赖才会完整进入缓存）；请先成功启动一次 Hub 再打包。')
     process.exit(1)
   }
@@ -112,6 +113,12 @@ if (offline) {
   //    避免源码/在线安装被误设离线模式后首次启动失败
   mkdirSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime', 'cache'), { recursive: true })
   writeFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime', 'cache', 'OFFLINE-PACKAGE'), 'offline-usb' + String.fromCharCode(10), 'utf8')
+  if (localOffice) writeFileSync(join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime', 'cache', 'LOCAL-OFFICE'), 'Hub is installed only on explicit request.\n')
+  const officeNode = join(root, 'apps', 'zhizaoyunAIOS', 'runtime', 'office-node')
+  if (localOffice) {
+    if (!existsSync(join(officeNode, 'node_modules', 'docx', 'package.json'))) throw Error('Prepare office-node dependencies before packaging local office.')
+    cpSync(officeNode, join(workDir, 'extras', 'office-node'), { recursive: true })
+  }
   // 1) 内嵌运行时缓存（Python 3.12 + uv + wheel 缓存）与锁定 PawApp
   const liveRuntime = join(root, 'apps', 'zhizaoyunAIOS', 'runtime')
   const pkgRuntime = join(workDir, 'apps', 'zhizaoyunAIOS', 'runtime')

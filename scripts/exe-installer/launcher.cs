@@ -113,7 +113,7 @@ class Launcher
     {
         try
         {
-            var req = (HttpWebRequest)WebRequest.Create(Url + "/api/version");
+            var req = (HttpWebRequest)WebRequest.Create(Url + "/api/healthz");
             req.Timeout = 2000;
             req.ReadWriteTimeout = 2000;
             using (var resp = req.GetResponse()) { return true; }

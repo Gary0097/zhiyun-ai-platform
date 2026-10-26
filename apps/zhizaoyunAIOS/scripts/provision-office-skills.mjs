@@ -234,7 +234,7 @@ function bumpVersion (manifest) {
 }
 
 // ---------- 预置主流程 ----------
-export function provisionOfficeSkills ({ workspace, packRoot, log = console.log } = {}) {
+export function provisionOfficeSkills ({ workspace, packRoot, log = console.log, preservePrompts = false } = {}) {
   if (!workspace || !packRoot) throw new Error('provisionOfficeSkills 需要 workspace 与 packRoot 参数')
   const pack = loadOfficePack(packRoot)
   for (const skill of pack.skills) skill.sourceDir = join(packRoot, skill.dir)
@@ -321,7 +321,7 @@ export function provisionOfficeSkills ({ workspace, packRoot, log = console.log 
     }
     result.targets.push(stateKey)
     // 办公回复规范：仅 default 工作区（用户对话的办公助手）
-    if (target.kind === 'workspace' && target.label === 'default') {
+    if (!preservePrompts && target.kind === 'workspace' && target.label === 'default') {
       const promptChanged = ensureOfficePrompt(target.dir, targetState, log)
       if (promptChanged.file) log(`  [office] 办公回复规范 OFFICE.md 已写入 default 工作区（${OFFICE_PROMPT.length} 字符：安全/精炼/交付/事实纪律）`)
       if (promptChanged.config) log('  [office] system_prompt_files → OFFICE.md+SOUL.md+PROFILE.md（避免泛用 AGENTS.md 全文注入）')

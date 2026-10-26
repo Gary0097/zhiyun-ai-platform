@@ -83,3 +83,8 @@ python -m markitdown --help   # 可选：提取既有 PPT 文本
 - `office-content`：整份材料的策划与文案主线；
 - `office-image-search`：配图检索与下载；
 - `office-excel` / `office-word`：数据源与讲稿文档。
+
+
+## 文件交付
+
+生成后重读校验真实文件。普通文件使用 send_file_to_user 传入绝对路径，确认工具返回成功后交付文件卡片；不得把 files/xxx 之类相对路径写成可下载网页链接。文件名含字面 % 时保留原名，改用原生工作区 file-download 接口并正确编码查询参数；不能冒称发送成功。
