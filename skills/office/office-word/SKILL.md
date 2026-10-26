@@ -66,3 +66,8 @@ soffice --version   # 可选：.doc 转换 / 导出 PDF
 - `office-content`：内容策划与文案主线；
 - `office-ppt`：同一主题的汇报版；
 - `office-excel`：报告中的数据表来源。
+
+
+## 文件交付
+
+生成后重读校验真实文件。普通文件使用 send_file_to_user 传入绝对路径，确认工具返回成功后交付文件卡片；不得把 files/xxx 之类相对路径写成可下载网页链接。文件名含字面 % 时保留原名，改用原生工作区 file-download 接口并正确编码查询参数；不能冒称发送成功。

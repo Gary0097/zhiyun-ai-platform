@@ -102,3 +102,8 @@ w3 = PdfWriter(); w3.append("a.pdf"); w3.encrypt("用户提供的密码"); w3.wr
 - `office-excel`：提取的表格转规范 xlsx；
 - `office-word`：提取内容重建可编辑文档；
 - `office-file-reader`：非 PDF 文件的通用读取入口。
+
+
+## 文件交付
+
+生成后重读校验真实文件。普通文件使用 send_file_to_user 传入绝对路径，确认工具返回成功后交付文件卡片；不得把 files/xxx 之类相对路径写成可下载网页链接。文件名含字面 % 时保留原名，改用原生工作区 file-download 接口并正确编码查询参数；不能冒称发送成功。
