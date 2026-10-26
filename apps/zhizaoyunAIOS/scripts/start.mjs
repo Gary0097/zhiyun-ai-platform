@@ -12,6 +12,12 @@ import { diagnose } from './doctor.mjs'
 const appRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
 const repoRoot = join(appRoot, '..', '..')
 const scriptsRoot = join(appRoot, 'scripts')
+if (existsSync(join(appRoot, 'runtime', 'local-instance.json'))) {
+  const { startLocalInstance } = await import('./local-instance.mjs')
+  try { process.exitCode = await startLocalInstance() }
+  catch (error) { console.error(error.message); process.exitCode = 1 }
+  process.exit(process.exitCode)
+}
 const port = listenPort(process.env.AIOS_PORT)
 const runtime = resolveRuntime()
 const launchEnv = runtimeEnvironment(runtime)

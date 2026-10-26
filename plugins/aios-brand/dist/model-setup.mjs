@@ -94,7 +94,9 @@ export function createModelSetupPage(Q) {
       const isManaged = list.some(p => p.id === 'hub-managed')
       setManaged(isManaged)
       // Do not retain returned keys in component state or echo them into a field.
-      const safe = list.filter(p => p.is_custom || p.is_local || p.api_key).map(p => ({
+      // Free/OAuth providers can be active without an API key. Do not hide
+      // them merely because the native vault does not expose a masked key.
+      const safe = list.filter(p => p.is_custom || p.is_local || p.enabled !== false).map(p => ({
         id: p.id, name: p.name, base_url: p.base_url, chat_model: p.chat_model,
         is_custom: p.is_custom, models: mergeModels(p),
       }))

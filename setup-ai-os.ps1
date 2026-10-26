@@ -36,6 +36,22 @@ function Invoke-OfficeSetup {
   if ($RepairOffice) { $OfficeArgs += '--repair' }
   & $OfficeNode @OfficeArgs
   if ($LASTEXITCODE -ne 0) { throw 'Office setup failed. See the diagnostic above; installation is incomplete.' }
+  if (Test-Path -LiteralPath (Join-Path $RuntimeCache 'LOCAL-OFFICE')) {
+    & $OfficeNode (Join-Path $EmbeddedRoot 'scripts\ensure-workspace.mjs')
+    if ($LASTEXITCODE -ne 0) { throw 'Local workspace setup failed.' }
+    & $OfficeNode (Join-Path $EmbeddedRoot 'scripts\patch-console-ui.mjs')
+    if ($LASTEXITCODE -ne 0) { throw 'Local console setup failed.' }
+    $Workspace = Join-Path $EmbeddedRoot 'workspace'
+    $Secret = Join-Path $Workspace 'secret'
+    New-Item -ItemType Directory -Force -Path $Secret | Out-Null
+    # Keep an explicit user attachment across subsequent repair/upgrade runs.
+    if (-not (Test-Path -LiteralPath (Join-Path $EmbeddedRoot 'runtime\local-instance.json'))) {
+      & $OfficeNode (Join-Path $EmbeddedRoot 'scripts\local-instance.mjs') --workspace $Workspace --secret-dir $Secret
+      if ($LASTEXITCODE -ne 0) { throw 'Local instance setup failed.' }
+    }
+    Write-Host '轻量单机办公环境已就绪；Hub 可按需运行 setup-hub.ps1 安装。'
+    return
+  }
   # The complete Windows package provisions Hub and member conversion support
   # during installation, not during a member's first office task.
   $HubArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', (Join-Path $ProjectRoot 'setup-hub.ps1'), '-CacheDir', $RuntimeCache)

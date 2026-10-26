@@ -13,10 +13,10 @@ const scripts = join(embedded, 'scripts')
 
 // 1) 版本锁一致性（唯一运行时 = QwenPaw 2.2.2）
 const qwenpawLock = JSON.parse(readFileSync(join(embedded, 'qwenpaw.lock.json'), 'utf8'))
-assert.equal(qwenpawLock.version, '2.2.2')
-assert.equal(qwenpawLock.ref, 'v2.2.2')
+assert.equal(qwenpawLock.version, '2.2.2.post1')
+assert.equal(qwenpawLock.ref, 'v2.2.2.post1')
 const installerManifest = readFileSync(join(root, 'scripts/exe-installer/installer.manifest'), 'utf8')
-assert.equal(installerManifest.match(/<assemblyIdentity\s+version="([^"]+)"/)?.[1], qwenpawLock.version + '.0', 'installer manifest must match runtime lock')
+assert.equal(installerManifest.match(/<assemblyIdentity\s+version="([^"]+)"/)?.[1], qwenpawLock.version.replace('.post', '.'), 'installer manifest must match runtime lock')
 assert.ok(!existsSync(join(embedded, 'pawapps.lock.json')), '2.2.2 极简形态不应存在 PawApp 锁')
 
 // 2) 跨平台入口完整性（单机 8088 + Hub 8000）
@@ -77,6 +77,8 @@ const commands = [
   [process.execPath, ['--check', join(scripts, 'start.mjs')]],
   [process.execPath, ['--check', join(scripts, 'runtime-env.mjs')]],
   [process.execPath, ['--check', join(scripts, 'doctor.mjs')]],
+  [process.execPath, ['--check', join(scripts, 'local-instance.mjs')]],
+  [process.execPath, [join(root, 'scripts', 'test-local-instance.mjs')]],
   [process.execPath, [join(root, 'scripts', 'test-startup-diagnostics.mjs')]],
   [process.execPath, [join(root, 'scripts', 'test-model-setup.mjs')]],
   [process.execPath, ['--check', join(root, 'plugins', 'aios-brand', 'dist', 'index.js')]],
@@ -166,4 +168,4 @@ for (const entry of ['check-ai-os.cmd', 'check-ai-os.sh']) {
   assert.ok(readFileSync(join(root, entry), 'utf8').includes('check-office-pack'), `${entry} must run the office pack health check`)
 }
 
-console.log('智造云 AIOS 2.2.2 发布门禁通过：QwenPaw 2.2.2 唯一运行时、原生登录、跨平台入口（单机 8088 + Hub 8000）、控制台品牌化、办公完全体（11 项默认启用 + 依赖预装 + ZCode 桥接 + token 预算 + 文件下载修复 + 启动提速）均正常。')
+console.log(`智造云 AIOS 发布门禁通过：QwenPaw ${qwenpawLock.version} 运行时、原生登录、跨平台入口、控制台品牌化及办公安装回归通过。外部服务和模型能力以实机验收为准。`)

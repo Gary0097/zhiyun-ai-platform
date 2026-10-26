@@ -19,7 +19,7 @@
   // Load the native model setup helper only when opened, never during chat boot.
   try {
     var ModelSetup = React.lazy(function () {
-      var modelSetupUrl = Q.host.getApiUrl('/frontend_plugin/aios-brand/files/dist/model-setup.mjs?v=1.1.0');
+      var modelSetupUrl = Q.host.getApiUrl('/frontend_plugin/aios-brand/files/dist/model-setup.mjs?v=1.2.0');
       return import(new URL(modelSetupUrl, window.location.origin).href).then(function (module) {
         return { default: module.createModelSetupPage(Q) };
       });
